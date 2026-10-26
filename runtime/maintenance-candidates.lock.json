@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "scope": "AstrBot maintenance validation candidates; not a trusted production update catalog",
+  "astrbot": {
+    "4.29.1": {
+      "status": "candidate for maintenance validation",
+      "source": {
+        "url": "https://codeload.github.com/AstrBotDevs/AstrBot/tar.gz/refs/tags/v4.29.1",
+        "sha256": "d91a7d0f04a58a0faae44e603f5fa5dfbee3f464ea22455dae69a3df6d6adb42"
+      },
+      "dashboard": {
+        "url": "https://github.com/AstrBotDevs/AstrBot/releases/download/v4.29.1/AstrBot-v4.29.1-dashboard.zip",
+        "sha256": "55a52c359d16574ccef04e760006b3b0d7a5253c3c4912099ae3ebc53e4f3603"
+      }
+    },
+    "4.29.3": {
+      "status": "current verified runtime",
+      "source": {
+        "url": "https://codeload.github.com/AstrBotDevs/AstrBot/tar.gz/refs/tags/v4.29.3",
+        "sha256": "b84dc012f1121072def6d47f47ac11678b73e957ade1e4e16c5a3dfe9d521fe0"
+      },
+      "dashboard": {
+        "url": "https://github.com/AstrBotDevs/AstrBot/releases/download/v4.29.3/AstrBot-v4.29.3-dashboard.zip",
+        "sha256": "a09f560c4140b930180f63a4929c885da80e24fb9bbda56619727bd25e985a11"
+      }
+    }
+  }
+}

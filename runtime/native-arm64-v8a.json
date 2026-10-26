@@ -1,0 +1,7 @@
+{
+  "libproot.so": "4bdf8d919eb8f1bf7fbce7a7a8e38d542c8409506b7b3853e48dd4b26ade5787",
+  "libproot-loader.so": "1da54355333cca3fb6ee10e3b82a24df24fb230c99241ce83809bf9e240609b5",
+  "libproot-loader32.so": "c429996fee730e1a4fe12625b22dab5a5bc2847a4cae274d36fd4a19cd8299a8",
+  "libtalloc.so": "160d39bc0d7ed946f22310d1d6f20addda21b02b0972dffe929fe49951543941",
+  "libandroid-shmem.so": "84475798e07c8174dbbfaec70a827fdb02f19ffa69a589380c13e7507fd0e731"
+}

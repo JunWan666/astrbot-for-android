@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "assets": [
+    {
+      "project": "AstrBot",
+      "sourceUrl": "https://astrbot.app/assets/astrbot-logo-with-text.svg",
+      "original": "docs/images/astrbot-logo-with-text.svg",
+      "sha256": "afa7f3ec7c83f49481c553716c78b5de2c11d1e472d9354e41311a87a2370294",
+      "appResource": "app/src/main/res/drawable/logo_astrbot.xml",
+      "transformation": "First symbol group, converted to Android VectorDrawable; original paths and colors retained."
+    },
+    {
+      "project": "NapCat",
+      "sourceUrl": "https://cdn.apifox.com/app/project-icon/custom/20241226/3c5b999f-935a-4116-9d68-e4ddbaa7ef3f.png",
+      "original": "docs/images/napcat-logo.png",
+      "sha256": "0805da7da7a81e84390b7c9ad6e0fdfe7e8a897928ee4cfae3b077054d20e0fe",
+      "appResource": "app/src/main/res/drawable-nodpi/logo_napcat.webp",
+      "transformation": "Resized to 256px WebP with original aspect ratio, colors and alpha retained."
+    }
+  ]
+}

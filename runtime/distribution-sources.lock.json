@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "scope": "additional original upstream source archives and Termux packaging recipes; not a redistribution authorization",
+  "sources": [
+    {
+      "name": "proot",
+      "version": "5.1.107.101",
+      "url": "https://codeload.github.com/termux/proot/zip/refs/tags/v5.1.107.101",
+      "sha256": "a66743f50c7b0bac1913b83bf55e139d679c80a0ca2808eec76432a65640017f",
+      "filename": "proot-5.1.107.101.zip",
+      "bytes": 551493,
+      "digestProvenance": "pinned-termux-build-recipe"
+    },
+    {
+      "name": "libandroid-shmem",
+      "version": "0.7",
+      "url": "https://codeload.github.com/termux/libandroid-shmem/tar.gz/refs/tags/v0.7",
+      "sha256": "1e5ff8459bc0a8c229dd8a94b27d119987e09ef3414331c2b5ebfff20b98e867",
+      "filename": "libandroid-shmem-0.7.tar.gz",
+      "bytes": 8891,
+      "digestProvenance": "pinned-termux-build-recipe"
+    },
+    {
+      "name": "talloc",
+      "version": "2.5.0",
+      "url": "https://www.samba.org/ftp/talloc/talloc-2.5.0.tar.gz",
+      "sha256": "912afa237510ae542a7733998eb18a12bcda35ab6729c8e2ddb43e8d0ebab007",
+      "filename": "talloc-2.5.0.tar.gz",
+      "bytes": 690172,
+      "digestProvenance": "pinned-termux-build-recipe"
+    },
+    {
+      "name": "napcat-source",
+      "version": "4.18.41",
+      "url": "https://codeload.github.com/NapNeko/NapCatQQ/tar.gz/refs/tags/v4.18.41",
+      "sha256": "47d58d647f8b229610f6d682e820e862fe6b64d01899f7949c174e5cafe79777",
+      "filename": "NapCatQQ-4.18.41.tar.gz",
+      "bytes": 58841420,
+      "digestProvenance": "downloaded-tag-or-commit; bytes pinned for subsequent builds"
+    },
+    {
+      "name": "termux-packages",
+      "version": "8f1f8bbb32c5b867405200f64dbd579d0c90e8ab",
+      "url": "https://codeload.github.com/termux/termux-packages/tar.gz/8f1f8bbb32c5b867405200f64dbd579d0c90e8ab",
+      "sha256": "39c39b11da5cbffefe31c5327f39744343f38f97725f032e72801bd004b4b336",
+      "filename": "termux-packages-8f1f8bbb32c5b867405200f64dbd579d0c90e8ab.tar.gz",
+      "bytes": 9615242,
+      "digestProvenance": "downloaded-tag-or-commit; bytes pinned for subsequent builds"
+    }
+  ]
+}

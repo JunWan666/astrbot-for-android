@@ -1,0 +1,20 @@
+* text=auto eol=lf
+*.kt text eol=lf
+*.kts text eol=lf
+*.py text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+gradlew text eol=lf
+*.jar binary
+*.der binary
+*.png binary
+*.webp binary
+
+# These lock files are bound byte-for-byte to source collection manifests.
+runtime/*.lock.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+runtime/*.lock.txt -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

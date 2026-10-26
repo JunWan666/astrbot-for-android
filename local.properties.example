@@ -1,0 +1,7 @@
+# Optional local build inputs. Copy to local.properties; use forward slashes.
+# No signing keys or credentials belong in this file.
+# sdk.dir=D:/ProgramConfiguration/Android/Sdk
+# runtimeAssetsDir=D:/astrbot-build-inputs/runtime/apk-assets
+# distributionAssetsDir=D:/astrbot-build-inputs/runtime/distribution-assets
+# bootstrapAssetsDir=D:/astrbot-build-inputs/app/src/main/assets
+# nativeLibsDir=D:/astrbot-build-inputs/app/src/main/jniLibs

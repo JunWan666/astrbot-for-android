@@ -1,0 +1,23 @@
+AstrBot for Android
+Copyright (c) 2026 JunWan666
+
+Author and maintainer: JunWan666
+Author homepage: https://github.com/JunWan666
+Project repository: https://github.com/JunWan666/astrbot-for-android
+License for the original Android manager code and documentation: MIT.
+
+Redistributed copies or substantial portions of this Software must retain
+the copyright notice and the MIT permission notice in LICENSE.
+
+This project is an independent Android manager. AstrBot, NapCat, Linux QQ,
+Ubuntu, PRoot and other third-party components retain their own authorship,
+licenses and trademarks. The manager's MIT license does not relicense them
+or grant permission to redistribute third-party binaries. See
+THIRD_PARTY_NOTICES.md and the corresponding upstream license texts.
+
+Service logos identify the corresponding upstream projects. Their artwork
+and trademarks belong to their respective owners and are not relicensed
+under the manager's MIT license.
+AstrBot logo: https://astrbot.app/assets/astrbot-logo-with-text.svg
+NapCat logo: https://cdn.apifox.com/app/project-icon/custom/20241226/3c5b999f-935a-4116-9d68-e4ddbaa7ef3f.png
+Original assets and resource transformations: runtime/brand-assets.json.

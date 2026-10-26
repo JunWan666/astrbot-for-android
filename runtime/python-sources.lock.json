@@ -1,0 +1,3343 @@
+{
+  "format": "astrbot-python-source-companion",
+  "packages": [
+    {
+      "index": {
+        "bytes": 3011,
+        "path": "metadata/aiocqhttp/1.4.4.json",
+        "sha256": "831cda9b74c4a826c4b4f02e413d862024a621d4a522747d43ae9882a3fac012",
+        "url": "https://pypi.org/pypi/aiocqhttp/1.4.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiocqhttp-1.4.4.dist-info/METADATA",
+        "sha256": "94e1794f2834a1ba549194269bf0c7723e3a94ac21285c6c027dc13d1b8848db"
+      },
+      "name": "aiocqhttp",
+      "source": {
+        "bytes": 22989,
+        "filename": "aiocqhttp-1.4.4.tar.gz",
+        "path": "sources/eb2b6996753cacee45bf615aba5db4625b495e7a184a2fd27d2e5408f472c03d/aiocqhttp-1.4.4.tar.gz",
+        "sha256": "eb2b6996753cacee45bf615aba5db4625b495e7a184a2fd27d2e5408f472c03d",
+        "url": "https://files.pythonhosted.org/packages/c2/91/e4bf8584695b065e223aa42ed4462fb67532a9f936d45df5d982eb3320b6/aiocqhttp-1.4.4.tar.gz",
+        "yanked": false
+      },
+      "version": "1.4.4"
+    },
+    {
+      "index": {
+        "bytes": 7329,
+        "path": "metadata/aiodocker/0.27.0.json",
+        "sha256": "c5fd3af30a2e21edf45fa734b5a4ad45d7734795ee4372a43c0ef6161f1cfb8c",
+        "url": "https://pypi.org/pypi/aiodocker/0.27.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiodocker-0.27.0.dist-info/METADATA",
+        "sha256": "5f913863ebae034ef49604f7c205251c9f71cdebc64cf14bd86dd4f2d4929d08"
+      },
+      "name": "aiodocker",
+      "source": {
+        "bytes": 328202,
+        "filename": "aiodocker-0.27.0.tar.gz",
+        "path": "sources/74586f4929aee4563ee7db50996a1a39ac35e06c80701daad31f94aadb6551c7/aiodocker-0.27.0.tar.gz",
+        "sha256": "74586f4929aee4563ee7db50996a1a39ac35e06c80701daad31f94aadb6551c7",
+        "url": "https://files.pythonhosted.org/packages/a8/19/f07d8532d7489ed8629847d004d0bbd286287286a76828be43aca7e6b106/aiodocker-0.27.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.27.0"
+    },
+    {
+      "index": {
+        "bytes": 8547,
+        "path": "metadata/aiofiles/25.1.0.json",
+        "sha256": "0fe9c6370f4be7da52a4ba0355bf6b41e4fd5473dccce576f6767d99fc7a1c9d",
+        "url": "https://pypi.org/pypi/aiofiles/25.1.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiofiles-25.1.0.dist-info/METADATA",
+        "sha256": "6b96b99073158a00ddb012a514834b48c3ec5f732ce059ffcde700481759a8b5"
+      },
+      "name": "aiofiles",
+      "source": {
+        "bytes": 46354,
+        "filename": "aiofiles-25.1.0.tar.gz",
+        "path": "sources/a8d728f0a29de45dc521f18f07297428d56992a742f0cd2701ba86e44d23d5b2/aiofiles-25.1.0.tar.gz",
+        "sha256": "a8d728f0a29de45dc521f18f07297428d56992a742f0cd2701ba86e44d23d5b2",
+        "url": "https://files.pythonhosted.org/packages/41/c3/534eac40372d8ee36ef40df62ec129bee4fdb5ad9706e58a29be53b2c970/aiofiles-25.1.0.tar.gz",
+        "yanked": false
+      },
+      "version": "25.1.0"
+    },
+    {
+      "index": {
+        "bytes": 8227,
+        "path": "metadata/aiohappyeyeballs/2.7.1.json",
+        "sha256": "90a6fe95d5083b27fa3cb21b46a78cdf84befd72a03001ea3182747e6794b983",
+        "url": "https://pypi.org/pypi/aiohappyeyeballs/2.7.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiohappyeyeballs-2.7.1.dist-info/METADATA",
+        "sha256": "e68d1bf48aec9dcc2767343dedec25e12860085cba180e10bc3d3bdd031602ba"
+      },
+      "name": "aiohappyeyeballs",
+      "source": {
+        "bytes": 24757,
+        "filename": "aiohappyeyeballs-2.7.1.tar.gz",
+        "path": "sources/065665c041c42a5938ed220bdcd7230f22527fbec085e1853d2402c8a3615d9d/aiohappyeyeballs-2.7.1.tar.gz",
+        "sha256": "065665c041c42a5938ed220bdcd7230f22527fbec085e1853d2402c8a3615d9d",
+        "url": "https://files.pythonhosted.org/packages/ce/f4/eec0465c2f67b2664688d0240b3212d5196fd89e741df67ddb81f8d35658/aiohappyeyeballs-2.7.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.7.1"
+    },
+    {
+      "index": {
+        "bytes": 150263,
+        "path": "metadata/aiohttp/3.14.5.json",
+        "sha256": "7deb2f0d6dc95c63a2b576236bbe3051f3c0b1d402bd5f59e7619c05684f499a",
+        "url": "https://pypi.org/pypi/aiohttp/3.14.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiohttp-3.14.5.dist-info/METADATA",
+        "sha256": "50b29a2268649f7ce5b22c0a41b60896d246fee58e2a74b468f66848e469834c"
+      },
+      "name": "aiohttp",
+      "source": {
+        "bytes": 8078052,
+        "filename": "aiohttp-3.14.5.tar.gz",
+        "path": "sources/5558a7f5a05af9ecf744af91e5baefc436f93c9333e656c27ec253f9a6bbe178/aiohttp-3.14.5.tar.gz",
+        "sha256": "5558a7f5a05af9ecf744af91e5baefc436f93c9333e656c27ec253f9a6bbe178",
+        "url": "https://files.pythonhosted.org/packages/6c/4c/bdccd81e9ee225b69c60e7766c9a5b05364f118f4d383713b89a682d772d/aiohttp-3.14.5.tar.gz",
+        "yanked": false
+      },
+      "version": "3.14.5"
+    },
+    {
+      "index": {
+        "bytes": 5846,
+        "path": "metadata/aiosignal/1.4.0.json",
+        "sha256": "443bdf542505c93e62117e868b9984b0c5784d50ab5b40ad0ae36d600b2d75ae",
+        "url": "https://pypi.org/pypi/aiosignal/1.4.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiosignal-1.4.0.dist-info/METADATA",
+        "sha256": "09247ef1da8bc696728d47130e702e4307f6f7d101d6c485bff9f3a71ce7008d"
+      },
+      "name": "aiosignal",
+      "source": {
+        "bytes": 25007,
+        "filename": "aiosignal-1.4.0.tar.gz",
+        "path": "sources/f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7/aiosignal-1.4.0.tar.gz",
+        "sha256": "f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7",
+        "url": "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.4.0"
+    },
+    {
+      "index": {
+        "bytes": 6410,
+        "path": "metadata/aiosqlite/0.22.1.json",
+        "sha256": "93392bfc92c3fe2a1df7c8ca779af90836ec342f30140704a68c0844e55a931f",
+        "url": "https://pypi.org/pypi/aiosqlite/0.22.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/aiosqlite-0.22.1.dist-info/METADATA",
+        "sha256": "cf3c8cc7397687f74602557a3e4f5ce1806591a62c82fe94c9b396fd80d1b39a"
+      },
+      "name": "aiosqlite",
+      "source": {
+        "bytes": 14821,
+        "filename": "aiosqlite-0.22.1.tar.gz",
+        "path": "sources/043e0bd78d32888c0a9ca90fc788b38796843360c855a7262a532813133a0650/aiosqlite-0.22.1.tar.gz",
+        "sha256": "043e0bd78d32888c0a9ca90fc788b38796843360c855a7262a532813133a0650",
+        "url": "https://files.pythonhosted.org/packages/4e/8a/64761f4005f17809769d23e518d915db74e6310474e733e3593cfc854ef1/aiosqlite-0.22.1.tar.gz",
+        "yanked": false
+      },
+      "version": "0.22.1"
+    },
+    {
+      "index": {
+        "bytes": 8643,
+        "path": "metadata/annotated-doc/0.0.5.json",
+        "sha256": "1aab691a5f37dd292e6d93ab53f7da5d839f56ba605345f017022ec75eb643af",
+        "url": "https://pypi.org/pypi/annotated-doc/0.0.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/annotated_doc-0.0.5.dist-info/METADATA",
+        "sha256": "8c24d70c5d9153d22123353a906042fd7603df2d15c2196290b0f8a962558c46"
+      },
+      "name": "annotated-doc",
+      "source": {
+        "bytes": 10758,
+        "filename": "annotated_doc-0.0.5.tar.gz",
+        "path": "sources/c7e58ce09192557605d8bbd92836d7e1d520ac9580096042c0bfd197efacf1bb/annotated_doc-0.0.5.tar.gz",
+        "sha256": "c7e58ce09192557605d8bbd92836d7e1d520ac9580096042c0bfd197efacf1bb",
+        "url": "https://files.pythonhosted.org/packages/5a/8e/38aa427ed5402449e226975b649c5dc73ccadfefeb95e6aecb8f8ea4b6b6/annotated_doc-0.0.5.tar.gz",
+        "yanked": false
+      },
+      "version": "0.0.5"
+    },
+    {
+      "index": {
+        "bytes": 17411,
+        "path": "metadata/annotated-types/0.8.0.json",
+        "sha256": "a6e8e5b10c8fd2f596bba53e015cd37f6279fb5cec26ce0c5e9968625be4fefa",
+        "url": "https://pypi.org/pypi/annotated-types/0.8.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/annotated_types-0.8.0.dist-info/METADATA",
+        "sha256": "614985b278f601b8ef863f82783b991cc3ada4b89f592eb71c7c48c5f2ef2298"
+      },
+      "name": "annotated-types",
+      "source": {
+        "bytes": 15893,
+        "filename": "annotated_types-0.8.0.tar.gz",
+        "path": "sources/13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7/annotated_types-0.8.0.tar.gz",
+        "sha256": "13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7",
+        "url": "https://files.pythonhosted.org/packages/5f/56/a8120250d128bed162cd73c76d45f6ef9991f3e068f62a8ee060afa3104a/annotated_types-0.8.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.8.0"
+    },
+    {
+      "index": {
+        "bytes": 7891,
+        "path": "metadata/anthropic/2.3.0.json",
+        "sha256": "b8938d141cd9699958a51d44bf4bbb47d6e1f7fab5eb6ae2acbd140d0d2de7f5",
+        "url": "https://pypi.org/pypi/anthropic/2.3.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/anthropic-2.3.0.dist-info/METADATA",
+        "sha256": "d57699f917285389689c7a2984ea22ac330f85017a89d3a1853a6e0410f48e71"
+      },
+      "name": "anthropic",
+      "source": {
+        "bytes": 1869656,
+        "filename": "anthropic-2.3.0.tar.gz",
+        "path": "sources/edfdea1e3fa7b3ce25df1511953408b2f03bfa61eb6f6268f766101a9e18ad53/anthropic-2.3.0.tar.gz",
+        "sha256": "edfdea1e3fa7b3ce25df1511953408b2f03bfa61eb6f6268f766101a9e18ad53",
+        "url": "https://files.pythonhosted.org/packages/3e/ba/4c91947e0d0062d66d371db371597287153f7685fbed512d3294d0cde3c7/anthropic-2.3.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.3.0"
+    },
+    {
+      "index": {
+        "bytes": 6904,
+        "path": "metadata/anyio/4.15.1.json",
+        "sha256": "e2ee22fad2fab3e66be503cba9b41945607d3076c9b7aa49b6e2f95ac323efab",
+        "url": "https://pypi.org/pypi/anyio/4.15.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/anyio-4.15.1.dist-info/METADATA",
+        "sha256": "043aecb571af7189e8a6c528f5d8e32545f1b2cdfaaf761d51e6d5b67ea3ca81"
+      },
+      "name": "anyio",
+      "source": {
+        "bytes": 276966,
+        "filename": "anyio-4.15.1.tar.gz",
+        "path": "sources/9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94/anyio-4.15.1.tar.gz",
+        "sha256": "9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94",
+        "url": "https://files.pythonhosted.org/packages/a9/d2/f4d173e22df740bc37b1db102b386ba719b66e95b0f0d751f556b387e6d2/anyio-4.15.1.tar.gz",
+        "yanked": false
+      },
+      "version": "4.15.1"
+    },
+    {
+      "index": {
+        "bytes": 8249,
+        "path": "metadata/apscheduler/3.11.3.json",
+        "sha256": "1a67bf2a8bead9a661af5ea010505a032096f5de186b0cf8290aade604914026",
+        "url": "https://pypi.org/pypi/apscheduler/3.11.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/apscheduler-3.11.3.dist-info/METADATA",
+        "sha256": "704848c9adcf732a2f9315f55fed35f6cce21c5542ae5b7a5ff46cd3a7c63638"
+      },
+      "name": "apscheduler",
+      "source": {
+        "bytes": 110312,
+        "filename": "apscheduler-3.11.3.tar.gz",
+        "path": "sources/cd2fcc9330039a81a5893472ad49facf23a6d5604cbe1d918c835c6de7834d5a/apscheduler-3.11.3.tar.gz",
+        "sha256": "cd2fcc9330039a81a5893472ad49facf23a6d5604cbe1d918c835c6de7834d5a",
+        "url": "https://files.pythonhosted.org/packages/8c/6b/eeff360196bb20b312c9e762a820fd1b2c6d809466c755ef57863478e454/apscheduler-3.11.3.tar.gz",
+        "yanked": false
+      },
+      "version": "3.11.3"
+    },
+    {
+      "index": {
+        "bytes": 11038,
+        "path": "metadata/attrs/26.1.0.json",
+        "sha256": "a882bf941fb4a0bb748d0194df544121cc130f5fb15a710ab6b804c17d2899b7",
+        "url": "https://pypi.org/pypi/attrs/26.1.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/attrs-26.1.0.dist-info/METADATA",
+        "sha256": "4cd40e690f23bf37cbcad34efd6758e062df1df07c86833f7e3ce95bf1fa38cc"
+      },
+      "name": "attrs",
+      "source": {
+        "bytes": 952055,
+        "filename": "attrs-26.1.0.tar.gz",
+        "path": "sources/d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32/attrs-26.1.0.tar.gz",
+        "sha256": "d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32",
+        "url": "https://files.pythonhosted.org/packages/9a/8e/82a0fe20a541c03148528be8cac2408564a6c9a0cc7e9171802bc1d26985/attrs-26.1.0.tar.gz",
+        "yanked": false
+      },
+      "version": "26.1.0"
+    },
+    {
+      "index": {
+        "bytes": 5900,
+        "path": "metadata/beautifulsoup4/4.15.0.json",
+        "sha256": "96c502f9035ea8dd04730834389a7ae8f2bd0079e24fa4083e8569b0f70e5054",
+        "url": "https://pypi.org/pypi/beautifulsoup4/4.15.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/beautifulsoup4-4.15.0.dist-info/METADATA",
+        "sha256": "b2f888103259f1607c85f3b1163be1bc49fc9941a3243c3b89a21075bfc6d4fb"
+      },
+      "name": "beautifulsoup4",
+      "source": {
+        "bytes": 632571,
+        "filename": "beautifulsoup4-4.15.0.tar.gz",
+        "path": "sources/288e3ca7d54b06f2ac191970bc275c1939cb46d450b255bf6718b04aa37ab4f7/beautifulsoup4-4.15.0.tar.gz",
+        "sha256": "288e3ca7d54b06f2ac191970bc275c1939cb46d450b255bf6718b04aa37ab4f7",
+        "url": "https://files.pythonhosted.org/packages/43/65/318323f98dbee45d42dff61d8f047181bc6f2268a9068cfad035a46be5af/beautifulsoup4-4.15.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.15.0"
+    },
+    {
+      "index": {
+        "bytes": 3814,
+        "path": "metadata/blinker/1.9.0.json",
+        "sha256": "f14d9c3deb29ae1aa16824a067c4e1fb68e38e286d31e8f0f8319b2e01c9778d",
+        "url": "https://pypi.org/pypi/blinker/1.9.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/blinker-1.9.0.dist-info/METADATA",
+        "sha256": "b8846233cc238db1e40ad6c2c93bdcb54dfb200664d2411ee64c4095dd5dbf30"
+      },
+      "name": "blinker",
+      "source": {
+        "bytes": 22460,
+        "filename": "blinker-1.9.0.tar.gz",
+        "path": "sources/b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf/blinker-1.9.0.tar.gz",
+        "sha256": "b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf",
+        "url": "https://files.pythonhosted.org/packages/21/28/9b3f50ce0e048515135495f198351908d99540d69bfdc8c1d15b73dc55ce/blinker-1.9.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.9.0"
+    },
+    {
+      "index": {
+        "bytes": 4631,
+        "path": "metadata/certifi/2026.10.23.json",
+        "sha256": "546ce90e02c152f5ff565baca6bc2a8f43c355855f637756f49a0143e312bdb2",
+        "url": "https://pypi.org/pypi/certifi/2026.10.23/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/certifi-2026.10.23.dist-info/METADATA",
+        "sha256": "e463e38f7fe7da36a11e6d3fecc5dfa5b97be8c8022620400750d79ae7d842bc"
+      },
+      "name": "certifi",
+      "source": {
+        "bytes": 136225,
+        "filename": "certifi-2026.10.23.tar.gz",
+        "path": "sources/a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd/certifi-2026.10.23.tar.gz",
+        "sha256": "a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd",
+        "url": "https://files.pythonhosted.org/packages/fd/11/b524cbd9bbdaca58608e4cf4053fd463417549e1959fa8d3aa18319f9555/certifi-2026.10.23.tar.gz",
+        "yanked": false
+      },
+      "version": "2026.10.23"
+    },
+    {
+      "index": {
+        "bytes": 89333,
+        "path": "metadata/cffi/2.1.1.json",
+        "sha256": "2255e530e3f80593a354e3d84a29966924d0e10309d1e3a6d50f845ab7d8df66",
+        "url": "https://pypi.org/pypi/cffi/2.1.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/cffi-2.1.1.dist-info/METADATA",
+        "sha256": "558bafb9093a8e790175d9ecff9688382981d744877dad86fd6770db0f4dc918"
+      },
+      "name": "cffi",
+      "source": {
+        "bytes": 530807,
+        "filename": "cffi-2.1.1.tar.gz",
+        "path": "sources/dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be/cffi-2.1.1.tar.gz",
+        "sha256": "dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be",
+        "url": "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.1.1"
+    },
+    {
+      "index": {
+        "bytes": 5598,
+        "path": "metadata/chardet/5.1.0.json",
+        "sha256": "849240b58e9f548c153fd56a5603fccffa656d5b76b0effae7c65bd7ec1ab6f9",
+        "url": "https://pypi.org/pypi/chardet/5.1.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/chardet-5.1.0.dist-info/METADATA",
+        "sha256": "9f389fa27a47d2dde73be01e25eeead7c529a334570dcdad86541dd0d3e7fee7"
+      },
+      "name": "chardet",
+      "source": {
+        "bytes": 2069617,
+        "filename": "chardet-5.1.0.tar.gz",
+        "path": "sources/0d62712b956bc154f85fb0a266e2a3c5913c2967e00348701b32411d6def31e5/chardet-5.1.0.tar.gz",
+        "sha256": "0d62712b956bc154f85fb0a266e2a3c5913c2967e00348701b32411d6def31e5",
+        "url": "https://files.pythonhosted.org/packages/41/32/cdc91dcf83849c7385bf8e2a5693d87376536ed000807fa07f5eab33430d/chardet-5.1.0.tar.gz",
+        "yanked": false
+      },
+      "version": "5.1.0"
+    },
+    {
+      "index": {
+        "bytes": 202370,
+        "path": "metadata/charset-normalizer/3.5.2.json",
+        "sha256": "9fda300857ae6a0486b4cd2d2fec7817ed2d45657249a6dfc0c2bbd1a44267b6",
+        "url": "https://pypi.org/pypi/charset-normalizer/3.5.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/charset_normalizer-3.5.2.dist-info/METADATA",
+        "sha256": "89ce6362bb7be88558f4be99a98f5d1b4da93d19cd0323e5ee0bac05cf883dfb"
+      },
+      "name": "charset-normalizer",
+      "source": {
+        "bytes": 172659,
+        "filename": "charset_normalizer-3.5.2.tar.gz",
+        "path": "sources/39de2a259fc954455c57274dc94c79d5842774e1247a016aff30bc0efed0f4ef/charset_normalizer-3.5.2.tar.gz",
+        "sha256": "39de2a259fc954455c57274dc94c79d5842774e1247a016aff30bc0efed0f4ef",
+        "url": "https://files.pythonhosted.org/packages/33/1c/f41d4e74c28ab327ff3acd36053f7ea506c55872d7a90b0fa71aa3ab0c89/charset_normalizer-3.5.2.tar.gz",
+        "yanked": false
+      },
+      "version": "3.5.2"
+    },
+    {
+      "index": {
+        "bytes": 4722,
+        "path": "metadata/click/8.5.0.json",
+        "sha256": "4e36adc9b46f837e10ce801b7a478f9146fefdfb287292b7668fc64b1474e41d",
+        "url": "https://pypi.org/pypi/click/8.5.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/click-8.5.0.dist-info/METADATA",
+        "sha256": "e87bce0bd194de70dfb8e708e0a6b0483009f25611804eaf87bfeb63e6c20501"
+      },
+      "name": "click",
+      "source": {
+        "bytes": 382235,
+        "filename": "click-8.5.0.tar.gz",
+        "path": "sources/ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34/click-8.5.0.tar.gz",
+        "sha256": "ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34",
+        "url": "https://files.pythonhosted.org/packages/c7/0e/7fa0ef50764b67090eca4114772a2abf8b6148198475e54c660b97caeee6/click-8.5.0.tar.gz",
+        "yanked": false
+      },
+      "version": "8.5.0"
+    },
+    {
+      "index": {
+        "bytes": 4931,
+        "path": "metadata/cobble/0.1.4.json",
+        "sha256": "c440373c86f47f0b156e627d8bc03581270db5fcabbb550a5f0680ac9a222199",
+        "url": "https://pypi.org/pypi/cobble/0.1.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/cobble-0.1.4.dist-info/METADATA",
+        "sha256": "6eb2cf88cfb39b884adde1eff7d8f89f80b256572eb0c6c164d6f99943dbd49f"
+      },
+      "name": "cobble",
+      "source": {
+        "bytes": 3805,
+        "filename": "cobble-0.1.4.tar.gz",
+        "path": "sources/de38be1539992c8a06e569630717c485a5f91be2192c461ea2b220607dfa78aa/cobble-0.1.4.tar.gz",
+        "sha256": "de38be1539992c8a06e569630717c485a5f91be2192c461ea2b220607dfa78aa",
+        "url": "https://files.pythonhosted.org/packages/54/7a/a507c709be2c96e1bb6102eb7b7f4026c5e5e223ef7d745a17d239e9d844/cobble-0.1.4.tar.gz",
+        "yanked": false
+      },
+      "version": "0.1.4"
+    },
+    {
+      "index": {
+        "bytes": 57201,
+        "path": "metadata/cryptography/50.0.2.json",
+        "sha256": "7423990cc0948676ef47a71ea62a476ece4c76245e6bebd1c3a71f03c4ffc0f4",
+        "url": "https://pypi.org/pypi/cryptography/50.0.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/cryptography-50.0.2.dist-info/METADATA",
+        "sha256": "047cfc71226409de4318b360aef15c63a2adf609731e3dcf7fe932f14ea042ee"
+      },
+      "name": "cryptography",
+      "source": {
+        "bytes": 880623,
+        "filename": "cryptography-50.0.2.tar.gz",
+        "path": "sources/7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5/cryptography-50.0.2.tar.gz",
+        "sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5",
+        "url": "https://files.pythonhosted.org/packages/9d/af/182eb91b0df3fe75c4d9f26fe70684569566745f6ba7e5c9c73a862c5252/cryptography-50.0.2.tar.gz",
+        "yanked": false
+      },
+      "version": "50.0.2"
+    },
+    {
+      "index": {
+        "bytes": 26667,
+        "path": "metadata/dashscope/2.0.1.json",
+        "sha256": "aece41d1eefdcee0ccc9a6ea4b9e3c661125390bb6d49dd8b9164a9aa0492763",
+        "url": "https://pypi.org/pypi/dashscope/2.0.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/dashscope-2.0.1.dist-info/METADATA",
+        "sha256": "c1eb2e4ad92e1068703ffe060802de91562ada6fc9c0f93cae19c91b2f704d58"
+      },
+      "name": "dashscope",
+      "source": {
+        "bytes": 2122480,
+        "filename": "dashscope-2.0.1.tar.gz",
+        "path": "sources/31d93dbddaa9ecddaf43099c9f75e4d204cd54cbd78f70253199ff799e157552/dashscope-2.0.1.tar.gz",
+        "sha256": "31d93dbddaa9ecddaf43099c9f75e4d204cd54cbd78f70253199ff799e157552",
+        "url": "https://files.pythonhosted.org/packages/da/8c/e5bce8eaf558fad2f36e7c0d6dfcc53eefe9d04411e5a59274d236c71be3/dashscope-2.0.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.0.1"
+    },
+    {
+      "index": {
+        "bytes": 35962,
+        "path": "metadata/defusedxml/0.7.1.json",
+        "sha256": "f015c37fa0b87a1d7fad57bea96c5c34856df2cbb29626004dee2122d510136a",
+        "url": "https://pypi.org/pypi/defusedxml/0.7.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/defusedxml-0.7.1.dist-info/METADATA",
+        "sha256": "369d3cef64870daf849fba711cb8d05a7efe3c8d9ab0f763adc34079fe378bb1"
+      },
+      "name": "defusedxml",
+      "source": {
+        "bytes": 75520,
+        "filename": "defusedxml-0.7.1.tar.gz",
+        "path": "sources/1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69/defusedxml-0.7.1.tar.gz",
+        "sha256": "1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69",
+        "url": "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz",
+        "yanked": false
+      },
+      "version": "0.7.1"
+    },
+    {
+      "index": {
+        "bytes": 8735,
+        "path": "metadata/deprecated/3.0.0.json",
+        "sha256": "2d6b00aab722d19a4df45837f15b1eda3afffaec661aeb9e3cb6fd4f1f494d39",
+        "url": "https://pypi.org/pypi/deprecated/3.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/deprecated-3.0.0.dist-info/METADATA",
+        "sha256": "e0f1fb18cd5bd39761fc1de8233112757c443c152fe9898b5b8ca1341a28faf5"
+      },
+      "name": "deprecated",
+      "source": {
+        "bytes": 166912,
+        "filename": "deprecated-3.0.0.tar.gz",
+        "path": "sources/16850204d3a1e6bb0acd06bff48d96e8b0a0d25d1c52f71705405a0f4894192d/deprecated-3.0.0.tar.gz",
+        "sha256": "16850204d3a1e6bb0acd06bff48d96e8b0a0d25d1c52f71705405a0f4894192d",
+        "url": "https://files.pythonhosted.org/packages/f7/9c/16649913bf14c73e0a9453782e148362ff2657067deff6aa9c7ebcddcc31/deprecated-3.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "3.0.0"
+    },
+    {
+      "index": {
+        "bytes": 6959,
+        "path": "metadata/dingtalk-stream/0.24.3.json",
+        "sha256": "7837c0d00589b0d2f20a3d77d1245add318987944d8c88d060c1bb375b6521a3",
+        "url": "https://pypi.org/pypi/dingtalk-stream/0.24.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/dingtalk_stream-0.24.3.dist-info/METADATA",
+        "sha256": "df24a2a8015d21e9d1275ca5380ff91974e4626d46d924dfd6467ce60ab6d12a"
+      },
+      "name": "dingtalk-stream",
+      "source": null,
+      "upstream": {
+        "commit": "6381a7bacb0353e1e0cd425688a02ff785fda44c",
+        "proofs": [
+          {
+            "bytes": 385,
+            "path": "upstream-metadata/dingtalk-stream/tag-0.json",
+            "sha256": "f744efb67f2f0c1451e9c432f7d4cae765853dadb68c9a868017fc1096245fdc",
+            "url": "https://api.github.com/repos/open-dingtalk/dingtalk-stream-sdk-python/git/ref/tags/v0.24.3"
+          }
+        ],
+        "repository": "open-dingtalk/dingtalk-stream-sdk-python",
+        "source": {
+          "bytes": 131862,
+          "filename": "dingtalk-stream-sdk-python-6381a7bacb0353e1e0cd425688a02ff785fda44c.tar.gz",
+          "path": "sources/b521d35890617e3fa5f5993cdd08d6bac8ad92e32f9e2352f636239e0696ad43/dingtalk-stream-sdk-python-6381a7bacb0353e1e0cd425688a02ff785fda44c.tar.gz",
+          "sha256": "b521d35890617e3fa5f5993cdd08d6bac8ad92e32f9e2352f636239e0696ad43",
+          "url": "https://codeload.github.com/open-dingtalk/dingtalk-stream-sdk-python/tar.gz/6381a7bacb0353e1e0cd425688a02ff785fda44c"
+        },
+        "tag": "v0.24.3",
+        "versionMember": "dingtalk_stream/version.py"
+      },
+      "version": "0.24.3"
+    },
+    {
+      "index": {
+        "bytes": 9058,
+        "path": "metadata/distro/1.9.0.json",
+        "sha256": "d83d91adebd208c0ce5b969017d4ce5c4ec59ea7d46793c20d36b261325fc236",
+        "url": "https://pypi.org/pypi/distro/1.9.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/distro-1.9.0.dist-info/METADATA",
+        "sha256": "31632ab2de5591131091b3397bdcdf797718579d85a75186f06839dd0c09e81d"
+      },
+      "name": "distro",
+      "source": {
+        "bytes": 60722,
+        "filename": "distro-1.9.0.tar.gz",
+        "path": "sources/2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed/distro-1.9.0.tar.gz",
+        "sha256": "2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed",
+        "url": "https://files.pythonhosted.org/packages/fc/f8/98eea607f65de6527f8a2e8885fc8015d3e6f5775df186e443e0964a11c3/distro-1.9.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.9.0"
+    },
+    {
+      "index": {
+        "bytes": 5663,
+        "path": "metadata/docstring-parser/0.18.0.json",
+        "sha256": "d327fa6f57f9d666866df08051263cf35541797d2b615c489d23d26a937931bb",
+        "url": "https://pypi.org/pypi/docstring-parser/0.18.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/docstring_parser-0.18.0.dist-info/METADATA",
+        "sha256": "cbc42027997fd4b194ae5fd064a4d1e57b92976941d0c26d369561a7c016a333"
+      },
+      "name": "docstring-parser",
+      "source": {
+        "bytes": 29341,
+        "filename": "docstring_parser-0.18.0.tar.gz",
+        "path": "sources/292510982205c12b1248696f44959db3cdd1740237a968ea1e2e7a900eeb2015/docstring_parser-0.18.0.tar.gz",
+        "sha256": "292510982205c12b1248696f44959db3cdd1740237a968ea1e2e7a900eeb2015",
+        "url": "https://files.pythonhosted.org/packages/e0/4d/f332313098c1de1b2d2ff91cf2674415cc7cddab2ca1b01ae29774bd5fdf/docstring_parser-0.18.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.18.0"
+    },
+    {
+      "index": {
+        "bytes": 4816,
+        "path": "metadata/et-xmlfile/2.0.0.json",
+        "sha256": "807b439c620d04dc8b1680d18d462233b4c4711d11a32a2e6d74b47949af9bf0",
+        "url": "https://pypi.org/pypi/et-xmlfile/2.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/et_xmlfile-2.0.0.dist-info/METADATA",
+        "sha256": "0e97d7ea909ed0fbe03d88bc8b6f58677cee1b07bd3353ce361cd2405915204e"
+      },
+      "name": "et-xmlfile",
+      "source": {
+        "bytes": 17234,
+        "filename": "et_xmlfile-2.0.0.tar.gz",
+        "path": "sources/dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54/et_xmlfile-2.0.0.tar.gz",
+        "sha256": "dab3f4764309081ce75662649be815c4c9081e88f0837825f90fd28317d4da54",
+        "url": "https://files.pythonhosted.org/packages/d3/38/af70d7ab1ae9d4da450eeec1fa3918940a5fafb9055e934af8d6eb0c2313/et_xmlfile-2.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.0.0"
+    },
+    {
+      "index": {
+        "bytes": 21217,
+        "path": "metadata/faiss-cpu/1.15.1.json",
+        "sha256": "7f73674f31ee8c8b88e40da5c6bfcc9bba0cfaffb2b8e2aee158abdd67a7dfed",
+        "url": "https://pypi.org/pypi/faiss-cpu/1.15.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/faiss_cpu-1.15.1.dist-info/METADATA",
+        "sha256": "ea9516cb19c2bcbcf915a2bdeb06006bcec125e0a1d22eb5d0724f0e1bfc903c"
+      },
+      "name": "faiss-cpu",
+      "source": null,
+      "upstream": {
+        "commit": "75c755c5a1fc854756aaf3bd1131213aeb21d8d1",
+        "proofs": [
+          {
+            "bytes": 349,
+            "path": "upstream-metadata/faiss-cpu/tag-0.json",
+            "sha256": "0e64254d88caba992f3c7be1562072d20b8091632c65e2bdf6c52e3aeadbf431",
+            "url": "https://api.github.com/repos/facebookresearch/faiss/git/ref/tags/v1.15.1"
+          },
+          {
+            "bytes": 674,
+            "path": "upstream-metadata/faiss-cpu/tag-1.json",
+            "sha256": "ed7f02903f5975d9af413634355afbd91b3015c4d848889dd4a597c788824775",
+            "url": "https://api.github.com/repos/facebookresearch/faiss/git/tags/7ea7339886edf8b4d9e719f593a5dfccff158274"
+          }
+        ],
+        "repository": "facebookresearch/faiss",
+        "source": {
+          "bytes": 1842118,
+          "filename": "faiss-75c755c5a1fc854756aaf3bd1131213aeb21d8d1.tar.gz",
+          "path": "sources/6dac2ea4b53c592236bf5f71103c5a18d2ccdaffd8c7a45bd720b811847c4c7b/faiss-75c755c5a1fc854756aaf3bd1131213aeb21d8d1.tar.gz",
+          "sha256": "6dac2ea4b53c592236bf5f71103c5a18d2ccdaffd8c7a45bd720b811847c4c7b",
+          "url": "https://codeload.github.com/facebookresearch/faiss/tar.gz/75c755c5a1fc854756aaf3bd1131213aeb21d8d1"
+        },
+        "tag": "v1.15.1",
+        "versionMember": "CMakeLists.txt"
+      },
+      "version": "1.15.1"
+    },
+    {
+      "index": {
+        "bytes": 29123,
+        "path": "metadata/fastapi/0.162.0.json",
+        "sha256": "f018e474e103b057969eea9e06640855f4e2d170a5da06cb4b134628146bde26",
+        "url": "https://pypi.org/pypi/fastapi/0.162.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/fastapi-0.162.0.dist-info/METADATA",
+        "sha256": "71eccf0418f121959670e72e343ec964105ea0190783e5048eef970a539c4e63"
+      },
+      "name": "fastapi",
+      "source": {
+        "bytes": 527867,
+        "filename": "fastapi-0.162.0.tar.gz",
+        "path": "sources/6a22c1e2e6e32e0633ee7e170f00009a29b8228b16feb219ee42f32fd8d88a8f/fastapi-0.162.0.tar.gz",
+        "sha256": "6a22c1e2e6e32e0633ee7e170f00009a29b8228b16feb219ee42f32fd8d88a8f",
+        "url": "https://files.pythonhosted.org/packages/e9/eb/2cf8c80abf09b2800aef0a83b41066fbfda8ee5495b7a08b9d1af40f7046/fastapi-0.162.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.162.0"
+    },
+    {
+      "index": {
+        "bytes": 4056,
+        "path": "metadata/filelock/4.2.4.json",
+        "sha256": "15f44ff22fbab63cb4a5d2a9e03df833b06e70f11fef3cb3eb2cbaaac8652617",
+        "url": "https://pypi.org/pypi/filelock/4.2.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/filelock-4.2.4.dist-info/METADATA",
+        "sha256": "d99c0f72a7ab84c924b734018a28a5001505fe0f96280c4462b864313edddb50"
+      },
+      "name": "filelock",
+      "source": {
+        "bytes": 652444,
+        "filename": "filelock-4.2.4.tar.gz",
+        "path": "sources/c6d8663535e1650ee430507b4ffbac7b464dd64b7647ea0112a9f406499d163d/filelock-4.2.4.tar.gz",
+        "sha256": "c6d8663535e1650ee430507b4ffbac7b464dd64b7647ea0112a9f406499d163d",
+        "url": "https://files.pythonhosted.org/packages/d8/28/3893324bcadf8f89b1616637468d766af3f625008c0735bf704fdfa86617/filelock-4.2.4.tar.gz",
+        "yanked": false
+      },
+      "version": "4.2.4"
+    },
+    {
+      "index": {
+        "bytes": 8865,
+        "path": "metadata/filetype/1.2.0.json",
+        "sha256": "2861359cbfafd6a5518073592195be7ff47c7ec5c703f76811e5ee41aac565be",
+        "url": "https://pypi.org/pypi/filetype/1.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/filetype-1.2.0.dist-info/METADATA",
+        "sha256": "30f2c7e912eaf67b34ec633ba9609853787ea1e25fa131f1f585bc0661fabf51"
+      },
+      "name": "filetype",
+      "source": {
+        "bytes": 998020,
+        "filename": "filetype-1.2.0.tar.gz",
+        "path": "sources/66b56cd6474bf41d8c54660347d37afcc3f7d1970648de365c102ef77548aadb/filetype-1.2.0.tar.gz",
+        "sha256": "66b56cd6474bf41d8c54660347d37afcc3f7d1970648de365c102ef77548aadb",
+        "url": "https://files.pythonhosted.org/packages/bb/29/745f7d30d47fe0f251d3ad3dc2978a23141917661998763bebb6da007eb1/filetype-1.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.2.0"
+    },
+    {
+      "index": {
+        "bytes": 5088,
+        "path": "metadata/flask/3.1.3.json",
+        "sha256": "782593ae20369a820d57d3311d04d54f805e40262b95448ce325a8cae182c354",
+        "url": "https://pypi.org/pypi/flask/3.1.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/flask-3.1.3.dist-info/METADATA",
+        "sha256": "aa6760ed6f545704474d70733e4a63a7f1481e376973edc896a13d02a7224c7c"
+      },
+      "name": "flask",
+      "source": {
+        "bytes": 759004,
+        "filename": "flask-3.1.3.tar.gz",
+        "path": "sources/0ef0e52b8a9cd932855379197dd8f94047b359ca0a78695144304cb45f87c9eb/flask-3.1.3.tar.gz",
+        "sha256": "0ef0e52b8a9cd932855379197dd8f94047b359ca0a78695144304cb45f87c9eb",
+        "url": "https://files.pythonhosted.org/packages/26/00/35d85dcce6c57fdc871f3867d465d780f302a175ea360f62533f12b27e2b/flask-3.1.3.tar.gz",
+        "yanked": false
+      },
+      "version": "3.1.3"
+    },
+    {
+      "index": {
+        "bytes": 135862,
+        "path": "metadata/frozenlist/1.8.0.json",
+        "sha256": "b12a7f8b816bfb2a70f2eb97140890efb08a234ab3b75841b0e89e197effa5ad",
+        "url": "https://pypi.org/pypi/frozenlist/1.8.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/frozenlist-1.8.0.dist-info/METADATA",
+        "sha256": "946c22dc9f7e2c76f2d698f00a4306dbe49a820e2b3f1a0e22fe5286cbec35f1"
+      },
+      "name": "frozenlist",
+      "source": {
+        "bytes": 45875,
+        "filename": "frozenlist-1.8.0.tar.gz",
+        "path": "sources/3ede829ed8d842f6cd48fc7081d7a41001a56f1f38603f9d49bf3020d59a31ad/frozenlist-1.8.0.tar.gz",
+        "sha256": "3ede829ed8d842f6cd48fc7081d7a41001a56f1f38603f9d49bf3020d59a31ad",
+        "url": "https://files.pythonhosted.org/packages/2d/f5/c831fac6cc817d26fd54c7eaccd04ef7e0288806943f7cc5bbf69f3ac1f0/frozenlist-1.8.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.8.0"
+    },
+    {
+      "index": {
+        "bytes": 7652,
+        "path": "metadata/google-auth/2.62.0.json",
+        "sha256": "1fa3d7f366e108c7bdabb0e0cd5bce66724edf377662fba762c13ae731e72eed",
+        "url": "https://pypi.org/pypi/google-auth/2.62.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/google_auth-2.62.0.dist-info/METADATA",
+        "sha256": "7f89925f9bab6feb1a5bd97b19902fffb9f0ad00aa24b24423b9163ae6655c2e"
+      },
+      "name": "google-auth",
+      "source": {
+        "bytes": 398180,
+        "filename": "google_auth-2.62.0.tar.gz",
+        "path": "sources/0bef0ce54bdf9ce226c5d66e4264413bd918141c31bbe49fb52eac882f513d69/google_auth-2.62.0.tar.gz",
+        "sha256": "0bef0ce54bdf9ce226c5d66e4264413bd918141c31bbe49fb52eac882f513d69",
+        "url": "https://files.pythonhosted.org/packages/f5/b9/4b2528f30114b106e3c3a7298ba38d85e682fd1f83fe7c4a5b77c7677082/google_auth-2.62.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.62.0"
+    },
+    {
+      "index": {
+        "bytes": 63584,
+        "path": "metadata/google-genai/2.33.0.json",
+        "sha256": "3de02d223ffbb6dd34ee5f4e99d32a963d802b60187b040ed1dc8db5bd95f86f",
+        "url": "https://pypi.org/pypi/google-genai/2.33.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/google_genai-2.33.0.dist-info/METADATA",
+        "sha256": "42560c1f87068664ad3313ae9ed25f3f92ec43eb7597cf579d630ca13b200bc9"
+      },
+      "name": "google-genai",
+      "source": {
+        "bytes": 758627,
+        "filename": "google_genai-2.33.0.tar.gz",
+        "path": "sources/fced7f746da45264b34bcf6044a6fcdb91ebad1825e95c324ee48addb6e557ae/google_genai-2.33.0.tar.gz",
+        "sha256": "fced7f746da45264b34bcf6044a6fcdb91ebad1825e95c324ee48addb6e557ae",
+        "url": "https://files.pythonhosted.org/packages/83/a4/b83b378b4a2fbbfb300c3fde0ff9f443f049c33e2accedf06bc0ad9bf393/google_genai-2.33.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.33.0"
+    },
+    {
+      "index": {
+        "bytes": 73323,
+        "path": "metadata/greenlet/3.5.6.json",
+        "sha256": "c7dc3bdf600092ea1294ae9fac80198bb2b463943668f410f5174c16a4761d74",
+        "url": "https://pypi.org/pypi/greenlet/3.5.6/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/greenlet-3.5.6.dist-info/METADATA",
+        "sha256": "b9b4cbbc1f3165e50fbc4696c433fe82b8a151fde65eede28fb6ec5efb3e1fab"
+      },
+      "name": "greenlet",
+      "source": {
+        "bytes": 207653,
+        "filename": "greenlet-3.5.6.tar.gz",
+        "path": "sources/8e67c43bdfc88d5fee6db0d3e40175b362fc95fb85f0412d233b9b203c53a575/greenlet-3.5.6.tar.gz",
+        "sha256": "8e67c43bdfc88d5fee6db0d3e40175b362fc95fb85f0412d233b9b203c53a575",
+        "url": "https://files.pythonhosted.org/packages/3e/6e/0091f175ccd02b02bc8811bbcbcc6ac2e980be116e3b2f7a736ca322bf84/greenlet-3.5.6.tar.gz",
+        "yanked": false
+      },
+      "version": "3.5.6"
+    },
+    {
+      "index": {
+        "bytes": 10603,
+        "path": "metadata/h11/0.16.0.json",
+        "sha256": "97f4efb9cc00826f0408076983adc1a1e48e8f2cabf403aaf250f724e081440d",
+        "url": "https://pypi.org/pypi/h11/0.16.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/h11-0.16.0.dist-info/METADATA",
+        "sha256": "28f326098ac09fcba79b8f180f96087c841fe2456215cb7b872a9c7d5cd19d64"
+      },
+      "name": "h11",
+      "source": {
+        "bytes": 101250,
+        "filename": "h11-0.16.0.tar.gz",
+        "path": "sources/4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1/h11-0.16.0.tar.gz",
+        "sha256": "4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1",
+        "url": "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.16.0"
+    },
+    {
+      "index": {
+        "bytes": 5918,
+        "path": "metadata/h2/4.4.1.json",
+        "sha256": "8903fbfc73b625064e48cc99a2c629bd47e4dd47593fa3530de83aeb55f89105",
+        "url": "https://pypi.org/pypi/h2/4.4.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/h2-4.4.1.dist-info/METADATA",
+        "sha256": "b17f68f6127946c3b748ea5728a9b172589ede2b9cebfa353dd5f05263096c7f"
+      },
+      "name": "h2",
+      "source": {
+        "bytes": 2157281,
+        "filename": "h2-4.4.1.tar.gz",
+        "path": "sources/4e866ffb1a869ae14dd9b5e6beb5c24a13da0495ad72b65925ded182521c1516/h2-4.4.1.tar.gz",
+        "sha256": "4e866ffb1a869ae14dd9b5e6beb5c24a13da0495ad72b65925ded182521c1516",
+        "url": "https://files.pythonhosted.org/packages/e7/85/7c366e69d84c17bb778fe41419e1fbcce3033d5b7ce29bbffff0a98b859f/h2-4.4.1.tar.gz",
+        "yanked": false
+      },
+      "version": "4.4.1"
+    },
+    {
+      "index": {
+        "bytes": 5447,
+        "path": "metadata/hpack/4.2.0.json",
+        "sha256": "30c2f7e29c9c0cad70eac912fa745252f62c4a7bab1fd5e1a79f5202666b6456",
+        "url": "https://pypi.org/pypi/hpack/4.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/hpack-4.2.0.dist-info/METADATA",
+        "sha256": "d2408cbb7b7d2f4bd041a96a850300da45e1bf79b1a380148a5fc29dcd55255f"
+      },
+      "name": "hpack",
+      "source": {
+        "bytes": 51300,
+        "filename": "hpack-4.2.0.tar.gz",
+        "path": "sources/0895cfa3b5531fc65fe439c05eb65144f123bf7a394fcaa56aa423548d8e45c0/hpack-4.2.0.tar.gz",
+        "sha256": "0895cfa3b5531fc65fe439c05eb65144f123bf7a394fcaa56aa423548d8e45c0",
+        "url": "https://files.pythonhosted.org/packages/26/5b/fcabf6028144a8723726318b07a32c2f3314acdff6265743cf08a344b18e/hpack-4.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.2.0"
+    },
+    {
+      "index": {
+        "bytes": 24057,
+        "path": "metadata/httpcore/1.0.9.json",
+        "sha256": "e26eca5c3d288fe9e6446af9bcbca1038ba688629d5c8a2886c47d74718d87a2",
+        "url": "https://pypi.org/pypi/httpcore/1.0.9/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/httpcore-1.0.9.dist-info/METADATA",
+        "sha256": "fe2d4fda6199128978779e0cf27f3c045c531863fcdd987eacc74f3a18d41c21"
+      },
+      "name": "httpcore",
+      "source": {
+        "bytes": 85484,
+        "filename": "httpcore-1.0.9.tar.gz",
+        "path": "sources/6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8/httpcore-1.0.9.tar.gz",
+        "sha256": "6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8",
+        "url": "https://files.pythonhosted.org/packages/06/94/82699a10bca87a5556c9c59b5963f2d039dbd239f25bc2a63907a05a14cb/httpcore-1.0.9.tar.gz",
+        "yanked": false
+      },
+      "version": "1.0.9"
+    },
+    {
+      "index": {
+        "bytes": 30224,
+        "path": "metadata/httpcore2/2.16.0.json",
+        "sha256": "194dc38b07c5836c3793de7ce6a56f998798304de165a4857c52f6525a6dd9ab",
+        "url": "https://pypi.org/pypi/httpcore2/2.16.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/httpcore2-2.16.0.dist-info/METADATA",
+        "sha256": "c073bd68b2bd543fbc2bab3763b42ed1e70666536d32c1bf39ef2764fd50b0a4"
+      },
+      "name": "httpcore2",
+      "source": {
+        "bytes": 69886,
+        "filename": "httpcore2-2.16.0.tar.gz",
+        "path": "sources/c72cd0413563b17e1cd8354677dff887466f8ec2551679759e93126534428643/httpcore2-2.16.0.tar.gz",
+        "sha256": "c72cd0413563b17e1cd8354677dff887466f8ec2551679759e93126534428643",
+        "url": "https://files.pythonhosted.org/packages/c0/61/afa9d6b7452f9eca73f73d45324eb0bb52f098fd5e6049bf6b8263be9b4e/httpcore2-2.16.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.16.0"
+    },
+    {
+      "index": {
+        "bytes": 9117,
+        "path": "metadata/httpx/0.28.1.json",
+        "sha256": "293bfab7bf587fcd0825f1bd8eed8e6303285ba14801b15659853827cbe30796",
+        "url": "https://pypi.org/pypi/httpx/0.28.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/httpx-0.28.1.dist-info/METADATA",
+        "sha256": "febb9b0f8f3e80d57c8199c304f35c4336e8581d1d18d7983c92766b82793b25"
+      },
+      "name": "httpx",
+      "source": {
+        "bytes": 141406,
+        "filename": "httpx-0.28.1.tar.gz",
+        "path": "sources/75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc/httpx-0.28.1.tar.gz",
+        "sha256": "75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc",
+        "url": "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz",
+        "yanked": false
+      },
+      "version": "0.28.1"
+    },
+    {
+      "index": {
+        "bytes": 12184,
+        "path": "metadata/httpx-sse/0.4.3.json",
+        "sha256": "10290174877d76e44ac10aaa9ee06a591b140b99943bfde6c9ccf031527f1f59",
+        "url": "https://pypi.org/pypi/httpx-sse/0.4.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/httpx_sse-0.4.3.dist-info/METADATA",
+        "sha256": "d4c6d804ee5ac46e9b3b6595c27ab8ae2ba7cfb5f692c78b16ff463e4bd1a81e"
+      },
+      "name": "httpx-sse",
+      "source": {
+        "bytes": 15943,
+        "filename": "httpx_sse-0.4.3.tar.gz",
+        "path": "sources/9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d/httpx_sse-0.4.3.tar.gz",
+        "sha256": "9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d",
+        "url": "https://files.pythonhosted.org/packages/0f/4c/751061ffa58615a32c31b2d82e8482be8dd4a89154f003147acee90f2be9/httpx_sse-0.4.3.tar.gz",
+        "yanked": false
+      },
+      "version": "0.4.3"
+    },
+    {
+      "index": {
+        "bytes": 11983,
+        "path": "metadata/httpx2/2.16.0.json",
+        "sha256": "95a397422b57e91a6e9ee2dc062b31229cbed63a2e863f2c1a58ec5ec2555cf0",
+        "url": "https://pypi.org/pypi/httpx2/2.16.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/httpx2-2.16.0.dist-info/METADATA",
+        "sha256": "192f20046200ff50911a7278c21dfbee1e1a4c6fa7943227afe9231d28defc3f"
+      },
+      "name": "httpx2",
+      "source": {
+        "bytes": 103116,
+        "filename": "httpx2-2.16.0.tar.gz",
+        "path": "sources/0d54c98128e8f2ff7fbbde0fca8c359e5f032edeaaaac443cdb7f31f685bcd7f/httpx2-2.16.0.tar.gz",
+        "sha256": "0d54c98128e8f2ff7fbbde0fca8c359e5f032edeaaaac443cdb7f31f685bcd7f",
+        "url": "https://files.pythonhosted.org/packages/43/73/5ca2cedf5e4e50423d1c258877865a6b62793633b561c58499f8aeb33b7e/httpx2-2.16.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.16.0"
+    },
+    {
+      "index": {
+        "bytes": 7153,
+        "path": "metadata/hypercorn/0.18.0.json",
+        "sha256": "7a1765f452ef5d84323a6badff15370ab5e954c5eeaef380a7e3f7b827f1fbe5",
+        "url": "https://pypi.org/pypi/hypercorn/0.18.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/hypercorn-0.18.0.dist-info/METADATA",
+        "sha256": "ce2f1f94c6b353a11cd90efc43ccb5c0ef1bd348a8727738aae50e453b8d650c"
+      },
+      "name": "hypercorn",
+      "source": {
+        "bytes": 68420,
+        "filename": "hypercorn-0.18.0.tar.gz",
+        "path": "sources/d63267548939c46b0247dc8e5b45a9947590e35e64ee73a23c074aa3cf88e9da/hypercorn-0.18.0.tar.gz",
+        "sha256": "d63267548939c46b0247dc8e5b45a9947590e35e64ee73a23c074aa3cf88e9da",
+        "url": "https://files.pythonhosted.org/packages/44/01/39f41a014b83dd5c795217362f2ca9071cf243e6a75bdcd6cd5b944658cc/hypercorn-0.18.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.18.0"
+    },
+    {
+      "index": {
+        "bytes": 6371,
+        "path": "metadata/hyperframe/6.1.0.json",
+        "sha256": "161f3cc4aa873bb55267755306b46993c7f16ed1f1c3dca10c6059f6cd8f1af0",
+        "url": "https://pypi.org/pypi/hyperframe/6.1.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/hyperframe-6.1.0.dist-info/METADATA",
+        "sha256": "a29f5792b9459b47658804988520009156ef8c2dea66022c2969a145065bad69"
+      },
+      "name": "hyperframe",
+      "source": {
+        "bytes": 26566,
+        "filename": "hyperframe-6.1.0.tar.gz",
+        "path": "sources/f630908a00854a7adeabd6382b43923a4c4cd4b821fcb527e6ab9e15382a3b08/hyperframe-6.1.0.tar.gz",
+        "sha256": "f630908a00854a7adeabd6382b43923a4c4cd4b821fcb527e6ab9e15382a3b08",
+        "url": "https://files.pythonhosted.org/packages/02/e7/94f8232d4a74cc99514c13a9f995811485a6903d48e5d952771ef6322e30/hyperframe-6.1.0.tar.gz",
+        "yanked": false
+      },
+      "version": "6.1.0"
+    },
+    {
+      "index": {
+        "bytes": 9180,
+        "path": "metadata/idna/3.20.json",
+        "sha256": "e7cbd26e23ce60f6cb3a151d2adf3b1b087bb8f10ac2d9d6db70fdccbf3bb041",
+        "url": "https://pypi.org/pypi/idna/3.20/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/idna-3.20.dist-info/METADATA",
+        "sha256": "dbd8c14c1e4ca1e0c9824a6dbc7cbbf78884f38eb52d91148cd3025f671e4b85"
+      },
+      "name": "idna",
+      "source": {
+        "bytes": 216463,
+        "filename": "idna-3.20.tar.gz",
+        "path": "sources/a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44/idna-3.20.tar.gz",
+        "sha256": "a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44",
+        "url": "https://files.pythonhosted.org/packages/f5/08/8eea9d4b8302028f3abb2c0813953f7aec26d33b7a8960ed760e65ff29fa/idna-3.20.tar.gz",
+        "yanked": false
+      },
+      "version": "3.20"
+    },
+    {
+      "index": {
+        "bytes": 4110,
+        "path": "metadata/itsdangerous/2.2.0.json",
+        "sha256": "aa5e5ed36c2160bc41e306cdf8f69429074282ebfa328529de4c979c750344c1",
+        "url": "https://pypi.org/pypi/itsdangerous/2.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/itsdangerous-2.2.0.dist-info/METADATA",
+        "sha256": "d2b934fb56708a1b94e439f0255c0f5a8108e3258ec827b18a1dc9c991db9611"
+      },
+      "name": "itsdangerous",
+      "source": {
+        "bytes": 54410,
+        "filename": "itsdangerous-2.2.0.tar.gz",
+        "path": "sources/e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173/itsdangerous-2.2.0.tar.gz",
+        "sha256": "e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173",
+        "url": "https://files.pythonhosted.org/packages/9c/cb/8ac0172223afbccb63986cc25049b154ecfb5e85932587206f42317be31d/itsdangerous-2.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.2.0"
+    },
+    {
+      "index": {
+        "bytes": 3499,
+        "path": "metadata/jieba/0.42.1.json",
+        "sha256": "32148cdec080a495a3dc986626f042897691a3297443949a99a425a0c4842005",
+        "url": "https://pypi.org/pypi/jieba/0.42.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/jieba-0.42.1.dist-info/METADATA",
+        "sha256": "5661d2cfc5b23f8c1b5ed4cecfa1ec866ddf563273c61e3911a362a3e6f3eea1"
+      },
+      "name": "jieba",
+      "source": {
+        "bytes": 19214172,
+        "filename": "jieba-0.42.1.tar.gz",
+        "path": "sources/055ca12f62674fafed09427f176506079bc135638a14e23e25be909131928db2/jieba-0.42.1.tar.gz",
+        "sha256": "055ca12f62674fafed09427f176506079bc135638a14e23e25be909131928db2",
+        "url": "https://files.pythonhosted.org/packages/c6/cb/18eeb235f833b726522d7ebed54f2278ce28ba9438e3135ab0278d9792a2/jieba-0.42.1.tar.gz",
+        "yanked": false
+      },
+      "version": "0.42.1"
+    },
+    {
+      "index": {
+        "bytes": 4925,
+        "path": "metadata/jinja2/3.1.6.json",
+        "sha256": "1bc757d7065f3e67d3a49e72ebc731d0774055575732592eede9820c136329cc",
+        "url": "https://pypi.org/pypi/jinja2/3.1.6/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/jinja2-3.1.6.dist-info/METADATA",
+        "sha256": "68c5548fb67c4132a13898d9b31ec50c6bea2abdd915d921f214355c3a6499c8"
+      },
+      "name": "jinja2",
+      "source": {
+        "bytes": 245115,
+        "filename": "jinja2-3.1.6.tar.gz",
+        "path": "sources/0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d/jinja2-3.1.6.tar.gz",
+        "sha256": "0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d",
+        "url": "https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-3.1.6.tar.gz",
+        "yanked": false
+      },
+      "version": "3.1.6"
+    },
+    {
+      "index": {
+        "bytes": 109207,
+        "path": "metadata/jiter/0.18.0.json",
+        "sha256": "71f3eb8e067f1e14b6a800d7344222f2af63cc0cf3deaeab23c5a2ba2f73dc17",
+        "url": "https://pypi.org/pypi/jiter/0.18.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/jiter-0.18.0.dist-info/METADATA",
+        "sha256": "605996e695df21e5ed5275c832a7cca52635d45fac23825233382012b5acfa5c"
+      },
+      "name": "jiter",
+      "source": {
+        "bytes": 234470,
+        "filename": "jiter-0.18.0.tar.gz",
+        "path": "sources/a0ca63fd9450a212e4e658d4cfe0ab4977c4f9b0003c68828b843c65e27662ff/jiter-0.18.0.tar.gz",
+        "sha256": "a0ca63fd9450a212e4e658d4cfe0ab4977c4f9b0003c68828b843c65e27662ff",
+        "url": "https://files.pythonhosted.org/packages/63/5b/f68319f4fe624311a744a33d10fdbcac4c971991e348223cba60d31780b2/jiter-0.18.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.18.0"
+    },
+    {
+      "index": {
+        "bytes": 9468,
+        "path": "metadata/jsonschema/4.26.0.json",
+        "sha256": "d0c9ccdfa30c3cdc57b048c2be21123dfb0c2f4d6bef2e8324dcb4eac985cfcf",
+        "url": "https://pypi.org/pypi/jsonschema/4.26.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/jsonschema-4.26.0.dist-info/METADATA",
+        "sha256": "05b189866ca98a96da3934bf6b83687ced3ff85325273b77e16b705f6d8b26d2"
+      },
+      "name": "jsonschema",
+      "source": {
+        "bytes": 366583,
+        "filename": "jsonschema-4.26.0.tar.gz",
+        "path": "sources/0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326/jsonschema-4.26.0.tar.gz",
+        "sha256": "0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326",
+        "url": "https://files.pythonhosted.org/packages/b3/fc/e067678238fa451312d4c62bf6e6cf5ec56375422aee02f9cb5f909b3047/jsonschema-4.26.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.26.0"
+    },
+    {
+      "index": {
+        "bytes": 5037,
+        "path": "metadata/jsonschema-specifications/2025.9.1.json",
+        "sha256": "91810d8f79384375ad0c0cf631e06903e2790b030d3fad2f1ad657b20ddd839e",
+        "url": "https://pypi.org/pypi/jsonschema-specifications/2025.9.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/jsonschema_specifications-2025.9.1.dist-info/METADATA",
+        "sha256": "35abd41757f32b4ea24756920ded47b70173d77cbc052a5a6d3ab583b2e8d89d"
+      },
+      "name": "jsonschema-specifications",
+      "source": {
+        "bytes": 32855,
+        "filename": "jsonschema_specifications-2025.9.1.tar.gz",
+        "path": "sources/b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d/jsonschema_specifications-2025.9.1.tar.gz",
+        "sha256": "b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d",
+        "url": "https://files.pythonhosted.org/packages/19/74/a633ee74eb36c44aa6d1095e7cc5569bebf04342ee146178e2d36600708b/jsonschema_specifications-2025.9.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2025.9.1"
+    },
+    {
+      "index": {
+        "bytes": 17998,
+        "path": "metadata/lark-oapi/1.7.5.json",
+        "sha256": "f3e26dd780831dfaa784fa2e38b4fa19948e1254083a8997be1f10f0b8497532",
+        "url": "https://pypi.org/pypi/lark-oapi/1.7.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/lark_oapi-1.7.5.dist-info/METADATA",
+        "sha256": "6ecc00926f9832c686aa61b41957ae9a2a17744193d1ffcbad61254a1e988cfe"
+      },
+      "name": "lark-oapi",
+      "source": {
+        "bytes": 2351682,
+        "filename": "lark_oapi-1.7.5.tar.gz",
+        "path": "sources/81258795e7cfc5ef797e71aff14435359a2abaf698ef0e6f9d3857fe08b719ab/lark_oapi-1.7.5.tar.gz",
+        "sha256": "81258795e7cfc5ef797e71aff14435359a2abaf698ef0e6f9d3857fe08b719ab",
+        "url": "https://files.pythonhosted.org/packages/08/da/8dc51e0e808b7f84c4598869a057aa46f0c0f8d27872e0ff87a6512f3b93/lark_oapi-1.7.5.tar.gz",
+        "yanked": false
+      },
+      "version": "1.7.5"
+    },
+    {
+      "index": {
+        "bytes": 24929,
+        "path": "metadata/loguru/0.7.3.json",
+        "sha256": "ee7b27c01867c9a870e3f432f1fce5a5c3baaccacd0d66e347b733e81f5b2045",
+        "url": "https://pypi.org/pypi/loguru/0.7.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/loguru-0.7.3.dist-info/METADATA",
+        "sha256": "3a371f8b089014fdaee055edc440d448242847926ad67613621af402f9975fd9"
+      },
+      "name": "loguru",
+      "source": {
+        "bytes": 63559,
+        "filename": "loguru-0.7.3.tar.gz",
+        "path": "sources/19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6/loguru-0.7.3.tar.gz",
+        "sha256": "19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6",
+        "url": "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz",
+        "yanked": false
+      },
+      "version": "0.7.3"
+    },
+    {
+      "index": {
+        "bytes": 155078,
+        "path": "metadata/lxml/6.1.3.json",
+        "sha256": "1f03dafdc0bd6c308a1e69aff7caef27f6d7c586eadd34e02229703a8541fe61",
+        "url": "https://pypi.org/pypi/lxml/6.1.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/lxml-6.1.3.dist-info/METADATA",
+        "sha256": "aad89f8107bc74045b86c9b7f7c0984196102520dd7faed5e4e45693b7c315ef"
+      },
+      "name": "lxml",
+      "source": {
+        "bytes": 4211198,
+        "filename": "lxml-6.1.3.tar.gz",
+        "path": "sources/45222d94ddd511536f3b2f7d9deae3b2339b4ce0f075f1ca25703b07cad9dd21/lxml-6.1.3.tar.gz",
+        "sha256": "45222d94ddd511536f3b2f7d9deae3b2339b4ce0f075f1ca25703b07cad9dd21",
+        "url": "https://files.pythonhosted.org/packages/23/ad/28ecd7cb894d172f3c9c80a075eeeb2017ac62e3632cee05a5f9493547eb/lxml-6.1.3.tar.gz",
+        "yanked": false
+      },
+      "version": "6.1.3"
+    },
+    {
+      "index": {
+        "bytes": 29225,
+        "path": "metadata/mammoth/1.13.0.json",
+        "sha256": "407c7e297b47ef8b2d8e4f85e1fb4dd87c2b3d200793d1c7a442c7322c81577c",
+        "url": "https://pypi.org/pypi/mammoth/1.13.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/mammoth-1.13.0.dist-info/METADATA",
+        "sha256": "aa45c59d8352de6aebe3c85b991045ffdf0acbedb76237dcf48d5e8cee0d8b6d"
+      },
+      "name": "mammoth",
+      "source": {
+        "bytes": 53987,
+        "filename": "mammoth-1.13.0.tar.gz",
+        "path": "sources/b359bee7bc00caba47dacc64286928133dd947917bab852eea01d0c8d8997296/mammoth-1.13.0.tar.gz",
+        "sha256": "b359bee7bc00caba47dacc64286928133dd947917bab852eea01d0c8d8997296",
+        "url": "https://files.pythonhosted.org/packages/c3/a8/d6691d0b76cf55cf19851e9e189d0356526024d650c131a0969fcd76225d/mammoth-1.13.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.13.0"
+    },
+    {
+      "index": {
+        "bytes": 9233,
+        "path": "metadata/markdown-it-py/4.2.0.json",
+        "sha256": "62affba459c80b1279b5759735f7da3e9c7d24966086ff81ec0303c94512b966",
+        "url": "https://pypi.org/pypi/markdown-it-py/4.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/markdown_it_py-4.2.0.dist-info/METADATA",
+        "sha256": "72c36ff516755443b1ecb61e17b2567a990230b49a504b0eb0c42d5f82448a9c"
+      },
+      "name": "markdown-it-py",
+      "source": {
+        "bytes": 82454,
+        "filename": "markdown_it_py-4.2.0.tar.gz",
+        "path": "sources/04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49/markdown_it_py-4.2.0.tar.gz",
+        "sha256": "04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49",
+        "url": "https://files.pythonhosted.org/packages/06/ff/7841249c247aa650a76b9ee4bbaeae59370dc8bfd2f6c01f3630c35eb134/markdown_it_py-4.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.2.0"
+    },
+    {
+      "index": {
+        "bytes": 12382,
+        "path": "metadata/markdownify/1.2.3.json",
+        "sha256": "066da353d9bdd72b7beda66dab063f7baab4e95adf4a16c061b95c92393d682e",
+        "url": "https://pypi.org/pypi/markdownify/1.2.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/markdownify-1.2.3.dist-info/METADATA",
+        "sha256": "4b457b9a3b3c6e7c87277a5157f9f99588b6cf89ee16ae20c8a019c6a66f6e2b"
+      },
+      "name": "markdownify",
+      "source": {
+        "bytes": 18852,
+        "filename": "markdownify-1.2.3.tar.gz",
+        "path": "sources/1a176f05522c8a2cb1dd3ab9d307dcdadbed5c26ae717855bfc42b3b6d38d937/markdownify-1.2.3.tar.gz",
+        "sha256": "1a176f05522c8a2cb1dd3ab9d307dcdadbed5c26ae717855bfc42b3b6d38d937",
+        "url": "https://files.pythonhosted.org/packages/92/ab/d1297139c0e2ceb151ae564c8c4f57ac0155d8f1f8b4cbd5d6523c82ea36/markdownify-1.2.3.tar.gz",
+        "yanked": false
+      },
+      "version": "1.2.3"
+    },
+    {
+      "index": {
+        "bytes": 5690,
+        "path": "metadata/markitdown-no-magika/0.1.2.json",
+        "sha256": "89548321dab5fe729485923361dedadc84ce61ddfefaba166873b7db9504d858",
+        "url": "https://pypi.org/pypi/markitdown-no-magika/0.1.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/markitdown_no_magika-0.1.2.dist-info/METADATA",
+        "sha256": "e6ebe549d2004371c94675d70c44e63db4ac15b97eab786bff24506dfd348f84"
+      },
+      "name": "markitdown-no-magika",
+      "source": {
+        "bytes": 39402,
+        "filename": "markitdown_no_magika-0.1.2.tar.gz",
+        "path": "sources/35f129f4715727f10c58f645536e63084db7029e39d73ffcf7788539dc644116/markitdown_no_magika-0.1.2.tar.gz",
+        "sha256": "35f129f4715727f10c58f645536e63084db7029e39d73ffcf7788539dc644116",
+        "url": "https://files.pythonhosted.org/packages/98/85/d14e6c4e892a999b3decd21ede782b7a82be20449fb4d3c6b1441796c605/markitdown_no_magika-0.1.2.tar.gz",
+        "yanked": false
+      },
+      "version": "0.1.2"
+    },
+    {
+      "index": {
+        "bytes": 135847,
+        "path": "metadata/markupsafe/3.0.4.json",
+        "sha256": "85cd5bce3f85e67ab0b921be9c9ba144a7cc01a2d02b85ad65b1f8dabeac4c57",
+        "url": "https://pypi.org/pypi/markupsafe/3.0.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/markupsafe-3.0.4.dist-info/METADATA",
+        "sha256": "66767d76388ece15d49d50dafb655891ef5d868715e7128e7f7d737a70b353c4"
+      },
+      "name": "markupsafe",
+      "source": {
+        "bytes": 153777,
+        "filename": "markupsafe-3.0.4.tar.gz",
+        "path": "sources/2e9ad7dd851bf45fab9f75cbff4cb493fee9979e8d8c7c9c3ee119022518edd6/markupsafe-3.0.4.tar.gz",
+        "sha256": "2e9ad7dd851bf45fab9f75cbff4cb493fee9979e8d8c7c9c3ee119022518edd6",
+        "url": "https://files.pythonhosted.org/packages/38/9b/e422a865e1d5d57d0e509b4e0bf1c1a70a7f6382c29a5aa428df994c8bc8/markupsafe-3.0.4.tar.gz",
+        "yanked": false
+      },
+      "version": "3.0.4"
+    },
+    {
+      "index": {
+        "bytes": 11394,
+        "path": "metadata/mcp/1.30.0.json",
+        "sha256": "eed19fb444508429a58ca815b0692a8ccafa88392b35eb4096565275c3be414b",
+        "url": "https://pypi.org/pypi/mcp/1.30.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/mcp-1.30.0.dist-info/METADATA",
+        "sha256": "3880c29896149862971af57942e3e5c0ad2a909696a66b9811c62f6e47e65111"
+      },
+      "name": "mcp",
+      "source": {
+        "bytes": 680511,
+        "filename": "mcp-1.30.0.tar.gz",
+        "path": "sources/445414625fce5c295faa505bb11bacece661ab6f4028d57c935db57820b7a3e4/mcp-1.30.0.tar.gz",
+        "sha256": "445414625fce5c295faa505bb11bacece661ab6f4028d57c935db57820b7a3e4",
+        "url": "https://files.pythonhosted.org/packages/ba/93/0142dc84a666daf8ad51a34268f34c12fd6fda4f3810c4be2504eecc8212/mcp-1.30.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.30.0"
+    },
+    {
+      "index": {
+        "bytes": 3705,
+        "path": "metadata/mdurl/0.1.2.json",
+        "sha256": "c7baac0b363d92cf55f1f3a313f4bb0564bff27343e6a0a4e9d7ff03afc8a6c7",
+        "url": "https://pypi.org/pypi/mdurl/0.1.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/mdurl-0.1.2.dist-info/METADATA",
+        "sha256": "b53b29d48f499367053fda3c81e7ce27d2558380ebbf83e66023b02eb7ddd25d"
+      },
+      "name": "mdurl",
+      "source": {
+        "bytes": 8729,
+        "filename": "mdurl-0.1.2.tar.gz",
+        "path": "sources/bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba/mdurl-0.1.2.tar.gz",
+        "sha256": "bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba",
+        "url": "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz",
+        "yanked": false
+      },
+      "version": "0.1.2"
+    },
+    {
+      "index": {
+        "bytes": 139712,
+        "path": "metadata/multidict/7.2.0.json",
+        "sha256": "5a4128a098aa3581933a25a3b6b518fac0cc20b06dca3d4418ff440f16f4604e",
+        "url": "https://pypi.org/pypi/multidict/7.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/multidict-7.2.0.dist-info/METADATA",
+        "sha256": "fa2be386faee5cf43809e71040c9365eaf5687cbcf9b13d24666cbea834c089d"
+      },
+      "name": "multidict",
+      "source": {
+        "bytes": 369184,
+        "filename": "multidict-7.2.0.tar.gz",
+        "path": "sources/f4110a13e264858eb00697751785cb2c58ee96707d8ded5ddb8239530d3b9ba4/multidict-7.2.0.tar.gz",
+        "sha256": "f4110a13e264858eb00697751785cb2c58ee96707d8ded5ddb8239530d3b9ba4",
+        "url": "https://files.pythonhosted.org/packages/9b/18/0127fdb8aa54b1d29d5b8f752af088ad6aa47abe13adaa519377b0b331ab/multidict-7.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "7.2.0"
+    },
+    {
+      "index": {
+        "bytes": 63149,
+        "path": "metadata/numpy/2.5.4.json",
+        "sha256": "a42b40d53fac5388e974f21aa1f01d3b47440ad8181fc827b08023bf8ca3cc96",
+        "url": "https://pypi.org/pypi/numpy/2.5.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/numpy-2.5.4.dist-info/METADATA",
+        "sha256": "e2b909d6a37d76c2bc130f528d7fed0c517322bce16dc7846b6a6df30e200403"
+      },
+      "name": "numpy",
+      "source": {
+        "bytes": 20866315,
+        "filename": "numpy-2.5.4.tar.gz",
+        "path": "sources/9a94cf751c9ad8ebaa835bcd3d40dacf8534ad086b88c38029b65123c7999d2a/numpy-2.5.4.tar.gz",
+        "sha256": "9a94cf751c9ad8ebaa835bcd3d40dacf8534ad086b88c38029b65123c7999d2a",
+        "url": "https://files.pythonhosted.org/packages/95/b0/c7453d0b6e2073c3264468b106ee1563750cecc910965e67357e3698c83e/numpy-2.5.4.tar.gz",
+        "yanked": false
+      },
+      "version": "2.5.4"
+    },
+    {
+      "index": {
+        "bytes": 48212,
+        "path": "metadata/openai/3.37.0.json",
+        "sha256": "65bdd46edbe59dbfd1235a994658e6009ed440ec704f901f609c0b0fed3b2fe1",
+        "url": "https://pypi.org/pypi/openai/3.37.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/openai-3.37.0.dist-info/METADATA",
+        "sha256": "c6b334251b5adc6932973161211a7fb98ce0219aa953d7db4aec89f33be72cf3"
+      },
+      "name": "openai",
+      "source": {
+        "bytes": 2325534,
+        "filename": "openai-3.37.0.tar.gz",
+        "path": "sources/670bd6f699000d43a2073bcf94374a55bb133bfe5de0d084d47eb9bb9f6a8e5d/openai-3.37.0.tar.gz",
+        "sha256": "670bd6f699000d43a2073bcf94374a55bb133bfe5de0d084d47eb9bb9f6a8e5d",
+        "url": "https://files.pythonhosted.org/packages/0a/66/d4c48dc690e36b297c178636d8434050ac92df9db8a4c89d9bd451cccc95/openai-3.37.0.tar.gz",
+        "yanked": false
+      },
+      "version": "3.37.0"
+    },
+    {
+      "index": {
+        "bytes": 4748,
+        "path": "metadata/openpyxl/3.1.5.json",
+        "sha256": "6a922b57aebf0a54ec276b48bab917fa6684a5822e2d40a465972098d46be12e",
+        "url": "https://pypi.org/pypi/openpyxl/3.1.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/openpyxl-3.1.5.dist-info/METADATA",
+        "sha256": "23f80ca9830dd89435da1710f26deda8f81e5409287e74540210c72627a4ad96"
+      },
+      "name": "openpyxl",
+      "source": {
+        "bytes": 186464,
+        "filename": "openpyxl-3.1.5.tar.gz",
+        "path": "sources/cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050/openpyxl-3.1.5.tar.gz",
+        "sha256": "cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050",
+        "url": "https://files.pythonhosted.org/packages/3d/f9/88d94a75de065ea32619465d2f77b29a0469500e99012523b91cc4141cd1/openpyxl-3.1.5.tar.gz",
+        "yanked": false
+      },
+      "version": "3.1.5"
+    },
+    {
+      "index": {
+        "bytes": 3580,
+        "path": "metadata/opentelemetry-api/1.45.1.json",
+        "sha256": "da574eb54158846f06ac0a51034378feb22c47be67856f001da7337f3a116d2c",
+        "url": "https://pypi.org/pypi/opentelemetry-api/1.45.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/opentelemetry_api-1.45.1.dist-info/METADATA",
+        "sha256": "5bc71e90cb421be92a43bf5ad5b0f25dccfa2a24ddceaa2877779879962a4c9e"
+      },
+      "name": "opentelemetry-api",
+      "source": {
+        "bytes": 72804,
+        "filename": "opentelemetry_api-1.45.1.tar.gz",
+        "path": "sources/aa38ed19bcc084ba42782a73255b3582283eced7ad6dddbd6695189e69adfb75/opentelemetry_api-1.45.1.tar.gz",
+        "sha256": "aa38ed19bcc084ba42782a73255b3582283eced7ad6dddbd6695189e69adfb75",
+        "url": "https://files.pythonhosted.org/packages/2e/02/6e0ae9cc61bd3169d401077b507b3ebc344745171e1051ab430be012dcd9/opentelemetry_api-1.45.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.45.1"
+    },
+    {
+      "index": {
+        "bytes": 3744,
+        "path": "metadata/opentelemetry-sdk/1.45.1.json",
+        "sha256": "862992ce4f0a258d6fdda10c5a46d9c1d33adb8f39806f52f0291b672353c066",
+        "url": "https://pypi.org/pypi/opentelemetry-sdk/1.45.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/opentelemetry_sdk-1.45.1.dist-info/METADATA",
+        "sha256": "0a353d0fa633a7ece2b51f6f2dd3f64f75563d0d8bc8716480489fc2f9476e34"
+      },
+      "name": "opentelemetry-sdk",
+      "source": {
+        "bytes": 218324,
+        "filename": "opentelemetry_sdk-1.45.1.tar.gz",
+        "path": "sources/63d24a6ca645019a631e6a51999c73e93adcac1196ca640b8ae78a7cc4762bf3/opentelemetry_sdk-1.45.1.tar.gz",
+        "sha256": "63d24a6ca645019a631e6a51999c73e93adcac1196ca640b8ae78a7cc4762bf3",
+        "url": "https://files.pythonhosted.org/packages/a1/79/7392e21a1c8f0c61d90b223e31c7e48cb9d452e91a6b820ad24cca5f23c4/opentelemetry_sdk-1.45.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.45.1"
+    },
+    {
+      "index": {
+        "bytes": 4713,
+        "path": "metadata/opentelemetry-semantic-conventions/0.66b1.json",
+        "sha256": "767f3e5650445ce6af4aace197e317fa1d7c6e2d91257d190ecfae2500d05dd5",
+        "url": "https://pypi.org/pypi/opentelemetry-semantic-conventions/0.66b1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/opentelemetry_semantic_conventions-0.66b1.dist-info/METADATA",
+        "sha256": "0b21fb9e6e2c2c79b61c110c3235757606fc2d2d11eaa22840f2f66794efd61c"
+      },
+      "name": "opentelemetry-semantic-conventions",
+      "source": {
+        "bytes": 150250,
+        "filename": "opentelemetry_semantic_conventions-0.66b1.tar.gz",
+        "path": "sources/497ca63bf383723411e8eaf60c8779e9877633c936bb641080adab59d0eb6ec8/opentelemetry_semantic_conventions-0.66b1.tar.gz",
+        "sha256": "497ca63bf383723411e8eaf60c8779e9877633c936bb641080adab59d0eb6ec8",
+        "url": "https://files.pythonhosted.org/packages/46/e4/dbbfb2a010c4db2224a5114638acede6fe563d33cc20fb1752cebcbe6298/opentelemetry_semantic_conventions-0.66b1.tar.gz",
+        "yanked": false
+      },
+      "version": "0.66b1"
+    },
+    {
+      "index": {
+        "bytes": 4748,
+        "path": "metadata/optionaldict/0.1.2.json",
+        "sha256": "4817a19f931b5517f27facda460f439268595afb3c3316233b14529bc855ba23",
+        "url": "https://pypi.org/pypi/optionaldict/0.1.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/optionaldict-0.1.2.dist-info/METADATA",
+        "sha256": "e887b19556d13ecfc76b9efbe333aa856b6e28ad6dc56b1790dcce85f34760a1"
+      },
+      "name": "optionaldict",
+      "source": {
+        "bytes": 3454,
+        "filename": "optionaldict-0.1.2.tar.gz",
+        "path": "sources/175b62ee8259af703def42e0b44b413ea55e7b0732456cb2fd5cbbc998605966/optionaldict-0.1.2.tar.gz",
+        "sha256": "175b62ee8259af703def42e0b44b413ea55e7b0732456cb2fd5cbbc998605966",
+        "url": "https://files.pythonhosted.org/packages/ad/8b/cb72b1d40d21963ad1923ce529ae1f9ba49a13c18c7e6c47081c3dc1211f/optionaldict-0.1.2.tar.gz",
+        "yanked": false
+      },
+      "version": "0.1.2"
+    },
+    {
+      "index": {
+        "bytes": 47005,
+        "path": "metadata/ormsgpack/1.13.0.json",
+        "sha256": "80e64a0b1aabc6dd4e5424a80337471398d13919cabd545be595044b380369ea",
+        "url": "https://pypi.org/pypi/ormsgpack/1.13.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/ormsgpack-1.13.0.dist-info/METADATA",
+        "sha256": "582d86268d04891ad4defac9ad3619a6c27def87a87249b6ddabd170d10d1f3c"
+      },
+      "name": "ormsgpack",
+      "source": {
+        "bytes": 45467,
+        "filename": "ormsgpack-1.13.0.tar.gz",
+        "path": "sources/4127e84b07816e1f36d557e95b5642041692df22bf77f2c2f563a2039ab8144e/ormsgpack-1.13.0.tar.gz",
+        "sha256": "4127e84b07816e1f36d557e95b5642041692df22bf77f2c2f563a2039ab8144e",
+        "url": "https://files.pythonhosted.org/packages/72/ae/aea2bee05bd61645daf97515174d71d8fd978a2c395b4dd5f0a5ada7facc/ormsgpack-1.13.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.13.0"
+    },
+    {
+      "index": {
+        "bytes": 5748,
+        "path": "metadata/packaging/26.3.json",
+        "sha256": "4f190d2f0b312b3086058cee64ab4333bf3ce67fb78b4c2bdb43899049b29f4d",
+        "url": "https://pypi.org/pypi/packaging/26.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/packaging-26.3.dist-info/METADATA",
+        "sha256": "70fdb89fc4d4a9a043bf7372b8972bcc883fddff34ab55e9cf80d73875384763"
+      },
+      "name": "packaging",
+      "source": {
+        "bytes": 313412,
+        "filename": "packaging-26.3.tar.gz",
+        "path": "sources/94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79/packaging-26.3.tar.gz",
+        "sha256": "94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79",
+        "url": "https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-26.3.tar.gz",
+        "yanked": false
+      },
+      "version": "26.3"
+    },
+    {
+      "index": {
+        "bytes": 67213,
+        "path": "metadata/pandas/3.1.0.json",
+        "sha256": "22fdd3bd46dfe287d02a70c640837ce39d81f95c453fb613f374c698b5d48129",
+        "url": "https://pypi.org/pypi/pandas/3.1.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pandas-3.1.0.dist-info/METADATA",
+        "sha256": "b2b43910a5ef734a08be961df9c484f4664ad9ec2fa5a08294d0edfa08bcdd4b"
+      },
+      "name": "pandas",
+      "source": {
+        "bytes": 5933421,
+        "filename": "pandas-3.1.0.tar.gz",
+        "path": "sources/ecb9b2d8a817b1e1ba1fdb90c0abe9eab31b4fdf2562b7a56b86ac66ace17e49/pandas-3.1.0.tar.gz",
+        "sha256": "ecb9b2d8a817b1e1ba1fdb90c0abe9eab31b4fdf2562b7a56b86ac66ace17e49",
+        "url": "https://files.pythonhosted.org/packages/55/b1/a10c0d1a7e3ce44eb42635771004aa503e3b9ddde0bd39c524dda65f7eff/pandas-3.1.0.tar.gz",
+        "yanked": false
+      },
+      "version": "3.1.0"
+    },
+    {
+      "index": {
+        "bytes": 80892,
+        "path": "metadata/pillow/13.0.0.json",
+        "sha256": "183d4151cbc909acf39d4d5d48469d6bc66d5516e7f506854241839d0611b69e",
+        "url": "https://pypi.org/pypi/pillow/13.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pillow-13.0.0.dist-info/METADATA",
+        "sha256": "dba7fdfe24e302f46bae562f55d66cc367c0618abae9894a1ebec93dc8f0e511"
+      },
+      "name": "pillow",
+      "source": {
+        "bytes": 47058631,
+        "filename": "pillow-13.0.0.tar.gz",
+        "path": "sources/cdcd1ba258178f7356d74170c9a81ba4eab6a5d55748bc402a5a2a6fe6be3510/pillow-13.0.0.tar.gz",
+        "sha256": "cdcd1ba258178f7356d74170c9a81ba4eab6a5d55748bc402a5a2a6fe6be3510",
+        "url": "https://files.pythonhosted.org/packages/ce/a4/9cc30690a394a8305e8be4c9036aa16d0dfddadd09079860b582f562496d/pillow-13.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "13.0.0"
+    },
+    {
+      "index": {
+        "bytes": 6683,
+        "path": "metadata/pip/26.2.2.json",
+        "sha256": "ebd1e77f0bdb480aa8cf26c605ad6856753becb015a3d2006228cadb40465931",
+        "url": "https://pypi.org/pypi/pip/26.2.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pip-26.2.2.dist-info/METADATA",
+        "sha256": "fe157a60a970b288770fad79a124001f538a325b0a2270c594792b6a475eb798"
+      },
+      "name": "pip",
+      "source": {
+        "bytes": 1863336,
+        "filename": "pip-26.2.2.tar.gz",
+        "path": "sources/3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f/pip-26.2.2.tar.gz",
+        "sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+        "url": "https://files.pythonhosted.org/packages/fa/e8/0842d757e483e895e670f655084cfe8b8c72580c6769a76b30b2789a0608/pip-26.2.2.tar.gz",
+        "yanked": false
+      },
+      "version": "26.2.2"
+    },
+    {
+      "index": {
+        "bytes": 8925,
+        "path": "metadata/priority/2.0.0.json",
+        "sha256": "1089343d54e1ede38358527033ccf5a123bb7d4cabbe05e317f8a3556bffe04e",
+        "url": "https://pypi.org/pypi/priority/2.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/priority-2.0.0.dist-info/METADATA",
+        "sha256": "0162e322a691fccf188f000292451e5d9fe7a4ae3b86efca1d7487bd8a7f807b"
+      },
+      "name": "priority",
+      "source": {
+        "bytes": 24792,
+        "filename": "priority-2.0.0.tar.gz",
+        "path": "sources/c965d54f1b8d0d0b19479db3924c7c36cf672dbf2aec92d43fbdaf4492ba18c0/priority-2.0.0.tar.gz",
+        "sha256": "c965d54f1b8d0d0b19479db3924c7c36cf672dbf2aec92d43fbdaf4492ba18c0",
+        "url": "https://files.pythonhosted.org/packages/f5/3c/eb7c35f4dcede96fca1842dac5f4f5d15511aa4b52f3a961219e68ae9204/priority-2.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.0.0"
+    },
+    {
+      "index": {
+        "bytes": 147325,
+        "path": "metadata/propcache/0.5.4.json",
+        "sha256": "253a90067f5c44ffec37f3f1081934c91fb60edda0dc1e9bdf805edc8cecf693",
+        "url": "https://pypi.org/pypi/propcache/0.5.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/propcache-0.5.4.dist-info/METADATA",
+        "sha256": "6ed3bac0ad43050ceaf8bd09878ba3d673c94c4da0d4498f903f86c36cc6fb57"
+      },
+      "name": "propcache",
+      "source": {
+        "bytes": 61545,
+        "filename": "propcache-0.5.4.tar.gz",
+        "path": "sources/ff6b113f50bc066a698db5d944d2c6dc7507168dd3341e255a8892fd0715a558/propcache-0.5.4.tar.gz",
+        "sha256": "ff6b113f50bc066a698db5d944d2c6dc7507168dd3341e255a8892fd0715a558",
+        "url": "https://files.pythonhosted.org/packages/b3/9a/9fbf4e4ec0c2d7f1c32519fff782ef467859b8faa9fbc5331a96f6395d43/propcache-0.5.4.tar.gz",
+        "yanked": false
+      },
+      "version": "0.5.4"
+    },
+    {
+      "index": {
+        "bytes": 40031,
+        "path": "metadata/psutil/7.1.3.json",
+        "sha256": "86a77f48857151e45d8aa09319753b0d762acb63886ccc87fdcc732691161c3f",
+        "url": "https://pypi.org/pypi/psutil/7.1.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/psutil-7.1.3.dist-info/METADATA",
+        "sha256": "3578dc4ee5f43e542d29839741b9e3d8760c3c0e5d8c388ec2b0b980bd8c66a1"
+      },
+      "name": "psutil",
+      "source": {
+        "bytes": 489059,
+        "filename": "psutil-7.1.3.tar.gz",
+        "path": "sources/6c86281738d77335af7aec228328e944b30930899ea760ecf33a4dba66be5e74/psutil-7.1.3.tar.gz",
+        "sha256": "6c86281738d77335af7aec228328e944b30930899ea760ecf33a4dba66be5e74",
+        "url": "https://files.pythonhosted.org/packages/e1/88/bdd0a41e5857d5d703287598cbf08dad90aed56774ea52ae071bae9071b6/psutil-7.1.3.tar.gz",
+        "yanked": false
+      },
+      "version": "7.1.3"
+    },
+    {
+      "index": {
+        "bytes": 9749,
+        "path": "metadata/py-cord/2.8.1.json",
+        "sha256": "40b48d75273a9559daf129d9b3e23c72d2a8579f635f2119669fefcb673be737",
+        "url": "https://pypi.org/pypi/py-cord/2.8.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/py_cord-2.8.1.dist-info/METADATA",
+        "sha256": "7e57d26ef5cd8207c0b095b6aea8b0a85990a29a8a2fe7fbc554c11428424cf3"
+      },
+      "name": "py-cord",
+      "source": {
+        "bytes": 1173996,
+        "filename": "py_cord-2.8.1.tar.gz",
+        "path": "sources/b1ebd22416941bbeccb6d26df5cbd65ff6b1d47fcbbc9652efae039e46e8a562/py_cord-2.8.1.tar.gz",
+        "sha256": "b1ebd22416941bbeccb6d26df5cbd65ff6b1d47fcbbc9652efae039e46e8a562",
+        "url": "https://files.pythonhosted.org/packages/48/99/371cafe39067d46db88477a4badbbf4128938d5a11971f9f0b8f4581efa1/py_cord-2.8.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.8.1"
+    },
+    {
+      "index": {
+        "bytes": 10589,
+        "path": "metadata/pyasn1/0.6.4.json",
+        "sha256": "cce3a342bc3f2027bcf079357de8886d17f1c058c5233b3f348b749a9ed2c38b",
+        "url": "https://pypi.org/pypi/pyasn1/0.6.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pyasn1-0.6.4.dist-info/METADATA",
+        "sha256": "a092d99fad1e3744d6aa26eef2598e8ee2343ea403137ca73d06dccef19d70e2"
+      },
+      "name": "pyasn1",
+      "source": {
+        "bytes": 151262,
+        "filename": "pyasn1-0.6.4.tar.gz",
+        "path": "sources/9c447d8431c947fe4c8febc4ed9e760bc29011a5b01e5c74b67025bd9fb8ce81/pyasn1-0.6.4.tar.gz",
+        "sha256": "9c447d8431c947fe4c8febc4ed9e760bc29011a5b01e5c74b67025bd9fb8ce81",
+        "url": "https://files.pythonhosted.org/packages/a4/9a/23310166d960def5897e91fe20e5b724601b02a22e84ba1f94232c0b7f67/pyasn1-0.6.4.tar.gz",
+        "yanked": false
+      },
+      "version": "0.6.4"
+    },
+    {
+      "index": {
+        "bytes": 5596,
+        "path": "metadata/pyasn1-modules/0.4.2.json",
+        "sha256": "5176a4663fb2345b3a0cd53e6d72d541fab642ed1ad815b1224c124f8287cc8e",
+        "url": "https://pypi.org/pypi/pyasn1-modules/0.4.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pyasn1_modules-0.4.2.dist-info/METADATA",
+        "sha256": "162666d75297dfcdd0116cbeab134d78fab808b8a66bfa5c1d74832d9b754771"
+      },
+      "name": "pyasn1-modules",
+      "source": {
+        "bytes": 307892,
+        "filename": "pyasn1_modules-0.4.2.tar.gz",
+        "path": "sources/677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6/pyasn1_modules-0.4.2.tar.gz",
+        "sha256": "677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6",
+        "url": "https://files.pythonhosted.org/packages/e9/e6/78ebbb10a8c8e4b61a59249394a4a594c1a7af95593dc933a349c8d00964/pyasn1_modules-0.4.2.tar.gz",
+        "yanked": false
+      },
+      "version": "0.4.2"
+    },
+    {
+      "index": {
+        "bytes": 12094,
+        "path": "metadata/pycparser/3.12.json",
+        "sha256": "e919b291615d54a2328a0da6128cd9d95601ad04d27cec48eeb75e0d57c3b6ad",
+        "url": "https://pypi.org/pypi/pycparser/3.12/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pycparser-3.12.dist-info/METADATA",
+        "sha256": "ad8db5fe2b0e0a3b0e8419fe5041b80be92470a40b06bd9c1462a0a8bb637c92"
+      },
+      "name": "pycparser",
+      "source": {
+        "bytes": 158785,
+        "filename": "pycparser-3.12.tar.gz",
+        "path": "sources/f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6/pycparser-3.12.tar.gz",
+        "sha256": "f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6",
+        "url": "https://files.pythonhosted.org/packages/cb/27/eeb9f307bf07060f3d9f9aa0fb8c15b01bdfded0a941e4b2719c7f94cacd/pycparser-3.12.tar.gz",
+        "yanked": false
+      },
+      "version": "3.12"
+    },
+    {
+      "index": {
+        "bytes": 30301,
+        "path": "metadata/pycryptodome/4.2.0.json",
+        "sha256": "afe8c5dd479b31c19fe995eb47d0d620cd415d030c7e7d44e6ba3e4d61488a05",
+        "url": "https://pypi.org/pypi/pycryptodome/4.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pycryptodome-4.2.0.dist-info/METADATA",
+        "sha256": "37ebf5d007f2e2c84f359e73124537bad2265d698fc9c9d4db31186e5c61306d"
+      },
+      "name": "pycryptodome",
+      "source": {
+        "bytes": 1750332,
+        "filename": "pycryptodome-4.2.0.tar.gz",
+        "path": "sources/21d7fdba239d6ef863d3d08388801c683453a3bb4897c2b27f27847aad89bdf7/pycryptodome-4.2.0.tar.gz",
+        "sha256": "21d7fdba239d6ef863d3d08388801c683453a3bb4897c2b27f27847aad89bdf7",
+        "url": "https://files.pythonhosted.org/packages/33/c7/f9374c8939560ab22db1dd9dbe215b62d20f32634aeb7f259dc03c807b44/pycryptodome-4.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.2.0"
+    },
+    {
+      "index": {
+        "bytes": 136442,
+        "path": "metadata/pydantic/2.14.1.json",
+        "sha256": "7413703dd60983a01d25e54730f9153c4d7a83fc788c77955b5237269cf9f071",
+        "url": "https://pypi.org/pypi/pydantic/2.14.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pydantic-2.14.1.dist-info/METADATA",
+        "sha256": "4d4c8e8d5e6a27d5208f0d7949f25628e6747133034969d4d1399b1ad5394036"
+      },
+      "name": "pydantic",
+      "source": {
+        "bytes": 900362,
+        "filename": "pydantic-2.14.1.tar.gz",
+        "path": "sources/94f478203dd03404682a1ada216965651dd74b1d2d5ffd62e00e0837caab5c26/pydantic-2.14.1.tar.gz",
+        "sha256": "94f478203dd03404682a1ada216965651dd74b1d2d5ffd62e00e0837caab5c26",
+        "url": "https://files.pythonhosted.org/packages/7c/0b/8e10b2e693af8ec54346a14caf36221334775975a747c9ceaa3f8371d96d/pydantic-2.14.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.14.1"
+    },
+    {
+      "index": {
+        "bytes": 128266,
+        "path": "metadata/pydantic-core/2.50.1.json",
+        "sha256": "e93d77eaf72dda287409887550bda890a4067311ea072bf9b274df9ce6d96804",
+        "url": "https://pypi.org/pypi/pydantic-core/2.50.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pydantic_core-2.50.1.dist-info/METADATA",
+        "sha256": "ae6817764b603fa2300cd31b9566ecc33476df46163c4150fffc353121a166f2"
+      },
+      "name": "pydantic-core",
+      "source": {
+        "bytes": 513515,
+        "filename": "pydantic_core-2.50.1.tar.gz",
+        "path": "sources/e50d7b94baac6c7d09927fa5ca5800a0c7ee5015c7fcff65beb3a1931b5a6e09/pydantic_core-2.50.1.tar.gz",
+        "sha256": "e50d7b94baac6c7d09927fa5ca5800a0c7ee5015c7fcff65beb3a1931b5a6e09",
+        "url": "https://files.pythonhosted.org/packages/a6/24/af4ec4be49fbc810f35b0bdcacc3d433b56bbfa469fd3bfd4ae116cd9bf1/pydantic_core-2.50.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.50.1"
+    },
+    {
+      "index": {
+        "bytes": 5819,
+        "path": "metadata/pydantic-settings/2.16.1.json",
+        "sha256": "ed92f7c49b82990ee77ed8dd20229249a65c5c195faa637a284562753cd5d995",
+        "url": "https://pypi.org/pypi/pydantic-settings/2.16.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pydantic_settings-2.16.1.dist-info/METADATA",
+        "sha256": "893e79ff20ee1cfea0e778956505d65be9b0555c601a6e4ebb513f1ee707cb1c"
+      },
+      "name": "pydantic-settings",
+      "source": {
+        "bytes": 303436,
+        "filename": "pydantic_settings-2.16.1.tar.gz",
+        "path": "sources/aff602a1886338c2df3d1e958e2193a8dc33cec75b91f202e83fd98484b4b0da/pydantic_settings-2.16.1.tar.gz",
+        "sha256": "aff602a1886338c2df3d1e958e2193a8dc33cec75b91f202e83fd98484b4b0da",
+        "url": "https://files.pythonhosted.org/packages/05/ca/7817b4bf0c4b15c6a6ab8cdf4cb96c268335a8ca2f525de93b6ebe4c7d28/pydantic_settings-2.16.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.16.1"
+    },
+    {
+      "index": {
+        "bytes": 3446,
+        "path": "metadata/pydub/0.25.1.json",
+        "sha256": "f188fca3b457be671a4842eaaf3620468b7839f2c188be2004bb80a4217aa827",
+        "url": "https://pypi.org/pypi/pydub/0.25.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pydub-0.25.1.dist-info/METADATA",
+        "sha256": "7f433cfd956d6e2628508f5e8d721e274dc9a3d03935b8bed15d5b56ab398989"
+      },
+      "name": "pydub",
+      "source": {
+        "bytes": 38326,
+        "filename": "pydub-0.25.1.tar.gz",
+        "path": "sources/980a33ce9949cab2a569606b65674d748ecbca4f0796887fd6f46173a7b0d30f/pydub-0.25.1.tar.gz",
+        "sha256": "980a33ce9949cab2a569606b65674d748ecbca4f0796887fd6f46173a7b0d30f",
+        "url": "https://files.pythonhosted.org/packages/fe/9a/e6bca0eed82db26562c73b5076539a4a08d3cffd19c3cc5913a3e61145fd/pydub-0.25.1.tar.gz",
+        "yanked": false
+      },
+      "version": "0.25.1"
+    },
+    {
+      "index": {
+        "bytes": 4500,
+        "path": "metadata/pygments/2.21.0.json",
+        "sha256": "330104a10adc8a587e3f98f4e207557125ca0c1d489e129334da5acb2b813a03",
+        "url": "https://pypi.org/pypi/pygments/2.21.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pygments-2.21.0.dist-info/METADATA",
+        "sha256": "1dde075570136774c706bf0009183a793fe0ee262e4a5590cc6eff8453eedd43"
+      },
+      "name": "pygments",
+      "source": {
+        "bytes": 5005329,
+        "filename": "pygments-2.21.0.tar.gz",
+        "path": "sources/610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c/pygments-2.21.0.tar.gz",
+        "sha256": "610ca751c9bc2492b38eb9a38a7fbc93edbbb2d7182edaf34e66ae493dee5c8c",
+        "url": "https://files.pythonhosted.org/packages/49/2e/ced460408999b33da6b31b0021b0f37d329e202d4169aeb164493778f25b/pygments-2.21.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.21.0"
+    },
+    {
+      "index": {
+        "bytes": 5552,
+        "path": "metadata/pyjwt/2.15.1.json",
+        "sha256": "f13089db8caff0efbdec85ab5c3fa281a3cc76d5b708c74fab427c98e1f29a0d",
+        "url": "https://pypi.org/pypi/pyjwt/2.15.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pyjwt-2.15.1.dist-info/METADATA",
+        "sha256": "1ea0c9f139b8c928276b3628af165955f6f764491448a6ad8f103cdcbb382da3"
+      },
+      "name": "pyjwt",
+      "source": {
+        "bytes": 121252,
+        "filename": "pyjwt-2.15.1.tar.gz",
+        "path": "sources/4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8/pyjwt-2.15.1.tar.gz",
+        "sha256": "4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8",
+        "url": "https://files.pythonhosted.org/packages/43/ea/5194e52748b0da83d71e082d75496eaec6e58f419f5e184786ded517e6a9/pyjwt-2.15.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.15.1"
+    },
+    {
+      "index": {
+        "bytes": 12257,
+        "path": "metadata/pyotp/2.10.0.json",
+        "sha256": "dc5bb2fa36cbef28f76c7bf06cad1e9be172f35a7e468ca34f64c091ad56645d",
+        "url": "https://pypi.org/pypi/pyotp/2.10.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pyotp-2.10.0.dist-info/METADATA",
+        "sha256": "921222968b5c7aba480db1e9288544cf63407032fade2e195310b19c80659261"
+      },
+      "name": "pyotp",
+      "source": {
+        "bytes": 18625,
+        "filename": "pyotp-2.10.0.tar.gz",
+        "path": "sources/d01e9703443616b03c57c700b5cbffd56a1f929c1b0f8f03131bc78c1fca9d3f/pyotp-2.10.0.tar.gz",
+        "sha256": "d01e9703443616b03c57c700b5cbffd56a1f929c1b0f8f03131bc78c1fca9d3f",
+        "url": "https://files.pythonhosted.org/packages/2d/c6/c5d96a86fd0bf6fa1bbb5c5c341ff3208638b692727a683c8289068d9a11/pyotp-2.10.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.10.0"
+    },
+    {
+      "index": {
+        "bytes": 9370,
+        "path": "metadata/pypdf/6.21.2.json",
+        "sha256": "451120efbbfe4d789e0a41441a767ae87a3203c3871185fec82442948118ff3c",
+        "url": "https://pypi.org/pypi/pypdf/6.21.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pypdf-6.21.2.dist-info/METADATA",
+        "sha256": "9011b30e80b0f8b61bc5d1e9542dcc8378a19886b2de297b800c1318d51df564"
+      },
+      "name": "pypdf",
+      "source": {
+        "bytes": 7144571,
+        "filename": "pypdf-6.21.2.tar.gz",
+        "path": "sources/0a3e1c5c886a1be03646c16a04827cc166c2a0575c971b26a4bf89686551c2d4/pypdf-6.21.2.tar.gz",
+        "sha256": "0a3e1c5c886a1be03646c16a04827cc166c2a0575c971b26a4bf89686551c2d4",
+        "url": "https://files.pythonhosted.org/packages/06/28/081f1cbcca7042441dafc8de00f48ba60853f89e5bff92c5f26477346d81/pypdf-6.21.2.tar.gz",
+        "yanked": false
+      },
+      "version": "6.21.2"
+    },
+    {
+      "index": {
+        "bytes": 176501,
+        "path": "metadata/pyromark/0.10.3.json",
+        "sha256": "6629f2e1a1173d1833a6405ea4edda1609dc5c5d015b2bafed72b1fbd128561a",
+        "url": "https://pypi.org/pypi/pyromark/0.10.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pyromark-0.10.3.dist-info/METADATA",
+        "sha256": "27032484a8b40d702b8cc48a72f0eb7550182ed6a34a3ca56b75ebcd801f7ca5"
+      },
+      "name": "pyromark",
+      "source": {
+        "bytes": 50565,
+        "filename": "pyromark-0.10.3.tar.gz",
+        "path": "sources/895c32955b138b41db51cc1544e931647d2c644512990b21f46c50078285f1d6/pyromark-0.10.3.tar.gz",
+        "sha256": "895c32955b138b41db51cc1544e931647d2c644512990b21f46c50078285f1d6",
+        "url": "https://files.pythonhosted.org/packages/8d/00/30bc95f84f5e3ba5d934521ca63361ddd5108c43557e39f59fa97772f6b6/pyromark-0.10.3.tar.gz",
+        "yanked": false
+      },
+      "version": "0.10.3"
+    },
+    {
+      "index": {
+        "bytes": 16638,
+        "path": "metadata/pysocks/1.7.1.json",
+        "sha256": "c963fe76c7f6e8926cfe821baa12a7720a27f1aa35e70210f5d63257d3bb0da5",
+        "url": "https://pypi.org/pypi/pysocks/1.7.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/PySocks-1.7.1.dist-info/METADATA",
+        "sha256": "cdb40c8b38cf38e3f80e1122117db85d78cdad8b88c45f54194a4dd2e14307a6"
+      },
+      "name": "pysocks",
+      "source": {
+        "bytes": 284429,
+        "filename": "PySocks-1.7.1.tar.gz",
+        "path": "sources/3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0/PySocks-1.7.1.tar.gz",
+        "sha256": "3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0",
+        "url": "https://files.pythonhosted.org/packages/bd/11/293dd436aea955d45fc4e8a35b6ae7270f5b8e00b53cf6c024c83b657a11/PySocks-1.7.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.7.1"
+    },
+    {
+      "index": {
+        "bytes": 10528,
+        "path": "metadata/python-dateutil/3.0.0.json",
+        "sha256": "6e33ca795417ca662f2820675158d64500733c354a7f7b81184a5471886240a7",
+        "url": "https://pypi.org/pypi/python-dateutil/3.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_dateutil-3.0.0.dist-info/METADATA",
+        "sha256": "e10ead93598aed51bdb28aa30ef64ee5d6ccc871e88741d220e504e979af4695"
+      },
+      "name": "python-dateutil",
+      "source": {
+        "bytes": 271066,
+        "filename": "python_dateutil-3.0.0.tar.gz",
+        "path": "sources/7ebcb3c29a92f3ceafe79a7a48a5c45677e9e004bbeec5742ac0bbb00560b7a2/python_dateutil-3.0.0.tar.gz",
+        "sha256": "7ebcb3c29a92f3ceafe79a7a48a5c45677e9e004bbeec5742ac0bbb00560b7a2",
+        "url": "https://files.pythonhosted.org/packages/0e/df/f15f80383f152452d8985b36d95cb8751f901a3e0ff4cd27f7e118f168e2/python_dateutil-3.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "3.0.0"
+    },
+    {
+      "index": {
+        "bytes": 4072,
+        "path": "metadata/python-docx/1.2.0.json",
+        "sha256": "7dc6149fa5a8f34d922a1bfe6730be72bbb889bd879cba60776dccd597fac775",
+        "url": "https://pypi.org/pypi/python-docx/1.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_docx-1.2.0.dist-info/METADATA",
+        "sha256": "4c4cc819ebe6de4aca44daccfd3f9173e6f46d9ed900ad1c388ff9efb7b6b1d7"
+      },
+      "name": "python-docx",
+      "source": {
+        "bytes": 5723256,
+        "filename": "python_docx-1.2.0.tar.gz",
+        "path": "sources/7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce/python_docx-1.2.0.tar.gz",
+        "sha256": "7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce",
+        "url": "https://files.pythonhosted.org/packages/a9/f7/eddfe33871520adab45aaa1a71f0402a2252050c14c7e3009446c8f4701c/python_docx-1.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.2.0"
+    },
+    {
+      "index": {
+        "bytes": 32947,
+        "path": "metadata/python-dotenv/1.2.4.json",
+        "sha256": "89701376846132aefd76202d07dad6e84febe4a426a12973004e13018af15c41",
+        "url": "https://pypi.org/pypi/python-dotenv/1.2.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_dotenv-1.2.4.dist-info/METADATA",
+        "sha256": "87cfee6042412d48df1100ea7822684988c3f2b79de7a250f4717f4df3026d6f"
+      },
+      "name": "python-dotenv",
+      "source": {
+        "bytes": 60824,
+        "filename": "python_dotenv-1.2.4.tar.gz",
+        "path": "sources/f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0/python_dotenv-1.2.4.tar.gz",
+        "sha256": "f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0",
+        "url": "https://files.pythonhosted.org/packages/74/26/2fbeedb218a787a5eea551c7532cac4e009f83d689dd2faa0d0353473f86/python_dotenv-1.2.4.tar.gz",
+        "yanked": false
+      },
+      "version": "1.2.4"
+    },
+    {
+      "index": {
+        "bytes": 4230,
+        "path": "metadata/python-multipart/0.0.32.json",
+        "sha256": "f94ae178a5196b01730490f0b3b10b2ad32bf92aa2fba5c3f7ffd6b5235c9697",
+        "url": "https://pypi.org/pypi/python-multipart/0.0.32/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_multipart-0.0.32.dist-info/METADATA",
+        "sha256": "e9d399d7dea5eddf0e4d24b5c24687a82e7e50bf2c2b30f8f8a06a64d887dd86"
+      },
+      "name": "python-multipart",
+      "source": {
+        "bytes": 46881,
+        "filename": "python_multipart-0.0.32.tar.gz",
+        "path": "sources/be54b7f3fa167bb83e4fcd936b887b708f4e57fe75911c02aebf53efaf8d938e/python_multipart-0.0.32.tar.gz",
+        "sha256": "be54b7f3fa167bb83e4fcd936b887b708f4e57fe75911c02aebf53efaf8d938e",
+        "url": "https://files.pythonhosted.org/packages/5b/42/55c32bb9b12693c092ad250a0e82edb5b31ddeda6eb772de5f308b3804ad/python_multipart-0.0.32.tar.gz",
+        "yanked": false
+      },
+      "version": "0.0.32"
+    },
+    {
+      "index": {
+        "bytes": 21377,
+        "path": "metadata/python-ripgrep/0.0.8.json",
+        "sha256": "c5f8dde828060c455900762117c1205640719f9eff6927650d6868fbf1d3bae9",
+        "url": "https://pypi.org/pypi/python-ripgrep/0.0.8/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_ripgrep-0.0.8.dist-info/METADATA",
+        "sha256": "e6e71fcfc148340ebab634fec33276602c6626ede8b9fd01fafa5f42031dacf8"
+      },
+      "name": "python-ripgrep",
+      "source": {
+        "bytes": 47777,
+        "filename": "python_ripgrep-0.0.8.tar.gz",
+        "path": "sources/ebb0f4618c4a15baad524beab636e2b59e87b4ca283ceed0a1026384118d466b/python_ripgrep-0.0.8.tar.gz",
+        "sha256": "ebb0f4618c4a15baad524beab636e2b59e87b4ca283ceed0a1026384118d466b",
+        "url": "https://files.pythonhosted.org/packages/b4/af/c7000c2076169b2420790792bed5a9699280c6ba9865b4e07d725801cf5f/python_ripgrep-0.0.8.tar.gz",
+        "yanked": false
+      },
+      "version": "0.0.8"
+    },
+    {
+      "index": {
+        "bytes": 11319,
+        "path": "metadata/python-socks/3.1.1.json",
+        "sha256": "53f8ba707007765a36bbd5566048d8f1271921a1d15f1c0d0069e185274e0e1c",
+        "url": "https://pypi.org/pypi/python-socks/3.1.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_socks-3.1.1.dist-info/METADATA",
+        "sha256": "6c72ba43039d5a745408e072829e8c5bcf03f1b4cfd8c797e6b0262bb85a4c8e"
+      },
+      "name": "python-socks",
+      "source": {
+        "bytes": 232781,
+        "filename": "python_socks-3.1.1.tar.gz",
+        "path": "sources/8d3e817cdbe858dc0bb8c8fdc8e79b6ce37acce110d33374c6f57a675cc9029e/python_socks-3.1.1.tar.gz",
+        "sha256": "8d3e817cdbe858dc0bb8c8fdc8e79b6ce37acce110d33374c6f57a675cc9029e",
+        "url": "https://files.pythonhosted.org/packages/04/ad/484ffb79532517b11a90af38647c38652224650b31a7ae1cedd5a418d8ab/python_socks-3.1.1.tar.gz",
+        "yanked": false
+      },
+      "version": "3.1.1"
+    },
+    {
+      "index": {
+        "bytes": 19424,
+        "path": "metadata/python-telegram-bot/22.8.json",
+        "sha256": "0db34ecd8f24c35a25dd7f8f1d193dd91ca2d0e153fcd713d7a476250573c3ba",
+        "url": "https://pypi.org/pypi/python-telegram-bot/22.8/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/python_telegram_bot-22.8.dist-info/METADATA",
+        "sha256": "9fae99aaa169ef6a554b0aa8a1e0cdc4d23d5aec5b5d01b6633fc9a86bf19e34"
+      },
+      "name": "python-telegram-bot",
+      "source": {
+        "bytes": 1551700,
+        "filename": "python_telegram_bot-22.8.tar.gz",
+        "path": "sources/f9d3847fcb23ee603477e442800b33bb4adf851a73e0619d2050be879decf1ef/python_telegram_bot-22.8.tar.gz",
+        "sha256": "f9d3847fcb23ee603477e442800b33bb4adf851a73e0619d2050be879decf1ef",
+        "url": "https://files.pythonhosted.org/packages/ba/77/153517bb1ac1bba670c6fb1dbf09e1fd0730494b1705934e715391413a0d/python_telegram_bot-22.8.tar.gz",
+        "yanked": false
+      },
+      "version": "22.8"
+    },
+    {
+      "index": {
+        "bytes": 66402,
+        "path": "metadata/pyyaml/6.0.3.json",
+        "sha256": "c3f35597bc2f08cc990c2a5fe57bef6687b3a3d7c61d8b0ba4cc067777eb1def",
+        "url": "https://pypi.org/pypi/pyyaml/6.0.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/pyyaml-6.0.3.dist-info/METADATA",
+        "sha256": "03c3b415ed38d09faedc49360e930769b40c58f68585e6de00e2e4916a858d34"
+      },
+      "name": "pyyaml",
+      "source": {
+        "bytes": 130960,
+        "filename": "pyyaml-6.0.3.tar.gz",
+        "path": "sources/d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f/pyyaml-6.0.3.tar.gz",
+        "sha256": "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f",
+        "url": "https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz",
+        "yanked": false
+      },
+      "version": "6.0.3"
+    },
+    {
+      "index": {
+        "bytes": 7944,
+        "path": "metadata/qq-botpy/1.2.1.json",
+        "sha256": "19688be33853490b7abfe11aa508bed98f758241688a65a9560a52f6b23c6976",
+        "url": "https://pypi.org/pypi/qq-botpy/1.2.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/qq_botpy-1.2.1.dist-info/METADATA",
+        "sha256": "b72c57eedff82d3fd196d898bd15852e48bbffaf18b1127142bc78ffc3d6874f"
+      },
+      "name": "qq-botpy",
+      "source": {
+        "bytes": 38270,
+        "filename": "qq-botpy-1.2.1.tar.gz",
+        "path": "sources/442172a0557a9b43d2777d1c5e072090a9d1a54d588d1c5da8d3efc014f4887f/qq-botpy-1.2.1.tar.gz",
+        "sha256": "442172a0557a9b43d2777d1c5e072090a9d1a54d588d1c5da8d3efc014f4887f",
+        "url": "https://files.pythonhosted.org/packages/1f/b7/1b13569f9cf784d1d37caa2d7bc27246922fe50adb62c3dac0d53d7d38ee/qq-botpy-1.2.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.2.1"
+    },
+    {
+      "index": {
+        "bytes": 20427,
+        "path": "metadata/qrcode/8.2.json",
+        "sha256": "2761ab5af63a844c325eb61712dc37b169d8a169ad23b9be2c1af18696fc097d",
+        "url": "https://pypi.org/pypi/qrcode/8.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/qrcode-8.2.dist-info/METADATA",
+        "sha256": "3a8f1be6da9428b97806292d05e3148264b9053c22e79894918b670e930afc36"
+      },
+      "name": "qrcode",
+      "source": {
+        "bytes": 43317,
+        "filename": "qrcode-8.2.tar.gz",
+        "path": "sources/35c3f2a4172b33136ab9f6b3ef1c00260dd2f66f858f24d88418a015f446506c/qrcode-8.2.tar.gz",
+        "sha256": "35c3f2a4172b33136ab9f6b3ef1c00260dd2f66f858f24d88418a015f446506c",
+        "url": "https://files.pythonhosted.org/packages/8f/b2/7fc2931bfae0af02d5f53b174e9cf701adbb35f39d69c2af63d4a39f81a9/qrcode-8.2.tar.gz",
+        "yanked": false
+      },
+      "version": "8.2"
+    },
+    {
+      "index": {
+        "bytes": 6076,
+        "path": "metadata/quart/0.22.0.json",
+        "sha256": "61e90f5d7d69b9742db8a7f3835406684b88053a9029fce89dcc2576bd6fcb48",
+        "url": "https://pypi.org/pypi/quart/0.22.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/quart-0.22.0.dist-info/METADATA",
+        "sha256": "61a265faf802feb378fcf635153c68535e1eb8806eac0cc92f26cf7688163d97"
+      },
+      "name": "quart",
+      "source": {
+        "bytes": 65475,
+        "filename": "quart-0.22.0.tar.gz",
+        "path": "sources/6ba567bb29e0ea66f7c0a0297c2b6225bb531e37dbf9b75dbf4a6e1713c4c934/quart-0.22.0.tar.gz",
+        "sha256": "6ba567bb29e0ea66f7c0a0297c2b6225bb531e37dbf9b75dbf4a6e1713c4c934",
+        "url": "https://files.pythonhosted.org/packages/82/8a/13962df31309fa024b1811102981577b1702916779d3f17067bbf1f7691d/quart-0.22.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.22.0"
+    },
+    {
+      "index": {
+        "bytes": 5490,
+        "path": "metadata/rank-bm25/0.2.2.json",
+        "sha256": "e6fb8ec89dac635c586649f47a2033aa8b09cfdb71b75ecf00b59913eebedae9",
+        "url": "https://pypi.org/pypi/rank-bm25/0.2.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/rank_bm25-0.2.2.dist-info/METADATA",
+        "sha256": "1de65ad7ae030a81c3006d546f1939bf15dc1e3b45728c469a9c4097b08840e8"
+      },
+      "name": "rank-bm25",
+      "source": {
+        "bytes": 8347,
+        "filename": "rank_bm25-0.2.2.tar.gz",
+        "path": "sources/096ccef76f8188563419aaf384a02f0ea459503fdf77901378d4fd9d87e5e51d/rank_bm25-0.2.2.tar.gz",
+        "sha256": "096ccef76f8188563419aaf384a02f0ea459503fdf77901378d4fd9d87e5e51d",
+        "url": "https://files.pythonhosted.org/packages/fc/0a/f9579384aa017d8b4c15613f86954b92a95a93d641cc849182467cf0bb3b/rank_bm25-0.2.2.tar.gz",
+        "yanked": false
+      },
+      "version": "0.2.2"
+    },
+    {
+      "index": {
+        "bytes": 4842,
+        "path": "metadata/referencing/0.37.0.json",
+        "sha256": "a67968d8e03aa45e650fc2ff0d07796676db1a7841ce8e810bf2dba5af689464",
+        "url": "https://pypi.org/pypi/referencing/0.37.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/referencing-0.37.0.dist-info/METADATA",
+        "sha256": "c93b00e6ab1524fd60848376604c189a114374776475c25a31d57be47b29de6a"
+      },
+      "name": "referencing",
+      "source": {
+        "bytes": 78036,
+        "filename": "referencing-0.37.0.tar.gz",
+        "path": "sources/44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8/referencing-0.37.0.tar.gz",
+        "sha256": "44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8",
+        "url": "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.37.0"
+    },
+    {
+      "index": {
+        "bytes": 156896,
+        "path": "metadata/regex/2026.9.29.json",
+        "sha256": "08fc1fa7daa8db0404cbbaea4eed71acc7798421386d3de50f92302068fe58c5",
+        "url": "https://pypi.org/pypi/regex/2026.9.29/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/regex-2026.9.29.dist-info/METADATA",
+        "sha256": "33859377dbf8dd38ee3de73fd97faebf4a63d50576e3cc1a9dfe44df08b0936a"
+      },
+      "name": "regex",
+      "source": {
+        "bytes": 419199,
+        "filename": "regex-2026.9.29.tar.gz",
+        "path": "sources/8b5fcc4771732191b2b7d1dd68d8f0353f47f8d90b6150f6dce58bf1112442cb/regex-2026.9.29.tar.gz",
+        "sha256": "8b5fcc4771732191b2b7d1dd68d8f0353f47f8d90b6150f6dce58bf1112442cb",
+        "url": "https://files.pythonhosted.org/packages/fc/f2/af1da9d3ceed77bfcdce40427d49ba0be94e4fe84245e3bfef68c10e75b6/regex-2026.9.29.tar.gz",
+        "yanked": false
+      },
+      "version": "2026.9.29"
+    },
+    {
+      "index": {
+        "bytes": 3636,
+        "path": "metadata/reportlab/5.1.0.json",
+        "sha256": "0ac17bfa32fa76d6e8924422ad066dfdbb84e861c330840e3d0cac4faede5037",
+        "url": "https://pypi.org/pypi/reportlab/5.1.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/reportlab-5.1.0.dist-info/METADATA",
+        "sha256": "86667f600392d769e71fa5922887c9b1366f2393aced8bea31e72542088a9cca"
+      },
+      "name": "reportlab",
+      "source": {
+        "bytes": 4109612,
+        "filename": "reportlab-5.1.0.tar.gz",
+        "path": "sources/6878200464527e87672d19e9f7cfc6bb890e3a6931e74ac6a1a8d1754aa55671/reportlab-5.1.0.tar.gz",
+        "sha256": "6878200464527e87672d19e9f7cfc6bb890e3a6931e74ac6a1a8d1754aa55671",
+        "url": "https://files.pythonhosted.org/packages/89/22/c18474be40b9bbb52fdb7051177d4d25f1ea59fada17eb181026411e93b1/reportlab-5.1.0.tar.gz",
+        "yanked": false
+      },
+      "version": "5.1.0"
+    },
+    {
+      "index": {
+        "bytes": 6811,
+        "path": "metadata/requests/2.34.2.json",
+        "sha256": "8622e50ffd295ed759ec793f2a009172a4ed0204bbc5e948de23111bc3d2aeae",
+        "url": "https://pypi.org/pypi/requests/2.34.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/requests-2.34.2.dist-info/METADATA",
+        "sha256": "8c384ba3e979480faae2859d3c5e6c1276dd2c3616e322e124d52c8cfc556f27"
+      },
+      "name": "requests",
+      "source": {
+        "bytes": 142856,
+        "filename": "requests-2.34.2.tar.gz",
+        "path": "sources/f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed/requests-2.34.2.tar.gz",
+        "sha256": "f288924cae4e29463698d6d60bc6a4da69c89185ad1e0bcc4104f584e960b9ed",
+        "url": "https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-2.34.2.tar.gz",
+        "yanked": false
+      },
+      "version": "2.34.2"
+    },
+    {
+      "index": {
+        "bytes": 17323,
+        "path": "metadata/requests-toolbelt/1.0.0.json",
+        "sha256": "77572be079b3e272fe239c8a0e1ae3491e90ee3c58eb63614ea4d7e5bcbc2b8e",
+        "url": "https://pypi.org/pypi/requests-toolbelt/1.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/requests_toolbelt-1.0.0.dist-info/METADATA",
+        "sha256": "fa52f26237cc8d148d25c5746fdca499a56d0e765e69095cc3564a07cce23967"
+      },
+      "name": "requests-toolbelt",
+      "source": {
+        "bytes": 206888,
+        "filename": "requests-toolbelt-1.0.0.tar.gz",
+        "path": "sources/7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6/requests-toolbelt-1.0.0.tar.gz",
+        "sha256": "7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6",
+        "url": "https://files.pythonhosted.org/packages/f3/61/d7545dafb7ac2230c70d38d31cbfe4cc64f7144dc41f6e4e4b78ecd9f5bb/requests-toolbelt-1.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.0.0"
+    },
+    {
+      "index": {
+        "bytes": 20976,
+        "path": "metadata/rich/15.0.0.json",
+        "sha256": "455015cb0b237a24819d91236152ad0e71b2be39a83cbe6afa0e29ea8aafa550",
+        "url": "https://pypi.org/pypi/rich/15.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/rich-15.0.0.dist-info/METADATA",
+        "sha256": "fad34fc603fac4481bf81f8dd629492fc302c0ec31909c86644751512afb2e3b"
+      },
+      "name": "rich",
+      "source": {
+        "bytes": 230680,
+        "filename": "rich-15.0.0.tar.gz",
+        "path": "sources/edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36/rich-15.0.0.tar.gz",
+        "sha256": "edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36",
+        "url": "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "15.0.0"
+    },
+    {
+      "index": {
+        "bytes": 116828,
+        "path": "metadata/rpds-py/2026.9.1.json",
+        "sha256": "93808b9ff27aabe26d9a4f03b28422d1d05c3fb8716d88f3826e7ddf4b0b258b",
+        "url": "https://pypi.org/pypi/rpds-py/2026.9.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/rpds_py-2026.9.1.dist-info/METADATA",
+        "sha256": "5d72dca2e387c8d2b4180b68ee87c15b64751e059100a6db58891ec9995445c3"
+      },
+      "name": "rpds-py",
+      "source": {
+        "bytes": 63948,
+        "filename": "rpds_py-2026.9.1.tar.gz",
+        "path": "sources/4793ef7f78268b124b73fa933440f01d258bbae01de9fa53e9080c9ab0425a12/rpds_py-2026.9.1.tar.gz",
+        "sha256": "4793ef7f78268b124b73fa933440f01d258bbae01de9fa53e9080c9ab0425a12",
+        "url": "https://files.pythonhosted.org/packages/42/68/3bd46b8a5e01d3c2ebdf9c5e9497912e3fe0cde02bac21a7130ca866e403/rpds_py-2026.9.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2026.9.1"
+    },
+    {
+      "index": {
+        "bytes": 5706,
+        "path": "metadata/shellingham/1.5.4.json",
+        "sha256": "9381443cd6295d50fc7f7bd34a457243b0f3a54732cde45b0fc2d0994b61f3af",
+        "url": "https://pypi.org/pypi/shellingham/1.5.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/shellingham-1.5.4.dist-info/METADATA",
+        "sha256": "183d80220a37493262795739dd357cc5bb3f49bd390cc9198d5180e5451a07fa"
+      },
+      "name": "shellingham",
+      "source": {
+        "bytes": 10310,
+        "filename": "shellingham-1.5.4.tar.gz",
+        "path": "sources/8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de/shellingham-1.5.4.tar.gz",
+        "sha256": "8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de",
+        "url": "https://files.pythonhosted.org/packages/58/15/8b3609fd3830ef7b27b655beb4b4e9c62313a4e8da8c676e142cc210d58e/shellingham-1.5.4.tar.gz",
+        "yanked": false
+      },
+      "version": "1.5.4"
+    },
+    {
+      "index": {
+        "bytes": 11785,
+        "path": "metadata/shipyard-neo-sdk/0.2.0.json",
+        "sha256": "e4814d356c210ad02cec66d174f35f728e8c55e63ea5e24d30374fd52d95527d",
+        "url": "https://pypi.org/pypi/shipyard-neo-sdk/0.2.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/shipyard_neo_sdk-0.2.0.dist-info/METADATA",
+        "sha256": "52e34aa9d2157cb39d2013492765f829b79fb9c9bb707b97b641aa3074f0cec7"
+      },
+      "name": "shipyard-neo-sdk",
+      "source": {
+        "bytes": 77922,
+        "filename": "shipyard_neo_sdk-0.2.0.tar.gz",
+        "path": "sources/dc1df8fb6f4349845bbfe06a6fd3d9a6c06290ec1008d0f1557e2ab1282dbcda/shipyard_neo_sdk-0.2.0.tar.gz",
+        "sha256": "dc1df8fb6f4349845bbfe06a6fd3d9a6c06290ec1008d0f1557e2ab1282dbcda",
+        "url": "https://files.pythonhosted.org/packages/c3/1c/4efc6d66afa2cc18c6cdf845a85af5efe86055842d926d889e79bc34fa32/shipyard_neo_sdk-0.2.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.2.0"
+    },
+    {
+      "index": {
+        "bytes": 5209,
+        "path": "metadata/shipyard-python-sdk/0.2.4.json",
+        "sha256": "dcf724777d6e6606439ef62e40ed38d96ef61e0009ce05d91f47d9fd79ceee72",
+        "url": "https://pypi.org/pypi/shipyard-python-sdk/0.2.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/shipyard_python_sdk-0.2.4.dist-info/METADATA",
+        "sha256": "f690c70a3c12fc9a0d2d987d7224d5bbcf7a6607355b101b0da6dfcab5b4fd67"
+      },
+      "name": "shipyard-python-sdk",
+      "source": {
+        "bytes": 7223,
+        "filename": "shipyard_python_sdk-0.2.4.tar.gz",
+        "path": "sources/4c129a21d55ffc31698fc84b1082c91df122ab330481e17d7dda551076a800c2/shipyard_python_sdk-0.2.4.tar.gz",
+        "sha256": "4c129a21d55ffc31698fc84b1082c91df122ab330481e17d7dda551076a800c2",
+        "url": "https://files.pythonhosted.org/packages/0c/72/9aebc032e5a385020b11c73bc5ab9945c30ab0c4e6a90a22fb8f84c5b40a/shipyard_python_sdk-0.2.4.tar.gz",
+        "yanked": false
+      },
+      "version": "0.2.4"
+    },
+    {
+      "index": {
+        "bytes": 88057,
+        "path": "metadata/silk-python/0.2.8.json",
+        "sha256": "5a0508196b3112efc2ddb5878120b99c7d513599a632044cb790ec11a89c5050",
+        "url": "https://pypi.org/pypi/silk-python/0.2.8/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/silk_python-0.2.8.dist-info/METADATA",
+        "sha256": "1d72ddca5ab2477ffd4eebabce5cd70d6fa9275b07fca0f6a179db56a6dbe33e"
+      },
+      "name": "silk-python",
+      "source": {
+        "bytes": 93224,
+        "filename": "silk_python-0.2.8.tar.gz",
+        "path": "sources/4b47e84b9ea82675af795c858fcd923ee15eeb6a9cb2a7ce5aff3f411bbb29b0/silk_python-0.2.8.tar.gz",
+        "sha256": "4b47e84b9ea82675af795c858fcd923ee15eeb6a9cb2a7ce5aff3f411bbb29b0",
+        "url": "https://files.pythonhosted.org/packages/e8/28/cfb7367c97a38b1292ebdac07fe931724137d660484e96a08d389629e3dc/silk_python-0.2.8.tar.gz",
+        "yanked": false
+      },
+      "version": "0.2.8"
+    },
+    {
+      "index": {
+        "bytes": 3904,
+        "path": "metadata/six/1.17.0.json",
+        "sha256": "d8de39dd52b73048d81a8fd78022ee2bc72f8b568bcf0d88e5d5069c302b1208",
+        "url": "https://pypi.org/pypi/six/1.17.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/six-1.17.0.dist-info/METADATA",
+        "sha256": "562042078c2752549f6d8a7c86dbc5dd708088a7be6d80672ec7b07100b72468"
+      },
+      "name": "six",
+      "source": {
+        "bytes": 34031,
+        "filename": "six-1.17.0.tar.gz",
+        "path": "sources/ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81/six-1.17.0.tar.gz",
+        "sha256": "ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81",
+        "url": "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.17.0"
+    },
+    {
+      "index": {
+        "bytes": 18902,
+        "path": "metadata/slack-sdk/3.45.0.json",
+        "sha256": "6862a723d27f75d4cd19f311f28a2e3eb4dda15ed88f4bf16afb6ac5a4f74588",
+        "url": "https://pypi.org/pypi/slack-sdk/3.45.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/slack_sdk-3.45.0.dist-info/METADATA",
+        "sha256": "16da0f082ff1a5a86add8078e8267132efd3fda98f33753b57e6c114e3e749b9"
+      },
+      "name": "slack-sdk",
+      "source": {
+        "bytes": 259739,
+        "filename": "slack_sdk-3.45.0.tar.gz",
+        "path": "sources/1ab794452f238b59db0d8a4d346263d65190288add53ec67a05751d8e7402486/slack_sdk-3.45.0.tar.gz",
+        "sha256": "1ab794452f238b59db0d8a4d346263d65190288add53ec67a05751d8e7402486",
+        "url": "https://files.pythonhosted.org/packages/24/74/a4b30685bc76846b70baa9edaa45ba577ce5a28fc9e474b51524bb2aa932/slack_sdk-3.45.0.tar.gz",
+        "yanked": false
+      },
+      "version": "3.45.0"
+    },
+    {
+      "index": {
+        "bytes": 5953,
+        "path": "metadata/sniffio/1.3.1.json",
+        "sha256": "1217ad6ed84734e8f77ecfd151d91786d5a633b0482af1cde28185de0159bd37",
+        "url": "https://pypi.org/pypi/sniffio/1.3.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/sniffio-1.3.1.dist-info/METADATA",
+        "sha256": "0b318b57098edeccf585e60a889a6b6a7b5c4086f3a9aa62eff76a1d3cee12d9"
+      },
+      "name": "sniffio",
+      "source": {
+        "bytes": 20372,
+        "filename": "sniffio-1.3.1.tar.gz",
+        "path": "sources/f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc/sniffio-1.3.1.tar.gz",
+        "sha256": "f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc",
+        "url": "https://files.pythonhosted.org/packages/a2/87/a6771e1546d97e7e041b6ae58d80074f81b7d5121207425c964ddf5cfdbd/sniffio-1.3.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.3.1"
+    },
+    {
+      "index": {
+        "bytes": 8457,
+        "path": "metadata/socksio/1.0.0.json",
+        "sha256": "3de2225b858b17026924049bac176df7c758559c657c22039c36f8a9ebcd956e",
+        "url": "https://pypi.org/pypi/socksio/1.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/socksio-1.0.0.dist-info/METADATA",
+        "sha256": "bbfa5fe1625dadce138e24ff9c161b6499c4f33cd6b0adde62ef3531a6870286"
+      },
+      "name": "socksio",
+      "source": {
+        "bytes": 19055,
+        "filename": "socksio-1.0.0.tar.gz",
+        "path": "sources/f88beb3da5b5c38b9890469de67d0cb0f9d494b78b106ca1845f96c10b91c4ac/socksio-1.0.0.tar.gz",
+        "sha256": "f88beb3da5b5c38b9890469de67d0cb0f9d494b78b106ca1845f96c10b91c4ac",
+        "url": "https://files.pythonhosted.org/packages/f8/5c/48a7d9495be3d1c651198fd99dbb6ce190e2274d0f28b9051307bdec6b85/socksio-1.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.0.0"
+    },
+    {
+      "index": {
+        "bytes": 6548,
+        "path": "metadata/soupsieve/3.0.4.json",
+        "sha256": "e3b2bae7a8dc84d3a105f185938dd135a59445c5cf29805b68bfc97ab2345467",
+        "url": "https://pypi.org/pypi/soupsieve/3.0.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/soupsieve-3.0.4.dist-info/METADATA",
+        "sha256": "548d71d83acf92c9206af9b8bac48271f34d2cdd3f6c6b4237c88bad6fee09fd"
+      },
+      "name": "soupsieve",
+      "source": {
+        "bytes": 119017,
+        "filename": "soupsieve-3.0.4.tar.gz",
+        "path": "sources/924fab84ae21604c19e175e1f39815eb6fa83ba23836e09e9de180925e5bc4c0/soupsieve-3.0.4.tar.gz",
+        "sha256": "924fab84ae21604c19e175e1f39815eb6fa83ba23836e09e9de180925e5bc4c0",
+        "url": "https://files.pythonhosted.org/packages/19/63/0b6bae54546aed98d72f12d09df57b19a287f01c84d22047fa2e23772ab9/soupsieve-3.0.4.tar.gz",
+        "yanked": false
+      },
+      "version": "3.0.4"
+    },
+    {
+      "index": {
+        "bytes": 72557,
+        "path": "metadata/sqlalchemy/2.1.6.json",
+        "sha256": "abf006e8137d1f65a442973649e9d810cbd07dcd454f00d0b5f80d867b32c249",
+        "url": "https://pypi.org/pypi/sqlalchemy/2.1.6/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/sqlalchemy-2.1.6.dist-info/METADATA",
+        "sha256": "f174fb2a052ac3679f399ba9e73b5bd5a8bd1f69a78b1460aebc90eb7ebdda50"
+      },
+      "name": "sqlalchemy",
+      "source": {
+        "bytes": 10589700,
+        "filename": "sqlalchemy-2.1.6.tar.gz",
+        "path": "sources/499eae5c9051efe96cb9a73ec2fbde8ffa4186f102b9094ebab8fcc9d3b99f52/sqlalchemy-2.1.6.tar.gz",
+        "sha256": "499eae5c9051efe96cb9a73ec2fbde8ffa4186f102b9094ebab8fcc9d3b99f52",
+        "url": "https://files.pythonhosted.org/packages/36/dc/9addbf490110b5727380059ee542ad8353bdcee45a37ba6a5e0976966ae0/sqlalchemy-2.1.6.tar.gz",
+        "yanked": false
+      },
+      "version": "2.1.6"
+    },
+    {
+      "index": {
+        "bytes": 11772,
+        "path": "metadata/sqlmodel/0.0.48.json",
+        "sha256": "a60ebd6a98cd13aa98a930e360ac6118b7c67371e9495dd825332a5d70791b1d",
+        "url": "https://pypi.org/pypi/sqlmodel/0.0.48/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/sqlmodel-0.0.48.dist-info/METADATA",
+        "sha256": "afaab9734edb00b575b06a4952caec48c63a27ac41a6929be050be51cc1ff0a4"
+      },
+      "name": "sqlmodel",
+      "source": {
+        "bytes": 99329,
+        "filename": "sqlmodel-0.0.48.tar.gz",
+        "path": "sources/5582e87e845e23bb1179a7d8b11a4f5e441b4494528a41ee2fe1d129ffe91543/sqlmodel-0.0.48.tar.gz",
+        "sha256": "5582e87e845e23bb1179a7d8b11a4f5e441b4494528a41ee2fe1d129ffe91543",
+        "url": "https://files.pythonhosted.org/packages/dd/67/b2c0b771c89c023262dd8fb6ba2cdc6a004e5ff75dd5763051b38ccd133a/sqlmodel-0.0.48.tar.gz",
+        "yanked": false
+      },
+      "version": "0.0.48"
+    },
+    {
+      "index": {
+        "bytes": 18083,
+        "path": "metadata/sse-starlette/3.5.1.json",
+        "sha256": "5f616bb946270c2eeaa831315cfe279cb939e9e5a63af51d260f6bc46b160515",
+        "url": "https://pypi.org/pypi/sse-starlette/3.5.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/sse_starlette-3.5.1.dist-info/METADATA",
+        "sha256": "f212aaff8c6f4e0bfa69de5fcb87b1a323ea5e0e3332a7b730f12adb8cc627db"
+      },
+      "name": "sse-starlette",
+      "source": {
+        "bytes": 38356,
+        "filename": "sse_starlette-3.5.1.tar.gz",
+        "path": "sources/dbb1461cd53c1e284537c3ddcf92f54f24178519a3f1e335e49e5283993db0f7/sse_starlette-3.5.1.tar.gz",
+        "sha256": "dbb1461cd53c1e284537c3ddcf92f54f24178519a3f1e335e49e5283993db0f7",
+        "url": "https://files.pythonhosted.org/packages/af/2e/16b9cce59c2eebd2f944b41b01df119f8ee65535ce839c462f1b2c9ae2e0/sse_starlette-3.5.1.tar.gz",
+        "yanked": false
+      },
+      "version": "3.5.1"
+    },
+    {
+      "index": {
+        "bytes": 8655,
+        "path": "metadata/starlette/1.10.0.json",
+        "sha256": "97b97206e2e6e29b5283cd401a9c8d0a75738705f3fbc7f5db1fc487dfafdc9a",
+        "url": "https://pypi.org/pypi/starlette/1.10.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/starlette-1.10.0.dist-info/METADATA",
+        "sha256": "82f72dde2c5c3c55d45d9461adce5e30973481f7f3e10b59e497bbc5b8abf598"
+      },
+      "name": "starlette",
+      "source": {
+        "bytes": 2734356,
+        "filename": "starlette-1.10.0.tar.gz",
+        "path": "sources/b8399098d4c1e3522734f7235dc79b1fc967f96cf139c81e0fa30479e0685f9b/starlette-1.10.0.tar.gz",
+        "sha256": "b8399098d4c1e3522734f7235dc79b1fc967f96cf139c81e0fa30479e0685f9b",
+        "url": "https://files.pythonhosted.org/packages/48/bb/3d8757f21e9a53d9035c9eb039a777047139a16bfdbedfc7a58241c3d914/starlette-1.10.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.10.0"
+    },
+    {
+      "index": {
+        "bytes": 24026,
+        "path": "metadata/telegramify-markdown/1.4.1.json",
+        "sha256": "b3b60dfcdc3f758642d46ef19c739ebad66c4c654a32990ac7e2e31bc0ee75c0",
+        "url": "https://pypi.org/pypi/telegramify-markdown/1.4.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/telegramify_markdown-1.4.1.dist-info/METADATA",
+        "sha256": "09c5811e2eb5e8a9e581b1495cf00efbd4704d40ed1e6b2e53810b76805ab53b"
+      },
+      "name": "telegramify-markdown",
+      "source": {
+        "bytes": 105349,
+        "filename": "telegramify_markdown-1.4.1.tar.gz",
+        "path": "sources/ef89d40e5f5c20a8d95e2a9f72522a0426af7000e425b4cce1fa62389678277c/telegramify_markdown-1.4.1.tar.gz",
+        "sha256": "ef89d40e5f5c20a8d95e2a9f72522a0426af7000e425b4cce1fa62389678277c",
+        "url": "https://files.pythonhosted.org/packages/cf/78/a6b5bef18146174244bce11477c3a51a1bee0d920780aa27ccd5b59352d3/telegramify_markdown-1.4.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.4.1"
+    },
+    {
+      "index": {
+        "bytes": 3268,
+        "path": "metadata/tenacity/9.1.4.json",
+        "sha256": "13286186d1336398ff26ca432396ee7e7bbd92922a78c49f2a970196b1a4a9e0",
+        "url": "https://pypi.org/pypi/tenacity/9.1.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/tenacity-9.1.4.dist-info/METADATA",
+        "sha256": "2e3b45ca8334494f30fd1306d2adce6d47bc5c1d7a4e5df5462a3d1bd74bf5b0"
+      },
+      "name": "tenacity",
+      "source": {
+        "bytes": 49413,
+        "filename": "tenacity-9.1.4.tar.gz",
+        "path": "sources/adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a/tenacity-9.1.4.tar.gz",
+        "sha256": "adb31d4c263f2bd041081ab33b498309a57c77f9acf2db65aadf0898179cf93a",
+        "url": "https://files.pythonhosted.org/packages/47/c6/ee486fd809e357697ee8a44d3d69222b344920433d3b6666ccd9b374630c/tenacity-9.1.4.tar.gz",
+        "yanked": false
+      },
+      "version": "9.1.4"
+    },
+    {
+      "index": {
+        "bytes": 62016,
+        "path": "metadata/tiktoken/0.14.0.json",
+        "sha256": "05ff3946dc41fffc7ba7a35826e6385e29baa736fbe4fcc8ac9a37088049d58a",
+        "url": "https://pypi.org/pypi/tiktoken/0.14.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/tiktoken-0.14.0.dist-info/METADATA",
+        "sha256": "30086725221223f7a19463e71c0e9f79fe7aba9125b36632c00bf50a23fa968a"
+      },
+      "name": "tiktoken",
+      "source": {
+        "bytes": 38898,
+        "filename": "tiktoken-0.14.0.tar.gz",
+        "path": "sources/231dec90efcdccf1b565a1416107736f1e09b1a08fe736ef9d6363e626d03874/tiktoken-0.14.0.tar.gz",
+        "sha256": "231dec90efcdccf1b565a1416107736f1e09b1a08fe736ef9d6363e626d03874",
+        "url": "https://files.pythonhosted.org/packages/66/62/167a842aa0429d45f5e797354fd4343a96f6043d67d0513c675c7b8d36e6/tiktoken-0.14.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.14.0"
+    },
+    {
+      "index": {
+        "bytes": 6734,
+        "path": "metadata/truststore/0.10.5.json",
+        "sha256": "3aa1222ab6468e1e01b751aeda8db44afca8117297c93cb497c8d27e8f37e17b",
+        "url": "https://pypi.org/pypi/truststore/0.10.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/truststore-0.10.5.dist-info/METADATA",
+        "sha256": "1fd496f290853214e630d96f7163d2dd916f84ebe634b58aa827d6853e8f8610"
+      },
+      "name": "truststore",
+      "source": {
+        "bytes": 28091,
+        "filename": "truststore-0.10.5.tar.gz",
+        "path": "sources/30d36967ccaded5cbb38d602c433f53600036c79d502f4533a49b60a03bbefcd/truststore-0.10.5.tar.gz",
+        "sha256": "30d36967ccaded5cbb38d602c433f53600036c79d502f4533a49b60a03bbefcd",
+        "url": "https://files.pythonhosted.org/packages/ee/9f/c5201d42a484c061e528825fc8e2d565f5abd50a4ced6fb7d29c4ec99b2b/truststore-0.10.5.tar.gz",
+        "yanked": false
+      },
+      "version": "0.10.5"
+    },
+    {
+      "index": {
+        "bytes": 18759,
+        "path": "metadata/typer/0.27.3.json",
+        "sha256": "61552fe268e5dd109efec5a3542ed135afaf4094fae84d648a13c6e18004ad62",
+        "url": "https://pypi.org/pypi/typer/0.27.3/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/typer-0.27.3.dist-info/METADATA",
+        "sha256": "fc2cbb86c4fd175326b63427e9a3fa13e79364d7333a945414d9c6ac80c0f0e4"
+      },
+      "name": "typer",
+      "source": {
+        "bytes": 205303,
+        "filename": "typer-0.27.3.tar.gz",
+        "path": "sources/d0396f770a560ab1b0a8504e13b5f254b728cedb05c61cf0359e944e50ce8901/typer-0.27.3.tar.gz",
+        "sha256": "d0396f770a560ab1b0a8504e13b5f254b728cedb05c61cf0359e944e50ce8901",
+        "url": "https://files.pythonhosted.org/packages/03/51/d33db42cc72ffd8c30777547b42d01f0cbf9d95a770457698d0174b3ed71/typer-0.27.3.tar.gz",
+        "yanked": false
+      },
+      "version": "0.27.3"
+    },
+    {
+      "index": {
+        "bytes": 5631,
+        "path": "metadata/typing-extensions/4.16.0.json",
+        "sha256": "2140da00d62dde967f52d0be0ae28444f1d6a3fe603f52c83c23988c32122d5a",
+        "url": "https://pypi.org/pypi/typing-extensions/4.16.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/typing_extensions-4.16.0.dist-info/METADATA",
+        "sha256": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46"
+      },
+      "name": "typing-extensions",
+      "source": {
+        "bytes": 113555,
+        "filename": "typing_extensions-4.16.0.tar.gz",
+        "path": "sources/dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5/typing_extensions-4.16.0.tar.gz",
+        "sha256": "dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5",
+        "url": "https://files.pythonhosted.org/packages/f6/cc/6253133b5bb138fc3306cebfbda2c520f545d36b5be2c7255cc528bb45d6/typing_extensions-4.16.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.16.0"
+    },
+    {
+      "index": {
+        "bytes": 4629,
+        "path": "metadata/typing-inspection/0.4.4.json",
+        "sha256": "0605416f2f37f2df04e45360cf5ce4ca5eeca6d414bb6ddb1ec5a9893c62ac30",
+        "url": "https://pypi.org/pypi/typing-inspection/0.4.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/typing_inspection-0.4.4.dist-info/METADATA",
+        "sha256": "bad3d9e6342ef6750cf5128ec942327b8bebdce0b6e4d6f67cb15b27ae5118da"
+      },
+      "name": "typing-inspection",
+      "source": {
+        "bytes": 76928,
+        "filename": "typing_inspection-0.4.4.tar.gz",
+        "path": "sources/547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47/typing_inspection-0.4.4.tar.gz",
+        "sha256": "547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47",
+        "url": "https://files.pythonhosted.org/packages/a3/26/b09b8010994eccc3c09092e6b34058f36a460eea2d4c3e8b910c695975a0/typing_inspection-0.4.4.tar.gz",
+        "yanked": false
+      },
+      "version": "0.4.4"
+    },
+    {
+      "index": {
+        "bytes": 3613,
+        "path": "metadata/tzdata/2026.5.json",
+        "sha256": "27547051b51333cb7ba03f91b91fc7c92179937ccb62bb81ce46dc943c69873b",
+        "url": "https://pypi.org/pypi/tzdata/2026.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/tzdata-2026.5.dist-info/METADATA",
+        "sha256": "e0780e8b6dc8882ce87e871a9d4589d59cb05a0c2d64f58b1ba62cde1ee91f6a"
+      },
+      "name": "tzdata",
+      "source": {
+        "bytes": 200404,
+        "filename": "tzdata-2026.5.tar.gz",
+        "path": "sources/8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7/tzdata-2026.5.tar.gz",
+        "sha256": "8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7",
+        "url": "https://files.pythonhosted.org/packages/d9/68/f1b440335057bfce71b6e50a9d09445aa2ecbd08359a337976627b8409e7/tzdata-2026.5.tar.gz",
+        "yanked": false
+      },
+      "version": "2026.5"
+    },
+    {
+      "index": {
+        "bytes": 9882,
+        "path": "metadata/tzlocal/5.4.5.json",
+        "sha256": "41a8f5b4d44a7357a32c4563b82ecb80da1a67083477e43e9a82c2c37209622b",
+        "url": "https://pypi.org/pypi/tzlocal/5.4.5/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/tzlocal-5.4.5.dist-info/METADATA",
+        "sha256": "1ea55a3c219a76d8ebd7ec8a746d239c3b8b1a55e52d2a13329adca48d2f9d37"
+      },
+      "name": "tzlocal",
+      "source": {
+        "bytes": 31483,
+        "filename": "tzlocal-5.4.5.tar.gz",
+        "path": "sources/ba976898bad27945178c9ca25c222c19e322b30c10342b9f40b46714f70d2d5f/tzlocal-5.4.5.tar.gz",
+        "sha256": "ba976898bad27945178c9ca25c222c19e322b30c10342b9f40b46714f70d2d5f",
+        "url": "https://files.pythonhosted.org/packages/d8/89/2bd035df331499589fc92e59375c17c6cea6a500453b2c5f6a6ec9572825/tzlocal-5.4.5.tar.gz",
+        "yanked": false
+      },
+      "version": "5.4.5"
+    },
+    {
+      "index": {
+        "bytes": 9510,
+        "path": "metadata/urllib3/2.8.0.json",
+        "sha256": "5315e7401db3cacccd0c2ce5daf81f752a9cc3614b18c37f2b79930b7159ce2f",
+        "url": "https://pypi.org/pypi/urllib3/2.8.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/urllib3-2.8.0.dist-info/METADATA",
+        "sha256": "10898c620e8007c030e07fa5622b68358a43010025dfbd78a1cb797699de2bb4"
+      },
+      "name": "urllib3",
+      "source": {
+        "bytes": 458972,
+        "filename": "urllib3-2.8.0.tar.gz",
+        "path": "sources/63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63/urllib3-2.8.0.tar.gz",
+        "sha256": "63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63",
+        "url": "https://files.pythonhosted.org/packages/e3/05/b17359e1cefb4f909b5e40b1b90a496d987258916dbbf88e842c729f510e/urllib3-2.8.0.tar.gz",
+        "yanked": false
+      },
+      "version": "2.8.0"
+    },
+    {
+      "index": {
+        "bytes": 8685,
+        "path": "metadata/uvicorn/0.54.0.json",
+        "sha256": "a308e83961793f6114221aefe9e046ef587da0fc986c4dc50ace1ee43fbe9bcb",
+        "url": "https://pypi.org/pypi/uvicorn/0.54.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/uvicorn-0.54.0.dist-info/METADATA",
+        "sha256": "9399e5ddda3d26e842d6fb5420c38b0857aac568d53badbdc224b3a21339efa8"
+      },
+      "name": "uvicorn",
+      "source": {
+        "bytes": 112283,
+        "filename": "uvicorn-0.54.0.tar.gz",
+        "path": "sources/a2e33cbfaa0306f8e6b0c13e0cb89d7d7a2da3e62b90c66e18c33d9807b28620/uvicorn-0.54.0.tar.gz",
+        "sha256": "a2e33cbfaa0306f8e6b0c13e0cb89d7d7a2da3e62b90c66e18c33d9807b28620",
+        "url": "https://files.pythonhosted.org/packages/da/34/30e9280707135d2cfc589dfff3cb796bd07a3aeb1a3e415ba09dd89d7bb4/uvicorn-0.54.0.tar.gz",
+        "yanked": false
+      },
+      "version": "0.54.0"
+    },
+    {
+      "index": {
+        "bytes": 34147,
+        "path": "metadata/watchfiles/1.3.0.json",
+        "sha256": "ba585baa9af3fdcdb897e9e6f5711a7551aa994c617318e898b3ec749383f73a",
+        "url": "https://pypi.org/pypi/watchfiles/1.3.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/watchfiles-1.3.0.dist-info/METADATA",
+        "sha256": "1fba87d08d66f10f7515e4817abd4ac7f27abf3300cb33b7ad3f79762987a502"
+      },
+      "name": "watchfiles",
+      "source": {
+        "bytes": 108119,
+        "filename": "watchfiles-1.3.0.tar.gz",
+        "path": "sources/99aee4a07847c06820765fd7b1b49ceac4f3f711ccb7d104655a33231de1c207/watchfiles-1.3.0.tar.gz",
+        "sha256": "99aee4a07847c06820765fd7b1b49ceac4f3f711ccb7d104655a33231de1c207",
+        "url": "https://files.pythonhosted.org/packages/b3/68/e6aa0b77d217b31f8f486ec0cdfe5e00e6e38dc0be657e7d85819b9faf0a/watchfiles-1.3.0.tar.gz",
+        "yanked": false
+      },
+      "version": "1.3.0"
+    },
+    {
+      "index": {
+        "bytes": 10450,
+        "path": "metadata/websocket-client/1.9.2.json",
+        "sha256": "24ae17dbe7896ce2bd4f7ab63d402b0d96524f814c8a1b82d55f11ecd14d43c4",
+        "url": "https://pypi.org/pypi/websocket-client/1.9.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/websocket_client-1.9.2.dist-info/METADATA",
+        "sha256": "4a97c326e009bd602e900d0059912bc57c56b5fa1129f6198d10533b6e89450c"
+      },
+      "name": "websocket-client",
+      "source": {
+        "bytes": 84110,
+        "filename": "websocket_client-1.9.2.tar.gz",
+        "path": "sources/0fcb57545848be86992e128218fd96dd87a6769ffdb1a968dff79632b85604d0/websocket_client-1.9.2.tar.gz",
+        "sha256": "0fcb57545848be86992e128218fd96dd87a6769ffdb1a968dff79632b85604d0",
+        "url": "https://files.pythonhosted.org/packages/d8/cb/a5abcc2891249f393827c650c6296660ce40374ac22d99ab9aea41f9d2a2/websocket_client-1.9.2.tar.gz",
+        "yanked": false
+      },
+      "version": "1.9.2"
+    },
+    {
+      "index": {
+        "bytes": 68364,
+        "path": "metadata/websockets/15.0.1.json",
+        "sha256": "4fb54d1c82905d596dc279f9480b26a9e2d58906d351f4fa0b50b60e9d9e4a42",
+        "url": "https://pypi.org/pypi/websockets/15.0.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/websockets-15.0.1.dist-info/METADATA",
+        "sha256": "551e4ae9e806fcfa49dbe190e21c9df8293581e22544c2d0a6f841e6a7e71254"
+      },
+      "name": "websockets",
+      "source": {
+        "bytes": 177016,
+        "filename": "websockets-15.0.1.tar.gz",
+        "path": "sources/82544de02076bafba038ce055ee6412d68da13ab47f0c60cab827346de828dee/websockets-15.0.1.tar.gz",
+        "sha256": "82544de02076bafba038ce055ee6412d68da13ab47f0c60cab827346de828dee",
+        "url": "https://files.pythonhosted.org/packages/21/e6/26d09fab466b7ca9c7737474c52be4f76a40301b08362eb2dbc19dcc16c1/websockets-15.0.1.tar.gz",
+        "yanked": false
+      },
+      "version": "15.0.1"
+    },
+    {
+      "index": {
+        "bytes": 6366,
+        "path": "metadata/wechatpy/1.8.18.json",
+        "sha256": "9af9f6ca5f97c22396df109177fa26daf8ec856e0a6c336e9e1b3c31a7bc3b30",
+        "url": "https://pypi.org/pypi/wechatpy/1.8.18/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/wechatpy-1.8.18.dist-info/METADATA",
+        "sha256": "6a1d93c8feb7d9752a50ab99ac63108574f3d76b10356819f3095c15a60b2d0f"
+      },
+      "name": "wechatpy",
+      "source": {
+        "bytes": 107318,
+        "filename": "wechatpy-1.8.18.tar.gz",
+        "path": "sources/b356d0181abcf8487268e5759f942c4ffbb5090c00197858109e90000a301d08/wechatpy-1.8.18.tar.gz",
+        "sha256": "b356d0181abcf8487268e5759f942c4ffbb5090c00197858109e90000a301d08",
+        "url": "https://files.pythonhosted.org/packages/80/34/849aaa2a03dc41b002e224006746bdb2eea729435225709139c4b3a95d2b/wechatpy-1.8.18.tar.gz",
+        "yanked": false
+      },
+      "version": "1.8.18"
+    },
+    {
+      "index": {
+        "bytes": 6113,
+        "path": "metadata/werkzeug/3.1.9.json",
+        "sha256": "2ebf74c299c008b5df95eaf3d0aa223cd9504142686eb3186627ab46b733096a",
+        "url": "https://pypi.org/pypi/werkzeug/3.1.9/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/werkzeug-3.1.9.dist-info/METADATA",
+        "sha256": "9f04352e946ecb0883fbf379994c1cacf6720a124acdd7fd59029a889f4eebba"
+      },
+      "name": "werkzeug",
+      "source": {
+        "bytes": 940188,
+        "filename": "werkzeug-3.1.9.tar.gz",
+        "path": "sources/55ca7c70a75689be937aa27f8ff4b018f06ff4838fc73045560bf0f5a1291060/werkzeug-3.1.9.tar.gz",
+        "sha256": "55ca7c70a75689be937aa27f8ff4b018f06ff4838fc73045560bf0f5a1291060",
+        "url": "https://files.pythonhosted.org/packages/a4/34/4dd12fc8bb7d61c91467ec3efe415ffa7d5456f799954b40c5bbaeae470e/werkzeug-3.1.9.tar.gz",
+        "yanked": false
+      },
+      "version": "3.1.9"
+    },
+    {
+      "index": {
+        "bytes": 95052,
+        "path": "metadata/wrapt/2.5.1.json",
+        "sha256": "2330c47a6ddde4fef8284fd3c3c6ebec48f10778024bf65b82b120f4e4938bc8",
+        "url": "https://pypi.org/pypi/wrapt/2.5.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/wrapt-2.5.1.dist-info/METADATA",
+        "sha256": "166ca07d308c14c3e9dfe028c6389bf1a439027fe7b389d33eedb7d002e8bafb"
+      },
+      "name": "wrapt",
+      "source": {
+        "bytes": 184455,
+        "filename": "wrapt-2.5.1.tar.gz",
+        "path": "sources/f595bb0185aab3e9dc31950c95d914f56ea8278810c3b928f3426e12ed6d27bc/wrapt-2.5.1.tar.gz",
+        "sha256": "f595bb0185aab3e9dc31950c95d914f56ea8278810c3b928f3426e12ed6d27bc",
+        "url": "https://files.pythonhosted.org/packages/04/22/89e2f3bdae5cb34e0cab0cd86d7172dbf418de4b46c9b17b9c7a560dfa44/wrapt-2.5.1.tar.gz",
+        "yanked": false
+      },
+      "version": "2.5.1"
+    },
+    {
+      "index": {
+        "bytes": 7506,
+        "path": "metadata/wsproto/1.3.2.json",
+        "sha256": "8aa831cf9c02afdf8161e814e00c574e7e345c73f9497aeef9c709e3cc994367",
+        "url": "https://pypi.org/pypi/wsproto/1.3.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/wsproto-1.3.2.dist-info/METADATA",
+        "sha256": "c758e97f876f6c7cd2fd9517b50ab34110f36b733299fc0d43d1aeb1ec154dc9"
+      },
+      "name": "wsproto",
+      "source": {
+        "bytes": 50116,
+        "filename": "wsproto-1.3.2.tar.gz",
+        "path": "sources/b86885dcf294e15204919950f666e06ffc6c7c114ca900b060d6e16293528294/wsproto-1.3.2.tar.gz",
+        "sha256": "b86885dcf294e15204919950f666e06ffc6c7c114ca900b060d6e16293528294",
+        "url": "https://files.pythonhosted.org/packages/c7/79/12135bdf8b9c9367b8701c2c19a14c913c120b882d50b014ca0d38083c2c/wsproto-1.3.2.tar.gz",
+        "yanked": false
+      },
+      "version": "1.3.2"
+    },
+    {
+      "index": {
+        "bytes": 5172,
+        "path": "metadata/xinference-client/4.0.0.json",
+        "sha256": "aa94f91800981b5dfb692407fd55b6b063f45574d12152a41d65d8c21812d695",
+        "url": "https://pypi.org/pypi/xinference-client/4.0.0/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/xinference_client-4.0.0.dist-info/METADATA",
+        "sha256": "6b8f82745975559f5c9700b454ee9be3ccba2dcafd0609d162d0204bfe51335c"
+      },
+      "name": "xinference-client",
+      "source": {
+        "bytes": 64728,
+        "filename": "xinference_client-4.0.0.tar.gz",
+        "path": "sources/27c777c97a453397c571fadb09a62a7ed1bae3e9b26814b34746cd15d3f82042/xinference_client-4.0.0.tar.gz",
+        "sha256": "27c777c97a453397c571fadb09a62a7ed1bae3e9b26814b34746cd15d3f82042",
+        "url": "https://files.pythonhosted.org/packages/56/5d/51b0019ac40c9b3b84b5007edd2656b6d2b4120f0ade614492ba49c5f83f/xinference_client-4.0.0.tar.gz",
+        "yanked": false
+      },
+      "version": "4.0.0"
+    },
+    {
+      "index": {
+        "bytes": 5725,
+        "path": "metadata/xlrd/2.0.2.json",
+        "sha256": "320fd24af58bea9b9ef35aa0763f79c81a0b464ad8078d1558b96c39ce38bd65",
+        "url": "https://pypi.org/pypi/xlrd/2.0.2/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/xlrd-2.0.2.dist-info/METADATA",
+        "sha256": "ae263dba4d616210bb2d709cd091ba453984314f79f8f50f44af864352656dec"
+      },
+      "name": "xlrd",
+      "source": {
+        "bytes": 100167,
+        "filename": "xlrd-2.0.2.tar.gz",
+        "path": "sources/08b5e25de58f21ce71dc7db3b3b8106c1fa776f3024c54e45b45b374e89234c9/xlrd-2.0.2.tar.gz",
+        "sha256": "08b5e25de58f21ce71dc7db3b3b8106c1fa776f3024c54e45b45b374e89234c9",
+        "url": "https://files.pythonhosted.org/packages/07/5a/377161c2d3538d1990d7af382c79f3b2372e880b65de21b01b1a2b78691e/xlrd-2.0.2.tar.gz",
+        "yanked": false
+      },
+      "version": "2.0.2"
+    },
+    {
+      "index": {
+        "bytes": 17428,
+        "path": "metadata/xmltodict/1.0.4.json",
+        "sha256": "773402c277006753316fc46da4b9bb8296a9d49d0682a4721868c2836cd08ff5",
+        "url": "https://pypi.org/pypi/xmltodict/1.0.4/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/xmltodict-1.0.4.dist-info/METADATA",
+        "sha256": "08b2908e0ceb1edc16c270e005d52d3484ecab089aa1bb3dbe5a896507f7f1e3"
+      },
+      "name": "xmltodict",
+      "source": {
+        "bytes": 26124,
+        "filename": "xmltodict-1.0.4.tar.gz",
+        "path": "sources/6d94c9f834dd9e44514162799d344d815a3a4faec913717a9ecbfa5be1bb8e61/xmltodict-1.0.4.tar.gz",
+        "sha256": "6d94c9f834dd9e44514162799d344d815a3a4faec913717a9ecbfa5be1bb8e61",
+        "url": "https://files.pythonhosted.org/packages/19/70/80f3b7c10d2630aa66414bf23d210386700aa390547278c789afa994fd7e/xmltodict-1.0.4.tar.gz",
+        "yanked": false
+      },
+      "version": "1.0.4"
+    },
+    {
+      "index": {
+        "bytes": 236256,
+        "path": "metadata/yarl/1.25.1.json",
+        "sha256": "a07cf3b564a15e3be66faacf0c81a23497ebfbf1ec849a3a77b494ba4b60cf0f",
+        "url": "https://pypi.org/pypi/yarl/1.25.1/json"
+      },
+      "installedMetadata": {
+        "runtimeMember": "opt/astrbot-venv/lib/python3.12/site-packages/yarl-1.25.1.dist-info/METADATA",
+        "sha256": "fd6baa258a11c4d7e7008272a69180d4d34aa04a6a5afda36ac5e55aa0aa4f41"
+      },
+      "name": "yarl",
+      "source": {
+        "bytes": 246245,
+        "filename": "yarl-1.25.1.tar.gz",
+        "path": "sources/03dd38de09bc213e9a8b29761eec33ee1d5318dac0e49d8af36e4d27830e23a7/yarl-1.25.1.tar.gz",
+        "sha256": "03dd38de09bc213e9a8b29761eec33ee1d5318dac0e49d8af36e4d27830e23a7",
+        "url": "https://files.pythonhosted.org/packages/75/16/e8be8e2fb175bbf41a0680381a319f1199fae256588241a2ac8677eafb49/yarl-1.25.1.tar.gz",
+        "yanked": false
+      },
+      "version": "1.25.1"
+    }
+  ],
+  "pythonLockSha256": "2e879325375000e776bf1b59bfcc0237c23db1b7bea12db93d0b3cd7f9135e13",
+  "runtimeSha256": "9990abeb9febcefe4e68d75c13efa00ab764caea9e3a96d29a35eb42c62588b7",
+  "schemaVersion": 1,
+  "scope": "Exact release sdists and separately identified upstream tag/commit source supplements; HTTPS trust, not signed author provenance; wheel/native build correspondence unverified"
+}

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "status": "source artifacts pinned; compatibility validation in progress",
+  "astrbot": {
+    "version": "4.29.3",
+    "source": {
+      "url": "https://codeload.github.com/AstrBotDevs/AstrBot/tar.gz/refs/tags/v4.29.3",
+      "sha256": "b84dc012f1121072def6d47f47ac11678b73e957ade1e4e16c5a3dfe9d521fe0"
+    },
+    "dashboard": {
+      "url": "https://github.com/AstrBotDevs/AstrBot/releases/download/v4.29.3/AstrBot-v4.29.3-dashboard.zip",
+      "sha256": "a09f560c4140b930180f63a4929c885da80e24fb9bbda56619727bd25e985a11"
+    }
+  },
+  "napcat": {
+    "version": "4.18.41",
+    "source": {
+      "url": "https://github.com/NapNeko/NapCatQQ/releases/download/v4.18.41/NapCat.Shell.zip",
+      "sha256": "6801f93e533846cea05f4f531874a0e84371ab2331c5585b57cd7e3b869cf96b"
+    }
+  },
+  "qq": {
+    "version": "3.2.34-53644",
+    "arm64-v8a": {
+      "url": "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.36/beta/9ee04bef/linuxqq_3.2.34-53644_arm64.deb",
+      "sha256": "181b895cb573548e396e54bb0548cca92ffdc1b1a4b018fa4551bb062385fdca"
+    },
+    "x86_64": {
+      "url": "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.36/beta/9ee04bef/linuxqq_3.2.34-53644_amd64.deb",
+      "sha256": "436c65e1dd28422e128a21cbddb5fe4e2e6c079d7f27fec2541e014d38cc336e"
+    }
+  }
+}
