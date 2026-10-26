@@ -1,5 +1,8 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import io.astrbot.android.core.ServiceId
 import kotlinx.coroutines.*
@@ -27,8 +30,8 @@ internal class EnvironmentChecks(private val context: Context,
         val native = File(context.applicationInfo.nativeLibraryDir)
         val launchFiles = listOf("libprocess-runner.so", "libproot.so", "libproot-loader.so")
         val nativeReady = launchFiles.all { File(native, it).isFile && File(native, it).canExecute() }
-        item("APK 启动组件", if (nativeReady) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
-            if (nativeReady) "内置启动文件可读取和执行" else "APK 启动组件缺失或不可执行，请覆盖安装同签名 APK，保留应用数据")
+        item(AppText.get(R.string.ui_apk_launch_components), if (nativeReady) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
+            if (nativeReady) AppText.get(R.string.ui_bundled_launch_files_are_readable_and_executable) else AppText.get(R.string.ui_apk_launch_components_are_missing_or_not_executable_install))
         val bundled = readJson { runtime.bundledManifest() }
         val marker = readJson {
             val file = File(root, ".astrbot-bootstrap.json")
@@ -36,24 +39,24 @@ internal class EnvironmentChecks(private val context: Context,
             JSONObject(file.readText())
         }
         val installed = marker?.optString("kind") == "complete" && marker.optString("abi") == runtime.abi
-        item("环境安装记录", if (installed) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
-            if (installed) "已识别完整运行环境" else "未完成完整环境初始化，或安装记录无法识别；已有文件会保留")
+        item(AppText.get(R.string.ui_runtime_installation_record), if (installed) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
+            if (installed) AppText.get(R.string.ui_complete_runtime_recognized) else AppText.get(R.string.ui_complete_initialization_is_unfinished_or_its_record_is_unrecognized))
         val pending = listOf("restore.json", "update.json", "runtime-update.json", "persona.json", "backup-retention.json").any {
             DurableFiles.exists(File(context.filesDir, "operations/$it"))
         }
-        item("维护恢复记录", if (pending) EnvironmentCheckStatus.ATTENTION else EnvironmentCheckStatus.OK,
-            if (pending) "存在未完成操作，请返回管理页处理恢复后重新检查；本次检查不更改操作记录" else "未发现待恢复的维护记录")
+        item(AppText.get(R.string.ui_maintenance_recovery_records), if (pending) EnvironmentCheckStatus.ATTENTION else EnvironmentCheckStatus.OK,
+            if (pending) AppText.get(R.string.ui_an_unfinished_operation_exists_return_to_the_manager_to) else AppText.get(R.string.ui_no_pending_maintenance_recovery_found))
         val resources = listOf(
             "Ubuntu Shell" to "usr/bin/dash", "Python" to "usr/bin/python3.12",
-            "Python 虚拟环境" to "opt/astrbot-venv/pyvenv.cfg", "AstrBot 入口" to "opt/astrbot/main.py",
-            "AstrBot 后台" to "opt/astrbot/astrbot/dashboard/dist/index.html", "Linux QQ" to "opt/qq/qq",
+            AppText.get(R.string.ui_python_virtual_environment) to "opt/astrbot-venv/pyvenv.cfg", AppText.get(R.string.ui_astrbot_entry_point) to "opt/astrbot/main.py",
+            AppText.get(R.string.ui_astrbot_webui) to "opt/astrbot/astrbot/dashboard/dist/index.html", "Linux QQ" to "opt/qq/qq",
             "NapCat" to "opt/qq/resources/app/app_launcher/napcat/napcat.mjs", "Xvfb" to "usr/bin/Xvfb")
         val missing = resources.filterNot { File(root, it.second).let { file -> file.isFile && file.canRead() } }.map { it.first }
-        item("运行资源文件", if (missing.isEmpty()) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
-            if (missing.isEmpty()) "关键入口文件存在；不等同于完整文件摘要或业务验证" else "缺失或不可读取：${missing.joinToString("、")}")
+        item(AppText.get(R.string.ui_runtime_resource_files), if (missing.isEmpty()) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
+            if (missing.isEmpty()) AppText.get(R.string.ui_key_entry_files_exist_this_does_not_verify_complete) else AppText.get(R.string.ui_missing_or_unreadable, missing.joinToString("、")))
         val versions = if (installed) runCatching { InstalledVersions.read(root) }.getOrNull() else null
-        item("版本与备份标识", if (versions != null) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
-            if (versions != null) "可读取当前组件组合和备份兼容标识" else "版本依据不完整，不能安全地创建修复事务；请导出诊断并使用匹配的维护资源")
+        item(AppText.get(R.string.ui_version_and_backup_identity), if (versions != null) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
+            if (versions != null) AppText.get(R.string.ui_component_combination_and_backup_compatibility_identity_are_readable) else AppText.get(R.string.ui_version_information_is_incomplete_so_a_repair_transaction_cannot))
         var configurationFailed = false
         for (id in ServiceId.entries) {
             val file = File(context.filesDir, if (id == ServiceId.ASTRBOT) "persistent/astrbot/data/cmd_config.json" else "persistent/napcat/config/webui.json")
@@ -65,11 +68,11 @@ internal class EnvironmentChecks(private val context: Context,
                 else -> EnvironmentCheckStatus.OK
             }
             configurationFailed = configurationFailed || status == EnvironmentCheckStatus.FAILED
-            item("${id.label} 后台配置", status, when {
-                !file.exists() && !File(file.path + ".bak").exists() -> "尚未创建，首次启动会准备默认配置"
-                status == EnvironmentCheckStatus.FAILED -> "配置格式、监听地址或端口无法识别；修复运行资源不会重置此配置"
-                !connection.enabled -> "用户已在项目配置中关闭后台，属于配置状态"
-                else -> "本机入口配置可识别；本项不验证登录、模型、QQ 或 OneBot 消息"
+            item(AppText.get(R.string.ui_webui_configuration, id.label), status, when {
+                !file.exists() && !File(file.path + ".bak").exists() -> AppText.get(R.string.ui_not_created_yet_first_start_prepares_default_configuration)
+                status == EnvironmentCheckStatus.FAILED -> AppText.get(R.string.ui_configuration_format_listen_address_or_port_is_unrecognized_repairing)
+                !connection.enabled -> AppText.get(R.string.ui_the_webui_is_disabled_in_project_configuration)
+                else -> AppText.get(R.string.ui_local_endpoint_configuration_is_recognized_login_models_qq_and)
             })
         }
         var dependenciesReady = false
@@ -77,30 +80,30 @@ internal class EnvironmentChecks(private val context: Context,
             dependenciesReady = try { pythonCheck(runtime) }
                 catch (failure: CancellationException) { throw failure }
                 catch (_: Exception) { false }
-            item("Python 基础依赖", if (dependenciesReady) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
-                if (dependenciesReady) "隔离模式加载 quart、fastapi、faiss 成功，未启动机器人服务"
-                else "Python 或基础依赖加载失败，查看环境日志；未修改用户配置")
-        } else item("Python 基础依赖", EnvironmentCheckStatus.ATTENTION,
-            "需先满足安装、启动文件与维护条件，本次未执行依赖加载")
+            item(AppText.get(R.string.ui_python_dependencies), if (dependenciesReady) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
+                if (dependenciesReady) AppText.get(R.string.ui_loaded_quart_fastapi_and_faiss_in_isolated_mode_without)
+                else AppText.get(R.string.ui_python_or_a_dependency_failed_to_load_check_runtime))
+        } else item(AppText.get(R.string.ui_python_dependencies), EnvironmentCheckStatus.ATTENTION,
+            AppText.get(R.string.ui_installation_launch_files_and_maintenance_conditions_must_pass_first))
         val sameImage = installed && bundled?.optString("kind") == "complete" &&
             marker?.optString("sha256") == bundled.optString("sha256")
         val required = bundled?.optLong("unpackedBytes", 0)?.takeIf { it in 1..12L * 1024 * 1024 * 1024 }
             ?.let { it * 2 + 64L * 1024 * 1024 }
         val enoughSpace = required != null && context.filesDir.usableSpace >= required
-        item("修复暂存空间", if (enoughSpace) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.ATTENTION,
-            required?.let { "可用 ${context.filesDir.usableSpace / 1024 / 1024} MiB；环境准备至少预留 ${it / 1024 / 1024} MiB，数据快照另行精确检查" }
-                ?: "当前 APK 的完整资源大小无法识别")
+        item(AppText.get(R.string.ui_repair_staging_space), if (enoughSpace) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.ATTENTION,
+            required?.let { AppText.get(R.string.ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot, context.filesDir.usableSpace / 1024 / 1024, it / 1024 / 1024) }
+                ?: AppText.get(R.string.ui_cannot_determine_the_full_resource_size_in_this_apk))
         val damaged = missing.isNotEmpty() || installed && !dependenciesReady
         val reason = when {
-            pending -> "先完成未结束的维护操作，再重新检查"
-            !nativeReady -> "请覆盖安装同签名 APK，修复内置启动组件；不要卸载清除数据"
-            !installed -> "请先完成初始化；无法识别的已有环境不会被自动覆盖"
-            versions == null -> "版本依据不完整，先导出诊断；不会用猜测的版本覆盖环境"
-            !sameImage -> "当前环境与 APK 内置资源不同，请使用运行环境升级或匹配版本的 APK"
-            configurationFailed -> "请先处理后台配置，资源重部署不会修复配置内容"
-            !enoughSpace -> "请先释放暂存空间，修复前还会检查数据快照容量"
-            !damaged -> "未发现此检查可定位的资源损坏；业务问题请在对应后台处理"
-            else -> "可重新部署 APK 内置的同版本资源；准备后还会核对完整版本组合，保留配置、数据库和 QQ 会话"
+            pending -> AppText.get(R.string.ui_complete_the_pending_maintenance_operation_then_check_again)
+            !nativeReady -> AppText.get(R.string.ui_install_an_apk_with_the_same_signing_certificate_to)
+            !installed -> AppText.get(R.string.ui_initialize_the_runtime_first_an_unrecognized_existing_runtime_will)
+            versions == null -> AppText.get(R.string.ui_version_information_is_incomplete_export_diagnostics_first_the_runtime)
+            !sameImage -> AppText.get(R.string.ui_the_installed_runtime_differs_from_the_bundled_resources_use)
+            configurationFailed -> AppText.get(R.string.ui_resolve_dashboard_configuration_issues_first_redeploying_resources_does)
+            !enoughSpace -> AppText.get(R.string.ui_free_staging_space_first_data_snapshot_space_will_also)
+            !damaged -> AppText.get(R.string.ui_no_resource_damage_was_identified_by_this_check_manage)
+            else -> AppText.get(R.string.ui_the_same_version_bundled_resources_can_be_redeployed_the)
         }
         EnvironmentCheckReport(System.currentTimeMillis(), items,
             pending.not() && nativeReady && installed && versions != null && sameImage && !configurationFailed && enoughSpace && damaged, reason)

@@ -1,5 +1,8 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.app.usage.StorageStatsManager
 import android.content.Context
 import android.os.Process
@@ -14,8 +17,10 @@ import java.io.File
 import java.nio.file.*
 import java.nio.file.attribute.BasicFileAttributes
 
-enum class StoragePressure(val title: String) {
-    UNKNOWN("存储待检查"), NORMAL("存储空间正常"), LOW("存储空间偏低"), CRITICAL("存储空间严重不足");
+enum class StoragePressure(private val titleResource: Int) {
+    UNKNOWN(R.string.ui_storage_not_checked), NORMAL(R.string.ui_storage_space_normal), LOW(R.string.ui_storage_space_low), CRITICAL(R.string.ui_storage_critically_low);
+    val title: String get() = AppText.get(titleResource)
+
     companion object {
         private const val MIB = 1024L * 1024
         fun from(bytes: Long?): StoragePressure = when {
@@ -30,7 +35,7 @@ enum class StoragePressure(val title: String) {
 data class StorageSpaceReading(val availableBytes: Long? = null, val checkedAtMillis: Long? = null) {
     val pressure get() = StoragePressure.from(availableBytes)
     val warning get() = when (pressure) {
-        StoragePressure.LOW, StoragePressure.CRITICAL -> "${pressure.title}，请在设置的“日志与诊断 → 存储使用”查看占用"
+        StoragePressure.LOW, StoragePressure.CRITICAL -> AppText.get(R.string.ui_view_usage_in_settings_logs_and_diagnostics_storage_usage, pressure.title)
         else -> null
     }
 }
@@ -38,10 +43,10 @@ data class StorageSpaceReading(val availableBytes: Long? = null, val checkedAtMi
 internal object StorageSpace {
     fun read(context: Context) = StorageSpaceReading(
         runCatching { StatFs(context.filesDir.path).availableBytes }.getOrNull(), System.currentTimeMillis())
-    const val HELP = "手机内部存储可用空间低于 512 MiB 时提醒，低于 128 MiB 时标记严重不足。" +
-        "请先释放手机其他文件，或在备份管理中核对后删除不再需要的备份；已下载的管理器 APK 可在检查更新页清理。" +
-        "不要使用系统“清除数据”：它会删除运行环境、配置和账号资料。" +
-        "提醒不会自动停止服务或删除 QQ 缓存、会话、数据库及未知文件。更新和备份继续执行各自的准确空间检查。"
+    val HELP get() = AppText.get(R.string.ui_a_warning_appears_below_512_mib_of_free_internal) +
+        AppText.get(R.string.ui_free_other_phone_files_or_review_and_delete_unneeded) +
+        AppText.get(R.string.ui_do_not_use_the_system_clear_data_action_it) +
+        AppText.get(R.string.ui_warnings_do_not_automatically_stop_services_or_delete_qq)
 }
 
 /** Cheap volume checks have their own timer; a long maintenance lock cannot delay warnings. */
@@ -61,7 +66,7 @@ internal class StorageSpaceMonitor(private val read: () -> StorageSpaceReading,
             if (space.pressure != StoragePressure.UNKNOWN && space.pressure != lastKnown) {
                 space.warning?.let(::record)
                 if (space.pressure == StoragePressure.NORMAL && lastKnown in setOf(StoragePressure.LOW, StoragePressure.CRITICAL))
-                    record("存储可用空间已恢复到提醒阈值以上")
+                    record(AppText.get(R.string.ui_free_storage_has_recovered_above_the_warning_threshold))
                 lastKnown = space.pressure
             }
             delay(intervalMillis)
@@ -112,19 +117,20 @@ internal class StorageUsageRepository(private val context: Context,
         fun category(id: String, title: String, scope: String, vararg paths: String) =
             Category(id, title, scope, paths.map { File(context.filesDir, it) })
         val categories = listOf(
-            category("astrbot", "AstrBot 数据", "配置、插件、数据库、追踪数据及上游日志", "persistent/astrbot"),
-            category("napcat", "NapCat 数据", "后台配置及上游日志", "persistent/napcat"),
-            category("qq-home", "QQ 与用户目录", "QQ 会话、缓存、附件及 Ubuntu 用户目录", "persistent/home", "persistent/qq"),
-            category("backups", "本机备份", "手动备份和自动快照；受保护快照也计入", "backups"),
-            category("staging", "更新与导入暂存", "下载的 APK、程序及待导入备份", "staging"),
-            category("logs", "管理输出日志", "管理器、环境和两个项目的轮转输出", "logs"),
-            Category("cache", "应用缓存", "导出及浏览器等应用私有缓存", listOf(context.cacheDir)),
+            category("astrbot", AppText.get(R.string.ui_astrbot_data), AppText.get(R.string.ui_configuration_plugins_databases_trace_data_and_upstream_logs), "persistent/astrbot"),
+            category("napcat", AppText.get(R.string.ui_napcat_data), AppText.get(R.string.ui_dashboard_configuration_and_upstream_logs), "persistent/napcat"),
+            category("qq-home", AppText.get(R.string.ui_qq_and_user_directory), AppText.get(R.string.ui_qq_sessions_cache_attachments_and_the_ubuntu_user_directory), "persistent/home", "persistent/qq"),
+            category("backups", AppText.get(R.string.ui_local_backups), AppText.get(R.string.ui_manual_backups_and_automatic_snapshots_including_protected_snapshots), "backups"),
+            category("staging", AppText.get(R.string.ui_update_and_import_staging), AppText.get(R.string.ui_downloaded_apks_programs_and_backups_awaiting_import), "staging"),
+            category("extensions", AppText.get(R.string.cpolar_extension_storage), AppText.get(R.string.cpolar_extension_storage_hint), "extensions", "manager/extensions"),
+            category("logs", AppText.get(R.string.ui_manager_output_logs), AppText.get(R.string.ui_rotated_output_from_the_manager_runtime_and_both_services), "logs"),
+            Category("cache", AppText.get(R.string.ui_app_cache), AppText.get(R.string.ui_private_app_cache_including_exports_and_browser_data), listOf(context.cacheDir)),
             // Enumerate the large guest last so its budget cannot hide cache, logs or downloads.
-            category("runtime", "运行资源与回退", "当前及回退运行环境、程序资源", "runtime-data", "releases"),
+            category("runtime", AppText.get(R.string.ui_runtime_resources_and_rollback), AppText.get(R.string.ui_current_and_rollback_runtime_and_program_resources), "runtime-data", "releases"),
         )
         val groups = categories.map { category ->
             coroutine.ensureActive()
-            progress("正在统计${category.title}")
+            progress(AppText.get(R.string.ui_scanning, category.title))
             val tally = StorageFileTally()
             var complete = true
             var links = 0

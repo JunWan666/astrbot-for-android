@@ -45,7 +45,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /** This Activity owns only the browser. RuntimeService owns the servers. */
-class WebUiActivity : ComponentActivity() {
+class WebUiActivity : LocalizedActivity() {
     private lateinit var webView: WebView
     private lateinit var endpoint: LocalEndpoint
     private lateinit var progress: ProgressBar
@@ -74,7 +74,7 @@ class WebUiActivity : ComponentActivity() {
         completeExport(uri, image = true)
     }
     private val upload = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-        if (chooser == null && uris.isNotEmpty()) Toast.makeText(this, "页面已重建，请重新选择上传文件", Toast.LENGTH_LONG).show()
+        if (chooser == null && uris.isNotEmpty()) Toast.makeText(this, AppText.get(R.string.ui_the_page_was_recreated_select_the_file_to_upload), Toast.LENGTH_LONG).show()
         chooser?.onReceiveValue(uris.takeIf { it.isNotEmpty() }?.let { if (chooseMultiple) it.toTypedArray() else arrayOf(it.first()) })
         chooser = null
     }
@@ -111,9 +111,9 @@ class WebUiActivity : ComponentActivity() {
             setOnClickListener { action(this) }
             toolbar.addView(this, LinearLayout.LayoutParams(dp(48), dp(48)))
         }
-        icon("返回", R.drawable.ic_back) { onBackPressedDispatcher.onBackPressed() }
+        icon(AppText.get(R.string.ui_back), R.drawable.ic_back) { onBackPressedDispatcher.onBackPressed() }
         val heading = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = android.view.Gravity.CENTER_VERTICAL }
-        heading.addView(TextView(this).apply { text = "${id.label} 后台"; textSize = 16f; setTextColor(foreground); setTypeface(typeface, android.graphics.Typeface.BOLD) })
+        heading.addView(TextView(this).apply { text = AppText.get(R.string.ui_webui_66d31, id.label); textSize = 16f; setTextColor(foreground); setTypeface(typeface, android.graphics.Typeface.BOLD) })
         status = TextView(this).apply {
             text = endpoint.origin; textSize = 11f
             setTextColor(android.graphics.Color.parseColor(if (dark) "#A0A7B7" else "#7B8294"))
@@ -122,7 +122,7 @@ class WebUiActivity : ComponentActivity() {
         heading.addView(status)
         toolbar.addView(heading, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
         if (modelSettingsEntry) toolbar.addView(android.widget.Button(this).apply {
-            text = "模型配置"; textSize = 12f; setTextColor(foreground)
+            text = AppText.get(R.string.ui_models); textSize = 12f; setTextColor(foreground)
             setOnClickListener {
                 pendingModelSettings = true
                 val state = RuntimeStore.state.value
@@ -131,28 +131,28 @@ class WebUiActivity : ComponentActivity() {
                 }
             }
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)))
-        icon("刷新", R.drawable.ic_restart) { retryPage() }
-        icon("更多操作", R.drawable.ic_more) { anchor ->
+        icon(AppText.get(R.string.ui_refresh), R.drawable.ic_restart) { retryPage() }
+        icon(AppText.get(R.string.ui_more_actions), R.drawable.ic_more) { anchor ->
             PopupMenu(this, anchor).apply {
                 val connection = RuntimeStore.state.value.webUis.getValue(id)
                 if (connection.enabled && connection.endpoint?.origin == endpoint.origin) {
-                    menu.add("外部浏览器打开"); menu.add("复制地址")
-                    if (!webUiNeedsRecovery(id, RuntimeStore.state.value, endpoint.origin, pageFailure.value, pendingAction.value)) menu.add("保存页面图片")
+                    menu.add(AppText.get(R.string.ui_open_in_browser)); menu.add(AppText.get(R.string.ui_copy_address))
+                    if (!webUiNeedsRecovery(id, RuntimeStore.state.value, endpoint.origin, pageFailure.value, pendingAction.value)) menu.add(AppText.get(R.string.ui_save_page_image))
                 }
-                menu.add("查看日志"); menu.add("关闭后台")
-                menu.add("页面缩放 · ${browserScale.percent}%")
+                menu.add(AppText.get(R.string.ui_view_logs)); menu.add(AppText.get(R.string.ui_close_webui))
+                menu.add(AppText.get(R.string.ui_page_zoom_b29fc, browserScale.percent))
                 setOnMenuItemClickListener { item ->
                     when (item.title.toString()) {
-                        "外部浏览器打开" -> openExternal(endpoint.origin)
-                        "复制地址" -> {
+                        AppText.get(R.string.ui_open_in_browser) -> openExternal(endpoint.origin)
+                        AppText.get(R.string.ui_copy_address) -> {
                             getSystemService(android.content.ClipboardManager::class.java)
-                                .setPrimaryClip(android.content.ClipData.newPlainText("后台地址", endpoint.origin))
-                            Toast.makeText(this@WebUiActivity, "已复制后台地址", Toast.LENGTH_SHORT).show()
+                                .setPrimaryClip(android.content.ClipData.newPlainText(AppText.get(R.string.ui_webui_address), endpoint.origin))
+                            Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_webui_address_copied), Toast.LENGTH_SHORT).show()
                         }
-                        "保存页面图片" -> saveVisiblePage()
-                        "查看日志" -> openManager(logs = true)
-                        "关闭后台" -> finish()
-                        else -> if (item.title.toString().startsWith("页面缩放")) browserScale.choose(webView)
+                        AppText.get(R.string.ui_save_page_image) -> saveVisiblePage()
+                        AppText.get(R.string.ui_view_logs) -> openManager(logs = true)
+                        AppText.get(R.string.ui_close_webui) -> finish()
+                        else -> if (item.title.toString().startsWith(AppText.get(R.string.ui_page_zoom))) browserScale.choose(webView)
                     }
                     true
                 }
@@ -186,7 +186,7 @@ class WebUiActivity : ComponentActivity() {
                     loadSequence++
                     loadDeadline?.cancel(); loadDeadline = null
                     loginAssist?.cancel()
-                    status.text = "正在连接 ${id.label}…"
+                    status.text = AppText.get(R.string.ui_connecting_to, id.label)
                     if (pageFailure.value == null) beginPageLoad()
                 }
                 override fun onPageCommitVisible(view: WebView, url: String?) {
@@ -245,7 +245,7 @@ class WebUiActivity : ComponentActivity() {
                     saveBlob(url)
                 } else if (url.startsWith("data:") && pendingDownload == null) {
                     saveDataUrl(url)
-                } else Toast.makeText(this@WebUiActivity, "此下载方式尚未支持，可尝试外部浏览器", Toast.LENGTH_LONG).show()
+                } else Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_this_download_method_is_not_supported_yet_try_an), Toast.LENGTH_LONG).show()
             }
         }
         browserScale.attach(webView)
@@ -259,7 +259,7 @@ class WebUiActivity : ComponentActivity() {
                             downloadNonce = null
                             pendingDownload = null
                             if (result.has("data")) saveDataUrl(result.getString("data"), result.optString("name"))
-                            else Toast.makeText(this, "无法读取网页生成的文件，可尝试外部浏览器", Toast.LENGTH_LONG).show()
+                            else Toast.makeText(this, AppText.get(R.string.ui_unable_to_read_the_file_generated_by_this_page), Toast.LENGTH_LONG).show()
                         }
                     }
                 }
@@ -310,7 +310,7 @@ class WebUiActivity : ComponentActivity() {
                         recoveryPanel.visibility = if (blocked) View.VISIBLE else View.GONE
                         webView.visibility = if (blocked) View.INVISIBLE else View.VISIBLE
                         if (blocked) {
-                            status.text = state.services.getValue(id).summary()
+                            status.text = state.services.getValue(id).localizedSummary()
                             progress.visibility = View.GONE
                         }
                     }
@@ -428,7 +428,7 @@ class WebUiActivity : ComponentActivity() {
                 if (Build.VERSION.SDK_INT >= 33) notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                 runCatching {
                     pendingAction.value = RuntimeService.command(this, if (action == WebUiRecoveryAction.START) "start" else "restart", serviceId)
-                }.onFailure { Toast.makeText(this, "无法提交请求，请返回首页重试", Toast.LENGTH_SHORT).show() }
+                }.onFailure { Toast.makeText(this, AppText.get(R.string.ui_unable_to_submit_the_request_return_to_home_and), Toast.LENGTH_SHORT).show() }
             }
         }
     }
@@ -442,7 +442,7 @@ class WebUiActivity : ComponentActivity() {
 
     private fun saveBlob(url: String) {
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-            Toast.makeText(this, "当前系统 WebView 不支持此下载，请更新 WebView 或使用外部浏览器", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, AppText.get(R.string.ui_this_system_webview_does_not_support_this_download_update), Toast.LENGTH_LONG).show()
             return
         }
         val nonce = UUID.randomUUID().toString()
@@ -469,7 +469,7 @@ class WebUiActivity : ComponentActivity() {
             delay(30_000)
             if (downloadNonce == nonce) {
                 downloadNonce = null; pendingDownload = null
-                Toast.makeText(this@WebUiActivity, "网页文件下载超时，请重试", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_web_download_timed_out_please_retry), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -494,7 +494,7 @@ class WebUiActivity : ComponentActivity() {
             } finally { bitmap.recycle() }
             if (bytes == null) {
                 pendingDownload = null
-                Toast.makeText(this@WebUiActivity, "页面图片未能捕获或过大，请调整显示后重试", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_unable_to_capture_the_page_image_or_the_image), Toast.LENGTH_LONG).show()
             } else {
                 stageExport(bytes, "webui-page-${System.currentTimeMillis()}.png", image = true)
             }
@@ -519,7 +519,7 @@ class WebUiActivity : ComponentActivity() {
             check(url.length <= 12 * 1024 * 1024 && header.startsWith("data:") && header.endsWith(";base64"))
             Base64.decode(url.substringAfter(','), Base64.DEFAULT).also { check(it.size <= 8 * 1024 * 1024) }
         }.getOrNull()
-        if (bytes == null) { Toast.makeText(this, "网页生成的文件需为 Base64 格式且不超过 8 MB，可尝试外部浏览器", Toast.LENGTH_LONG).show(); return }
+        if (bytes == null) { Toast.makeText(this, AppText.get(R.string.ui_page_generated_files_must_use_base64_and_be_no), Toast.LENGTH_LONG).show(); return }
         pendingDownload = "data:"
         val mime = header.removePrefix("data:").removeSuffix(";base64")
         val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime) ?: "bin"
@@ -541,7 +541,7 @@ class WebUiActivity : ComponentActivity() {
             pendingDownload = request
             pendingExportToken = token
         } else if (request != null) {
-            Toast.makeText(this, "导出已中断，请重新导出", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, AppText.get(R.string.ui_export_interrupted_export_again), Toast.LENGTH_LONG).show()
         }
         val retainedToken = pendingExportToken
         lifecycleScope.launch(Dispatchers.IO) {
@@ -564,7 +564,7 @@ class WebUiActivity : ComponentActivity() {
         } catch (_: Exception) {
             pendingDownload = null
             pendingExportToken = null
-            Toast.makeText(this@WebUiActivity, "无法准备导出文件，请检查可用空间后重试", Toast.LENGTH_LONG).show()
+            Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_unable_to_prepare_the_export_check_available_space_and), Toast.LENGTH_LONG).show()
         } finally {
             if (!handedOff) withContext(NonCancellable + Dispatchers.IO) { exportCache.discard(token) }
         }
@@ -579,16 +579,16 @@ class WebUiActivity : ComponentActivity() {
             try {
                 if (uri == null) return@launch
                 if (!exportOriginCurrent()) {
-                    Toast.makeText(this@WebUiActivity, "后台地址已变更，请重新导出", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_the_webui_address_changed_export_again), Toast.LENGTH_LONG).show()
                 } else if (token != null) {
                     val success = withContext(Dispatchers.IO) { runCatching {
                         exportCache.writeTo(token) { checkNotNull(contentResolver.openOutputStream(uri, "w")) }
                     }.isSuccess }
                     Toast.makeText(this@WebUiActivity, if (success) {
-                        if (image) "页面图片已保存" else "文件已保存"
-                    } else "导出内容已失效或保存失败，请重新导出", Toast.LENGTH_LONG).show()
+                        if (image) AppText.get(R.string.ui_page_image_saved) else AppText.get(R.string.ui_file_saved)
+                    } else AppText.get(R.string.ui_export_expired_or_save_failed_export_again), Toast.LENGTH_LONG).show()
                 } else if (!image && url != null && endpoint.acceptsNavigation(url)) download(url, uri)
-                else Toast.makeText(this@WebUiActivity, "导出内容已失效，请重新导出", Toast.LENGTH_LONG).show()
+                else Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_export_expired_export_again), Toast.LENGTH_LONG).show()
             } finally {
                 withContext(NonCancellable + Dispatchers.IO) { exportCache.discard(token) }
             }
@@ -597,7 +597,7 @@ class WebUiActivity : ComponentActivity() {
 
     private fun download(url: String, destination: Uri) = lifecycleScope.launch {
         if (!exportOriginCurrent() || !endpoint.acceptsNavigation(url)) {
-            Toast.makeText(this@WebUiActivity, "后台地址已变更，请重新导出", Toast.LENGTH_LONG).show()
+            Toast.makeText(this@WebUiActivity, AppText.get(R.string.ui_the_webui_address_changed_export_again), Toast.LENGTH_LONG).show()
             return@launch
         }
         val cookies = CookieManager.getInstance().getCookie(url)
@@ -606,9 +606,9 @@ class WebUiActivity : ComponentActivity() {
             runCatching {
                 val request = Request.Builder().url(url).apply { if (cookies != null) header("Cookie", cookies) }.build()
                 client.newCall(request).execute().use { response ->
-                    check(response.isSuccessful) { "下载接口返回 ${response.code}" }
+                    checkLocalized(response.isSuccessful) { AppText.get(R.string.ui_download_endpoint_returned, response.code) }
                     val body = checkNotNull(response.body)
-                    check(body.contentLength() <= 256L * 1024 * 1024) { "下载文件超出 256 MB 限制" }
+                    checkLocalized(body.contentLength() <= 256L * 1024 * 1024) { AppText.get(R.string.ui_download_exceeds_the_256_mb_limit) }
                     contentResolver.openOutputStream(destination, "w")!!.use { output ->
                         body.byteStream().use { input ->
                             val buffer = ByteArray(64 * 1024)
@@ -617,7 +617,7 @@ class WebUiActivity : ComponentActivity() {
                                 val n = input.read(buffer)
                                 if (n < 0) break
                                 count += n
-                                check(count <= 256L * 1024 * 1024) { "下载文件超出 256 MB 限制" }
+                                checkLocalized(count <= 256L * 1024 * 1024) { AppText.get(R.string.ui_download_exceeds_the_256_mb_limit) }
                                 output.write(buffer, 0, n)
                             }
                         }
@@ -627,12 +627,12 @@ class WebUiActivity : ComponentActivity() {
         }
         client.connectionPool.evictAll()
         client.dispatcher.executorService.shutdown()
-        Toast.makeText(this@WebUiActivity, if (result.isSuccess) "文件已保存" else "下载未完成，请重试", Toast.LENGTH_LONG).show()
+        Toast.makeText(this@WebUiActivity, if (result.isSuccess) AppText.get(R.string.ui_file_saved) else AppText.get(R.string.ui_download_incomplete_please_retry), Toast.LENGTH_LONG).show()
     }
     private fun openExternal(url: String) {
-        Toast.makeText(this, "外部浏览器可能需要单独登录后台", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, AppText.get(R.string.ui_you_may_need_to_sign_in_separately_in_the), Toast.LENGTH_SHORT).show()
         runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
-            .onFailure { Toast.makeText(this, "没有可用的浏览器", Toast.LENGTH_SHORT).show() }
+            .onFailure { Toast.makeText(this, AppText.get(R.string.ui_no_browser_available), Toast.LENGTH_SHORT).show() }
     }
     override fun onSaveInstanceState(outState: Bundle) {
         if (::webView.isInitialized) webView.saveState(outState)

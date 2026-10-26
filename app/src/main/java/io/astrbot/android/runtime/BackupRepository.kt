@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.system.Os
 import android.system.OsConstants
 import android.util.AtomicFile
@@ -43,8 +49,8 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
 
     suspend fun create(versions: RuntimeVersions, kind: String = "manual", preserveIds: Set<String> = emptySet()): BackupInfo = withContext(Dispatchers.IO) {
         require(kind in setOf("manual", "before-restore", "before-update"))
-        require(preserveIds.all(::validId)) { "备份编号无效" }
-        check(!hasPendingRestore && !hasPendingCleanup) { "有未完成的恢复或备份清理，请先处理操作记录" }
+        requireLocalized(preserveIds.all(::validId)) { AppText.get(R.string.ui_invalid_backup_id) }
+        checkLocalized(!hasPendingRestore && !hasPendingCleanup) { AppText.get(R.string.ui_a_restore_or_backup_cleanup_is_pending_resolve_its) }
         val entries = scan(persistent)
         val size = entries.sumOf { it.bytes }
         val id = UUID.randomUUID().toString()
@@ -53,14 +59,14 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
             .put("entries", JSONArray(entries.map { it.json() }))
         val metadataBytes = manifest.toString().toByteArray(Charsets.UTF_8).size.toLong()
         val remove = if (kind != "manual") capacityPlan(Math.addExact(size, metadataBytes), preserveIds) else emptyList()
-        require(filesDir.usableSpace >= size + metadataBytes + 64L * 1024 * 1024) { "空间不足，备份至少需要 ${(size + metadataBytes) / 1024 / 1024 + 64} MB" }
+        requireLocalized(filesDir.usableSpace >= size + metadataBytes + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_space_backup_requires_at_least_mb, (size + metadataBytes) / 1024 / 1024 + 64) }
         backups.mkdirs()
         val temporary = File(backups, ".creating-$id")
         check(temporary.mkdir())
         try {
             val tree = File(temporary, "data")
             copyTree(persistent, tree)
-            check(scan(tree) == entries) { "备份期间数据发生变化或校验失败，未提交备份" }
+            checkLocalized(scan(tree) == entries) { AppText.get(R.string.ui_data_changed_during_backup_or_verification_failed_the_backup) }
             writeAtomic(File(temporary, "metadata.json"), manifest)
             syncDirectory(temporary)
             if (remove.isNotEmpty()) writeAtomic(retention.baseFile, JSONObject().put("schema", 1).put("newId", id)
@@ -83,9 +89,9 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
 
     private fun capacityPlan(nextBytes: Long, preserveIds: Set<String>): List<String> {
         val existing = list()
-        check(existing.all { it.kind in setOf("manual", "before-update", "before-restore") }) { "存在无法识别的备份类型，已保留全部备份" }
-        check(existing.size == backups.listFiles().orEmpty().count { validId(it.name) && it.isDirectory }) {
-            "存在无法读取的备份记录，已保留全部备份；请导出诊断后处理，未创建新快照"
+        checkLocalized(existing.all { it.kind in setOf("manual", "before-update", "before-restore") }) { AppText.get(R.string.ui_unrecognized_backup_type_all_backups_are_preserved) }
+        checkLocalized(existing.size == backups.listFiles().orEmpty().count { validId(it.name) && it.isDirectory }) {
+            AppText.get(R.string.ui_a_backup_record_is_unreadable_all_backups_are_preserved)
         }
         val automatic = existing.filter { it.kind != "manual" }
         return BackupCapacityPolicy.plan(automatic.map { SnapshotCapacity(it.id, it.createdAt, it.storedBytes) },
@@ -93,31 +99,31 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     }
 
     fun delete(id: String) {
-        check(!journal.baseFile.exists()) { "恢复过程中不能删除备份" }
+        checkLocalized(!journal.baseFile.exists()) { AppText.get(R.string.ui_cannot_delete_backups_during_restore) }
         require(validId(id))
         deleteTree(File(backups, id))
     }
 
     suspend fun beginRestore(id: String, versions: RuntimeVersions) = withContext(Dispatchers.IO) {
-        require(validId(id)) { "备份编号无效" }
-        check(!journal.baseFile.exists() && !previous.exists()) { "存在未处理的恢复记录，已保留现有数据" }
+        requireLocalized(validId(id)) { AppText.get(R.string.ui_invalid_backup_id) }
+        checkLocalized(!journal.baseFile.exists() && !previous.exists()) { AppText.get(R.string.ui_an_unresolved_restore_record_exists_current_data_is_preserved) }
         val backup = File(backups, id)
         val metadata = readMetadata(backup)
-        require(metadata.getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
-            "备份与当前运行版本组合不同，不能仅恢复数据。请先恢复对应程序版本"
+        requireLocalized(metadata.getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
+            AppText.get(R.string.ui_the_backup_does_not_match_the_installed_program_versions)
         }
         val expected = metadata.getJSONArray("entries").let { array ->
             require(array.length() <= 200_000)
             (0 until array.length()).map { Entry.parse(array.getJSONObject(it)) }
         }
         val tree = File(backup, "data")
-        require(scan(tree) == expected) { "备份文件损坏或内容被修改，已保留当前数据" }
+        requireLocalized(scan(tree) == expected) { AppText.get(R.string.ui_the_backup_is_damaged_or_was_modified_current_data) }
         val size = expected.sumOf { it.bytes }
-        require(filesDir.usableSpace >= size + 64L * 1024 * 1024) { "恢复暂存空间不足" }
+        requireLocalized(filesDir.usableSpace >= size + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_restore_staging_space) }
         deleteTree(staged)
         try {
             copyTree(tree, staged)
-            check(scan(staged) == expected) { "恢复暂存校验失败" }
+            checkLocalized(scan(staged) == expected) { AppText.get(R.string.ui_restore_staging_verification_failed) }
             // This record precedes every rename. An interrupted uncommitted restore is rolled back.
             writeJournal(id, "prepared")
             move(persistent, previous)
@@ -130,7 +136,7 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     }
 
     fun commitRestore() {
-        val record = readJournal() ?: error("恢复记录缺失")
+        val record = readJournal() ?: error(AppText.get(R.string.ui_restore_record_missing))
         check(record.getString("phase") == "switched" && persistent.isDirectory && previous.isDirectory)
         writeJournal(record.getString("id"), "committed")
         finishCommitted()
@@ -139,14 +145,14 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     /** Merge selected portable scopes into a private copy; QQ HOME and other scopes stay local. */
     internal suspend fun beginPortableRestore(beforeId: String, versions: RuntimeVersions, source: File,
                                              validate: suspend (File) -> Unit) = withContext(Dispatchers.IO) {
-        require(validId(beforeId)) { "恢复前快照编号无效" }
-        check(!hasPendingRestore && !previous.exists()) { "存在未处理的恢复记录，已保留现有数据" }
-        require(readMetadata(File(backups, beforeId)).getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
-            "恢复前快照与当前环境不匹配"
+        requireLocalized(validId(beforeId)) { AppText.get(R.string.ui_invalid_pre_restore_snapshot_id) }
+        checkLocalized(!hasPendingRestore && !previous.exists()) { AppText.get(R.string.ui_an_unresolved_restore_record_exists_current_data_is_preserved) }
+        requireLocalized(readMetadata(File(backups, beforeId)).getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
+            AppText.get(R.string.ui_the_pre_restore_snapshot_does_not_match_the_current)
         }
         validate(source)
         val required = scan(persistent).sumOf { it.bytes } + scan(source).sumOf { it.bytes } + 64L * 1024 * 1024
-        require(filesDir.usableSpace >= required) { "便携备份恢复暂存空间不足" }
+        requireLocalized(filesDir.usableSpace >= required) { AppText.get(R.string.ui_insufficient_staging_space_for_portable_backup_restore) }
         deleteTree(staged)
         try {
             copyTree(persistent, staged)
@@ -155,8 +161,8 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
             for (scope in PortableBackupArchive.SCOPES) {
                 val target = File(staged, scope)
                 val parent = target.parentFile!!
-                require(!Files.isSymbolicLink(parent.toPath())) { "当前配置父目录为链接，已保留现有数据" }
-                check(parent.isDirectory || parent.mkdirs()) { "无法准备配置目录" }
+                requireLocalized(!Files.isSymbolicLink(parent.toPath())) { AppText.get(R.string.ui_the_configuration_parent_directory_is_a_link_current_data) }
+                checkLocalized(parent.isDirectory || parent.mkdirs()) { AppText.get(R.string.ui_cannot_prepare_configuration_directory) }
                 val mode = Os.lstat(parent.path).st_mode and 511
                 Os.chmod(parent.path, mode or 448)
                 DurableFiles.delete(target, writableGuestDirectories = true)
@@ -179,35 +185,35 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     fun recover(): String? {
         val record = readJournal()
         if (record == null) {
-            check(!previous.exists()) { "存在未识别的旧数据目录，已停止操作并保留文件" }
+            checkLocalized(!previous.exists()) { AppText.get(R.string.ui_an_unrecognized_old_data_directory_exists_operation_stopped_files) }
             deleteTree(staged)
             val cleaned = finishRetention()
             backups.listFiles().orEmpty().filter { it.name.startsWith(".creating-") }.forEach { deleteTree(it) }
             cleanupRetired(protectedIds())
-            return if (cleaned) "已完成上次自动快照清理，受保护备份已保留" else null
+            return if (cleaned) AppText.get(R.string.ui_previous_automatic_snapshot_cleanup_completed_protected_backups_are_pres) else null
         }
-        require(validId(record.getString("id")) && record.getString("phase") in setOf("prepared", "switched", "committed")) {
-            "恢复记录无法识别，已保留全部数据"
+        requireLocalized(validId(record.getString("id")) && record.getString("phase") in setOf("prepared", "switched", "committed")) {
+            AppText.get(R.string.ui_unrecognized_restore_record_all_data_is_preserved)
         }
         if (record.getString("phase") == "committed") {
             finishCommitted()
-            return "已完成上次恢复操作的清理"
+            return AppText.get(R.string.ui_cleanup_from_the_previous_restore_completed)
         }
         if (previous.exists()) {
-            check(previous.isDirectory && !Files.isSymbolicLink(previous.toPath())) { "旧数据目录异常，已保留文件" }
+            checkLocalized(previous.isDirectory && !Files.isSymbolicLink(previous.toPath())) { AppText.get(R.string.ui_unexpected_old_data_directory_files_are_preserved) }
             deleteTree(persistent)
             move(previous, persistent)
         } else {
-            check(record.getString("phase") == "prepared" && persistent.isDirectory) { "恢复所需的旧数据缺失，已停止操作" }
+            checkLocalized(record.getString("phase") == "prepared" && persistent.isDirectory) { AppText.get(R.string.ui_old_data_required_for_recovery_is_missing_operation_stopped) }
         }
         deleteTree(staged)
         journal.delete()
         syncDirectory(File(filesDir, "operations"))
-        return "上次恢复未完成，已恢复操作前的数据"
+        return AppText.get(R.string.ui_the_previous_restore_was_incomplete_original_data_has_been)
     }
 
     private fun finishCommitted() {
-        check(persistent.isDirectory && !Files.isSymbolicLink(persistent.toPath())) { "恢复后的数据目录缺失，保留旧数据" }
+        checkLocalized(persistent.isDirectory && !Files.isSymbolicLink(persistent.toPath())) { AppText.get(R.string.ui_restored_data_directory_is_missing_old_data_is_preserved) }
         deleteTree(previous)
         deleteTree(staged)
         journal.delete()
@@ -221,21 +227,21 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         val newId = record.getString("newId")
         val remove = record.getJSONArray("remove").let { values -> (0 until values.length()).map { values.getString(it) } }
         val preserve = record.getJSONArray("preserve").let { values -> (0 until values.length()).map { values.getString(it) }.toSet() }
-        require(record.getInt("schema") == 1 && validId(newId) && remove.distinct().size == remove.size &&
-            (remove + preserve).all(::validId) && newId !in remove && remove.none { it in preserve }) { "备份清理记录无法识别，已保留备份" }
+        requireLocalized(record.getInt("schema") == 1 && validId(newId) && remove.distinct().size == remove.size &&
+            (remove + preserve).all(::validId) && newId !in remove && remove.none { it in preserve }) { AppText.get(R.string.ui_unrecognized_backup_cleanup_record_backups_are_preserved) }
         val current = File(backups, newId)
         if (!current.exists() && File(backups, ".creating-$newId").isDirectory) {
             deleteTree(File(backups, ".creating-$newId"))
         } else {
-            check(current.isDirectory && !Files.isSymbolicLink(current.toPath()) && File(current, "data").isDirectory &&
-                !Files.isSymbolicLink(File(current, "data").toPath())) { "新快照缺失，已保留旧备份与清理记录" }
-            check(readMetadata(current).getString("kind") in setOf("before-update", "before-restore")) { "新自动快照记录异常，已保留旧备份" }
+            checkLocalized(current.isDirectory && !Files.isSymbolicLink(current.toPath()) && File(current, "data").isDirectory &&
+                !Files.isSymbolicLink(File(current, "data").toPath())) { AppText.get(R.string.ui_the_new_snapshot_is_missing_old_backups_and_cleanup) }
+            checkLocalized(readMetadata(current).getString("kind") in setOf("before-update", "before-restore")) { AppText.get(R.string.ui_invalid_new_automatic_snapshot_record_old_backups_are_preserved) }
             val protected = protectedIds() + preserve + newId
             for (id in remove) {
                 if (id in protected) continue
                 val source = File(backups, id)
                 if (source.exists()) {
-                    check(source.isDirectory && !Files.isSymbolicLink(source.toPath())) { "待清理快照目录异常，已保留文件" }
+                    checkLocalized(source.isDirectory && !Files.isSymbolicLink(source.toPath())) { AppText.get(R.string.ui_unexpected_snapshot_directory_awaiting_cleanup_files_are_preserved) }
                     if (readMetadata(source).getString("kind") !in setOf("before-update", "before-restore")) continue
                     move(source, File(backups, ".deleting-$id"))
                 }
@@ -250,8 +256,8 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     private fun cleanupRetired(protected: Set<String>) {
         for (file in backups.listFiles().orEmpty().filter { it.name.startsWith(".deleting-") }) {
             val id = file.name.removePrefix(".deleting-")
-            require(validId(id)) { "备份清理目录无法识别，已保留文件" }
-            check(file.isDirectory && !Files.isSymbolicLink(file.toPath())) { "备份清理目录异常，已保留文件" }
+            requireLocalized(validId(id)) { AppText.get(R.string.ui_unrecognized_backup_cleanup_directory_files_are_preserved) }
+            checkLocalized(file.isDirectory && !Files.isSymbolicLink(file.toPath())) { AppText.get(R.string.ui_unexpected_backup_cleanup_directory_files_are_preserved) }
             val keep = File(file, "metadata.json").isFile && readMetadata(file, id).getString("kind") !in setOf("before-update", "before-restore")
             if (id in protected || keep) move(file, File(backups, id))
             else DurableFiles.delete(file, writableGuestDirectories = true)
@@ -269,16 +275,16 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
 
     private fun readMetadata(directory: File, expectedId: String = directory.name): JSONObject {
         val file = File(directory, "metadata.json")
-        require(file.isFile && !Files.isSymbolicLink(directory.toPath()) && file.length() <= 128L * 1024 * 1024) { "备份信息缺失或过大" }
+        requireLocalized(file.isFile && !Files.isSymbolicLink(directory.toPath()) && file.length() <= 128L * 1024 * 1024) { AppText.get(R.string.ui_backup_information_is_missing_or_too_large) }
         val metadata = JSONObject(file.readText())
-        require(metadata.getInt("schema") == 1 && metadata.getString("id") == expectedId) { "备份格式不支持" }
+        requireLocalized(metadata.getInt("schema") == 1 && metadata.getString("id") == expectedId) { AppText.get(R.string.ui_unsupported_backup_format) }
         return metadata
     }
 
     private fun info(metadata: JSONObject, metadataBytes: Long): BackupInfo {
         val versions = metadata.getJSONObject("versions")
         val bytes = metadata.getLong("bytes")
-        require(bytes >= 0 && metadataBytes >= 0) { "备份容量记录无效" }
+        requireLocalized(bytes >= 0 && metadataBytes >= 0) { AppText.get(R.string.ui_invalid_backup_size_record) }
         return BackupInfo(metadata.getString("id"), metadata.getLong("createdAt"), metadata.getString("kind"),
             bytes, metadata.getJSONArray("entries").length(),
             versions.keys().asSequence().filter { it != "compatibilityKey" }.associateWith { versions.getString(it) },
@@ -286,7 +292,7 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     }
 
     private suspend fun scan(directory: File): List<Entry> {
-        require(directory.isDirectory && !Files.isSymbolicLink(directory.toPath())) { "数据目录缺失或无效" }
+        requireLocalized(directory.isDirectory && !Files.isSymbolicLink(directory.toPath())) { AppText.get(R.string.ui_data_directory_is_missing_or_invalid) }
         val entries = ArrayList<Entry>()
         val coroutine = currentCoroutineContext()
         val base = directory.toPath()
@@ -313,12 +319,12 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
                         }
                         add(file, "file", attrs.size(), digest.digest().joinToString("") { "%02x".format(it) }, "")
                     }
-                    else -> error("数据中存在无法备份的特殊文件，请停止相关插件后重试")
+                    else -> error(AppText.get(R.string.ui_data_contains_special_files_that_cannot_be_backed_up))
                 }
                 return FileVisitResult.CONTINUE
             }
             private fun add(path: Path, kind: String, size: Long, digest: String, target: String) {
-                require(entries.size < 200_000) { "数据文件数量超出备份范围" }
+                requireLocalized(entries.size < 200_000) { AppText.get(R.string.ui_too_many_files_for_backup) }
                 entries += Entry(base.relativize(path).toString(), kind, size, digest,
                     if (kind == "symlink") 0 else Os.lstat(path.toString()).st_mode and 511, target)
             }
@@ -370,7 +376,7 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     }
 
     private fun move(source: File, destination: File) {
-        check(!Files.exists(destination.toPath(), LinkOption.NOFOLLOW_LINKS) && source.renameTo(destination)) { "无法切换数据目录，已保留恢复记录" }
+        checkLocalized(!Files.exists(destination.toPath(), LinkOption.NOFOLLOW_LINKS) && source.renameTo(destination)) { AppText.get(R.string.ui_cannot_switch_data_directories_recovery_records_are_preserved) }
         syncDirectory(destination.parentFile!!)
     }
 

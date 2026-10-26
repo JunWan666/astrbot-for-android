@@ -1,5 +1,10 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -40,8 +45,8 @@ class SshEngine(private val context: Context) {
         refresh()
         if (server != null) return
         val config = repository.configuration()
-        check(config.installed) { "请先安装 SSH 扩展" }
-        check(File(BootstrapRuntime(context).rootfs, ".astrbot-bootstrap.json").isFile) { "请先初始化 Ubuntu 环境" }
+        checkLocalized(config.installed) { AppText.get(R.string.ui_install_the_ssh_extension_first) }
+        checkLocalized(File(BootstrapRuntime(context).rootfs, ".astrbot-bootstrap.json").isFile) { AppText.get(R.string.ui_initialize_the_ubuntu_runtime_first) }
         val passwordDigest = MessageDigest.getInstance("SHA-256").digest(repository.password().toByteArray(Charsets.UTF_8))
         PathUtils.setUserHomeFolderResolver { File(context.filesDir, "extensions/ssh").toPath() }
         val key = repository.hostKey()
@@ -79,8 +84,8 @@ class SshEngine(private val context: Context) {
     }
 
     private fun newCommand(command: String?): SshProcessCommand = synchronized(gate) {
-        check(!closing && commands.size < 4) { "SSH 终端数量已达上限或服务正在停止" }
-        check(command == null || command.length <= 64 * 1024) { "SSH 命令过长" }
+        checkLocalized(!closing && commands.size < 4) { AppText.get(R.string.ui_ssh_session_limit_reached_or_the_server_is_stopping) }
+        checkLocalized(command == null || command.length <= 64 * 1024) { AppText.get(R.string.ui_ssh_command_is_too_long) }
         SshProcessCommand(BootstrapRuntime(context), command) { finished -> synchronized(gate) { commands.remove(finished) } }
             .also { commands.add(it) }
     }

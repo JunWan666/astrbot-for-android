@@ -13,30 +13,30 @@ import io.astrbot.android.runtime.ManagerState
 import io.astrbot.android.runtime.InstalledVersionInspection
 
 @Composable internal fun ProjectAboutDialog(state: ManagerState, onDismiss: () -> Unit, onAuthor: () -> Unit) {
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("应用与组件版本") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(AppText.get(R.string.ui_app_and_component_versions)) }, text = {
         Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ManagerAppLogo(Modifier.size(48.dp))
                 Column {
                     Text(ProjectIdentity.NAME, style = MaterialTheme.typography.titleMedium)
-                    Text("版本：${BuildConfig.VERSION_NAME}")
+                    Text(AppText.get(R.string.ui_version_18ab8, BuildConfig.VERSION_NAME))
                 }
             }
-            Text("开发与维护：${ProjectIdentity.AUTHOR}")
-            Text("项目许可：${ProjectIdentity.LICENSE}")
+            Text(AppText.get(R.string.ui_developed_and_maintained_by, ProjectIdentity.AUTHOR))
+            Text(AppText.get(R.string.ui_project_license, ProjectIdentity.LICENSE))
             Text(ProjectIdentity.COPYRIGHT, style = MaterialTheme.typography.bodySmall)
-            TextButton(onClick = onAuthor) { Text("作者 GitHub 主页") }
+            TextButton(onClick = onAuthor) { Text(AppText.get(R.string.ui_author_s_github_profile)) }
             HorizontalDivider()
             state.versions.filterKeys { it != "App" }.forEach { (component, version) ->
-                Text("$component：$version", style = MaterialTheme.typography.bodySmall)
+                Text("${componentLabel(component)}: $version", style = MaterialTheme.typography.bodySmall)
             }
             state.versionNotice?.let {
                 Text(it, color = if (it == InstalledVersionInspection.MATCHED_NOTICE)
                     MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error)
             }
-            Text("AstrBot 与 NapCat 支持独立在线更新，保留配置并提供回退。Linux QQ、Python 或底层依赖变化时，再升级匹配的运行环境。",
+            Text(AppText.get(R.string.ui_astrbot_and_napcat_support_independent_online_updates_retaining_configur),
                 style = MaterialTheme.typography.bodySmall)
-            Text("第三方项目保留各自作者、许可与商标，完整声明见“第三方许可”。", style = MaterialTheme.typography.bodySmall)
+            Text(AppText.get(R.string.ui_third_party_projects_retain_their_authorship_licenses_and_trademarks), style = MaterialTheme.typography.bodySmall)
         }
-    }, confirmButton = { TextButton(onClick = onDismiss) { Text("知道了") } })
+    }, confirmButton = { TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_ok)) } })
 }

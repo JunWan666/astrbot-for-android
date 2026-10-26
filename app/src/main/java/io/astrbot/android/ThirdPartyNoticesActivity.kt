@@ -29,7 +29,7 @@ import java.io.ByteArrayOutputStream
 import java.util.zip.ZipInputStream
 
 /** Public build-time assets only. Viewing or exporting never starts the runtime. */
-class ThirdPartyNoticesActivity : ComponentActivity() {
+class ThirdPartyNoticesActivity : LocalizedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -55,7 +55,7 @@ class ThirdPartyNoticesActivity : ComponentActivity() {
                     }
                 }.isSuccess }
                 exporting = false
-                Toast.makeText(this@ThirdPartyNoticesActivity, if (success) "许可材料已保存" else "保存失败，请重试", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@ThirdPartyNoticesActivity, if (success) AppText.get(R.string.ui_license_materials_saved) else AppText.get(R.string.ui_unable_to_save_please_retry), Toast.LENGTH_LONG).show()
             }
         }
         LaunchedEffect(Unit) {
@@ -66,13 +66,13 @@ class ThirdPartyNoticesActivity : ComponentActivity() {
                 }
             } }
             names = result.getOrNull()
-            if (result.isFailure) error = "许可材料暂不可用，请查看项目发行记录或重新安装完整包。"
+            if (result.isFailure) error = AppText.get(R.string.ui_license_materials_are_unavailable_check_the_project_releases_or)
         }
         LaunchedEffect(selected) {
             text = null
             page = 0
             selected?.let { name ->
-                text = withContext(Dispatchers.IO) { runCatching { readNotice(name) }.getOrElse { "无法读取此文件，请导出许可材料后查看。" } }
+                text = withContext(Dispatchers.IO) { runCatching { readNotice(name) }.getOrElse { AppText.get(R.string.ui_unable_to_read_this_file_export_the_license_materials) } }
             }
         }
         LaunchedEffect(page, selected) { scroll.scrollTo(0) }
@@ -80,19 +80,19 @@ class ThirdPartyNoticesActivity : ComponentActivity() {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { finish() }) { Icon(painterResource(R.drawable.ic_back), "返回管理器", Modifier.size(21.dp)) }
-                Text("第三方许可", Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
-                TextButton(onClick = { export.launch("astrbot-third-party-notices.zip") }, enabled = names != null && !exporting) { Text("导出许可材料") }
+                IconButton(onClick = { finish() }) { Icon(painterResource(R.drawable.ic_back), AppText.get(R.string.ui_back_to_manager), Modifier.size(21.dp)) }
+                Text(AppText.get(R.string.ui_third_party_licenses), Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
+                TextButton(onClick = { export.launch("astrbot-third-party-notices.zip") }, enabled = names != null && !exporting) { Text(AppText.get(R.string.ui_export_license_materials)) }
             }
             if (exporting) LinearProgressIndicator(Modifier.fillMaxWidth())
             if (selected == null) {
-                Text("当前安装包随附的许可原文与来源记录", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(AppText.get(R.string.ui_license_texts_and_source_records_bundled_with_this_apk), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 error?.let { Text(it) }
                 if (names == null && error == null) CircularProgressIndicator()
-                OutlinedTextField(value = query, onValueChange = { query = it }, label = { Text("筛选文件名") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+                OutlinedTextField(value = query, onValueChange = { query = it }, label = { Text(AppText.get(R.string.ui_filter_filenames)) }, modifier = Modifier.fillMaxWidth(), singleLine = true,
                     shape = MaterialTheme.shapes.medium, textStyle = MaterialTheme.typography.bodyMedium)
                 val filtered = names.orEmpty().filter { it.contains(query, ignoreCase = true) }
-                Text("${filtered.size} 个文件", Modifier.padding(start = 4.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(AppText.get(R.string.ui_files, filtered.size), Modifier.padding(start = 4.dp), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(bottom = 16.dp)) {
                     items(filtered, key = { it }) { name ->
                         Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
@@ -102,7 +102,7 @@ class ThirdPartyNoticesActivity : ComponentActivity() {
                 }
             } else {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    TextButton(onClick = { selected = null }) { Text("返回文件列表") }
+                    TextButton(onClick = { selected = null }) { Text(AppText.get(R.string.ui_back_to_file_list)) }
                     Text(selected!!, Modifier.weight(1f), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 val content = text
@@ -110,9 +110,9 @@ class ThirdPartyNoticesActivity : ComponentActivity() {
                 else {
                     val pages = maxOf(1, (content.length + PAGE_SIZE - 1) / PAGE_SIZE)
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        TextButton(onClick = { page-- }, enabled = page > 0) { Text("上一页") }
-                        Text("第 ${page + 1} / $pages 页", style = MaterialTheme.typography.bodySmall)
-                        TextButton(onClick = { page++ }, enabled = page + 1 < pages) { Text("下一页") }
+                        TextButton(onClick = { page-- }, enabled = page > 0) { Text(AppText.get(R.string.ui_previous)) }
+                        Text(AppText.get(R.string.ui_page_a43ad, page + 1, pages), style = MaterialTheme.typography.bodySmall)
+                        TextButton(onClick = { page++ }, enabled = page + 1 < pages) { Text(AppText.get(R.string.ui_next)) }
                     }
                     Surface(Modifier.weight(1f).padding(bottom = 12.dp), shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
                         SelectionContainer(Modifier.fillMaxSize().verticalScroll(scroll).padding(14.dp)) {

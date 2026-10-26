@@ -30,9 +30,11 @@
 
 **AstrBot for Android** (AstrBot 运行管理器) is an Android application for deploying and managing AstrBot and NapCat locally. A single APK bundles the PRoot Ubuntu environment and service components, providing environment setup, service controls, status monitoring, logs, backup and restore, and independent online updates. Root access is not required.
 
-Built with Kotlin and Jetpack Compose, the app provides a native management interface and embeds the AstrBot and NapCat WebUIs in a WebView. Users can sign in to QQ, configure model providers and plugins, manage personas, enable LAN access, and use the optional SSH extension directly from their phone.
+Built with Kotlin and Jetpack Compose, the app provides a native management interface in Simplified Chinese and English and embeds the AstrBot and NapCat WebUIs in a WebView. Users can sign in to QQ, configure model providers and plugins, manage personas, enable LAN access, and use SSH and cpolar tunneling extensions directly from their phone.
 
 ## Screenshots
+
+The current stable release is **v1.0.0**. The main branch and screenshots below include the language settings and cpolar extension being developed for a future release.
 
 <table width="100%" align="center">
   <tr>
@@ -65,7 +67,7 @@ Built with Kotlin and Jetpack Compose, the app provides a native management inte
   </tr>
 </table>
 
-The screenshots show the current Chinese interface.
+The screenshots show the app in Simplified Chinese. English is also available in Settings → Language.
 
 ## Features
 
@@ -81,6 +83,8 @@ The screenshots show the current Chinese interface.
 | Resource overview | View memory usage for the app and managed processes, total device memory and the usage percentage. Storage usage is shown separately. |
 | Backup and restore | Create local snapshots and portable backups, roll back updates, and automatically remove old unprotected automatic snapshots. |
 | SSH extension | Installed by default and started on demand, with configurable password, port and LAN access. |
+| cpolar extension | Install on demand and sign in through the official embedded WebUI. Includes SSH, AstrBot and NapCat tunnel presets. |
+| App language | Choose system default, Simplified Chinese or English for the management interface, notifications and app messages. |
 | Background setup | Access notification, battery optimization, unrestricted background usage and auto-start settings, with guidance for locking the app in recent tasks. |
 | Updates | Check for app, AstrBot and NapCat updates independently; verify downloads and confirm installation. |
 
@@ -89,9 +93,9 @@ Home and Settings use fixed layouts, with pagination for small windows. Personas
 ## Getting started
 
 1. Download the full APK from [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest), install it on an ARM64 Android device, then open the app and initialize the environment.
-2. Tap **Start all (启动全部)** and wait for AstrBot and NapCat to become ready.
+2. Tap **Start all** and wait for AstrBot and NapCat to become ready.
 3. Open the NapCat WebUI to sign in to QQ, then configure model providers, messaging platforms and plugins in the AstrBot WebUI.
-4. Follow **Settings → Background running (设置 → 后台运行)** to adjust device permissions, then configure personas, backups and SSH as needed.
+4. Follow **Settings → Background running** to adjust device permissions, then configure personas, backups, SSH and cpolar as needed.
 
 The full APK includes the runtime environment, so initialization does not require a separate Ubuntu download or dependency installation. QQ sign-in, model API calls and online updates require network access. Enter account credentials and API keys directly in the relevant WebUI. See the [user guide (Chinese)](使用指南.md) for more details.
 
@@ -101,6 +105,8 @@ The full APK includes the runtime environment, so initialization does not requir
 - The full APK is approximately **720 MiB**. Allow additional storage for the extracted environment, QQ data and backups.
 - Resource usage varies with plugins, model calls and QQ activity. Home displays actual app memory usage; the app does not preallocate memory for a virtual machine.
 - Continuous operation requires appropriate background permissions on the device. The app currently does not start automatically at boot.
+
+Install cpolar separately in **Settings → Runtime extensions**; its client is not bundled in the APK. Sign in through its official WebUI to save the token automatically and manage the three default tunnels. Start each target service in the app before using its tunnel. Features depend on your cpolar account plan.
 
 ## Building from source
 
@@ -116,7 +122,7 @@ The keystore and credentials stay in the Git-ignored `.local/signing/` directory
 
 ## Updates
 
-**Settings → About → Check for updates (设置 → 关于 → 检查更新)** manages app APK updates. AstrBot and NapCat have separate component update entries. Compatible component updates do not require reinstalling the app. Updates support signature verification, resumable downloads, snapshots before installation and rollback on failure. Installation requires user confirmation after the download completes.
+**Settings → About → Check for updates** manages app APK updates. AstrBot and NapCat have separate component update entries. Compatible component updates do not require reinstalling the app. Updates support signature verification, resumable downloads, snapshots before installation and rollback on failure. Installation requires user confirmation after the download completes.
 
 The app uses this project's signed GitHub update channels by default: **Releases host app APKs and AstrBot packages, the `updates` branch hosts signed update manifests, and NapCat packages are downloaded directly from upstream official Shell releases**. Changes to Linux QQ, Python or underlying dependencies require a matching runtime environment upgrade. See [updates and distribution (Chinese)](更新与分发.md) for configuration details.
 
@@ -132,7 +138,7 @@ Join the QQ community to discuss app usage, AstrBot / NapCat configuration, pers
 
 The detailed guides and project policies below are currently available in Chinese.
 
-- [User guide](使用指南.md): WebUI configuration, personas, SSH, resources and backups.
+- [User guide](使用指南.md): WebUI configuration, personas, language, SSH, cpolar, resources and backups.
 - [Build guide](构建指南.md): Development tools, runtime assets and APK builds.
 - [Updates and distribution](更新与分发.md): App signing, update channels and GitHub publishing.
 - [Distribution materials](发行材料.md): Third-party licenses, dependency inventories and accompanying source archives.

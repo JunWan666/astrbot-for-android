@@ -1,5 +1,12 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.requireNotNullLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.net.Uri
 import android.system.Os
@@ -47,12 +54,12 @@ class UpdateRepository(private val context: Context, private val component: Stri
 
     internal suspend fun prepareExpected(uri: Uri, expectedVersion: String?, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
         check(component == "astrbot")
-        check(!hasPendingUpdate && !backups.hasPendingRestore) { "请先完成上次维护操作" }
+        checkLocalized(!hasPendingUpdate && !backups.hasPendingRestore) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
         DurableFiles.delete(work); check(work.mkdirs())
         try {
-            progress("正在读取更新包")
+            progress(AppText.get(R.string.ui_reading_update_package))
             context.contentResolver.openInputStream(uri).use { input ->
-                requireNotNull(input) { "无法读取所选更新包" }
+                requireNotNullLocalized(input) { AppText.get(R.string.ui_cannot_read_the_selected_update_package) }
                 FileOutputStream(packageFile).use { output -> boundedCopy(input, output, MAX_PACKAGE); output.fd.sync() }
             }
             verifyAndExtract(progress, expectedVersion)
@@ -60,7 +67,7 @@ class UpdateRepository(private val context: Context, private val component: Stri
     }
 
     internal suspend fun prepareNapCat(archive: File, envelope: JSONObject, id: String, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
-        check(component == "napcat" && !hasPendingUpdate && !backups.hasPendingRestore) { "请先完成上次维护操作" }
+        checkLocalized(component == "napcat" && !hasPendingUpdate && !backups.hasPendingRestore) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
         DurableFiles.delete(work); check(work.mkdirs())
         try {
             FileOutputStream(packageFile).use { output -> archive.inputStream().use { boundedCopy(it, output, MAX_PACKAGE) }; output.fd.sync() }
@@ -70,15 +77,15 @@ class UpdateRepository(private val context: Context, private val component: Stri
     }
 
     suspend fun verifyPrepared(progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
-        check(!hasPendingUpdate) { "有未完成的更新记录" }
+        checkLocalized(!hasPendingUpdate) { AppText.get(R.string.ui_an_unfinished_update_record_exists) }
         verifyAndExtract(progress)
     }
 
     private suspend fun verifyAndExtract(progress: (String) -> Unit, expectedVersion: String? = null): UpdateInfo {
-        progress("正在校验更新签名及兼容性")
+        progress(AppText.get(R.string.ui_verifying_update_signature_and_compatibility))
         DurableFiles.delete(staged)
         if (DurableFiles.exists(prepared)) DurableFiles.removeRecord(prepared)
-        require(packageFile.isFile && packageFile.length() <= MAX_PACKAGE) { "更新包缺失或过大" }
+        requireLocalized(packageFile.isFile && packageFile.length() <= MAX_PACKAGE) { AppText.get(R.string.ui_update_package_is_missing_or_too_large) }
         if (component == "napcat") {
             val value = OfficialNapCat.extract(context, packageFile, staged, requireNotNull(DurableFiles.read(officialProof)))
             DurableFiles.write(prepared, value)
@@ -86,43 +93,43 @@ class UpdateRepository(private val context: Context, private val component: Stri
         }
         val manifest = ZipFile(packageFile).use { zip ->
             val entries = zip.entries().asSequence().toList()
-            require(entries.size == 3 && entries.map { it.name }.toSet() == setOf("manifest.json", "manifest.sig", "program.tar.bin")) { "更新包结构无效" }
+            requireLocalized(entries.size == 3 && entries.map { it.name }.toSet() == setOf("manifest.json", "manifest.sig", "program.tar.bin")) { AppText.get(R.string.ui_invalid_update_package_structure) }
             fun read(name: String, limit: Int): ByteArray {
                 val entry = zip.getEntry(name)
-                require(entry.size in 1..limit.toLong()) { "更新包字段大小异常" }
+                requireLocalized(entry.size in 1..limit.toLong()) { AppText.get(R.string.ui_invalid_update_package_field_size) }
                 return zip.getInputStream(entry).use { it.readBytesLimited(limit) }
             }
             val bytes = read("manifest.json", 64 * 1024)
             val signature = read("manifest.sig", 256)
             UpdateTrust(context).verify(bytes, signature)
             val value = JSONObject(bytes.toString(Charsets.UTF_8))
-            require(value.getInt("schema") == 1 && value.getString("component") == "astrbot") { "更新格式或组件不支持" }
-            require(value.getString("version").matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(?:[a-zA-Z0-9.-]+)?"))) { "更新版本无效" }
-            require(expectedVersion == null || value.getString("version") == expectedVersion) { "更新包版本与签名目录不一致" }
-            require(value.getInt("minAppCode") <= BuildConfig.VERSION_CODE) { "此更新需要新版管理器 APK" }
+            requireLocalized(value.getInt("schema") == 1 && value.getString("component") == "astrbot") { AppText.get(R.string.ui_unsupported_update_format_or_component) }
+            requireLocalized(value.getString("version").matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+(?:[a-zA-Z0-9.-]+)?"))) { AppText.get(R.string.ui_invalid_update_version) }
+            requireLocalized(expectedVersion == null || value.getString("version") == expectedVersion) { AppText.get(R.string.ui_update_package_version_differs_from_the_signed_catalog) }
+            requireLocalized(value.getInt("minAppCode") <= BuildConfig.VERSION_CODE) { AppText.get(R.string.ui_this_update_requires_a_newer_manager_apk) }
             val installed = InstalledVersions.read(context)
-            require(value.getString("abi") == installed.components["架构"] && value.getString("environmentKey") == installed.environmentKey) {
-                "此更新与当前运行环境或依赖不匹配，请使用对应运行包或 APK"
+            requireLocalized(value.getString("abi") == installed.components["架构"] && value.getString("environmentKey") == installed.environmentKey) {
+                AppText.get(R.string.ui_this_update_does_not_match_the_current_runtime_or)
             }
             val count = value.getInt("entries")
             val size = value.getLong("unpackedBytes")
             val payloadSize = value.getLong("payloadBytes")
             require(count in 1..100_000 && size in 1..MAX_PROGRAM && payloadSize in 1..MAX_PACKAGE)
-            require(files.usableSpace >= size * 2 + 64L * 1024 * 1024) { "更新暂存空间不足" }
+            requireLocalized(files.usableSpace >= size * 2 + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_update_staging_space) }
             val payload = File(work, "program.tar.bin")
             try {
                 val digest = MessageDigest.getInstance("SHA-256")
                 val entry = zip.getEntry("program.tar.bin")
-                require(entry.size == payloadSize) { "更新资源大小不符" }
+                requireLocalized(entry.size == payloadSize) { AppText.get(R.string.ui_update_resource_size_mismatch) }
                 FileOutputStream(payload).use { output ->
                     zip.getInputStream(entry).use { boundedCopy(it, output, payloadSize, digest) }; output.fd.sync()
                 }
-                require(payload.length() == payloadSize && digest.digest().hex() == value.getString("payloadSha256")) { "更新资源摘要不符，已保留当前版本" }
-                progress("正在解包并校验 AstrBot ${value.getString("version")}")
+                requireLocalized(payload.length() == payloadSize && digest.digest().hex() == value.getString("payloadSha256")) { AppText.get(R.string.ui_update_resource_digest_mismatch_current_version_is_preserved) }
+                progress(AppText.get(R.string.ui_extracting_and_verifying_astrbot, value.getString("version")))
                 extract(payload, count, size)
                 validateProgram(staged, value.getString("version"))
                 val source = JSONObject(File(staged, ".astrbot-source.json").readText())
-                require(canonicalSource(source) == canonicalSource(value.getJSONObject("source"))) { "项目来源记录与签名清单不一致" }
+                requireLocalized(canonicalSource(source) == canonicalSource(value.getJSONObject("source"))) { AppText.get(R.string.ui_project_source_record_differs_from_the_signed_manifest) }
             } finally { payload.delete() }
             value
         }
@@ -140,40 +147,40 @@ class UpdateRepository(private val context: Context, private val component: Stri
                 currentCoroutineContext().ensureActive()
                 val entry = archive.nextEntry ?: break
                 val path = ArchivePaths.entry(staged.toPath(), entry.name)
-                require(path != staged.toPath() && names.add(path.toString()) && ++count <= expectedCount) { "更新归档含重复或异常路径" }
-                require(!entry.name.split('/').contains("..") && !entry.isSymbolicLink && !entry.isLink) { "更新包不支持链接或父目录路径" }
+                requireLocalized(path != staged.toPath() && names.add(path.toString()) && ++count <= expectedCount) { AppText.get(R.string.ui_update_archive_contains_duplicate_or_invalid_paths) }
+                requireLocalized(!entry.name.split('/').contains("..") && !entry.isSymbolicLink && !entry.isLink) { AppText.get(R.string.ui_update_package_contains_unsupported_links_or_parent_directory_paths) }
                 when {
                     entry.isDirectory -> require(path.toFile().isDirectory || path.toFile().mkdirs())
                     entry.isFile -> {
                         require(entry.size in 0..MAX_PROGRAM)
-                        size += entry.size; require(size <= expectedSize) { "更新解包大小超出签名清单" }
+                        size += entry.size; requireLocalized(size <= expectedSize) { AppText.get(R.string.ui_extracted_update_size_exceeds_the_signed_manifest) }
                         path.parent.toFile().mkdirs()
                         FileOutputStream(path.toFile()).use { output ->
                             boundedCopy(archive, output, entry.size); output.fd.sync()
                         }
                         Os.chmod(path.toString(), 420)
                     }
-                    else -> error("更新归档含特殊文件")
+                    else -> error(AppText.get(R.string.ui_update_archive_contains_special_files))
                 }
             }
         }
-        require(count == expectedCount && size == expectedSize) { "更新解包数量或大小不符" }
+        requireLocalized(count == expectedCount && size == expectedSize) { AppText.get(R.string.ui_extracted_update_count_or_size_mismatch) }
         DurableFiles.sync(staged)
     }
 
     suspend fun prepareRollback(progress: (String) -> Unit): String = withContext(Dispatchers.IO) {
         check(!hasPendingUpdate && !backups.hasPendingRestore)
-        val record = DurableFiles.read(rollback) ?: error("没有可回退的程序与数据快照")
+        val record = DurableFiles.read(rollback) ?: error(AppText.get(R.string.ui_no_program_and_data_snapshot_available_for_rollback))
         val current = InstalledVersions.read(context)
         val counterpart = if (component == "napcat") "AstrBot" else "NapCat"
-        require(listOf(counterpart, "Linux QQ", "Python", "运行环境", "架构").all {
+        requireLocalized(listOf(counterpart, "Linux QQ", "Python", "运行环境", "架构").all {
             record.getJSONObject("oldVersions").optString(it) == current.components[it]
-        }) { "其他组件已更新，无法单独恢复此旧组合；请使用匹配的完整环境与备份" }
+        }) { AppText.get(R.string.ui_other_components_have_changed_so_this_old_combination_cannot) }
         val previous = previous(record)
-        require(previous.isDirectory && backups.list().any { it.id == record.getString("snapshotId") }) { "回退程序或数据快照缺失" }
+        requireLocalized(previous.isDirectory && backups.list().any { it.id == record.getString("snapshotId") }) { AppText.get(R.string.ui_rollback_program_or_data_snapshot_is_missing) }
         val needed = previous.walkTopDown().filter { it.isFile }.sumOf { it.length() }
-        require(files.usableSpace >= needed + 64L * 1024 * 1024) { "回退准备空间不足" }
-        progress("正在准备旧程序与对应数据")
+        requireLocalized(files.usableSpace >= needed + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_rollback_preparation_space) }
+        progress(AppText.get(R.string.ui_preparing_previous_program_and_its_data))
         DurableFiles.delete(work); check(work.mkdirs())
         DurableFiles.copyProgram(previous, staged)
         validateProgram(staged, record.getJSONObject("oldVersions").getString(label))
@@ -206,9 +213,9 @@ class UpdateRepository(private val context: Context, private val component: Stri
     /** Idempotent program + corresponding data recovery before any service launch. */
     suspend fun recover(): String? = withContext(Dispatchers.IO) {
         val record = DurableFiles.read(journal) ?: return@withContext null
-        require(record.getInt("schema") == 1 && record.getString("phase") in setOf("prepared", "switched", "rolling-back", "committed")) { "更新记录无法识别，已保留全部文件" }
+        requireLocalized(record.getInt("schema") == 1 && record.getString("phase") in setOf("prepared", "switched", "rolling-back", "committed")) { AppText.get(R.string.ui_unrecognized_update_record_all_files_are_preserved) }
         if (record.getString("phase") == "committed") {
-            finishCommitted(record); return@withContext "已完成上次更新的提交与清理"
+            finishCommitted(record); return@withContext AppText.get(R.string.ui_previous_update_commit_and_cleanup_completed)
         }
         val phase = record.getString("phase")
         record.put("phase", "rolling-back"); DurableFiles.write(journal, record)
@@ -218,16 +225,16 @@ class UpdateRepository(private val context: Context, private val component: Stri
             DurableFiles.delete(active)
             DurableFiles.move(old, active)
         } else {
-            require(phase == "prepared" || phase == "rolling-back") { "恢复所需旧程序缺失，已保留数据" }
+            requireLocalized(phase == "prepared" || phase == "rolling-back") { AppText.get(R.string.ui_previous_program_required_for_recovery_is_missing_data_is) }
         }
         val versions = InstalledVersions.read(context)
-        require(versions.compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) { "旧程序版本校验失败，已保留更新快照" }
+        requireLocalized(versions.compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) { AppText.get(R.string.ui_previous_program_version_check_failed_update_snapshot_is_preserved) }
         backups.beginRestore(record.getString("snapshotId"), versions)
         checkDatabase()
         backups.commitRestore()
         DurableFiles.delete(work)
         DurableFiles.removeRecord(journal)
-        "更新未完成，已恢复旧程序及操作前的数据快照"
+        AppText.get(R.string.ui_update_was_incomplete_previous_program_and_original_data_snapshot)
     }
 
     suspend fun restoreRollbackData(id: String) {
@@ -253,7 +260,7 @@ class UpdateRepository(private val context: Context, private val component: Stri
                 with sqlite3.connect(f'file:{p}?mode=ro', uri=True) as c:
                     assert c.execute('PRAGMA quick_check').fetchall() == [('ok',)], 'database check failed'
         """.trimIndent(), timeoutSeconds = 60)
-        check(result.exitCode == 0) { "数据快照的 SQLite 检查失败，已保留恢复记录" }
+        checkLocalized(result.exitCode == 0) { AppText.get(R.string.ui_sqlite_verification_failed_for_the_data_snapshot_recovery_records) }
     }
 
     private fun finishCommitted(record: JSONObject) {
@@ -280,21 +287,21 @@ class UpdateRepository(private val context: Context, private val component: Stri
     private fun validateProgram(program: File, version: String) {
         if (component == "napcat") {
             val source = File(program, "napcat.mjs")
-            require(source.isFile && source.length() <= 32 * 1024 * 1024 &&
-                NapCatVersion.read(program, source.readText()) == version && File(program, "static/index.html").isFile) { "NapCat 回退程序版本或界面不匹配" }
+            requireLocalized(source.isFile && source.length() <= 32 * 1024 * 1024 &&
+                NapCatVersion.read(program, source.readText()) == version && File(program, "static/index.html").isFile) { AppText.get(R.string.ui_napcat_rollback_program_version_or_dashboard_mismatch) }
             return
         }
         fun text(path: String): String {
             val file = File(program, path)
-            require(file.isFile && file.length() <= 4 * 1024 * 1024) { "更新缺少必要程序或界面文件" }
+            requireLocalized(file.isFile && file.length() <= 4 * 1024 * 1024) { AppText.get(R.string.ui_update_lacks_required_program_or_dashboard_files) }
             return file.readText()
         }
         text("main.py")
-        require(Regex("__version__\\s*=\\s*[\"']([^\"']+)").find(text("astrbot/__init__.py"))?.groupValues?.get(1) == version) { "程序版本不匹配" }
-        require(text("astrbot/dashboard/dist/assets/version").trim().removePrefix("v").removePrefix("V") == version) { "Dashboard 与程序版本不匹配" }
+        requireLocalized(Regex("__version__\\s*=\\s*[\"']([^\"']+)").find(text("astrbot/__init__.py"))?.groupValues?.get(1) == version) { AppText.get(R.string.ui_program_version_mismatch) }
+        requireLocalized(text("astrbot/dashboard/dist/assets/version").trim().removePrefix("v").removePrefix("V") == version) { AppText.get(R.string.ui_dashboard_and_program_version_mismatch) }
         val html = text("astrbot/dashboard/dist/index.html")
         val references = Regex("(?:src|href)=[\"']/?(assets/[^\"']+\\.(?:js|css))[\"']").findAll(html).map { it.groupValues[1] }.toList()
-        require(references.isNotEmpty() && references.all { File(program, "astrbot/dashboard/dist/$it").isFile }) { "Dashboard 资源缺失" }
+        requireLocalized(references.isNotEmpty() && references.all { File(program, "astrbot/dashboard/dist/$it").isFile }) { AppText.get(R.string.ui_dashboard_resources_missing) }
     }
     private suspend fun boundedCopy(input: InputStream, output: java.io.OutputStream, max: Long, digest: MessageDigest? = null) {
         val buffer = ByteArray(128 * 1024)
@@ -303,8 +310,8 @@ class UpdateRepository(private val context: Context, private val component: Stri
             currentCoroutineContext().ensureActive()
             val count = input.read(buffer)
             if (count < 0) break
-            size += count; require(size <= max) { "更新资源超出允许大小" }
-            require(files.usableSpace >= 16L * 1024 * 1024) { "读取更新资源时空间不足" }
+            size += count; requireLocalized(size <= max) { AppText.get(R.string.ui_update_resources_exceed_the_allowed_size) }
+            requireLocalized(files.usableSpace >= 16L * 1024 * 1024) { AppText.get(R.string.ui_storage_ran_out_while_reading_update_resources) }
             output.write(buffer, 0, count); digest?.update(buffer, 0, count)
         }
     }

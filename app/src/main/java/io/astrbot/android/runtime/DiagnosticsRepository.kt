@@ -1,5 +1,12 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.requireNotNullLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.app.ActivityManager
 import android.content.Context
 import android.net.Uri
@@ -24,16 +31,16 @@ class DiagnosticsRepository(private val context: Context) {
     suspend fun export(destination: Uri, snapshot: ManagerState, progress: (String) -> Unit) = withContext(Dispatchers.IO) {
         // Controller serialization guarantees an older folder cannot belong to another export.
         DurableFiles.delete(cache)
-        check(cache.mkdirs()) { "无法准备诊断包缓存" }
+        checkLocalized(cache.mkdirs()) { AppText.get(R.string.ui_cannot_prepare_diagnostic_cache) }
         try {
-            require(cache.usableSpace >= MAX_ARCHIVE + RESERVE) { "诊断包缓存空间不足" }
-            progress("正在收集系统、版本和运行状态")
+            requireLocalized(cache.usableSpace >= MAX_ARCHIVE + RESERVE) { AppText.get(R.string.ui_insufficient_diagnostic_cache_space) }
+            progress(AppText.get(R.string.ui_collecting_system_version_and_runtime_information))
             val report = report(snapshot)
             val entries = mutableListOf<Pair<String, File>>()
             val logs = JSONArray()
             for (category in LogCategory.entries) {
                 currentCoroutineContext().ensureActive()
-                progress("正在收集${category.label}脱敏日志")
+                progress(AppText.get(R.string.ui_collecting_redacted_logs, category.label))
                 val name = "logs/${category.name.lowercase()}.log"
                 val file = File(cache, name).apply { parentFile!!.mkdirs() }
                 var status = "collected"
@@ -51,9 +58,9 @@ class DiagnosticsRepository(private val context: Context) {
                 catch (_: Exception) {
                     // Discard partial output and exception text, which can contain source data.
                     status = "unavailable"
-                    file.writeText("日志暂无法读取，未附带部分内容或原始异常。\n")
+                    file.writeText(AppText.get(R.string.ui_some_logs_are_unreadable_partial_content_and_original_errors))
                 }
-                require(file.length() <= MAX_LOG_OUTPUT) { "诊断日志超出采集上限" }
+                requireLocalized(file.length() <= MAX_LOG_OUTPUT) { AppText.get(R.string.ui_diagnostic_logs_exceed_the_collection_limit) }
                 entries += name to file
                 logs.put(JSONObject().put("category", category.name).put("entry", name).put("status", status).put("bytes", file.length()))
             }
@@ -74,9 +81,9 @@ class DiagnosticsRepository(private val context: Context) {
                     zip.closeEntry()
                 }
             }
-            require(archive.length() in 1..MAX_ARCHIVE) { "诊断包超过大小上限" }
-            progress("正在写入所选诊断包文件")
-            requireNotNull(context.contentResolver.openOutputStream(destination, "wt")) { "无法写入所选诊断包" }.use { output ->
+            requireLocalized(archive.length() in 1..MAX_ARCHIVE) { AppText.get(R.string.ui_diagnostic_archive_exceeds_the_size_limit) }
+            progress(AppText.get(R.string.ui_writing_diagnostics_to_the_selected_file))
+            requireNotNullLocalized(context.contentResolver.openOutputStream(destination, "wt")) { AppText.get(R.string.ui_cannot_write_the_selected_diagnostic_file) }.use { output ->
                 archive.inputStream().use { input ->
                     val buffer = ByteArray(128 * 1024)
                     while (true) {
@@ -155,10 +162,10 @@ class DiagnosticsRepository(private val context: Context) {
         private const val MAX_LOG_OUTPUT = 8L * 1024 * 1024
         private const val MAX_ARCHIVE = 40L * 1024 * 1024
         private const val RESERVE = 64L * 1024 * 1024
-        const val NOTICE = "诊断包包含设备型号、系统/组件版本、运行状态、管理事件和受限大小的脱敏日志。" +
-            "不附带配置文件、数据库、插件文件、QQ 登录会话文件或设备唯一标识。" +
-            "仅隐藏已识别的凭据和登录二维码；日志仍可能包含聊天内容、账号或其他个人信息，请检查后再分享。" +
-            "每类最多采集两份历史日志和当前日志，每文件最近 512 KiB；超长行、截断行及链接文件会省略。" +
-            "此文件用于排查问题，不能用于恢复数据。\n"
+        val NOTICE get() = AppText.get(R.string.ui_diagnostics_include_device_model_system_and_component_versions_runtime) +
+            AppText.get(R.string.ui_configuration_files_databases_plugins_qq_login_session_files_and) +
+            AppText.get(R.string.ui_only_recognized_credentials_and_login_qr_codes_are_hidden) +
+            AppText.get(R.string.ui_up_to_two_historical_logs_and_the_current_log) +
+            AppText.get(R.string.ui_this_file_is_for_troubleshooting_and_cannot_restore_data)
     }
 }

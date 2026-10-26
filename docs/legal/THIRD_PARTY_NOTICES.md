@@ -1,5 +1,7 @@
 # Third-party components
 
+The cpolar extension downloads the official Linux ARM64 client 3.3.12 only when requested. Its ZIP and executable hashes are pinned in `CpolarRepository.kt`. No cpolar executable is bundled in this repository, its source distribution, or the default APK. The client remains subject to [cpolar's terms and account plan](https://www.cpolar.com/); the manager's MIT license does not apply to it.
+
 The original Android manager code and documentation are copyright (c) 2026 JunWan666 and licensed under the [MIT License](../../LICENSE). Attribution is recorded in [NOTICE](NOTICE).
 
 This file describes the pinned complete ARM64 runtime, not just the Ubuntu bootstrap. The manager's MIT license does not replace third-party terms or grant permission to redistribute third-party software.

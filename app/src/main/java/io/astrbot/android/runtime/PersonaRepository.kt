@@ -1,5 +1,10 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -19,7 +24,7 @@ internal class PersonaRepository(private val context: Context) {
     val hasPendingChange get() = DurableFiles.exists(journal)
 
     fun inspect(): PersonaInstallation = runCatching {
-        check(!hasPendingChange) { "正在恢复中断的人设操作，请稍候" }
+        checkLocalized(!hasPendingChange) { AppText.get(R.string.ui_recovering_an_interrupted_persona_operation_please_wait) }
         val configuration = readConfig()
         open(readOnly = true).use { db ->
             checkSchema(db)
@@ -32,22 +37,22 @@ internal class PersonaRepository(private val context: Context) {
             PersonaInstallation(ids, current, null, previous?.optString("applied") == current)
         }
     }.getOrElse { PersonaInstallation(unavailable = it.message?.takeIf { message -> message.any { c -> c in '\u4e00'..'\u9fff' } }
-        ?.let(SecretRedactor::redact) ?: "当前版本的人设数据暂不兼容，可复制提示词到 AstrBot 后台") }
+        ?.let(SecretRedactor::redact) ?: AppText.get(R.string.ui_this_persona_database_version_is_incompatible_copy_the_prompt)) }
 
     fun begin(preset: PersonaPreset?, applyDefault: Boolean, restorePrevious: Boolean = false) {
-        check(!hasPendingChange) { "有未完成的人设操作，请先恢复" }
+        checkLocalized(!hasPendingChange) { AppText.get(R.string.ui_an_unfinished_persona_operation_must_be_recovered_first) }
         val configuration = readConfig()
         val selected = personaObject(configuration)
         val prior = selected.optString("persona_id", "default")
         val undoBefore = DurableFiles.read(undo)
         val target = if (restorePrevious) {
-            check(undoBefore != null && undoBefore.getString("applied") == prior) { "默认人设已在后台变更，请在后台选择人设" }
+            checkLocalized(undoBefore != null && undoBefore.getString("applied") == prior) { AppText.get(R.string.ui_the_default_persona_was_changed_in_the_dashboard_select) }
             undoBefore.getString("previous")
         } else requireNotNull(preset).databaseId
         open().use { db ->
             checkSchema(db)
             val exists = exists(db, target)
-            if (restorePrevious) check(target == "default" || exists) { "原人设已被删除，请在后台选择其他人设" }
+            if (restorePrevious) checkLocalized(target == "default" || exists) { AppText.get(R.string.ui_the_original_persona_was_deleted_choose_another_in_the) }
             val record = JSONObject().put("schema", 1).put("target", target).put("previous", prior)
                 .put("created", !exists && !restorePrevious).put("changeDefault", applyDefault || restorePrevious)
                 .put("previousPresent", selected.has("persona_id"))
@@ -81,7 +86,7 @@ internal class PersonaRepository(private val context: Context) {
 
     fun recover(): Boolean {
         val record = DurableFiles.read(journal) ?: return false
-        check(record.getInt("schema") == 1) { "人设恢复记录格式不兼容，已保留数据" }
+        checkLocalized(record.getInt("schema") == 1) { AppText.get(R.string.ui_incompatible_persona_recovery_record_data_is_preserved) }
         val configuration = readConfig()
         open().use { db ->
             checkSchema(db)
@@ -104,18 +109,18 @@ internal class PersonaRepository(private val context: Context) {
     }
 
     private fun readConfig(): JSONObject {
-        check(config.isFile && database.isFile) { "请先启动一次 AstrBot，等待后台就绪后再应用人设" }
+        checkLocalized(config.isFile && database.isFile) { AppText.get(R.string.ui_start_astrbot_once_and_wait_for_the_dashboard_to) }
         val versionFile = File(context.filesDir, "runtime-data/ubuntu/opt/astrbot/astrbot/__init__.py")
         // Database and config contracts are explicitly checked below; no schema migration is performed here.
-        check(versionFile.isFile) { "请先初始化 AstrBot 运行环境" }
+        checkLocalized(versionFile.isFile) { AppText.get(R.string.ui_initialize_the_astrbot_runtime_first) }
         return requireNotNull(DurableFiles.read(config)).also { personaObject(it) }
     }
 
     private fun personaObject(configuration: JSONObject): JSONObject {
         val runner = configuration.optJSONObject("agent_runner")
-        check(runner?.optString("runner_type") == "local") { "当前使用远程 Agent，请在 AstrBot 后台配置人设；预设仍可复制" }
+        checkLocalized(runner?.optString("runner_type") == "local") { AppText.get(R.string.ui_a_remote_agent_is_active_configure_personas_in_astrbot) }
         val result = runner.optJSONObject("config")?.optJSONObject("persona")
-        check(result != null) { "当前 AstrBot 人设配置格式不兼容，可复制提示词到后台" }
+        checkLocalized(result != null) { AppText.get(R.string.ui_incompatible_astrbot_persona_configuration_format_copy_the_prompt_into) }
         return result
     }
 
@@ -127,8 +132,8 @@ internal class PersonaRepository(private val context: Context) {
     private fun checkSchema(db: SQLiteDatabase) {
         val columns = mutableSetOf<String>()
         db.rawQuery("PRAGMA table_info(personas)", null).use { cursor -> while (cursor.moveToNext()) columns += cursor.getString(cursor.getColumnIndexOrThrow("name")) }
-        check(columns.containsAll(listOf("persona_id", "system_prompt", "begin_dialogs", "tools", "skills", "custom_error_message", "folder_id", "sort_order", "created_at", "updated_at"))) {
-            "当前 AstrBot 数据库暂不兼容，可复制提示词到后台"
+        checkLocalized(columns.containsAll(listOf("persona_id", "system_prompt", "begin_dialogs", "tools", "skills", "custom_error_message", "folder_id", "sort_order", "created_at", "updated_at"))) {
+            AppText.get(R.string.ui_this_astrbot_database_is_incompatible_copy_the_prompt_into)
         }
     }
 }

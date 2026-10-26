@@ -1,5 +1,13 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireNotNullLocalized
+import io.astrbot.android.LocalizedStateException
+import io.astrbot.android.userFacingMessage
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.net.Uri
 import io.astrbot.android.core.*
@@ -21,7 +29,7 @@ data class ManagerState(
     val environmentInstalled: Boolean = false,
     val componentsReady: Boolean = false,
     val busy: Boolean = false,
-    val phase: String = "检查运行环境",
+    val phase: String = AppText.get(R.string.ui_checking_runtime),
     val error: String? = null,
     val services: Map<ServiceId, ServiceStatus> = ServiceId.entries.associateWith { ServiceStatus(it) },
     val webUis: Map<ServiceId, WebUiConnection> = ServiceId.entries.associateWith { WebUiConnection(LocalEndpoint(it.defaultPort)) },
@@ -49,8 +57,10 @@ data class ManagerState(
     val storageSpace: StorageSpaceReading = StorageSpaceReading(),
 )
 
-enum class LogCategory(val label: String) {
-    MANAGER("管理器"), RUNTIME("运行环境"), ASTRBOT("AstrBot"), NAPCAT("NapCat / QQ")
+enum class LogCategory(private val labelResource: Int) {
+    MANAGER(R.string.ui_manager_7ad33), RUNTIME(R.string.ui_runtime), ASTRBOT(R.string.component_astrbot), NAPCAT(R.string.component_napcat_qq), CPOLAR(R.string.cpolar_name)
+;
+    val label: String get() = AppText.get(labelResource)
 }
 
 object RuntimeStore {
@@ -77,10 +87,14 @@ object RuntimeStore {
         val connections = ServiceId.entries.associateWith { RuntimeConfiguration(context).read(it) }
         val histories = ServiceId.entries.associateWith { ServiceHistoryRepository(context).read(it) }
         runCatching {
+            val repository = CpolarRepository(context)
+            CpolarStore.state.update { it.copy(configuration = repository.configuration(), desired = repository.desired()) }
+        }.onFailure { CpolarStore.state.update { it.copy(error = AppText.get(R.string.cpolar_operation_error)) } }
+        runCatching {
             val ssh = SshRepository(context)
             ssh.ensureDefault()
             SshStore.state.update { state -> state.copy(configuration = ssh.configuration(), desired = ssh.desired()) }
-        }.onFailure { SshStore.state.update { it.copy(error = "SSH 扩展设置暂不可用，请重新设置或重装扩展") } }
+        }.onFailure { SshStore.state.update { it.copy(error = AppText.get(R.string.ui_ssh_extension_settings_are_unavailable_configure_ssh_again_or)) } }
         state.update { it.copy(environmentInstalled = installed, componentsReady = ready,
             services = it.services.mapValues { (id, status) -> if (owner == null) status.copy(history = histories.getValue(id)) else status },
             versions = inspection?.components.orEmpty(), versionNotice = inspection?.notice, versionsCheckedAtMillis = inspection?.checkedAtMillis,
@@ -93,7 +107,7 @@ object RuntimeStore {
             portableImport = portableImport, personas = personas, storageSpace = StorageSpace.read(context),
             webUis = it.webUis + ServiceId.entries.filter { id -> !it.services.getValue(id).desiredRunning }
                 .associateWith { id -> connections.getValue(id) },
-            phase = if (it.busy) it.phase else if (ready) "运行环境已就绪" else if (installed) "基础环境已就绪，完整组件待准备" else "等待初始化") }
+            phase = if (it.busy) it.phase else if (ready) AppText.get(R.string.ui_runtime_ready) else if (installed) AppText.get(R.string.ui_base_runtime_ready_complete_components_still_required) else AppText.get(R.string.ui_waiting_for_initialization)) }
     }
     fun log(context: Context, id: ServiceId): RotatingLog {
         return log(context, LogCategory.valueOf(id.name))
@@ -110,6 +124,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     private val runtime = BootstrapRuntime(context)
     private val ssh = SshEngine(context)
     private val sshRepository = SshRepository(context)
+    private val cpolar = CpolarEngine(context, scope)
+    private val cpolarRepository = CpolarRepository(context)
     private val configuration = RuntimeConfiguration(context)
     private val activeConnections = ConcurrentHashMap<ServiceId, WebUiConnection>()
     private val commands get() = RuntimeStore.operationLock
@@ -184,7 +200,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     if (status.history != saved && RuntimeStore.owner === owner) {
                         runCatching { histories.save(id, status.history) }
                             .onSuccess { saved = status.history }
-                            .onFailure { RuntimeStore.log(context, LogCategory.MANAGER).append("${id.label} 运行记录保存失败，请检查存储空间") }
+                            .onFailure { RuntimeStore.log(context, LogCategory.MANAGER).append(AppText.get(R.string.ui_unable_to_save_history_check_storage_space, id.label)) }
                     }
                 }
             }
@@ -219,7 +235,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         if (id == ServiceId.ASTRBOT) astrbotStartup.launchId()?.let { launch ->
                             if (observedLaunch != null && observedLaunch != launch) {
                                 interfaceHealth.reset(android.os.SystemClock.elapsedRealtime())
-                                event("检测到 AstrBot 上游重启，重新检查本机接口与版本")
+                                event(AppText.get(R.string.ui_astrbot_upstream_restart_detected_checking_local_endpoints_and_versions))
                             }
                             observedLaunch = launch
                         }
@@ -234,7 +250,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                             interfaceHealth.reset(android.os.SystemClock.elapsedRealtime())
                             available = true
                         }
-                        val displayed = if (connection != configured) connection.copy(note = "后台配置已变更，重启此服务后生效") else connection
+                        val displayed = if (connection != configured) connection.copy(note = AppText.get(R.string.ui_webui_configuration_changed_restart_this_service_to_apply_it)) else connection
                         updateState { it.copy(webUis = it.webUis + (id to displayed)) }
                         val qq = if (available && id == ServiceId.NAPCAT) {
                             if (napCatEndpoint != connection.endpoint) {
@@ -266,24 +282,28 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         val readOnlyCheck = action in setOf("export-diagnostics", "check-environment")
         updateState { it.copy(busy = true, error = if (readOnlyCheck) diagnosticSnapshot.error else null, notice = null) }
         if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = true, error = null) }
-        event("开始 $action ${id?.label.orEmpty()}")
+        if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = true, error = null) }
+        event(AppText.get(R.string.ui_start_1ae95, action, id?.label.orEmpty()))
         try {
             if (action == "check-environment") {
-                updateState { it.copy(phase = "正在检查运行资源与后台配置") }
+                updateState { it.copy(phase = AppText.get(R.string.ui_checking_runtime_resources_and_webui_configuration)) }
                 val report = EnvironmentChecks(context).check()
-                updateState { it.copy(environmentCheck = report, notice = "环境检查完成，可查看分类结果与处理建议") }
+                updateState { it.copy(environmentCheck = report, notice = AppText.get(R.string.ui_environment_check_complete_review_results_and_recommended_actions)) }
                 return@withLock
             }
             if (action == "export-diagnostics") {
-                DiagnosticsRepository(context).export(Uri.parse(requireNotNull(sourceUri) { "未选择诊断包保存位置" }), diagnosticSnapshot) { phase ->
+                DiagnosticsRepository(context).export(Uri.parse(requireNotNullLocalized(sourceUri) { AppText.get(R.string.ui_no_diagnostic_export_location_selected) }), diagnosticSnapshot) { phase ->
                     updateState { it.copy(phase = phase) }
                 }
-                updateState { it.copy(notice = "诊断包已导出，请检查日志内容后再分享") }
+                updateState { it.copy(notice = AppText.get(R.string.ui_diagnostics_exported_review_log_contents_before_sharing)) }
                 return@withLock
             }
             resumeSsh = action in setOf("backup", "backup-apk", "restore", "export-backup", "apply-backup", "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat") ||
                 backups.hasPendingRestore || updates.hasPendingUpdate || napcat.hasPendingUpdate || images.hasPendingUpdate
-            if (resumeSsh) ssh.stop(paused = sshRepository.desired())
+            if (resumeSsh) {
+                ssh.stop(paused = sshRepository.desired())
+                cpolar.stop(paused = cpolarRepository.desired())
+            }
             if (backups.hasPendingRestore || updates.hasPendingUpdate || napcat.hasPendingUpdate || images.hasPendingUpdate) supervisors.values.toList().reversed().forEach { it.stop() }
             images.recover()?.let { result -> updateState { it.copy(notice = result) } }
             updates.recover()?.let { result -> updateState { it.copy(notice = result) } }
@@ -293,7 +313,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             if (personas.hasPendingChange) {
                 supervisors.getValue(ServiceId.ASTRBOT).stop()
                 withContext(Dispatchers.IO) { personas.recover() }
-                updateState { it.copy(notice = "已恢复中断前的人设设置") }
+                updateState { it.copy(notice = AppText.get(R.string.ui_restored_persona_settings_from_before_the_interruption)) }
             }
             when (action) {
                 "reconcile" -> {
@@ -304,7 +324,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                             configuration.prepareDefaults()
                             for (serviceId in wanted) {
                                 if (supervisors.getValue(serviceId).state.value.desiredRunning) continue
-                                updateState { it.copy(phase = "核对并恢复 ${serviceId.label} 运行") }
+                                updateState { it.copy(phase = AppText.get(R.string.ui_checking_and_restoring, serviceId.label)) }
                                 // The native owner cleans descendants on parent death. Allow that bounded
                                 // cleanup to finish; never kill an unknown process occupying this port.
                                 val endpoint = configuration.read(serviceId).endpoint
@@ -318,6 +338,31 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     }
                     ssh.refresh()
                     if (sshRepository.desired()) ssh.start()
+                    cpolar.refresh()
+                    if (cpolarRepository.desired()) runCatching { cpolar.start() }.onFailure {
+                        CpolarStore.state.update { state -> state.copy(error = AppText.get(R.string.cpolar_start_error)) }
+                    }
+                }
+                "cpolar-install" -> {
+                    cpolarRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                    cpolar.start()
+                    cpolarRepository.setDesired(true)
+                    cpolar.refresh()
+                }
+                "cpolar-start" -> {
+                    cpolar.start()
+                    cpolarRepository.setDesired(true)
+                    cpolar.refresh()
+                }
+                "cpolar-stop" -> {
+                    cpolarRepository.setDesired(false)
+                    cpolar.stop()
+                    cpolar.refresh()
+                }
+                "cpolar-uninstall" -> {
+                    cpolar.stop()
+                    cpolarRepository.uninstall()
+                    cpolar.refresh()
                 }
                 "ssh-start" -> {
                     sshRepository.ensureDefault()
@@ -339,37 +384,37 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     ssh.stop()
                     ssh.refresh()
                     if (wanted) ssh.start()
-                    updateState { it.copy(notice = "SSH 设置已保存" + if (wanted) "，原连接已断开，请重新连接" else "，启动后生效") }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_ssh_settings_saved) + if (wanted) AppText.get(R.string.ui_existing_sessions_disconnected_connect_again) else AppText.get(R.string.ui_applies_when_the_service_starts)) }
                 }
                 "initialize" -> install()
                 "persona-add", "persona-apply", "persona-undo" -> changePersona(action, updateId)
                 "start", "restart" -> {
                     install()
-                    check(RuntimeStore.state.value.componentsReady) { "当前安装包仅含基础环境，完整运行资源尚未准备好" }
+                    checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_this_apk_contains_only_the_base_runtime_complete_resources) }
                     configuration.prepareDefaults()
                     val ids = id?.let { listOf(it) } ?: ServiceId.entries
                     if (action == "restart") ids.reversed().forEach { supervisors.getValue(it).stop() }
                     for (serviceId in ids) {
-                        check(preferences.edit().putBoolean("desired_${serviceId.name}", true).commit()) { "无法保存运行偏好，请检查存储空间" }
-                        updateState { it.copy(phase = "正在启动 ${serviceId.label}") }
+                        checkLocalized(preferences.edit().putBoolean("desired_${serviceId.name}", true).commit()) { AppText.get(R.string.ui_unable_to_save_runtime_preferences_check_storage_space) }
+                        updateState { it.copy(phase = AppText.get(R.string.ui_starting_d784e, serviceId.label)) }
                         supervisors.getValue(serviceId).start()
                         // A full start waits for the actual local interface before the next service.
                         if (id == null && activeConnections[serviceId]?.let { it.enabled && it.endpoint != null } == true) waitForInterface(serviceId)
                     }
                 }
                 "stop" -> (id?.let { listOf(it) } ?: ServiceId.entries.reversed()).forEach { serviceId ->
-                    check(preferences.edit().putBoolean("desired_${serviceId.name}", false).commit()) { "无法保存停止偏好，请检查存储空间" }
+                    checkLocalized(preferences.edit().putBoolean("desired_${serviceId.name}", false).commit()) { AppText.get(R.string.ui_unable_to_save_stop_preferences_check_storage_space) }
                     supervisors.getValue(serviceId).stop()
                 }
                 "enable-lan", "disable-lan" -> {
-                    val serviceId = requireNotNull(id) { "请选择需要调整的后台" }
-                    check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
+                    val serviceId = requireNotNullLocalized(id) { AppText.get(R.string.ui_select_a_webui_to_configure) }
+                    checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
                     configuration.prepareDefaults()
                     val connection = configuration.read(serviceId)
-                    check(connection.enabled && connection.endpoint != null) { "请先在项目配置中启用有效的 WebUI 地址" }
+                    checkLocalized(connection.enabled && connection.endpoint != null) { AppText.get(R.string.ui_enable_a_valid_webui_endpoint_in_project_configuration_first) }
                     val supervisor = supervisors.getValue(serviceId)
                     val wanted = supervisor.state.value.desiredRunning
-                    updateState { it.copy(phase = "正在调整 ${serviceId.label} 局域网访问") }
+                    updateState { it.copy(phase = AppText.get(R.string.ui_updating_lan_access, serviceId.label)) }
                     if (wanted) supervisor.stop()
                     try {
                         withContext(Dispatchers.IO) { configuration.setLanAccess(serviceId, action == "enable-lan") }
@@ -381,44 +426,44 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         supervisor.start()
                         waitForInterface(serviceId)
                     }
-                    updateState { it.copy(notice = "${serviceId.label} 已" +
-                        (if (action == "enable-lan") "开启局域网访问" else "限制为本机访问") +
-                        if (wanted) "；已重新检查本机接口" else "；启动服务后生效") }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_formatted_text, serviceId.label) +
+                        (if (action == "enable-lan") AppText.get(R.string.ui_lan_access_enabled_bc976) else AppText.get(R.string.ui_access_restricted_to_this_device)) +
+                        if (wanted) AppText.get(R.string.ui_local_endpoint_checked_again) else AppText.get(R.string.ui_applies_when_the_service_starts_884b1)) }
                 }
                 "backup", "backup-apk", "restore" -> maintain(action, backupId)
                 "save-backup-limits" -> {
                     val limits = BackupLimits(backupLimitCount, backupLimitMiB.toLong() * 1024 * 1024)
                     withContext(Dispatchers.IO) { BackupCapacitySettings(context).save(limits) }
-                    updateState { it.copy(notice = "自动快照上限已保存，下次新建自动快照时按上限清理最旧且未受保护的快照") }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_automatic_snapshot_limits_saved_future_snapshots_will_remove_the)) }
                 }
                 "export-backup", "apply-backup" -> maintainPortable(action, sourceUri)
                 "prepare-backup" -> {
                     install()
-                    check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
-                    portable.prepareImport(Uri.parse(requireNotNull(sourceUri) { "未选择便携备份" }), InstalledVersions.read(context)) { phase -> updateState { it.copy(phase = phase) } }
-                    updateState { it.copy(notice = "便携备份已校验，尚未恢复。请查看范围并确认导入") }
+                    checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
+                    portable.prepareImport(Uri.parse(requireNotNullLocalized(sourceUri) { AppText.get(R.string.ui_no_portable_backup_selected) }), InstalledVersions.read(context)) { phase -> updateState { it.copy(phase = phase) } }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_portable_backup_verified_but_not_restored_review_its_scope)) }
                 }
                 "discard-backup" -> {
                     withContext(Dispatchers.IO) { portable.discardImport() }
-                    updateState { it.copy(notice = "已取消待导入备份，当前数据保持原样") }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_pending_backup_import_cancelled_current_data_is_unchanged)) }
                 }
-                "prepare-update" -> updates.prepare(Uri.parse(requireNotNull(sourceUri) { "未选择更新包" })) { phase -> updateState { it.copy(phase = phase) } }
+                "prepare-update" -> updates.prepare(Uri.parse(requireNotNullLocalized(sourceUri) { AppText.get(R.string.ui_no_update_package_selected) })) { phase -> updateState { it.copy(phase = phase) } }
                 "check-update" -> {
                     val result = onlineUpdates.check { phase -> updateState { it.copy(phase = phase) } }
                     runCatching { AutomaticUpdateSettings(context).succeeded(onlineUpdates.sourceScope, System.currentTimeMillis()) }
                     updateState { it.copy(availableUpdate = result.candidate, latestUpdate = result.latest, notice = result.message) }
                 }
                 "download-update" -> {
-                    onlineUpdates.download(requireNotNull(updateId) { "请先检查更新" }, updates) { phase -> updateState { it.copy(phase = phase) } }
-                    updateState { it.copy(notice = "更新包已下载并校验，确认版本说明后再安装") }
+                    onlineUpdates.download(requireNotNullLocalized(updateId) { AppText.get(R.string.ui_check_for_updates_first) }, updates) { phase -> updateState { it.copy(phase = phase) } }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_update_package_downloaded_and_verified_review_release_notes_before)) }
                 }
                 "check-napcat" -> {
                     val result = onlineNapCat.check { phase -> updateState { it.copy(phase = phase) } }
                     updateState { it.copy(latestNapCat = result.latest, notice = result.message) }
                 }
                 "download-napcat" -> {
-                    onlineNapCat.download(requireNotNull(updateId) { "请先检查更新" }, napcat) { phase -> updateState { it.copy(phase = phase) } }
-                    updateState { it.copy(notice = "NapCat 更新包已下载并校验，可确认备份和安装") }
+                    onlineNapCat.download(requireNotNullLocalized(updateId) { AppText.get(R.string.ui_check_for_updates_first) }, napcat) { phase -> updateState { it.copy(phase = phase) } }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_napcat_update_downloaded_and_verified_review_backup_and_installation)) }
                 }
                 "apply-napcat", "rollback-napcat" -> updateNapCat(action == "rollback-napcat")
                 "apply-update", "rollback" -> updatePrograms(action == "rollback")
@@ -429,60 +474,68 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     updateState { it.copy(environmentCheck = report) }
                 }
                 "delete-backup" -> {
-                    check(backupId !in updates.protectedBackupIds + napcat.protectedBackupIds + images.protectedBackupIds) { "此快照用于程序或环境回退，请保留；后续成功更新后会解除保护" }
-                    withContext(Dispatchers.IO) { backups.delete(requireNotNull(backupId) { "未选择备份" }) }
-                    updateState { it.copy(notice = "备份已删除") }
+                    checkLocalized(backupId !in updates.protectedBackupIds + napcat.protectedBackupIds + images.protectedBackupIds) { AppText.get(R.string.ui_this_snapshot_is_required_for_program_or_runtime_rollback) }
+                    withContext(Dispatchers.IO) { backups.delete(requireNotNullLocalized(backupId) { AppText.get(R.string.ui_no_backup_selected) }) }
+                    updateState { it.copy(notice = AppText.get(R.string.ui_backup_deleted)) }
                 }
-                else -> error("未知运行操作")
+                else -> error(AppText.get(R.string.ui_unknown_runtime_operation))
             }
         } catch (_: TimeoutCancellationException) {
             updateState { it.copy(error = if (action == "apply-backup")
-                "导入后的服务就绪检查超时，已尝试恢复操作前数据和原运行状态；请查看管理日志及服务状态"
+                AppText.get(R.string.ui_services_did_not_become_ready_after_import_recovery_of)
                 else if (action in setOf("apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat"))
-                "新版本就绪检查超时，已尝试恢复旧程序与对应数据；请查看管理日志及服务状态"
-                else "等待后台就绪超时，进程状态会继续检查；可查看日志、继续等待或停止服务") }
+                AppText.get(R.string.ui_the_new_version_did_not_become_ready_recovery_of)
+                else AppText.get(R.string.ui_webui_readiness_timed_out_process_monitoring_continues_view_logs)) }
         } catch (failure: CancellationException) { throw failure }
         catch (failure: Exception) {
-            val message = if (action.startsWith("ssh-")) failure.message?.takeIf { it.any { c -> c in '\u4e00'..'\u9fff' } }
-                ?: "SSH 操作失败，请检查端口是否被占用、运行环境及可用存储后重试"
-            else if (action == "export-diagnostics") "诊断包导出失败，请检查可用空间或重新选择保存位置；现有运行环境与数据已保留"
+            val message = if (action.startsWith("cpolar-")) failure.userFacingMessage() ?: AppText.get(R.string.cpolar_operation_error)
+            else if (action.startsWith("ssh-")) failure.userFacingMessage()
+                ?: AppText.get(R.string.ui_ssh_operation_failed_check_the_port_runtime_and_free)
+            else if (action == "export-diagnostics") AppText.get(R.string.ui_diagnostic_export_failed_check_free_space_or_choose_another)
             else if (action in setOf("check-update", "download-update", "check-napcat", "download-napcat")) when (failure) {
-                is java.io.IOException -> "更新连接中断或服务器不可用，已保留当前程序和下载进度，可稍后重试"
-                is org.json.JSONException, is java.security.GeneralSecurityException -> "无法验证更新目录或更新包，请重新检查更新"
-                else -> failure.message?.takeIf { it.any { char -> char in '\u4e00'..'\u9fff' } }
-                    ?: "更新信息格式或完整性检查失败，请重新检查更新"
+                is java.io.IOException -> AppText.get(R.string.ui_the_update_connection_was_interrupted_or_the_server_is)
+                is org.json.JSONException, is java.security.GeneralSecurityException -> AppText.get(R.string.ui_cannot_verify_the_update_catalog_or_package_check_for)
+                else -> failure.userFacingMessage()
+                    ?: AppText.get(R.string.ui_update_information_failed_format_or_integrity_checks_check_for)
             } else if (action in setOf("prepare-backup", "export-backup", "apply-backup")) when (failure) {
-                is java.io.IOException -> "备份文件读写失败或被截断，请重新选择文件后重试；现有数据已保留"
-                is org.json.JSONException -> "便携备份清单无法识别，未修改现有数据"
-                else -> failure.message?.takeIf { it.any { char -> char in '\u4e00'..'\u9fff' } } ?: "便携备份校验或恢复失败，现有数据与恢复记录已保留"
-            } else failure.message ?: "操作失败"
-            event("操作失败：${SecretRedactor.redact(message)}")
+                is java.io.IOException -> AppText.get(R.string.ui_the_backup_could_not_be_read_or_written_or)
+                is org.json.JSONException -> AppText.get(R.string.ui_the_portable_backup_manifest_is_unrecognized_existing_data_was)
+                else -> failure.userFacingMessage() ?: AppText.get(R.string.ui_portable_backup_verification_or_restore_failed_existing_data_and)
+            } else failure.message ?: AppText.get(R.string.ui_operation_failed)
+            event(AppText.get(R.string.ui_operation_failed_6846d, SecretRedactor.redact(message)))
             if (action.startsWith("ssh-")) SshStore.state.update { it.copy(error = message) }
+            if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(error = message) }
             updateState { it.copy(error = SecretRedactor.redact(message)) }
         } finally {
             withContext(NonCancellable) {
                 if (resumeSsh && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && sshRepository.desired()) {
                     runCatching { ssh.start() }.onFailure {
-                        SshStore.state.update { state -> state.copy(paused = false, error = "维护已结束，但 SSH 恢复失败，请检查端口后重试") }
+                        SshStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.ui_maintenance_finished_but_ssh_could_not_restart_check_the)) }
+                    }
+                }
+                if ((resumeSsh || action == "reconcile") && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && cpolarRepository.desired()) {
+                    runCatching { cpolar.start() }.onFailure {
+                        CpolarStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.cpolar_start_error)) }
                     }
                 }
                 if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = false) }
+                if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = false) }
                 if (!readOnlyCheck) {
                     if (!backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate) retainLogs()
                     RuntimeStore.refreshInstallation(context)
                 }
                 updateState { it.copy(busy = false, phase = if (readOnlyCheck) diagnosticSnapshot.phase else it.phase) }
-                event("结束 $action")
+                event(AppText.get(R.string.ui_finished_072d2, action))
             }
         }
     }
 
     private suspend fun maintainPortable(action: String, sourceUri: String?) {
         install()
-        check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
+        checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
         val versions = withContext(Dispatchers.IO) { InstalledVersions.read(context) }
         val exporting = action == "export-backup"
-        val destination = if (exporting) Uri.parse(requireNotNull(sourceUri) { "未选择备份保存位置" }) else null
+        val destination = if (exporting) Uri.parse(requireNotNullLocalized(sourceUri) { AppText.get(R.string.ui_no_backup_destination_selected) }) else null
         if (!exporting) {
             portable.verifyPrepared(versions)
             withContext(Dispatchers.IO) { backups.checkAutomaticCapacity() }
@@ -493,12 +546,12 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         updateState { it.copy(maintenance = maintenance) }
         try {
             supervisors.values.forEach { it.setMaintenance(maintenance) }
-            progress("正在停止服务，准备一致性${if (exporting) "便携备份" else "恢复前快照"}")
+            progress(AppText.get(R.string.ui_stopping_services_to_prepare_a_consistent, if (exporting) AppText.get(R.string.ui_portable_backups) else AppText.get(R.string.ui_pre_restore_snapshot)))
             supervisors.values.toList().reversed().forEach { it.stop() }
             if (exporting) portable.prepareExport(versions, progress)
             else {
                 val snapshot = backups.create(versions, "before-restore")
-                progress("正在保留当前手机 QQ 会话并准备导入数据")
+                progress(AppText.get(R.string.ui_preserving_this_phone_s_qq_session_and_preparing_imported))
                 portable.beginRestore(snapshot, versions)
                 updates.checkDatabase()
                 configuration.prepareDefaults()
@@ -508,8 +561,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             if (exporting) portable.deliverExport(requireNotNull(destination), progress)
             else withContext(Dispatchers.IO) { backups.commitRestore(); portable.discardImport() }
             updateState { it.copy(notice = if (exporting)
-                "便携备份已导出，不包含 QQ 登录会话；包含业务配置及密钥，请妥善保管"
-                else "便携备份已恢复，已保留本机 QQ 会话及恢复前快照；请使用备份中的后台凭据核对业务配置") }
+                AppText.get(R.string.ui_portable_backup_exported_without_the_qq_login_session_it)
+                else AppText.get(R.string.ui_portable_backup_restored_this_phone_s_qq_session_and)) }
         } catch (failure: Throwable) {
             // A local readiness timeout leaves this command active; an explicit Stop cancels it.
             val resumeWanted = currentCoroutineContext().isActive
@@ -537,7 +590,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             check(report.canRepair) { report.repairExplanation }
         } else {
             install()
-            check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
+            checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
         }
         withContext(Dispatchers.IO) { backups.checkAutomaticCapacity() }
         val progress: (String) -> Unit = { phase -> updateState { it.copy(phase = phase) }; event(phase) }
@@ -547,16 +600,16 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         updateState { it.copy(maintenance = MaintenanceState.UPDATING) }
         try {
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.UPDATING) }
-            progress("正在停止两个服务并创建环境切换前快照")
+            progress(AppText.get(R.string.ui_stopping_both_services_and_creating_a_snapshot_before_switching))
             supervisors.values.toList().reversed().forEach { it.stop() }
             val snapshot = backups.create(versions, "before-update")
-            progress("正在切换运行环境及组件")
+            progress(AppText.get(R.string.ui_switching_runtime_and_components))
             withContext(Dispatchers.IO) { images.begin(snapshot, versions, wanted, rollback, repair) }
             if (restoreData != null) backups.beginRestore(restoreData, InstalledVersions.read(context))
             updates.checkDatabase()
             configuration.prepareDefaults()
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
-            progress("正在验证实际 AstrBot 与 NapCat 服务")
+            progress(AppText.get(R.string.ui_checking_the_actual_astrbot_and_napcat_services))
             // Both projects must launch, including when they were previously stopped.
             for (id in ServiceId.entries) {
                 supervisors.getValue(id).start()
@@ -566,22 +619,22 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     while (astrbotStartup.migration() != "passed") { checkMigration(); delay(250) }
                 } else {
                     delay(5000)
-                    check(supervisors.getValue(id).state.value.process == ProcessState.RUNNING) { "NapCat 启动检查失败" }
+                    checkLocalized(supervisors.getValue(id).state.value.process == ProcessState.RUNNING) { AppText.get(R.string.ui_napcat_startup_check_failed) }
                 }
             }
             updates.checkDatabase()
             ServiceId.entries.filter { it !in wanted }.reversed().forEach { supervisors.getValue(it).stop() }
             withContext(Dispatchers.IO) { updates.commitRollbackData(); images.commit() }
-            updateState { it.copy(notice = "运行环境${if (repair) "修复" else if (rollback) "回退" else "升级"}完成，已恢复原运行状态；QQ 登录与业务连接请在后台确认") }
+            updateState { it.copy(notice = AppText.get(R.string.ui_runtime_completed_previous_running_states_restored_check_qq_login, if (repair) AppText.get(R.string.ui_repair) else if (rollback) AppText.get(R.string.ui_rollback) else AppText.get(R.string.ui_upgrade))) }
         } catch (failure: Throwable) {
-            event("环境维护异常：${SecretRedactor.redact(failure.stackTraceToString()).take(8000)}")
-            if (images.hasCommittedUpdate) throw IllegalStateException("新环境已通过检查并提交，旧文件清理未完成。记录已保留，重新打开管理器可重试清理", failure)
+            event(AppText.get(R.string.ui_runtime_maintenance_error, SecretRedactor.redact(failure.stackTraceToString()).take(8000)))
+            if (images.hasCommittedUpdate) throw LocalizedStateException(AppText.get(R.string.ui_the_new_runtime_passed_checks_and_was_committed_old), failure)
             withContext(NonCancellable) {
                 supervisors.values.toList().reversed().forEach { it.stop() }
                 if (images.hasPendingUpdate) {
-                    progress("环境切换未完成，正在恢复原环境与数据")
+                    progress(AppText.get(R.string.ui_runtime_switch_did_not_complete_restoring_the_original_runtime))
                     runCatching { images.recover() }.onFailure {
-                        throw IllegalStateException("原环境恢复尚未完成，已保留文件与快照，请查看管理日志后重试", it)
+                        throw LocalizedStateException(AppText.get(R.string.ui_original_runtime_recovery_is_incomplete_files_and_snapshots_are), it)
                     }
                 }
                 supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
@@ -597,7 +650,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     }
 
     private suspend fun updateNapCat(rollback: Boolean) {
-        check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
+        checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
         withContext(Dispatchers.IO) { backups.checkAutomaticCapacity() }
         val progress: (String) -> Unit = { phase -> updateState { it.copy(phase = phase) }; event(phase) }
         val restoreData = if (rollback) napcat.prepareRollback(progress) else { napcat.verifyPrepared(progress); null }
@@ -606,13 +659,13 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         updateState { it.copy(maintenance = MaintenanceState.UPDATING) }
         try {
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.UPDATING) }
-            progress("正在停止服务并创建 NapCat 更新前快照")
+            progress(AppText.get(R.string.ui_stopping_services_and_creating_a_pre_update_napcat_snapshot))
             supervisors.values.toList().reversed().forEach { it.stop() }
             val snapshot = backups.create(versions, "before-update")
             if (!rollback) napcat.preserveUserPlugins()
             withContext(Dispatchers.IO) { napcat.begin(snapshot, versions, wanted) }
             if (restoreData != null) napcat.restoreRollbackData(restoreData)
-            progress("正在检查 NapCat 资源、QQ 运行依赖与现有数据")
+            progress(AppText.get(R.string.ui_checking_napcat_resources_qq_dependencies_and_existing_data))
             // QQ disables Electron's RunAsNode mode. Never launch it just to inspect a stopped
             // account. ldd inspects the loader/dependencies; no NapCat module is imported here.
             val result = runtime.execute("/opt/astrbot-venv/bin/python", "-c", """
@@ -627,21 +680,21 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 result = subprocess.run(['ldd', '/opt/qq/qq'], capture_output=True, text=True, timeout=45)
                 assert result.returncode == 0 and 'not found' not in result.stdout + result.stderr, 'QQ dependencies missing'
             """.trimIndent(), timeoutSeconds = 60)
-            if (result.exitCode != 0) event("NapCat 资源检查退出 ${result.exitCode}：${SecretRedactor.redact(result.output.takeLast(2000))}")
-            check(result.exitCode == 0) { "NapCat 资源或 QQ 运行依赖不兼容，正在恢复原版本" }
+            if (result.exitCode != 0) event(AppText.get(R.string.ui_napcat_resource_check_exited_with, result.exitCode, SecretRedactor.redact(result.output.takeLast(2000))))
+            checkLocalized(result.exitCode == 0) { AppText.get(R.string.ui_napcat_resources_or_qq_runtime_dependencies_are_incompatible_restoring) }
             updates.checkDatabase()
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
             // Only services that the user had running may restart. A stopped QQ stays stopped.
             resumeAfterMaintenance(wanted, validateStartup = true)
             withContext(Dispatchers.IO) { napcat.commitRollbackData(); napcat.commit() }
             updateState { it.copy(notice = if (ServiceId.NAPCAT in wanted)
-                "NapCat ${if (rollback) "回退" else "更新"}完成，配置与 QQ 会话已保留，后台接口已恢复"
-                else "NapCat ${if (rollback) "回退" else "更新"}完成，资源与依赖检查通过；QQ 保持停止，启动后可检查后台") }
+                AppText.get(R.string.ui_napcat_complete_configuration_and_qq_sessions_retained_webui_responding, if (rollback) AppText.get(R.string.ui_rollback) else AppText.get(R.string.ui_update))
+                else AppText.get(R.string.ui_napcat_complete_resource_and_dependency_checks_passed_qq_remains, if (rollback) AppText.get(R.string.ui_rollback) else AppText.get(R.string.ui_update))) }
         } catch (failure: Throwable) {
             withContext(NonCancellable) {
                 supervisors.values.toList().reversed().forEach { it.stop() }
                 if (napcat.hasPendingUpdate) runCatching { napcat.recover() }.onFailure {
-                    throw IllegalStateException("NapCat 恢复未完成，程序与数据快照已保留，请查看管理日志后重试", it)
+                    throw LocalizedStateException(AppText.get(R.string.ui_napcat_recovery_incomplete_program_files_and_data_snapshots_are), it)
                 }
                 supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
                 if (failure !is CancellationException) runCatching { resumeAfterMaintenance(wanted) }.onFailure { failure.addSuppressed(it) }
@@ -657,7 +710,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
 
     private suspend fun updatePrograms(rollback: Boolean) {
         install()
-        check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
+        checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
         withContext(Dispatchers.IO) { backups.checkAutomaticCapacity() }
         val progress: (String) -> Unit = { phase -> updateState { it.copy(phase = phase) }; event(phase) }
         val restoreData = if (rollback) updates.prepareRollback(progress) else { updates.verifyPrepared(progress); null }
@@ -666,17 +719,17 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         updateState { it.copy(maintenance = MaintenanceState.UPDATING) }
         try {
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.UPDATING) }
-            progress("正在停止服务并创建更新前快照")
+            progress(AppText.get(R.string.ui_stopping_services_and_creating_a_pre_update_snapshot))
             supervisors.values.toList().reversed().forEach { it.stop() }
             val snapshot = backups.create(versions, "before-update")
-            progress("正在切换程序${if (rollback) "及对应数据" else ""}")
+            progress(AppText.get(R.string.ui_switching_program, if (rollback) AppText.get(R.string.ui_and_its_data) else ""))
             withContext(Dispatchers.IO) { updates.begin(snapshot, versions, wanted) }
             if (restoreData != null) updates.restoreRollbackData(restoreData)
             updates.checkDatabase()
-            progress("正在检查新程序与实际后台")
+            progress(AppText.get(R.string.ui_checking_the_new_program_and_its_dashboard))
             val verify = runtime.execute("/bin/sh", "-lc", "cd /opt/astrbot && /opt/astrbot-venv/bin/python main.py --help", timeoutSeconds = 90)
-            if (verify.exitCode != 0) event("新程序检查退出 ${verify.exitCode}：${SecretRedactor.redact(verify.output.takeLast(3000))}")
-            check(verify.exitCode == 0) { "新程序启动验证失败" }
+            if (verify.exitCode != 0) event(AppText.get(R.string.ui_new_program_check_exited_with, verify.exitCode, SecretRedactor.redact(verify.output.takeLast(3000))))
+            checkLocalized(verify.exitCode == 0) { AppText.get(R.string.ui_new_program_startup_verification_failed) }
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
             // The changed program must really start even if the user previously kept it stopped.
             supervisors.getValue(ServiceId.ASTRBOT).start()
@@ -685,7 +738,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 withTimeout(120_000) {
                     while (astrbotStartup.migration() != "passed") {
                         checkMigration()
-                        check(supervisors.getValue(ServiceId.ASTRBOT).state.value.process == ProcessState.RUNNING) { "新程序未保持运行" }
+                        checkLocalized(supervisors.getValue(ServiceId.ASTRBOT).state.value.process == ProcessState.RUNNING) { AppText.get(R.string.ui_the_new_program_did_not_stay_running) }
                         delay(250)
                     }
                 }
@@ -693,15 +746,15 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             updates.checkDatabase()
             if (ServiceId.ASTRBOT !in wanted) supervisors.getValue(ServiceId.ASTRBOT).stop()
             resumeAfterMaintenance(wanted)
-            progress("正在提交${if (rollback) "回退" else "更新"}记录")
+            progress(AppText.get(R.string.ui_committing_records, if (rollback) AppText.get(R.string.ui_rollback) else AppText.get(R.string.ui_update)))
             withContext(Dispatchers.IO) { updates.commitRollbackData(); updates.commit() }
-            updateState { it.copy(notice = if (rollback) "已恢复对应程序和数据快照，并恢复原运行状态" else "更新完成，已保留旧程序与对应数据快照；QQ 与业务连接请在后台确认") }
+            updateState { it.copy(notice = if (rollback) AppText.get(R.string.ui_restored_the_program_data_snapshot_and_previous_running_state) else AppText.get(R.string.ui_update_completed_the_previous_program_and_its_data_snapshot)) }
         } catch (failure: Throwable) {
             withContext(NonCancellable) {
                 supervisors.values.toList().reversed().forEach { it.stop() }
                 if (updates.hasPendingUpdate) {
-                    progress("更新未完成，正在恢复旧程序及对应数据")
-                    runCatching { updates.recover() }.onFailure { throw IllegalStateException("更新回退未完成，文件与记录已保留，请查看管理日志后重试", it) }
+                    progress(AppText.get(R.string.ui_update_did_not_complete_restoring_the_previous_program_and))
+                    runCatching { updates.recover() }.onFailure { throw LocalizedStateException(AppText.get(R.string.ui_update_rollback_is_incomplete_files_and_records_are_preserved), it) }
                 }
                 supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
                 if (failure !is CancellationException) runCatching { resumeAfterMaintenance(wanted) }.onFailure { failure.addSuppressed(it) }
@@ -717,21 +770,21 @@ class RuntimeController(private val context: Context, private val scope: Corouti
 
     private suspend fun maintain(action: String, backupId: String?) {
         install()
-        check(RuntimeStore.state.value.componentsReady) { "请先完成完整运行环境初始化" }
+        checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
         if (action != "backup") withContext(Dispatchers.IO) { backups.checkAutomaticCapacity(preserveIds = setOfNotNull(backupId)) }
         val versions = withContext(Dispatchers.IO) { InstalledVersions.read(context) }
         val wanted = supervisors.filterValues { it.state.value.desiredRunning }.keys.toList()
         val isBackup = action != "restore"
         val maintenance = if (isBackup) MaintenanceState.BACKING_UP else MaintenanceState.RESTORING
-        updateState { it.copy(maintenance = maintenance, phase = "正在停止服务，准备一致性快照") }
+        updateState { it.copy(maintenance = maintenance, phase = AppText.get(R.string.ui_stopping_services_to_prepare_a_consistent_snapshot)) }
         try {
             supervisors.values.forEach { it.setMaintenance(maintenance) }
             supervisors.values.toList().reversed().forEach { it.stop() }
-            updateState { it.copy(phase = if (isBackup) "正在复制并校验备份" else "正在备份恢复前的数据") }
+            updateState { it.copy(phase = if (isBackup) AppText.get(R.string.ui_copying_and_verifying_backup) else AppText.get(R.string.ui_backing_up_data_before_restore)) }
             backups.create(versions, when (action) { "backup" -> "manual"; "backup-apk" -> "before-update"; else -> "before-restore" }, preserveIds = setOfNotNull(backupId))
             if (action == "restore") {
-                updateState { it.copy(phase = "校验备份并切换数据") }
-                backups.beginRestore(requireNotNull(backupId) { "未选择备份" }, versions)
+                updateState { it.copy(phase = AppText.get(R.string.ui_verifying_backup_and_switching_data)) }
+                backups.beginRestore(requireNotNullLocalized(backupId) { AppText.get(R.string.ui_no_backup_selected) }, versions)
                 val check = runtime.execute("/opt/astrbot-venv/bin/python", "-c", """
                     import sqlite3
                     from pathlib import Path
@@ -740,12 +793,12 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         with sqlite3.connect(f'file:{path}?mode=ro', uri=True) as connection:
                             assert connection.execute('PRAGMA quick_check').fetchall() == [('ok',)], 'database check failed'
                 """.trimIndent(), timeoutSeconds = 60)
-                check(check.exitCode == 0) { "恢复后的数据库检查失败，正在恢复原数据" }
+                checkLocalized(check.exitCode == 0) { AppText.get(R.string.ui_restored_database_check_failed_restoring_original_data) }
             }
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
             resumeAfterMaintenance(wanted)
             if (action == "restore") withContext(Dispatchers.IO) { backups.commitRestore() }
-            updateState { it.copy(notice = if (isBackup) "本机备份已完成，已恢复原先的运行状态" else "数据已恢复并校验，已恢复原先的运行状态") }
+            updateState { it.copy(notice = if (isBackup) AppText.get(R.string.ui_local_backup_completed_previous_running_states_restored) else AppText.get(R.string.ui_data_restored_and_verified_previous_running_states_restored)) }
         } catch (failure: Throwable) {
             withContext(NonCancellable) {
                 if (backups.hasPendingRestore) {
@@ -766,12 +819,12 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     }
 
     private suspend fun changePersona(action: String, presetId: String?) {
-        check(RuntimeStore.state.value.componentsReady) { "请先完成运行环境初始化" }
+        checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_runtime_first) }
         val preset = if (action == "persona-undo") null else PersonaLibrary.read(context).firstOrNull { it.id == presetId }
-            ?: error("未找到此人设预设")
+            ?: error(AppText.get(R.string.ui_persona_preset_not_found))
         val supervisor = supervisors.getValue(ServiceId.ASTRBOT)
         val wanted = supervisor.state.value.desiredRunning
-        updateState { it.copy(maintenance = MaintenanceState.RESTORING, phase = "正在保存 AstrBot 人设设置") }
+        updateState { it.copy(maintenance = MaintenanceState.RESTORING, phase = AppText.get(R.string.ui_saving_astrbot_persona_settings)) }
         try {
             supervisor.setMaintenance(MaintenanceState.RESTORING)
             supervisor.stop()
@@ -780,9 +833,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             if (wanted) resumeAfterMaintenance(listOf(ServiceId.ASTRBOT), validateStartup = true)
             withContext(Dispatchers.IO) { personas.commit() }
             updateState { it.copy(notice = when (action) {
-                "persona-add" -> "人设已添加到 AstrBot，原有同名人设和后台修改已保留"
-                "persona-undo" -> "已恢复上一次默认人设，已添加的预设保留"
-                else -> "默认人设已切换，新会话会使用此人设；单独指定人设的会话不受影响"
+                "persona-add" -> AppText.get(R.string.ui_persona_added_to_astrbot_existing_personas_with_the_same)
+                "persona-undo" -> AppText.get(R.string.ui_previous_default_persona_restored_added_presets_are_preserved)
+                else -> AppText.get(R.string.ui_default_persona_changed_for_new_conversations_conversations_with_an)
             }) }
         } catch (failure: Throwable) {
             withContext(NonCancellable) {
@@ -803,7 +856,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
 
     private suspend fun resumeAfterMaintenance(wanted: List<ServiceId>, validateStartup: Boolean = false) {
         for (id in wanted) {
-            updateState { it.copy(phase = "正在恢复 ${id.label} 运行") }
+            updateState { it.copy(phase = AppText.get(R.string.ui_resuming, id.label)) }
             supervisors.getValue(id).start()
             if (activeConnections[id]?.let { it.enabled && it.endpoint != null } == true) waitForInterface(id, maintenanceCheck = validateStartup)
             else if (validateStartup && id == ServiceId.ASTRBOT) withTimeout(120_000) {
@@ -826,11 +879,11 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         runCatching {
             val active = supervisors.filterValues { it.state.value.let { state -> state.desiredRunning || state.process != ProcessState.STOPPED } }.keys
             val result = logRetention.enforce(active)
-            if (result.deletedFiles > 0) event("历史日志清理：${result.deletedFiles} 个文件，${result.deletedBytes / 1024} KiB")
+            if (result.deletedFiles > 0) event(AppText.get(R.string.ui_historical_log_cleanup_files_kib, result.deletedFiles, result.deletedBytes / 1024))
             if (result.deferredGroups > 0 && result.deferredGroups != lastLogRetentionDeferred)
-                event("部分日志暂不能清理，已保留正在使用、最近写入或无法检查的文件；停止服务后将再次检查")
+                event(AppText.get(R.string.ui_some_logs_cannot_be_cleaned_yet_active_recently_written))
             lastLogRetentionDeferred = result.deferredGroups
-        }.onFailure { event("历史日志检查未完成，将在下次维护时重试；现有文件已保留") }
+        }.onFailure { event(AppText.get(R.string.ui_historical_log_check_did_not_complete_it_will_retry)) }
     }
 
     private fun readNapCatToken() = JSONObject(File(context.filesDir, "persistent/napcat/config/webui.json").readText()).getString("token")
@@ -849,8 +902,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         withTimeout(if (maintenanceCheck) 120_000 else 300_000) {
             while (supervisors.getValue(id).state.value.health != HealthState.AVAILABLE ||
                 maintenanceCheck && id == ServiceId.ASTRBOT && astrbotStartup.migration() != "passed") {
-                check(supervisors.getValue(id).state.value.desiredRunning) { "服务启动已取消" }
-                if (maintenanceCheck) check(supervisors.getValue(id).state.value.process != ProcessState.CRASHED) { "新程序启动后异常退出，正在回退" }
+                checkLocalized(supervisors.getValue(id).state.value.desiredRunning) { AppText.get(R.string.ui_service_startup_canceled) }
+                if (maintenanceCheck) checkLocalized(supervisors.getValue(id).state.value.process != ProcessState.CRASHED) { AppText.get(R.string.ui_the_new_program_exited_unexpectedly_after_startup_rolling_back) }
                 if (maintenanceCheck && id == ServiceId.ASTRBOT) checkMigration()
                 delay(500)
             }
@@ -858,11 +911,12 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     }
 
     private fun checkMigration() {
-        check(astrbotStartup.migration() != "failed") { "新程序数据迁移失败，正在恢复旧程序及对应数据" }
-        check(astrbotStartup.migration() != "unsupported") { "新程序迁移状态暂不支持验证，请使用已验证的版本组合" }
+        checkLocalized(astrbotStartup.migration() != "failed") { AppText.get(R.string.ui_new_program_data_migration_failed_restoring_the_previous_program) }
+        checkLocalized(astrbotStartup.migration() != "unsupported") { AppText.get(R.string.ui_this_migration_state_cannot_be_verified_yet_use_a) }
     }
 
     suspend fun close() = commands.withLock {
+        cpolar.close()
         ssh.stop()
         supervisors.values.toList().reversed().forEach { it.close() }
         client.connectionPool.evictAll()
@@ -882,7 +936,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
 
     private fun checkPortFree(endpoint: LocalEndpoint) {
         try { ServerSocket().use { it.bind(InetSocketAddress(InetAddress.getByName(endpoint.host), endpoint.port)) } }
-        catch (_: java.io.IOException) { error("本机端口 ${endpoint.port} 已被占用，请先停止占用端口的服务") }
+        catch (_: java.io.IOException) { error(AppText.get(R.string.ui_local_port_is_in_use_stop_the_service_using, endpoint.port)) }
     }
 
     private fun updateState(transform: (ManagerState) -> ManagerState) {

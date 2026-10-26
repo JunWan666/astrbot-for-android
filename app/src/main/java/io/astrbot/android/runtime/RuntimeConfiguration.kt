@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.LocalizedStateException
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.util.AtomicFile
 import android.system.Os
@@ -88,7 +94,7 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
             val backup = File(file.path + ".bak")
             if (recoverPendingWrite) AtomicFile(file).openRead().close()
             val selected = if (!recoverPendingWrite && backup.exists()) backup else file
-            require(selected.length() <= 8 * 1024 * 1024) { "配置文件过大" }
+            requireLocalized(selected.length() <= 8 * 1024 * 1024) { AppText.get(R.string.ui_configuration_file_too_large) }
             JSONObject(selected.inputStream().bufferedReader(Charsets.UTF_8).use { it.readText() }.removePrefix("\uFEFF"))
         } else JSONObject()
         val config = if (id == ServiceId.ASTRBOT) {
@@ -96,17 +102,17 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
         } else document
         val enabled = if (id == ServiceId.ASTRBOT) !config.has("enable") || config.getBoolean("enable")
             else !config.has("disableWebUI") || !config.getBoolean("disableWebUI")
-        if (!enabled) WebUiConnection(enabled = false, note = "WebUI 已在项目配置中关闭，服务进程仍可运行")
+        if (!enabled) WebUiConnection(enabled = false, note = AppText.get(R.string.ui_webui_is_disabled_in_project_configuration_the_service_process))
         else {
             val host = if (config.has("host")) config.getString("host").trim() else "127.0.0.1"
             val loopback = when (host) {
                 "0.0.0.0", "127.0.0.1", "" -> "127.0.0.1"
                 "::", "::1", "[::]", "[::1]" -> "::1"
                 "localhost" -> "localhost"
-                else -> error("监听地址不能作为本机入口，请在项目配置中使用回环或通配地址；原配置已保留")
+                else -> error(AppText.get(R.string.ui_the_listen_address_cannot_be_used_as_a_local))
             }
             val rawPort = if (config.has("port")) config.get("port").toString() else id.defaultPort.toString()
-            val port = rawPort.toIntOrNull() ?: error("WebUI 端口须为整数；原配置已保留")
+            val port = rawPort.toIntOrNull() ?: error(AppText.get(R.string.ui_webui_port_must_be_an_integer_existing_configuration_is))
             val https = if (id == ServiceId.NAPCAT) {
                 File(persistent, "napcat/config/cert.pem").isFile && File(persistent, "napcat/config/key.pem").isFile
             } else {
@@ -116,12 +122,12 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
                 } && (ssl.optString("ca_certs").isBlank() || guestFile(ssl.optString("ca_certs"))?.isFile == true)
             }
             WebUiConnection(LocalEndpoint(port, loopback, if (https) "https" else "http"), note =
-                if (https) "HTTPS 使用系统证书验证；证书不受信任时请检查证书或使用外部浏览器" else null,
+                if (https) AppText.get(R.string.ui_https_uses_system_certificate_verification_for_untrusted_certificates_ch) else null,
                 lanEnabled = host == "0.0.0.0")
         }
     } catch (_: Exception) {
         // Never expose raw JSON parse failures: the source line can contain credentials.
-        WebUiConnection(note = "无法识别 WebUI 地址或配置，原文件已保留。请检查项目配置中的 host、port 和启用状态")
+        WebUiConnection(note = AppText.get(R.string.ui_webui_address_or_configuration_is_unrecognized_the_original_file))
     }
 
     /** One atomic file commit: interrupted changes leave either the old or requested host. */
@@ -146,7 +152,7 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
             require(JSONObject(file.readText()).toString() == document.toString())
         } catch (_: Exception) {
             // JSON errors can include the line holding a credential.
-            throw IllegalStateException("无法保存局域网设置，请检查 WebUI 配置、文件权限和可用空间；原配置已保留")
+            throw LocalizedStateException(AppText.get(R.string.ui_unable_to_save_lan_settings_check_webui_configuration_file))
         }
     }
 

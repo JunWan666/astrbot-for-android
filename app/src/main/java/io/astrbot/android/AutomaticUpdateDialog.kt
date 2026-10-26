@@ -11,18 +11,18 @@ import androidx.compose.ui.unit.dp
 
 @Composable internal fun AutomaticUpdateDialog(enabled: Boolean, configured: Boolean,
     onToggle: (Boolean) -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("自动检查更新") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(AppText.get(R.string.ui_automatic_update_checks)) }, text = {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(if (enabled) "已开启" else "已关闭", Modifier.weight(1f))
+                Text(if (enabled) AppText.get(R.string.ui_on) else AppText.get(R.string.ui_off), Modifier.weight(1f))
                 Switch(checked = enabled, onCheckedChange = onToggle, enabled = configured || enabled,
-                    modifier = Modifier.semantics { contentDescription = "自动检查更新开关" })
+                    modifier = Modifier.semantics { contentDescription = AppText.get(R.string.ui_automatic_update_checks_switch) })
             }
-            Text("打开应用且网络可用时，最多每天检查一次兼容的 AstrBot 更新。检查失败或中断后，至少间隔一小时再尝试。",
+            Text(AppText.get(R.string.ui_check_for_compatible_astrbot_updates_at_most_once_a),
                 style = MaterialTheme.typography.bodySmall)
-            Text("发现更新后可查看版本说明，下载和安装仍由你确认。", style = MaterialTheme.typography.bodySmall)
-            if (!configured) Text("当前安装包尚未配置在线更新通道，暂不可开启。可在程序更新页导入可信维护包。",
+            Text(AppText.get(R.string.ui_review_release_notes_when_an_update_is_found_downloads), style = MaterialTheme.typography.bodySmall)
+            if (!configured) Text(AppText.get(R.string.ui_this_build_has_no_online_update_channel_configured_you),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-    }, confirmButton = { TextButton(onClick = onDismiss) { Text("完成") } })
+    }, confirmButton = { TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_done)) } })
 }

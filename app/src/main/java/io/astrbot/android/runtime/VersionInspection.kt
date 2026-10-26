@@ -1,5 +1,8 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import io.astrbot.android.BuildConfig
 import org.json.JSONObject
 import java.io.File
@@ -8,7 +11,7 @@ data class VersionInspection(val components: Map<String, String>, val notice: St
 
 /** Display-only inspection survives partial upstream replacements. Maintenance keys remain strict. */
 object InstalledVersionInspection {
-    const val MATCHED_NOTICE = "组件版本匹配"
+    val MATCHED_NOTICE get() = AppText.get(R.string.ui_component_versions_match)
     internal val paths = listOf(".astrbot-bootstrap.json", "opt/astrbot/astrbot/__init__.py",
         "opt/astrbot/astrbot/dashboard/dist/assets/version", "opt/astrbot/.astrbot-source.json",
         "opt/qq/resources/app/app_launcher/napcat/napcat.mjs", "opt/qq/resources/app/package.json",
@@ -31,10 +34,10 @@ object InstalledVersionInspection {
         val qq = version(json(paths[5])?.optString("version"))
         val python = version(Regex("(?m)^version\\s*=\\s*(.+)$").find(text(paths[6], 64 * 1024).orEmpty())?.groupValues?.get(1))
         val components = linkedMapOf("App" to BuildConfig.VERSION_NAME,
-            "运行环境" to (bootstrap?.optString("id")?.takeIf { it.matches(Regex("[a-zA-Z0-9._-]{1,160}")) } ?: "未知"),
-            "架构" to (bootstrap?.optString("abi")?.takeIf { it in setOf("arm64-v8a", "x86_64") } ?: "未知"),
-            "Python" to (python ?: "未知"), "AstrBot" to (astrbot ?: "未知"), "AstrBot WebUI" to (dashboard ?: "未知"),
-            "NapCat" to (napcat ?: "未知（当前代码未适配）"), "Linux QQ" to (qq ?: "未知"))
+            "运行环境" to (bootstrap?.optString("id")?.takeIf { it.matches(Regex("[a-zA-Z0-9._-]{1,160}")) } ?: AppText.get(R.string.ui_unknown)),
+            "架构" to (bootstrap?.optString("abi")?.takeIf { it in setOf("arm64-v8a", "x86_64") } ?: AppText.get(R.string.ui_unknown)),
+            "Python" to (python ?: AppText.get(R.string.ui_unknown)), "AstrBot" to (astrbot ?: AppText.get(R.string.ui_unknown)), "AstrBot WebUI" to (dashboard ?: AppText.get(R.string.ui_unknown)),
+            "NapCat" to (napcat ?: AppText.get(R.string.ui_unknown_unsupported_by_this_build)), "Linux QQ" to (qq ?: AppText.get(R.string.ui_unknown)))
         val declared = bootstrap?.optJSONObject("components")
         val matches = declared != null && astrbot != null && dashboard == astrbot && napcat != null && qq != null &&
             python == "3.12.3" && source?.optString("version") == astrbot &&
@@ -42,9 +45,9 @@ object InstalledVersionInspection {
             (declared.optJSONObject("napcat")?.optString("version") == napcat || json(paths[8])?.optString("version") == napcat) &&
             declared.optJSONObject("qq")?.optString("version") == qq
         val notice = when {
-            listOf(astrbot, dashboard, napcat, qq, python).any { it == null } -> "版本组合待验证：部分组件版本无法识别，请查看日志或导出诊断包；现有数据已保留"
-            dashboard != astrbot -> "版本组合待验证：AstrBot 与 WebUI 版本不同，请在维护页使用匹配的更新包"
-            !matches -> "版本组合待验证：检测到独立更新或版本声明不同，请通过维护页使用匹配的运行包"
+            listOf(astrbot, dashboard, napcat, qq, python).any { it == null } -> AppText.get(R.string.ui_version_combination_unverified_some_component_versions_are_unrecognized)
+            dashboard != astrbot -> AppText.get(R.string.ui_version_combination_unverified_astrbot_and_its_webui_have_different)
+            !matches -> AppText.get(R.string.ui_version_combination_unverified_independent_updates_or_different_version)
             else -> MATCHED_NOTICE
         }
         return VersionInspection(components, notice, System.currentTimeMillis())

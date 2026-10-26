@@ -1,5 +1,8 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -17,18 +20,18 @@ internal data class InternetCapabilities(val internet: Boolean, val validated: B
 
 data class NetworkSnapshot(val state: InternetState = InternetState.UNKNOWN, val checkedAtMillis: Long? = null) {
     val title: String get() = when (state) {
-        InternetState.UNKNOWN -> "网络状态待确认"
-        InternetState.DISCONNECTED -> "网络已断开"
-        InternetState.CAPTIVE_PORTAL -> "网络需要认证"
-        InternetState.UNVALIDATED -> "外网连接待确认"
-        InternetState.VALIDATED -> "网络已连通"
+        InternetState.UNKNOWN -> AppText.get(R.string.ui_network_status_unknown)
+        InternetState.DISCONNECTED -> AppText.get(R.string.ui_network_disconnected)
+        InternetState.CAPTIVE_PORTAL -> AppText.get(R.string.ui_network_sign_in_required)
+        InternetState.UNVALIDATED -> AppText.get(R.string.ui_internet_access_unverified)
+        InternetState.VALIDATED -> AppText.get(R.string.ui_network_connected)
     }
     val detail: String get() = when (state) {
-        InternetState.UNKNOWN -> "暂时无法确认系统网络，本机后台状态单独检查。"
-        InternetState.DISCONNECTED -> "当前没有默认网络，QQ、模型和在线更新可能无法连接；本机后台可继续使用。"
-        InternetState.CAPTIVE_PORTAL -> "请先在系统中完成网络认证，再检查 QQ 和模型连接。"
-        InternetState.UNVALIDATED -> "系统尚未确认互联网可用，请检查网络；本机后台可继续使用。"
-        InternetState.VALIDATED -> "系统已确认互联网连接，QQ、OneBot 和模型需分别检查。"
+        InternetState.UNKNOWN -> AppText.get(R.string.ui_system_network_status_is_unavailable_local_webui_health_is)
+        InternetState.DISCONNECTED -> AppText.get(R.string.ui_no_default_network_qq_models_and_online_updates_may)
+        InternetState.CAPTIVE_PORTAL -> AppText.get(R.string.ui_complete_network_sign_in_in_system_settings_then_check)
+        InternetState.UNVALIDATED -> AppText.get(R.string.ui_the_system_has_not_confirmed_internet_access_check_your)
+        InternetState.VALIDATED -> AppText.get(R.string.ui_the_system_confirmed_internet_access_qq_onebot_and_model)
     }
 }
 

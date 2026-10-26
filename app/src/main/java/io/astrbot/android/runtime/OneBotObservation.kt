@@ -1,5 +1,8 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.os.SystemClock
 import android.util.AtomicFile
@@ -75,7 +78,7 @@ internal class OneBotObservation(private val context: Context) {
             }
             DurableFiles.write(marker, JSONObject().apply { assets.forEach { (name, content) -> put(name, sha256(content)) } })
         }.onFailure {
-            RuntimeStore.log(context, LogCategory.MANAGER).append("连接观察插件未安装或已被修改，连接状态可能显示未知；现有插件及启用设置已保留")
+            RuntimeStore.log(context, LogCategory.MANAGER).append(AppText.get(R.string.ui_the_connection_observer_plugin_is_missing_or_modified_connection))
         }
     }
 

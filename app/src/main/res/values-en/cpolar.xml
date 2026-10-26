@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cpolar_config_error">Cannot prepare default tunnels. Existing cpolar account settings and configuration are preserved. Check runtime logs and retry.</string>
+    <string name="cpolar_port_in_use">cpolar WebUI port 9200 is in use. Stop the service using that port first.</string>
+    <string name="cpolar_arm64_only" formatted="false">"The cpolar extension currently supports ARM64 phones only"</string>
+    <string name="cpolar_confirm" formatted="false">"Confirm"</string>
+    <string name="cpolar_connecting" formatted="false">"Starting WebUI"</string>
+    <string name="cpolar_dashboard_ready" formatted="false">"WebUI ready"</string>
+    <string name="cpolar_description" formatted="false">"Sign in, create tunnels and view public addresses in the official WebUI."</string>
+    <string name="cpolar_download_error" formatted="false">"cpolar download failed. Check your network and try again."</string>
+    <string name="cpolar_downloading" formatted="false">"Downloading the client from the official cpolar website"</string>
+    <string name="cpolar_exited" formatted="false">"cpolar exited. Check extension logs and start it again."</string>
+    <string name="cpolar_export_error" formatted="false">"Log export failed. Choose another destination."</string>
+    <string name="cpolar_extension_storage" formatted="false">"Extensions"</string>
+    <string name="cpolar_extension_storage_hint" formatted="false">"SSH settings and keys, plus the optional cpolar client"</string>
+    <string name="cpolar_extension_subtitle" formatted="false">"Download on demand · Public tunnels"</string>
+    <string name="cpolar_initialize_first" formatted="false">"Initialize the Ubuntu runtime first"</string>
+    <string name="cpolar_install" formatted="false">"Install"</string>
+    <string name="cpolar_install_notice" formatted="false">"Download and verify the official cpolar 3.3.12 client (about 6.6 MiB), then start its local WebUI. Includes SSH, AstrBot and NapCat tunnel presets. Sign in to connect using the dashboard configuration; features depend on your cpolar plan."</string>
+    <string name="cpolar_integrity_error" formatted="false">"cpolar file integrity check failed. Reinstall the extension."</string>
+    <string name="cpolar_login_hint" formatted="false">"Sign in with your cpolar account in the WebUI. It saves the Authtoken automatically. Manage tunnels and public addresses there too."</string>
+    <string name="cpolar_logs" formatted="false">"Logs"</string>
+    <string name="cpolar_name" formatted="false">"cpolar tunneling"</string>
+    <string name="cpolar_not_installed" formatted="false">"Not installed"</string>
+    <string name="cpolar_open_webui" formatted="false">"Open WebUI"</string>
+    <string name="cpolar_operation_error" formatted="false">"cpolar operation failed. Check network, configuration and free storage, then retry."</string>
+    <string name="cpolar_overview" formatted="false">"Overview"</string>
+    <string name="cpolar_paused" formatted="false">"Paused for maintenance"</string>
+    <string name="cpolar_privacy" formatted="false">"Includes SSH, AstrBot and NapCat tunnel presets using the service ports at creation. Account and tunnel settings are saved by the official WebUI and excluded from AstrBot backups."</string>
+    <string name="cpolar_runtime_error" formatted="false">"cpolar could not run in this runtime. Check runtime logs."</string>
+    <string name="cpolar_save_error" formatted="false">"Cannot save cpolar preferences. Check free storage."</string>
+    <string name="cpolar_space_error" formatted="false">"Installing cpolar requires at least 96 MiB of free space"</string>
+    <string name="cpolar_start" formatted="false">"Start cpolar"</string>
+    <string name="cpolar_start_error" formatted="false">"cpolar could not resume. Check configuration and logs, then retry."</string>
+    <string name="cpolar_stop" formatted="false">"Stop cpolar"</string>
+    <string name="cpolar_stop_notice" formatted="false">"Stop the cpolar WebUI and all its tunnels. Keep configuration."</string>
+    <string name="cpolar_stopped" formatted="false">"Stopped"</string>
+    <string name="cpolar_uninstall" formatted="false">"Uninstall"</string>
+    <string name="cpolar_uninstall_notice" formatted="false">"Stop cpolar and remove its client, tunnel configuration and saved login information. AstrBot, NapCat and SSH data are preserved."</string>
+    <string name="cpolar_verifying" formatted="false">"Verifying cpolar in the Ubuntu runtime"</string>
+    <string name="cpolar_webui_unavailable" formatted="false">"The cpolar WebUI is unavailable. Refresh or check extension logs."</string>
+    <string name="cpolar_working" formatted="false">"Working"</string>
+</resources>

@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+
+import io.astrbot.android.localizedSummary
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.app.*
 import android.content.Context
 import android.content.Intent
@@ -7,7 +13,6 @@ import android.graphics.Color
 import android.os.IBinder
 import android.os.PowerManager
 import io.astrbot.android.MainActivity
-import io.astrbot.android.R
 import io.astrbot.android.core.ServiceId
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -25,8 +30,8 @@ class RuntimeService : Service() {
     override fun onCreate() {
         super.onCreate()
         getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel(CHANNEL, "本地服务运行", NotificationManager.IMPORTANCE_LOW))
-        startForeground(NOTIFICATION_ID, notification("正在准备运行任务"))
+            NotificationChannel(CHANNEL, AppText.get(R.string.ui_local_services), NotificationManager.IMPORTANCE_LOW))
+        startForeground(NOTIFICATION_ID, notification(AppText.get(R.string.ui_preparing_runtime_tasks)))
         wakeLock = getSystemService(PowerManager::class.java).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "astrbot:runtime")
             .apply { setReferenceCounted(false) }
         scope.launch {
@@ -39,10 +44,14 @@ class RuntimeService : Service() {
         scope.launch {
             RuntimeStore.state.combine(NetworkConnectivity.observe(applicationContext)) { state, network -> state to network }
                 .combine(SshStore.state) { (state, network), ssh -> Triple(state, network, ssh) }
+                .combine(CpolarStore.state) { current, _ -> current }
+                .combine(AppText.languageChanged) { current, _ -> current }
                 .collectLatest { (state, network, ssh) ->
-                val detail = if (state.busy) state.phase else state.services.values.joinToString(" · ") { "${it.id.label} ${it.summary()}" }
+                val detail = if (state.busy) state.phase else state.services.values.joinToString(" · ") { "${it.id.label} ${it.localizedSummary()}" }
                 getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification("${network.title} · $detail" +
-                    (if (ssh.running) " · SSH 运行中" else "") + (state.storageSpace.warning?.let { " · ${state.storageSpace.pressure.title}" } ?: "")))
+                    (if (ssh.running) AppText.get(R.string.ui_ssh_running) else "") +
+                    (if (CpolarStore.state.value.running) " · cpolar" else "") +
+                    (state.storageSpace.warning?.let { " · ${state.storageSpace.pressure.title}" } ?: "")))
             }
         }
     }
@@ -55,7 +64,7 @@ class RuntimeService : Service() {
             // Persist a user's stop before cancelling queued work or recovering maintenance.
             val edit = getSharedPreferences("manager", Context.MODE_PRIVATE).edit()
             (id?.let { listOf(it) } ?: ServiceId.entries).forEach { edit.putBoolean("desired_${it.name}", false) }
-            check(edit.commit()) { "无法保存停止偏好" }
+            checkLocalized(edit.commit()) { AppText.get(R.string.ui_unable_to_save_stop_preferences) }
         }
         val previous = if (action == "stop") operations.toList() else emptyList()
         previous.forEach { it.cancel() }
@@ -68,7 +77,7 @@ class RuntimeService : Service() {
                 intent?.getIntExtra("sshPort", 8022) ?: 8022, intent?.getBooleanExtra("sshLan", false) ?: false, intent?.getStringExtra("sshPassword"))
             intent?.removeExtra("sshPassword")
             RuntimeStore.state.update { it.copy(completedOperation = requestId) }
-            if (RuntimeStore.state.value.services.values.none { it.desiredRunning } && !SshStore.state.value.running) stopSelf(startId)
+            if (RuntimeStore.state.value.services.values.none { it.desiredRunning } && !SshStore.state.value.running && !CpolarStore.state.value.running) stopSelf(startId)
         }
         operations.add(operation)
         operation.invokeOnCompletion { operations.remove(operation) }
@@ -97,12 +106,17 @@ class RuntimeService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopSsh = PendingIntent.getService(this, 2, Intent(this, RuntimeService::class.java).putExtra("operation", "ssh-stop"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val stopCpolar = PendingIntent.getService(this, 3, Intent(this, RuntimeService::class.java).putExtra("operation", "cpolar-stop"),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_notification)
             .setColor(Color.rgb(56, 103, 255))
-            .setContentTitle("AstrBot 运行管理器").setContentText(detail).setContentIntent(open)
+            .setContentTitle(AppText.get(R.string.ui_astrbot_manager)).setContentText(detail).setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText(detail))
-            .setOngoing(true).addAction(Notification.Action.Builder(null, "停止机器人", stop).build())
-            .apply { if (SshStore.state.value.running) addAction(Notification.Action.Builder(null, "停止 SSH", stopSsh).build()) }.build()
+            .setOngoing(true).addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_bots), stop).build())
+            .apply {
+                if (SshStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_ssh), stopSsh).build())
+                if (CpolarStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.cpolar_stop), stopCpolar).build())
+            }.build()
     }
 
     companion object {

@@ -59,7 +59,7 @@ import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
 import java.io.File
 
-class MainActivity : ComponentActivity() {
+class MainActivity : LocalizedActivity() {
     private val automaticUpdates by lazy { AutomaticUpdateChecks(applicationContext) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,6 +74,7 @@ class MainActivity : ComponentActivity() {
             val interrupted = withContext(Dispatchers.IO) { BackupRepository(filesDir).let { it.hasPendingRestore || it.hasPendingCleanup } || UpdateRepository(this@MainActivity).hasPendingUpdate || UpdateRepository(this@MainActivity, "napcat").hasPendingUpdate || RuntimeImageRepository(this@MainActivity).hasPendingUpdate || PortableBackupRepository(this@MainActivity).hasInterruptedWork || PersonaRepository(this@MainActivity).hasPendingChange }
             val wanted = getSharedPreferences("manager", MODE_PRIVATE).let { preferences ->
                 ServiceId.entries.any { preferences.getBoolean("desired_${it.name}", false) } ||
+                    preferences.getBoolean("desired_cpolar", false) ||
                     preferences.getBoolean(SshRepository.DESIRED, false) && preferences.getBoolean(SshRepository.INSTALLED, true)
             }
             if ((interrupted || wanted) && RuntimeStore.owner == null) RuntimeService.command(this@MainActivity, "reconcile")
@@ -115,6 +116,7 @@ class MainActivity : ComponentActivity() {
         var viewOnlineUpdate by remember { mutableStateOf(false) }
         var napcatUpdateDialog by remember { mutableStateOf(false) }
         var showAutomaticUpdates by remember { mutableStateOf(false) }
+        var showLanguage by remember { mutableStateOf(false) }
         val automaticSettingsFlow = remember { automaticUpdates.settings.observeEnabled() }
         val automaticEnabled by automaticSettingsFlow.collectAsStateWithLifecycle(false)
         var confirmLan by remember { mutableStateOf<Pair<ServiceId, Boolean>?>(null) }
@@ -149,8 +151,8 @@ class MainActivity : ComponentActivity() {
                         RuntimeStore.log(this@MainActivity, category).exportTo(it)
                     }
                 } }
-                Toast.makeText(this@MainActivity, if (result.isSuccess) "脱敏日志已导出" else "日志导出失败，请重试", Toast.LENGTH_LONG).show()
-            } else if (uri != null) Toast.makeText(this@MainActivity, "导出已中断，请重新导出日志", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, if (result.isSuccess) AppText.get(R.string.ui_redacted_logs_exported) else AppText.get(R.string.ui_log_export_failed_please_retry), Toast.LENGTH_LONG).show()
+            } else if (uri != null) Toast.makeText(this@MainActivity, AppText.get(R.string.ui_export_interrupted_export_the_logs_again), Toast.LENGTH_LONG).show()
         }
         fun command(operation: String, id: ServiceId? = null, backupId: String? = null, updateId: String? = null) {
             if (Build.VERSION.SDK_INT >= 33 && operation != "stop") permission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -177,6 +179,7 @@ class MainActivity : ComponentActivity() {
                 SettingAction.CHECK_APP_UPDATE -> startActivity(Intent(this@MainActivity, ManagerUpdateActivity::class.java))
                 SettingAction.STORAGE_USAGE -> startActivity(Intent(this@MainActivity, StorageUsageActivity::class.java))
                 SettingAction.AUTOMATIC_UPDATES -> showAutomaticUpdates = true
+                SettingAction.LANGUAGE -> showLanguage = true
                 SettingAction.IMPORT_UPDATE -> importUpdate.launch(arrayOf("application/zip", "application/octet-stream"))
                 SettingAction.ONLINE_UPDATE -> {
                     napcatUpdateDialog = false
@@ -262,7 +265,7 @@ class MainActivity : ComponentActivity() {
         }
         Scaffold(
             topBar = { ManagerHeader(page, state,
-                title = if (logViewerVisible) "${logService.label}日志" else selectedService?.let { "${it.label} · ${serviceRoute.title}" }
+                title = if (logViewerVisible) AppText.get(R.string.ui_logs, logService.label) else selectedService?.let { "${it.label} · ${serviceRoute.title}" }
                     ?: settingsRoute.takeIf { page == ManagerPage.SETTINGS && it != SettingsRoute.ROOT }?.title,
                 onBack = if (showBackButton) ({ back() }) else null) },
             bottomBar = { if (selectedService != null) ServiceBottomBar(if (logViewerVisible) ServiceRoute.LOGS else serviceRoute) { route ->
@@ -273,7 +276,7 @@ class MainActivity : ComponentActivity() {
             } },
         ) { insets ->
             if (logViewerVisible) ManagerLogViewer(logText, logPaused,
-                onPause = { logPaused = !logPaused }, onCopy = { copy("当前日志", logText) }, onExport = {
+                onPause = { logPaused = !logPaused }, onCopy = { copy(AppText.get(R.string.ui_current_logs), logText) }, onExport = {
                     exportCategory = logService
                     exportLog.launch("astrbot-${logService.name.lowercase()}-${System.currentTimeMillis()}.log")
                 }, modifier = Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
@@ -299,7 +302,7 @@ class MainActivity : ComponentActivity() {
                         .padding(horizontal = 16.dp).padding(bottom = 12.dp)) {
                         ManagerPersonas(state,
                             onApply = { preset, mode -> command(mode, ServiceId.ASTRBOT, updateId = preset?.id) },
-                            onCopy = { copy("人设提示词", it) }, onExternal = { external(it, localBackend = false) },
+                            onCopy = { copy(AppText.get(R.string.ui_persona_prompt), it) }, onExternal = { external(it, localBackend = false) },
                             onBackend = { startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", ServiceId.ASTRBOT.name)) })
                     }
                 }
@@ -311,15 +314,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        if (showLanguage) LanguageDialog(onDismiss = { showLanguage = false }) { language ->
+            showLanguage = false
+            AppLanguage.set(this@MainActivity, language)
+            if (Build.VERSION.SDK_INT < 33) recreate()
+        }
         if (showAutomaticUpdates) AutomaticUpdateDialog(automaticEnabled, automaticUpdates.configured, onToggle = { enabled ->
             if (!enabled || automaticUpdates.configured) lifecycleScope.launch {
                 val saved = withContext(Dispatchers.IO) { runCatching { automaticUpdates.settings.setEnabled(enabled) } }
-                if (saved.isFailure) message = "更新偏好未保存" to "请检查可用存储后重试。"
+                if (saved.isFailure) message = AppText.get(R.string.ui_update_preferences_were_not_saved) to AppText.get(R.string.ui_check_available_storage_and_try_again)
             }
         }, onDismiss = { showAutomaticUpdates = false })
         if (showVersions) ProjectAboutDialog(state, onDismiss = { showVersions = false }, onAuthor = {
             runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(ProjectIdentity.AUTHOR_URL))) }
-                .onFailure { Toast.makeText(this@MainActivity, "未找到浏览器，请访问 ${ProjectIdentity.AUTHOR_URL}", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(this@MainActivity, AppText.get(R.string.ui_no_browser_found_visit, ProjectIdentity.AUTHOR_URL), Toast.LENGTH_LONG).show() }
         })
         backgroundGuide?.let { BackgroundGuideDialog(it) { backgroundGuide = null } }
         if (showEnvironmentCheck) EnvironmentCheckDialog(state,
@@ -328,43 +336,43 @@ class MainActivity : ComponentActivity() {
             onDismiss = { showEnvironmentCheck = false })
         message?.let { (title, text) -> AlertDialog(onDismissRequest = { message = null }, title = { Text(title) },
             text = { Text(text, Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
-            confirmButton = { TextButton(onClick = { message = null }) { Text("关闭") } },
-            dismissButton = { TextButton(onClick = { message = null; openLogs(LogCategory.MANAGER) }) { Text("查看管理日志") } }) }
+            confirmButton = { TextButton(onClick = { message = null }) { Text(AppText.get(R.string.ui_close)) } },
+            dismissButton = { TextButton(onClick = { message = null; openLogs(LogCategory.MANAGER) }) { Text(AppText.get(R.string.ui_view_manager_logs)) } }) }
         confirmRuntime?.let { operation ->
             val reverting = operation == "rollback-runtime"
             val repairing = operation == "repair-runtime"
-            AlertDialog(onDismissRequest = { confirmRuntime = null }, title = { Text(if (repairing) "重新部署运行资源？" else if (reverting) "回退整个运行环境？" else "升级 APK 内置环境？") },
-                text = { Text(if (repairing) "将准备 APK 内置的同版本环境，停止两个服务与 SSH，备份配置、数据库和 QQ 会话，再重新部署运行资源并验证双服务。仅在组件组合完全匹配时执行，配置不重置。\n\n在 Ubuntu 程序目录内手动安装的依赖或修改将被替换；AstrBot 数据目录中的插件保留。成功后保留一次环境回退，完成后恢复原运行状态。失败则恢复原环境与数据快照。"
-                    else if (reverting) "将先备份当前数据，再恢复旧环境与对应快照。恢复点之后的数据不会合并。完成后恢复原先的运行状态。"
-                    else "将校验并准备 APK 内的完整环境，停止两个服务并备份配置、数据库和 QQ 会话，再切换环境并检查两个服务。失败时恢复原环境与对应快照；成功后保留一次回退。",
+            AlertDialog(onDismissRequest = { confirmRuntime = null }, title = { Text(if (repairing) AppText.get(R.string.ui_redeploy_runtime_resources) else if (reverting) AppText.get(R.string.ui_roll_back_the_entire_runtime_6833c) else AppText.get(R.string.ui_upgrade_the_bundled_runtime)) },
+                text = { Text(if (repairing) AppText.get(R.string.ui_prepare_the_runtime_bundled_with_this_apk_stop_both)
+                    else if (reverting) AppText.get(R.string.ui_back_up_current_data_then_restore_the_previous_runtime)
+                    else AppText.get(R.string.ui_verify_and_prepare_the_full_bundled_runtime_stop_both),
                     Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
-                confirmButton = { TextButton(enabled = !state.busy, onClick = { confirmRuntime = null; command(operation) }) { Text(if (repairing) "备份并修复" else if (reverting) "备份并回退环境" else "备份并升级环境") } },
-                dismissButton = { TextButton(onClick = { confirmRuntime = null }) { Text("取消") } })
+                confirmButton = { TextButton(enabled = !state.busy, onClick = { confirmRuntime = null; command(operation) }) { Text(if (repairing) AppText.get(R.string.ui_back_up_and_repair) else if (reverting) AppText.get(R.string.ui_back_up_and_roll_back) else AppText.get(R.string.ui_back_up_and_upgrade)) } },
+                dismissButton = { TextButton(onClick = { confirmRuntime = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         confirmLan?.let { (id, enabled) ->
-            AlertDialog(onDismissRequest = { confirmLan = null }, title = { Text("${if (enabled) "开启" else "关闭"} ${id.label} 局域网访问？") },
-                text = { Text(if (enabled) "允许其他设备通过手机 IPv4 地址访问此后台，请在可信局域网开启，仍需原有登录凭据。正在运行的服务会重启，端口及其他配置保留。"
-                    else "将此后台限制为手机本机访问。正在运行的服务会重启，端口及其他配置保留。") },
-                confirmButton = { TextButton(onClick = { confirmLan = null; command(if (enabled) "enable-lan" else "disable-lan", id) }) { Text(if (enabled) "开启并应用" else "关闭并应用") } },
-                dismissButton = { TextButton(onClick = { confirmLan = null }) { Text("取消") } })
+            AlertDialog(onDismissRequest = { confirmLan = null }, title = { Text(AppText.get(R.string.ui_lan_access_for, if (enabled) AppText.get(R.string.ui_enable) else AppText.get(R.string.ui_close), id.label)) },
+                text = { Text(if (enabled) AppText.get(R.string.ui_allow_other_devices_to_access_this_dashboard_through_the)
+                    else AppText.get(R.string.ui_restrict_this_dashboard_to_the_phone_the_service_will)) },
+                confirmButton = { TextButton(onClick = { confirmLan = null; command(if (enabled) "enable-lan" else "disable-lan", id) }) { Text(if (enabled) AppText.get(R.string.ui_enable_and_apply) else AppText.get(R.string.ui_disable_and_apply)) } },
+                dismissButton = { TextButton(onClick = { confirmLan = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
-        if (confirmDiagnostics) AlertDialog(onDismissRequest = { confirmDiagnostics = false }, title = { Text("导出诊断包？") },
-            text = { Text("包含设备型号、版本、运行状态和脱敏日志，不附带配置、数据库或 QQ 登录文件。导出不会停止服务。日志仍可能包含聊天内容或个人信息，请检查后再分享。") },
-            confirmButton = { TextButton(onClick = { confirmDiagnostics = false; exportDiagnostics.launch("astrbot-diagnostics-${System.currentTimeMillis()}.zip") }) { Text("选择保存位置") } },
-            dismissButton = { TextButton(onClick = { confirmDiagnostics = false }) { Text("取消") } })
+        if (confirmDiagnostics) AlertDialog(onDismissRequest = { confirmDiagnostics = false }, title = { Text(AppText.get(R.string.ui_export_diagnostics_2f10a)) },
+            text = { Text(AppText.get(R.string.ui_includes_the_device_model_versions_runtime_status_and_redacted)) },
+            confirmButton = { TextButton(onClick = { confirmDiagnostics = false; exportDiagnostics.launch("astrbot-diagnostics-${System.currentTimeMillis()}.zip") }) { Text(AppText.get(R.string.ui_choose_destination)) } },
+            dismissButton = { TextButton(onClick = { confirmDiagnostics = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         if (showDataRetention) DataRetentionDialog(
             onPortableBackup = { showDataRetention = false; settingsRoute = SettingsRoute.PORTABLE },
             onDismiss = { showDataRetention = false })
-        if (confirmPortableExport) AlertDialog(onDismissRequest = { confirmPortableExport = false }, title = { Text("导出便携备份？") },
-            text = { Text("包含 AstrBot 配置、数据库、插件和数据，以及 NapCat 配置；不包含 QQ 登录会话、运行环境和本机快照。会暂时停止两个服务制作一致性备份，再恢复原状态并保存到所选位置。文件含密码和业务密钥，不做脱敏；文件上限为 2 GiB。") },
-            confirmButton = { TextButton(onClick = { confirmPortableExport = false; exportPortable.launch("astrbot-portable-${System.currentTimeMillis()}.zip") }) { Text("选择保存位置") } },
-            dismissButton = { TextButton(onClick = { confirmPortableExport = false }) { Text("取消") } })
+        if (confirmPortableExport) AlertDialog(onDismissRequest = { confirmPortableExport = false }, title = { Text(AppText.get(R.string.ui_export_portable_backup_47820)) },
+            text = { Text(AppText.get(R.string.ui_includes_astrbot_configuration_database_plugins_and_data_plus_napcat)) },
+            confirmButton = { TextButton(onClick = { confirmPortableExport = false; exportPortable.launch("astrbot-portable-${System.currentTimeMillis()}.zip") }) { Text(AppText.get(R.string.ui_choose_destination)) } },
+            dismissButton = { TextButton(onClick = { confirmPortableExport = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         if (confirmPortableImport) state.portableImport?.let { backup ->
-            val date = java.text.DateFormat.getDateTimeInstance().format(java.util.Date(backup.createdAt))
-            AlertDialog(onDismissRequest = { confirmPortableImport = false }, title = { Text("恢复此便携备份？") },
-                text = { Text("备份时间：$date。将先停机创建本机恢复前快照，再替换 AstrBot 数据与 NapCat 配置，保留当前手机的 QQ 会话。备份点之后的数据不会合并；导入后请使用备份中的后台凭据检查业务配置。") },
-                confirmButton = { TextButton(onClick = { confirmPortableImport = false; command("apply-backup") }) { Text("备份当前数据并导入") } },
-                dismissButton = { TextButton(onClick = { confirmPortableImport = false }) { Text("取消") } })
+            val date = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.DEFAULT, java.text.DateFormat.DEFAULT, AppText.locale).format(java.util.Date(backup.createdAt))
+            AlertDialog(onDismissRequest = { confirmPortableImport = false }, title = { Text(AppText.get(R.string.ui_restore_this_portable_backup)) },
+                text = { Text(AppText.get(R.string.ui_backup_date_stop_services_and_create_a_local_recovery, date)) },
+                confirmButton = { TextButton(onClick = { confirmPortableImport = false; command("apply-backup") }) { Text(AppText.get(R.string.ui_back_up_and_import)) } },
+                dismissButton = { TextButton(onClick = { confirmPortableImport = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         if (editBackupLimits) {
             var countText by remember { mutableStateOf(state.backupLimits.automaticCount.toString()) }
@@ -372,80 +380,80 @@ class MainActivity : ComponentActivity() {
             val count = countText.toIntOrNull()
             val size = sizeText.toIntOrNull()
             val valid = count != null && count in 1..100 && size != null && size in 64..65536
-            AlertDialog(onDismissRequest = { editBackupLimits = false }, title = { Text("自动快照上限") }, text = {
+            AlertDialog(onDismissRequest = { editBackupLimits = false }, title = { Text(AppText.get(R.string.ui_automatic_snapshot_limits)) }, text = {
                 Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("新建更新前或恢复前快照时，按上限自动清理最旧且未受保护的自动快照。新快照校验成功后才清理旧快照。")
-                    OutlinedTextField(value = countText, onValueChange = { countText = it.take(4) }, label = { Text("最多保留（份）") },
-                        supportingText = { Text("1 至 100 份") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                    OutlinedTextField(value = sizeText, onValueChange = { sizeText = it.take(6) }, label = { Text("容量上限（MiB）") },
-                        supportingText = { Text("64 至 65536 MiB；1024 MiB = 1 GiB") }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                    Text("手动备份不计入上限且不会自动删除。回退所需和本次选中的恢复快照会保留；若仍无法满足上限，将暂停操作并提示调整。降低上限从下次自动快照生效。", style = MaterialTheme.typography.bodySmall)
+                    Text(AppText.get(R.string.ui_when_creating_a_snapshot_before_an_update_or_restore))
+                    OutlinedTextField(value = countText, onValueChange = { countText = it.take(4) }, label = { Text(AppText.get(R.string.ui_maximum_snapshots)) },
+                        supportingText = { Text(AppText.get(R.string.ui_1_to_100_snapshots)) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    OutlinedTextField(value = sizeText, onValueChange = { sizeText = it.take(6) }, label = { Text(AppText.get(R.string.ui_storage_limit_mib)) },
+                        supportingText = { Text(AppText.get(R.string.ui_64_to_65536_mib_1024_mib_1_gib)) }, singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    Text(AppText.get(R.string.ui_manual_backups_are_excluded_and_are_never_deleted_automatically), style = MaterialTheme.typography.bodySmall)
                 }
             }, confirmButton = { TextButton(enabled = valid && !state.busy, onClick = {
                 editBackupLimits = false
                 RuntimeService.command(this@MainActivity, "save-backup-limits", backupLimitCount = requireNotNull(count), backupLimitMiB = requireNotNull(size))
-            }) { Text("保存") } }, dismissButton = { TextButton(onClick = { editBackupLimits = false }) { Text("取消") } })
+            }) { Text(AppText.get(R.string.ui_save)) } }, dismissButton = { TextButton(onClick = { editBackupLimits = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
-        if (showBackups) AlertDialog(onDismissRequest = { showBackups = false }, title = { Text("本机备份") }, text = {
+        if (showBackups) AlertDialog(onDismissRequest = { showBackups = false }, title = { Text(AppText.get(R.string.ui_local_backups)) }, text = {
             Column(Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 val automatic = state.backups.filter { it.kind != "manual" }
-                Text("备份文件合计 ${Formatter.formatFileSize(this@MainActivity, state.backups.sumOf { it.storedBytes })}")
-                Text("自动快照 ${automatic.size} / ${state.backupLimits.automaticCount} 份 · ${Formatter.formatFileSize(this@MainActivity, automatic.sumOf { it.storedBytes })} / ${state.backupLimits.automaticBytes / 1024 / 1024} MiB",
+                Text(AppText.get(R.string.ui_total_backup_size, Formatter.formatFileSize(this@MainActivity, state.backups.sumOf { it.storedBytes })))
+                Text(AppText.get(R.string.ui_automatic_snapshots_mib, automatic.size, state.backupLimits.automaticCount, Formatter.formatFileSize(this@MainActivity, automatic.sumOf { it.storedBytes }), state.backupLimits.automaticBytes / 1024 / 1024),
                     style = MaterialTheme.typography.bodySmall)
-                if (state.backups.isEmpty()) Text("暂无备份")
+                if (state.backups.isEmpty()) Text(AppText.get(R.string.ui_no_backups_yet))
                 state.backups.forEach { backup ->
-                    val date = java.text.DateFormat.getDateTimeInstance().format(java.util.Date(backup.createdAt))
+                    val date = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.DEFAULT, java.text.DateFormat.DEFAULT, AppText.locale).format(java.util.Date(backup.createdAt))
                     Text(date, style = MaterialTheme.typography.titleSmall)
-                    Text("${when (backup.kind) { "manual" -> "手动备份"; "before-restore" -> "恢复前快照"; else -> "更新前快照" }} · ${backup.bytes / 1024 / 1024} MB · ${backup.count} 个文件项")
-                    Text("AstrBot ${backup.versions["AstrBot"] ?: "未知"} / NapCat ${backup.versions["NapCat"] ?: "未知"}", style = MaterialTheme.typography.bodySmall)
-                    if (backup.id in state.protectedBackupIds) Text("回退所需 · 受保护", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+                    Text(AppText.get(R.string.ui_mb_entries, when (backup.kind) { "manual" -> AppText.get(R.string.ui_manual_backup); "before-restore" -> AppText.get(R.string.ui_pre_restore_snapshot); else -> AppText.get(R.string.ui_pre_update_snapshot) }, backup.bytes / 1024 / 1024, backup.count))
+                    Text("AstrBot ${backup.versions["AstrBot"] ?: AppText.get(R.string.ui_unknown)} / NapCat ${backup.versions["NapCat"] ?: AppText.get(R.string.ui_unknown)}", style = MaterialTheme.typography.bodySmall)
+                    if (backup.id in state.protectedBackupIds) Text(AppText.get(R.string.ui_required_for_rollback_protected), color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
                     Row {
-                        TextButton(onClick = { restoreBackup = backup }, enabled = !state.busy) { Text("恢复") }
-                        TextButton(onClick = { deleteBackup = backup }, enabled = !state.busy && backup.id !in state.protectedBackupIds) { Text("删除") }
+                        TextButton(onClick = { restoreBackup = backup }, enabled = !state.busy) { Text(AppText.get(R.string.ui_restore)) }
+                        TextButton(onClick = { deleteBackup = backup }, enabled = !state.busy && backup.id !in state.protectedBackupIds) { Text(AppText.get(R.string.ui_delete)) }
                     }
                     HorizontalDivider()
                 }
             }
-        }, confirmButton = { TextButton(onClick = { showBackups = false }) { Text("关闭") } })
+        }, confirmButton = { TextButton(onClick = { showBackups = false }) { Text(AppText.get(R.string.ui_close)) } })
         restoreBackup?.let { backup ->
-            AlertDialog(onDismissRequest = { restoreBackup = null }, title = { Text("恢复此备份？") },
-                text = { Text("两个服务将暂时停止，当前数据会先备份，然后替换为此恢复点的配置、数据库、插件与 QQ 会话。恢复点之后的数据不会合并；仅允许恢复与当前程序版本匹配的备份。") },
-                confirmButton = { TextButton(onClick = { restoreBackup = null; showBackups = false; command("restore", backupId = backup.id) }) { Text("备份当前数据并恢复") } },
-                dismissButton = { TextButton(onClick = { restoreBackup = null }) { Text("取消") } })
+            AlertDialog(onDismissRequest = { restoreBackup = null }, title = { Text(AppText.get(R.string.ui_restore_this_backup)) },
+                text = { Text(AppText.get(R.string.ui_both_services_will_stop_briefly_current_data_is_backed)) },
+                confirmButton = { TextButton(onClick = { restoreBackup = null; showBackups = false; command("restore", backupId = backup.id) }) { Text(AppText.get(R.string.ui_back_up_and_restore)) } },
+                dismissButton = { TextButton(onClick = { restoreBackup = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         deleteBackup?.let { backup ->
-            AlertDialog(onDismissRequest = { deleteBackup = null }, title = { Text("删除此本机备份？") },
-                text = { Text("仅删除选中的备份文件，服务当前使用的数据不受影响。此操作无法撤销。") },
-                confirmButton = { TextButton(onClick = { deleteBackup = null; command("delete-backup", backupId = backup.id) }) { Text("删除") } },
-                dismissButton = { TextButton(onClick = { deleteBackup = null }) { Text("取消") } })
+            AlertDialog(onDismissRequest = { deleteBackup = null }, title = { Text(AppText.get(R.string.ui_delete_this_local_backup)) },
+                text = { Text(AppText.get(R.string.ui_only_the_selected_backup_file_is_deleted_data_currently)) },
+                confirmButton = { TextButton(onClick = { deleteBackup = null; command("delete-backup", backupId = backup.id) }) { Text(AppText.get(R.string.ui_delete)) } },
+                dismissButton = { TextButton(onClick = { deleteBackup = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         val updateLabel = if (napcatUpdateDialog) "NapCat" else "AstrBot"
         val stagedUpdate = if (napcatUpdateDialog) state.preparedNapCat else state.preparedUpdate
         val onlineVersion = if (napcatUpdateDialog) state.latestNapCat else state.latestUpdate
         if (confirmUpdate) stagedUpdate?.let { update ->
-            AlertDialog(onDismissRequest = { confirmUpdate = false }, title = { Text("更新 $updateLabel 至 ${update.version}？") },
-                text = { Text("${update.channel}\n${update.notes}\n\n将暂时停止两个服务，先备份数据，再切换程序。配置与 QQ 会话会保留，失败会恢复原程序及对应数据。" +
-                    if (napcatUpdateDialog) "QQ 原本停止时保持停止；原本运行时会重启检查后台接口。" else "AstrBot 会启动检查本机后台。") },
-                confirmButton = { TextButton(onClick = { confirmUpdate = false; command(if (napcatUpdateDialog) "apply-napcat" else "apply-update") }) { Text("备份并更新") } },
-                dismissButton = { TextButton(onClick = { confirmUpdate = false }) { Text("取消") } })
+            AlertDialog(onDismissRequest = { confirmUpdate = false }, title = { Text(AppText.get(R.string.ui_update_to, updateLabel, update.version)) },
+                text = { Text(AppText.get(R.string.ui_n_n_nboth_services_will_stop_briefly_data_is, update.channel, update.notes) +
+                    if (napcatUpdateDialog) AppText.get(R.string.ui_qq_remains_stopped_if_it_was_stopped_otherwise_it) else AppText.get(R.string.ui_astrbot_starts_to_check_its_local_dashboard)) },
+                confirmButton = { TextButton(onClick = { confirmUpdate = false; command(if (napcatUpdateDialog) "apply-napcat" else "apply-update") }) { Text(AppText.get(R.string.ui_back_up_and_update)) } },
+                dismissButton = { TextButton(onClick = { confirmUpdate = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         if (viewOnlineUpdate && onlineVersion != null) {
             val update = onlineVersion
             AlertDialog(onDismissRequest = { viewOnlineUpdate = false }, title = { Text("$updateLabel ${update.version}") },
                 text = { Text("${update.channel} · ${update.bytes / 1024 / 1024} MB\n${update.notes}\n\n" +
-                    (if (state.versions[updateLabel] == update.version) "当前已是此版本，可重新下载或安装。\n" else "") +
-                    "下载和校验期间服务继续运行。下载完成后需另行确认备份和安装。") },
-                confirmButton = { TextButton(onClick = { viewOnlineUpdate = false; command(if (napcatUpdateDialog) "download-napcat" else "download-update", updateId = update.id) }) { Text("下载并校验") } },
-                dismissButton = { TextButton(onClick = { viewOnlineUpdate = false }) { Text("关闭") } })
+                    (if (state.versions[updateLabel] == update.version) AppText.get(R.string.ui_this_version_is_already_installed_you_can_download_or) else "") +
+                    AppText.get(R.string.ui_services_keep_running_during_download_and_verification_backup_and)) },
+                confirmButton = { TextButton(onClick = { viewOnlineUpdate = false; command(if (napcatUpdateDialog) "download-napcat" else "download-update", updateId = update.id) }) { Text(AppText.get(R.string.ui_download_and_verify)) } },
+                dismissButton = { TextButton(onClick = { viewOnlineUpdate = false }) { Text(AppText.get(R.string.ui_close)) } })
         }
-        if (confirmRollback) AlertDialog(onDismissRequest = { confirmRollback = false }, title = { Text("回退 $updateLabel 及对应数据？") },
-            text = { Text("当前数据会先备份，然后恢复上次更新前的程序与数据快照。恢复点之后的数据不会合并，两个服务将暂时停止。") },
-            confirmButton = { TextButton(onClick = { confirmRollback = false; command(if (napcatUpdateDialog) "rollback-napcat" else "rollback") }) { Text("备份当前数据并回退") } },
-            dismissButton = { TextButton(onClick = { confirmRollback = false }) { Text("取消") } })
+        if (confirmRollback) AlertDialog(onDismissRequest = { confirmRollback = false }, title = { Text(AppText.get(R.string.ui_roll_back_and_its_data, updateLabel)) },
+            text = { Text(AppText.get(R.string.ui_back_up_current_data_then_restore_the_program_and)) },
+            confirmButton = { TextButton(onClick = { confirmRollback = false; command(if (napcatUpdateDialog) "rollback-napcat" else "rollback") }) { Text(AppText.get(R.string.ui_back_up_and_roll_back_65fe8)) } },
+            dismissButton = { TextButton(onClick = { confirmRollback = false }) { Text(AppText.get(R.string.ui_cancel)) } })
     }
 
     @Composable private fun CredentialControls(id: ServiceId) {
-        val label = if (id == ServiceId.NAPCAT) "NapCat 访问口令" else "AstrBot 初始密码"
+        val label = if (id == ServiceId.NAPCAT) AppText.get(R.string.ui_napcat_access_token) else AppText.get(R.string.ui_astrbot_initial_password)
         val owner = LocalLifecycleOwner.current
         var revealed by remember(id) { mutableStateOf<String?>(null) }
         var loading by remember(id) { mutableStateOf(false) }
@@ -464,7 +472,7 @@ class MainActivity : ComponentActivity() {
                 val value = withContext(Dispatchers.IO) { WebUiCredentials.read(this@MainActivity, id) }
                 if (attempt == request && owner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
                     loading = false
-                    if (value == null) Toast.makeText(this@MainActivity, "首次启动后生成凭据；已有配置请使用原密码", Toast.LENGTH_SHORT).show()
+                    if (value == null) Toast.makeText(this@MainActivity, AppText.get(R.string.ui_credentials_are_generated_at_first_startup_use_your_existing), Toast.LENGTH_SHORT).show()
                     else onRead(value)
                 }
             }
@@ -478,10 +486,10 @@ class MainActivity : ComponentActivity() {
                 else readCredential { revealed = it }
             }, enabled = !loading) {
                 Icon(painterResource(if (revealed == null) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
-                    contentDescription = "${if (revealed == null) "显示" else "隐藏"} $label")
+                    contentDescription = "${if (revealed == null) AppText.get(R.string.ui_show) else AppText.get(R.string.ui_hide)} $label")
             }
         }
-        ManagerActionButton("复制$label", { readCredential { copy(label, it, sensitive = true) } }, tone = ActionTone.NEUTRAL, enabled = !loading)
+        ManagerActionButton(AppText.get(R.string.ui_copy_f4880, label), { readCredential { copy(label, it, sensitive = true) } }, tone = ActionTone.NEUTRAL, enabled = !loading)
     }
 
     private fun copy(label: String, value: String, sensitive: Boolean = false) {
@@ -490,11 +498,11 @@ class MainActivity : ComponentActivity() {
             putBoolean("android.content.extra.IS_SENSITIVE", true)
         }
         getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
-        Toast.makeText(this, "已复制$label", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, AppText.get(R.string.ui_copied, label), Toast.LENGTH_SHORT).show()
     }
     private fun external(url: String, localBackend: Boolean = true) {
-        if (localBackend) Toast.makeText(this, "外部浏览器可能需要单独登录后台", Toast.LENGTH_SHORT).show()
+        if (localBackend) Toast.makeText(this, AppText.get(R.string.ui_you_may_need_to_sign_in_separately_in_the), Toast.LENGTH_SHORT).show()
         runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
-            .onFailure { Toast.makeText(this, "没有可用的浏览器", Toast.LENGTH_SHORT).show() }
+            .onFailure { Toast.makeText(this, AppText.get(R.string.ui_no_browser_available), Toast.LENGTH_SHORT).show() }
     }
 }

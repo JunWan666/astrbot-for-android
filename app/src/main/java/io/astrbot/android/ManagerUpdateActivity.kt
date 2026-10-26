@@ -24,9 +24,9 @@ import androidx.lifecycle.lifecycleScope
 import io.astrbot.android.runtime.*
 import kotlinx.coroutines.*
 
-class ManagerUpdateActivity : ComponentActivity() {
+class ManagerUpdateActivity : LocalizedActivity() {
     private val repository by lazy { ManagerApkRepository(applicationContext) }
-    private var status by mutableStateOf(ManagerApkStatus(null, false, 0, "正在读取更新信息"))
+    private var status by mutableStateOf(ManagerApkStatus(null, false, 0, AppText.get(R.string.ui_loading_update_information)))
     private var busy by mutableStateOf(false)
     private var allowed by mutableStateOf(false)
     private var operation: Job? = null
@@ -34,7 +34,7 @@ class ManagerUpdateActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        runOperation("读取 APK 更新信息") { status = repository.cached() }
+        runOperation(AppText.get(R.string.ui_read_apk_update_information)) { status = repository.cached() }
         setContent { ManagerTheme {
             var detail by rememberSaveable { mutableStateOf<String?>(null) }
             var install by rememberSaveable { mutableStateOf(false) }
@@ -45,57 +45,57 @@ class ManagerUpdateActivity : ComponentActivity() {
                 Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.fillMaxWidth()) {
-                        TextButton(onClick = { finish() }) { Text("返回") }
-                        Text("检查更新", Modifier.weight(1f).padding(top = 10.dp), style = MaterialTheme.typography.titleLarge)
+                        TextButton(onClick = { finish() }) { Text(AppText.get(R.string.ui_back)) }
+                        Text(AppText.get(R.string.ui_check_for_updates), Modifier.weight(1f).padding(top = 10.dp), style = MaterialTheme.typography.titleLarge)
                     }
                     Surface(Modifier.fillMaxWidth().clickable { detail = status.message }, shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surfaceContainerLow) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("管理器 ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.titleMedium)
+                            Text(AppText.get(R.string.ui_manager_b28f4, BuildConfig.VERSION_NAME), style = MaterialTheme.typography.titleMedium)
                             Text(status.message, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis)
                             if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
                         }
                     }
                     val candidate = status.candidate
                     FixedManagerMenu(listOf(
-                        ManagerMenuItem("检查管理器更新", R.drawable.ic_update, "获取已验证的 APK 版本", !busy && repository.configured) {
-                            runOperation("检查管理器更新") { status = repository.check(::progress) }
+                        ManagerMenuItem(AppText.get(R.string.ui_check_app_updates), R.drawable.ic_update, AppText.get(R.string.ui_find_verified_apk_releases), !busy && repository.configured) {
+                            runOperation(AppText.get(R.string.ui_check_app_updates)) { status = repository.check(::progress) }
                         },
-                        ManagerMenuItem("版本说明", R.drawable.ic_document, candidate?.versionName ?: "暂无适用的新版本", candidate != null) {
+                        ManagerMenuItem(AppText.get(R.string.ui_release_notes), R.drawable.ic_document, candidate?.versionName ?: AppText.get(R.string.ui_no_applicable_updates), candidate != null) {
                             detail = candidate?.let { "${it.versionName}\n${it.bytes / 1024 / 1024} MiB\n\n${it.notes}" }
                         },
-                        ManagerMenuItem(if (status.downloadedBytes > 0 && !status.prepared) "继续下载 APK" else "下载 APK",
-                            R.drawable.ic_import, "下载后校验，暂不安装", !busy && candidate != null && !status.prepared) {
-                            candidate?.let { info -> runOperation("下载管理器 APK") { status = repository.download(info.id, ::progress) } }
+                        ManagerMenuItem(if (status.downloadedBytes > 0 && !status.prepared) AppText.get(R.string.ui_resume_apk_download) else AppText.get(R.string.ui_download_apk),
+                            R.drawable.ic_import, AppText.get(R.string.ui_verify_after_downloading_installation_is_separate), !busy && candidate != null && !status.prepared) {
+                            candidate?.let { info -> runOperation(AppText.get(R.string.ui_download_app_apk)) { status = repository.download(info.id, ::progress) } }
                         },
-                        ManagerMenuItem("安装已校验 APK", R.drawable.ic_update,
-                            if (allowed) "交给系统安装器确认" else "安装前需允许此应用安装更新", !busy && status.prepared) { install = true },
-                        ManagerMenuItem("清理 APK 下载", R.drawable.ic_backup, "保留当前应用、机器人环境与数据", !busy) { clear = true }
+                        ManagerMenuItem(AppText.get(R.string.ui_install_verified_apk), R.drawable.ic_update,
+                            if (allowed) AppText.get(R.string.ui_confirm_installation_in_the_system_installer) else AppText.get(R.string.ui_allow_this_app_to_install_updates_first), !busy && status.prepared) { install = true },
+                        ManagerMenuItem(AppText.get(R.string.ui_clear_apk_downloads), R.drawable.ic_backup, AppText.get(R.string.ui_keep_the_current_app_bot_runtime_and_data), !busy) { clear = true }
                     ), Modifier.weight(1f))
-                    if (busy) TextButton(onClick = { operation?.cancel() }) { Text("取消本次操作") }
-                    Text("AstrBot 程序更新请返回“关于”中的对应入口。", style = MaterialTheme.typography.bodySmall)
+                    if (busy) TextButton(onClick = { operation?.cancel() }) { Text(AppText.get(R.string.ui_cancel_this_operation)) }
+                    Text(AppText.get(R.string.ui_for_astrbot_updates_return_to_the_corresponding_entry_under), style = MaterialTheme.typography.bodySmall)
                 }
             }
-            detail?.let { text -> AlertDialog(onDismissRequest = { detail = null }, title = { Text("更新信息") },
+            detail?.let { text -> AlertDialog(onDismissRequest = { detail = null }, title = { Text(AppText.get(R.string.ui_update_information)) },
                 text = { Text(text, Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
-                confirmButton = { TextButton(onClick = { detail = null }) { Text("关闭") } }) }
-            if (clear) AlertDialog(onDismissRequest = { clear = false }, title = { Text("清理 APK 下载") },
-                text = { Text("删除未完成和已下载的管理器安装包，释放手机空间。") },
-                confirmButton = { TextButton(onClick = { clear = false; runOperation("清理 APK 下载") { repository.clearDownload(); status = repository.cached() } }) { Text("清理") } },
-                dismissButton = { TextButton(onClick = { clear = false }) { Text("取消") } })
-            if (install) AlertDialog(onDismissRequest = { install = false }, title = { Text("安装管理器更新") },
-                text = { Text("安装前先短暂停止服务创建数据快照，再恢复原启停设置。系统安装会重启应用，服务可能再次中断；更新后请重新打开应用。是否继续？") },
+                confirmButton = { TextButton(onClick = { detail = null }) { Text(AppText.get(R.string.ui_close)) } }) }
+            if (clear) AlertDialog(onDismissRequest = { clear = false }, title = { Text(AppText.get(R.string.ui_clear_apk_downloads)) },
+                text = { Text(AppText.get(R.string.ui_delete_incomplete_and_completed_app_apk_downloads_to_free)) },
+                confirmButton = { TextButton(onClick = { clear = false; runOperation(AppText.get(R.string.ui_clear_apk_downloads)) { repository.clearDownload(); status = repository.cached() } }) { Text(AppText.get(R.string.ui_clear)) } },
+                dismissButton = { TextButton(onClick = { clear = false }) { Text(AppText.get(R.string.ui_cancel)) } })
+            if (install) AlertDialog(onDismissRequest = { install = false }, title = { Text(AppText.get(R.string.ui_install_app_update)) },
+                text = { Text(AppText.get(R.string.ui_services_will_briefly_stop_to_create_a_data_snapshot)) },
                 confirmButton = { TextButton(onClick = {
                     install = false
                     if (!packageManager.canRequestPackageInstalls()) permission = true else openInstaller()
-                }) { Text("继续安装") } }, dismissButton = { TextButton(onClick = { install = false }) { Text("取消") } })
-            if (permission) AlertDialog(onDismissRequest = { permission = false }, title = { Text("允许安装更新") },
-                text = { Text("在系统设置中允许本应用安装 APK，返回后再点击安装。系统仍会要求确认。") },
+                }) { Text(AppText.get(R.string.ui_continue_installation)) } }, dismissButton = { TextButton(onClick = { install = false }) { Text(AppText.get(R.string.ui_cancel)) } })
+            if (permission) AlertDialog(onDismissRequest = { permission = false }, title = { Text(AppText.get(R.string.ui_allow_update_installation)) },
+                text = { Text(AppText.get(R.string.ui_allow_this_app_to_install_apks_in_system_settings)) },
                 confirmButton = { TextButton(onClick = {
                     permission = false
                     runCatching { startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName"))) }
-                        .onFailure { status = status.copy(message = "无法打开安装权限设置，请在系统应用设置中允许安装未知应用") }
-                }) { Text("前往设置") } }, dismissButton = { TextButton(onClick = { permission = false }) { Text("取消") } })
+                        .onFailure { status = status.copy(message = AppText.get(R.string.ui_unable_to_open_installation_permissions_allow_unknown_app_installation)) }
+                }) { Text(AppText.get(R.string.ui_open_settings)) } }, dismissButton = { TextButton(onClick = { permission = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         } }
     }
 
@@ -106,35 +106,35 @@ class ManagerUpdateActivity : ComponentActivity() {
         operation = lifecycleScope.launch {
             busy = true
             val log = RuntimeStore.log(applicationContext, LogCategory.MANAGER)
-            log.append("$label · 开始")
-            try { block(); log.append("$label · 完成") }
+            log.append(AppText.get(R.string.ui_started, label))
+            try { block(); log.append(AppText.get(R.string.ui_finished, label)) }
             catch (failure: CancellationException) {
-                log.append("$label · 取消，保留下载进度")
-                progress("本次操作已取消，下载进度保留，可稍后继续")
+                log.append(AppText.get(R.string.ui_cancelled_download_progress_retained, label))
+                progress(AppText.get(R.string.ui_operation_cancelled_download_progress_is_retained_so_you_can))
                 throw failure
             } catch (failure: Exception) {
-                log.append("$label · 未完成（${failure.javaClass.simpleName}）")
+                log.append(AppText.get(R.string.ui_incomplete, label, failure.javaClass.simpleName))
                 // No server responses, arbitrary URLs or TLS details enter the user flow.
-                val message = failure.message?.takeIf { it.length in 1..180 && it.any { c -> c in '\u4e00'..'\u9fff' } }
-                progress(message ?: "更新操作未完成，请检查网络或稍后重试，现有应用保持不变")
+                val message = failure.userFacingMessage()?.takeIf { it.length in 1..180 }
+                progress(message ?: AppText.get(R.string.ui_update_incomplete_check_your_network_or_retry_later_the))
             } finally { busy = false }
         }
     }
     private fun openInstaller() {
         val id = status.candidate?.id ?: return
-        runOperation("校验并打开 APK 安装器") {
-            check(!RuntimeStore.state.value.busy) { "请等待当前环境操作完成后再安装" }
-            progress("正在重新校验 APK")
+        runOperation(AppText.get(R.string.ui_verify_apk_and_open_installer)) {
+            checkLocalized(!RuntimeStore.state.value.busy) { AppText.get(R.string.ui_wait_for_the_current_runtime_operation_to_finish_before) }
+            progress(AppText.get(R.string.ui_verifying_apk_again))
             repository.forInstaller(id)
             ManagerApkInstallBackup.createIfInstalled(applicationContext, ::progress)
-            check(!RuntimeStore.state.value.busy) { "请等待当前环境操作完成后再安装" }
+            checkLocalized(!RuntimeStore.state.value.busy) { AppText.get(R.string.ui_wait_for_the_current_runtime_operation_to_finish_before) }
             // Backup may take minutes: validate metadata, bytes and remaining installer space once more.
             val file = repository.forInstaller(id)
             val uri = FileProvider.getUriForFile(this@ManagerUpdateActivity, "$packageName.manager-apk", file)
             val intent = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION).apply { clipData = ClipData.newRawUri("APK 更新", uri) }
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION).apply { clipData = ClipData.newRawUri(AppText.get(R.string.ui_apk_update), uri) }
             startActivity(intent)
-            progress("已交给系统安装器；若取消，可再次点击安装")
+            progress(AppText.get(R.string.ui_opened_the_system_installer_if_you_cancel_select_install))
         }
     }
     override fun onDestroy() { operation?.cancel(); repository.close(); super.onDestroy() }

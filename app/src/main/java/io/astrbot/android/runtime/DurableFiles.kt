@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.system.Os
 import android.system.OsConstants
 import android.util.AtomicFile
@@ -30,7 +36,7 @@ internal object DurableFiles {
     }
     fun move(source: File, destination: File) {
         destination.parentFile!!.mkdirs()
-        check(!Files.exists(destination.toPath(), LinkOption.NOFOLLOW_LINKS) && source.renameTo(destination)) { "无法切换程序目录，已保留恢复记录" }
+        checkLocalized(!Files.exists(destination.toPath(), LinkOption.NOFOLLOW_LINKS) && source.renameTo(destination)) { AppText.get(R.string.ui_cannot_switch_program_directories_recovery_records_are_preserved) }
         sync(source.parentFile!!)
         if (source.parentFile != destination.parentFile) sync(destination.parentFile!!)
     }
@@ -69,7 +75,7 @@ internal object DurableFiles {
             }
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                 coroutine.ensureActive()
-                require(attrs.isRegularFile && !attrs.isSymbolicLink) { "程序中存在不支持的文件，已保留旧版本" }
+                requireLocalized(attrs.isRegularFile && !attrs.isSymbolicLink) { AppText.get(R.string.ui_the_program_contains_unsupported_files_the_old_version_is) }
                 FileOutputStream(target(file).toFile()).use { output -> file.toFile().inputStream().use { it.copyTo(output) }; output.fd.sync() }
                 Os.chmod(target(file).toString(), 420)
                 return FileVisitResult.CONTINUE

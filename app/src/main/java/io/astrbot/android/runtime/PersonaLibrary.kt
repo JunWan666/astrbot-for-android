@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.LocalizedStateException
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,8 +30,8 @@ internal object PersonaLibrary {
         val local = local(context)
         val preset = PersonaPreset("custom-${UUID.randomUUID()}", name.trim(), category, intro.trim(), prompt.trim(), greeting.trim(), "本地添加的人设", "")
         validate(preset)
-        require(local.custom.size < 200) { "最多保存 200 个自建人设，请先删除不需要的人设" }
-        require(visible(defaults, local).none { it.name.equals(preset.name, ignoreCase = true) }) { "已有同名人设，请换一个名称" }
+        requireLocalized(local.custom.size < 200) { AppText.get(R.string.persona_limit) }
+        requireLocalized(visible(defaults, local).none { it.name.equals(preset.name, ignoreCase = true) }) { AppText.get(R.string.persona_duplicate) }
         write(context, local.copy(custom = local.custom + preset))
         return preset
     }
@@ -61,7 +67,7 @@ internal object PersonaLibrary {
             require(items.map { it.id }.distinct().size == items.size)
             Local(items, List(deleted.length()) { deleted.getString(it) }.toSet())
         } catch (failure: Exception) {
-            throw IllegalStateException("本地人设库读取失败，原文件已保留，请重试", failure)
+            throw LocalizedStateException(AppText.get(R.string.persona_read_error), failure)
         }
     }
 
@@ -76,11 +82,11 @@ internal object PersonaLibrary {
     }
 
     private fun validate(preset: PersonaPreset) {
-        require(preset.id.matches(Regex("[a-z0-9-]{1,48}"))) { "人设标识无效" }
-        require(preset.name.length in 1..30 && preset.name.none { it.isISOControl() }) { "名称需为 1–30 个字符，不能包含换行" }
-        require(preset.category in categories) { "请选择人设分类" }
-        require(preset.prompt.length in 1..12_000) { "提示词需为 1–12000 个字符" }
-        require(preset.intro.length <= 120 && preset.greeting.length <= 1000) { "简介最多 120 字，开场白最多 1000 字" }
+        requireLocalized(preset.id.matches(Regex("[a-z0-9-]{1,48}"))) { AppText.get(R.string.persona_invalid_id) }
+        requireLocalized(preset.name.length in 1..30 && preset.name.none { it.isISOControl() }) { AppText.get(R.string.persona_invalid_name) }
+        requireLocalized(preset.category in categories) { AppText.get(R.string.persona_invalid_category) }
+        requireLocalized(preset.prompt.length in 1..12_000) { AppText.get(R.string.persona_invalid_prompt) }
+        requireLocalized(preset.intro.length <= 120 && preset.greeting.length <= 1000) { AppText.get(R.string.persona_invalid_intro) }
     }
 
     private fun bundled(context: Context): List<PersonaPreset> = context.assets.open("personas/catalog.json").bufferedReader().use {
@@ -101,4 +107,4 @@ internal object PersonaLibrary {
 }
 
 data class PersonaInstallation(val imported: Set<String> = emptySet(), val currentId: String? = null,
-    val unavailable: String? = "先启动一次 AstrBot，即可导入和切换人设", val canUndo: Boolean = false)
+    val unavailable: String? = AppText.get(R.string.persona_initialize), val canUndo: Boolean = false)

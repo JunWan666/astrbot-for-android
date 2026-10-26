@@ -1,5 +1,10 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.content.SharedPreferences
 import io.astrbot.android.BuildConfig
@@ -17,7 +22,7 @@ import okhttp3.OkHttpClient
 internal class AutomaticUpdateSettings(context: Context) {
     private val preferences = context.getSharedPreferences("automatic_updates", Context.MODE_PRIVATE)
     val enabled get() = preferences.getBoolean("enabled", false)
-    fun setEnabled(value: Boolean) { check(preferences.edit().putBoolean("enabled", value).commit()) { "无法保存更新偏好，请检查可用存储" } }
+    fun setEnabled(value: Boolean) { checkLocalized(preferences.edit().putBoolean("enabled", value).commit()) { AppText.get(R.string.ui_could_not_save_update_preferences_check_free_storage) } }
     fun observeEnabled() = callbackFlow {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key -> if (key == "enabled") trySend(enabled) }
         preferences.registerOnSharedPreferenceChangeListener(listener)

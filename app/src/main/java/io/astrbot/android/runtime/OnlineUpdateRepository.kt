@@ -1,5 +1,10 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
@@ -55,17 +60,17 @@ internal class OnlineUpdateRepository(
     }.getOrNull()
 
     suspend fun check(progress: (String) -> Unit): OnlineUpdateCheck = withContext(Dispatchers.IO) {
-        require(configured) { "此安装包尚未配置在线更新地址，可导入可信更新包或安装新版 APK" }
-        progress("正在检查签名更新目录")
+        requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_online_update_url_configured_import) }
+        progress(AppText.get(R.string.ui_checking_the_signed_update_catalog))
         acceptCatalog(fetchCatalog())
     }
 
     /** Network-only phase. Automatic checks must not hold the service/maintenance gate here. */
     internal suspend fun fetchCatalog(): JSONObject = withContext(Dispatchers.IO) {
-        require(configured) { "当前安装包尚未配置在线更新地址" }
+        requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_online_update_url_configured) }
         requireHttps(source)
         val bytes = withResponse(source.toHttpUrl()) { response ->
-            require(response.isSuccessful) { "更新目录暂不可用，请稍后重试" }
+            requireLocalized(response.isSuccessful) { AppText.get(R.string.ui_update_catalog_is_temporarily_unavailable_try_again_later) }
             val body = requireNotNull(response.body)
             require(body.contentLength() <= MAX_CATALOG)
             val output = ByteArrayOutputStream()
@@ -75,7 +80,7 @@ internal class OnlineUpdateRepository(
                     currentCoroutineContext().ensureActive()
                     val count = input.read(buffer)
                     if (count < 0) break
-                    require(output.size() + count <= MAX_CATALOG) { "更新目录过大" }
+                    requireLocalized(output.size() + count <= MAX_CATALOG) { AppText.get(R.string.ui_update_catalog_is_too_large) }
                     output.write(buffer, 0, count)
                 }
             }
@@ -93,23 +98,23 @@ internal class OnlineUpdateRepository(
         val installedVersions = InstalledVersions.read(context)
         val installed = installedVersions.components[label]
         val message = when {
-            chosen != null -> "发现 $label ${chosen.info.version}，可下载并校验"
-            latest != null -> "$label $installed 已是最新兼容版本，可重新下载并校验"
+            chosen != null -> AppText.get(R.string.ui_is_available_to_download_and_verify, label, chosen.info.version)
+            latest != null -> AppText.get(R.string.ui_is_the_latest_compatible_version_you_can_download_and, label, installed)
             catalog.entries.any { it.environment == installedVersions.environmentKey && it.abi == installedVersions.components["架构"] && it.minAppCode <= BuildConfig.VERSION_CODE } ->
-                "$label $installed 高于通道已发布版本，已保留当前程序；需要回退时使用对应快照"
-            catalog.entries.isNotEmpty() -> "上游版本需要不同的运行环境或新版管理器，当前 $label $installed 已保留"
-            else -> "$label 当前通道尚无已发布的兼容程序包"
+                AppText.get(R.string.ui_installed_is_newer_than_the_channel_release_and_has, label, installed)
+            catalog.entries.isNotEmpty() -> AppText.get(R.string.ui_the_upstream_version_requires_a_different_runtime_or_newer, label, installed)
+            else -> AppText.get(R.string.ui_no_compatible_package_is_published_on_this_channel, label)
         }
         return OnlineUpdateCheck(chosen?.info, message, latest?.info)
     }
 
     suspend fun download(id: String, updates: UpdateRepository, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
-        require(configured) { "当前安装包尚未配置在线更新地址" }
+        requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_online_update_url_configured) }
         val saved = DurableFiles.read(cache) ?: error("请先检查更新")
-        require(saved.getString("source") == source) { "更新来源已变化，请重新检查" }
+        requireLocalized(saved.getString("source") == source) { AppText.get(R.string.ui_update_source_has_changed_check_again) }
         val catalog = verify(saved.getJSONObject("envelope"), commitSequence = false)
-        val chosen = candidate(catalog, onlyNewer = false) ?: error("没有适配当前环境的程序包，请重新检查更新")
-        require(chosen.info.id == id) { "更新目录已变化，请重新查看版本说明" }
+        val chosen = candidate(catalog, onlyNewer = false) ?: error(AppText.get(R.string.ui_no_package_matches_the_current_runtime_check_for_updates))
+        requireLocalized(chosen.info.id == id) { AppText.get(R.string.ui_update_catalog_has_changed_review_the_release_information_again) }
         downloadDirectory.mkdirs()
         val previous = runCatching { DurableFiles.read(receipt) }.getOrNull()
         if (previous?.optString("sha256") != chosen.sha256 || previous.optLong("bytes") != chosen.info.bytes ||
@@ -118,19 +123,19 @@ internal class OnlineUpdateRepository(
         }
         DurableFiles.write(receipt, JSONObject().put("sha256", chosen.sha256).put("bytes", chosen.info.bytes))
         val offset = partial.length()
-        require(context.filesDir.usableSpace >= chosen.info.bytes - offset + 64L * 1024 * 1024) { "下载更新所需空间不足" }
+        requireLocalized(context.filesDir.usableSpace >= chosen.info.bytes - offset + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_space_to_download_the_update) }
         if (offset != chosen.info.bytes) {
-            progress("正在下载 $label ${chosen.info.version}（${offset / 1024 / 1024} / ${chosen.info.bytes / 1024 / 1024} MB）")
+            progress(AppText.get(R.string.ui_downloading_mb, label, chosen.info.version, offset / 1024 / 1024, chosen.info.bytes / 1024 / 1024))
             withResponse(chosen.url, offset) { response ->
-                require(response.code == 200 || response.code == 206) { "更新下载失败，已保留进度，可重试" }
+                requireLocalized(response.code == 200 || response.code == 206) { AppText.get(R.string.ui_update_download_failed_progress_is_preserved_you_can_retry) }
                 val append = offset > 0 && response.code == 206
                 val start = if (append) offset else 0L
-                if (response.code == 206) require(response.header("Content-Range") == "bytes $start-${chosen.info.bytes - 1}/${chosen.info.bytes}") {
-                    "下载范围与签名资源不一致，可重新检查更新"
+                if (response.code == 206) requireLocalized(response.header("Content-Range") == "bytes $start-${chosen.info.bytes - 1}/${chosen.info.bytes}") {
+                    AppText.get(R.string.ui_download_range_differs_from_signed_resources_check_for_updates)
                 }
-                require(response.header("Content-Encoding").let { it == null || it == "identity" }) { "更新服务器返回了不支持的传输编码" }
+                requireLocalized(response.header("Content-Encoding").let { it == null || it == "identity" }) { AppText.get(R.string.ui_update_server_returned_an_unsupported_transfer_encoding) }
                 val body = requireNotNull(response.body)
-                require(body.contentLength() == -1L || body.contentLength() == chosen.info.bytes - start) { "下载大小与签名目录不一致" }
+                requireLocalized(body.contentLength() == -1L || body.contentLength() == chosen.info.bytes - start) { AppText.get(R.string.ui_download_size_differs_from_the_signed_catalog) }
                 var received = start
                 var lastProgress = 0L
                 FileOutputStream(partial, append).use { output ->
@@ -140,20 +145,20 @@ internal class OnlineUpdateRepository(
                             currentCoroutineContext().ensureActive()
                             val count = input.read(buffer)
                             if (count < 0) break
-                            require(received + count <= chosen.info.bytes) { "下载资源超出签名大小" }
-                            require(context.filesDir.usableSpace >= 16L * 1024 * 1024) { "下载更新时存储空间不足" }
+                            requireLocalized(received + count <= chosen.info.bytes) { AppText.get(R.string.ui_download_exceeds_the_signed_size) }
+                            requireLocalized(context.filesDir.usableSpace >= 16L * 1024 * 1024) { AppText.get(R.string.ui_storage_ran_out_while_downloading_the_update) }
                             output.write(buffer, 0, count); received += count
                             if (received - lastProgress >= 1024 * 1024) {
-                                progress("正在下载 $label ${chosen.info.version}（${received / 1024 / 1024} / ${chosen.info.bytes / 1024 / 1024} MB）")
+                                progress(AppText.get(R.string.ui_downloading_mb, label, chosen.info.version, received / 1024 / 1024, chosen.info.bytes / 1024 / 1024))
                                 lastProgress = received
                             }
                         }
                     } } finally { output.fd.sync() }
                 }
-                require(received == chosen.info.bytes) { "下载中断，已保留进度，可再次下载继续" }
+                requireLocalized(received == chosen.info.bytes) { AppText.get(R.string.ui_download_interrupted_progress_is_preserved_download_again_to_resume) }
             }
         }
-        progress("正在核对下载文件摘要")
+        progress(AppText.get(R.string.ui_checking_the_downloaded_file_digest))
         val digest = MessageDigest.getInstance("SHA-256")
         partial.inputStream().use { input ->
             val buffer = ByteArray(128 * 1024)
@@ -167,7 +172,7 @@ internal class OnlineUpdateRepository(
         val hash = digest.digest().joinToString("") { "%02x".format(it) }
         if (hash != chosen.sha256 || partial.length() != chosen.info.bytes) {
             partial.delete()
-            error("下载文件校验失败，未改变当前程序；可重新下载")
+            error(AppText.get(R.string.ui_downloaded_file_verification_failed_current_program_is_unchanged_downloa))
         }
         // Revalidate expiration after a potentially long download, then independently verify the ZIP signature.
         verify(saved.getJSONObject("envelope"), commitSequence = false)
@@ -184,20 +189,20 @@ internal class OnlineUpdateRepository(
         val trust = UpdateTrust(context)
         trust.verify(bytes, Base64.decode(envelope.getString("signature"), Base64.NO_WRAP))
         val document = JSONObject(bytes.toString(Charsets.UTF_8))
-        require(document.getInt("schema") == 1 && document.getString("channel") == "stable") { "更新目录格式或通道不支持" }
+        requireLocalized(document.getInt("schema") == 1 && document.getString("channel") == "stable") { AppText.get(R.string.ui_unsupported_update_catalog_format_or_channel) }
         val sequence = document.getLong("sequence")
         require(sequence in 1..9_007_199_254_740_991L)
         val from = document.getLong("issuedAtMs")
         val until = document.getLong("expiresAtMs")
         val window = 31L * 24 * 60 * 60 * 1000
-        require(from in 1..(Long.MAX_VALUE - window) && until in (from + 1)..(from + window) && now() in from..until) {
-            "更新目录已过期或设备时间不正确，请重新检查更新"
+        requireLocalized(from in 1..(Long.MAX_VALUE - window) && until in (from + 1)..(from + window) && now() in from..until) {
+            AppText.get(R.string.ui_update_catalog_expired_or_device_time_is_incorrect_check)
         }
         val items = document.getJSONArray("entries")
         require(items.length() <= 100)
         val entries = (0 until items.length()).map { index ->
             val value = items.getJSONObject(index)
-            require(value.getString("component") == component) { "更新目录的组件与当前页面不一致" }
+            requireLocalized(value.getString("component") == component) { AppText.get(R.string.ui_update_catalog_component_does_not_match_this_page) }
             if (component == "napcat") OfficialNapCat.validateEntry(value)
             val id = value.getString("id"); require(id.matches(Regex("[a-zA-Z0-9._-]{1,100}")))
             val version = value.getString("version"); versionParts(version)
@@ -207,15 +212,15 @@ internal class OnlineUpdateRepository(
             val environment = value.getString("environmentKey"); require(environment.matches(Regex("[a-f0-9]{64}")))
             val abi = value.getString("abi"); require(abi in setOf("arm64-v8a", "x86_64"))
             val min = value.getInt("minAppCode"); require(min > 0)
-            Entry(OnlineUpdateInfo(id, version, "稳定更新", notes, size), requireHttps(value.getString("url")), sha, environment, abi, min)
+            Entry(OnlineUpdateInfo(id, version, AppText.get(R.string.ui_stable_update), notes, size), requireHttps(value.getString("url")), sha, environment, abi, min)
         }
         require(entries.map { it.info.id }.toSet().size == entries.size)
-        require(entries.map { Triple(it.info.version, it.environment, it.abi) }.toSet().size == entries.size) { "更新目录存在重复版本" }
+        requireLocalized(entries.map { Triple(it.info.version, it.environment, it.abi) }.toSet().size == entries.size) { AppText.get(R.string.ui_update_catalog_contains_duplicate_versions) }
         val fingerprint = UpdateTrust.sha256(bytes)
         val sequenceFile = File(context.filesDir, "manifests/update-sequences/$sourceScope.json")
         val previous = DurableFiles.read(sequenceFile)
-        if (previous != null) require(sequence > previous.getLong("sequence") ||
-            sequence == previous.getLong("sequence") && fingerprint == previous.getString("fingerprint")) { "更新目录版本已过时或序号冲突，请稍后重试" }
+        if (previous != null) requireLocalized(sequence > previous.getLong("sequence") ||
+            sequence == previous.getLong("sequence") && fingerprint == previous.getString("fingerprint")) { AppText.get(R.string.ui_update_catalog_is_outdated_or_its_sequence_number_conflicts_233b9) }
         if (commitSequence) DurableFiles.write(sequenceFile, JSONObject().put("sequence", sequence).put("fingerprint", fingerprint))
         return Catalog(entries)
     }
@@ -243,7 +248,7 @@ internal class OnlineUpdateRepository(
                 }
             } finally { cancellation.cancel() }
         }
-        error("更新服务器重定向次数过多")
+        error(AppText.get(R.string.ui_too_many_update_server_redirects))
     }
 
     fun close() { if (providedClient == null && clientDelegate.isInitialized()) { client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown() } }
@@ -254,10 +259,10 @@ internal class OnlineUpdateRepository(
         private const val MAX_CATALOG = 256 * 1024
         private const val MAX_PACKAGE = 256L * 1024 * 1024
         private fun requireHttps(value: String): HttpUrl = value.toHttpUrl().also {
-            require(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.fragment == null && value.length <= 4096) { "在线更新仅支持无凭据的 HTTPS 地址" }
+            requireLocalized(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.fragment == null && value.length <= 4096) { AppText.get(R.string.ui_online_updates_require_https_urls_without_embedded_credentials) }
         }
         private fun versionParts(value: String): List<Int> {
-            require(value.matches(Regex("[0-9]{1,5}\\.[0-9]{1,5}\\.[0-9]{1,5}"))) { "更新版本不属于受支持的稳定版本" }
+            requireLocalized(value.matches(Regex("[0-9]{1,5}\\.[0-9]{1,5}\\.[0-9]{1,5}"))) { AppText.get(R.string.ui_this_is_not_a_supported_stable_update_version) }
             return value.split('.').map(String::toInt)
         }
         private fun compare(a: List<Int>, b: List<Int>): Int = a.zip(b).firstOrNull { it.first != it.second }?.let { it.first.compareTo(it.second) } ?: 0

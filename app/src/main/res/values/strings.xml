@@ -1,0 +1,1139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" formatted="false">"AstrBot 运行管理器"</string>
+    <string name="language_title" formatted="false">"语言"</string>
+    <string name="language_subtitle" formatted="false">"跟随系统、简体中文或 English"</string>
+    <string name="language_system" formatted="false">"跟随系统"</string>
+    <string name="action_cancel" formatted="false">"取消"</string>
+    <string name="persona_category_fun" formatted="false">"趣味"</string>
+    <string name="persona_category_company" formatted="false">"陪伴"</string>
+    <string name="persona_category_productivity" formatted="false">"效率"</string>
+    <string name="persona_category_creative" formatted="false">"创作"</string>
+    <string name="persona_category_all" formatted="false">"全部"</string>
+    <string name="component_runtime" formatted="false">"运行环境"</string>
+    <string name="component_architecture" formatted="false">"架构"</string>
+    <string name="ui_add_persona" formatted="false">"新增人设"</string>
+    <string name="ui_paste_a_prompt_from_the_persona_marketplace_save_it" formatted="false">"可以粘贴从人设市场找到的提示词，保存后再添加到 AstrBot。"</string>
+    <string name="ui_persona_name" formatted="false">"人设名称"</string>
+    <string name="ui_persona_prompt" formatted="false">"人设提示词"</string>
+    <string name="ui_description_optional" formatted="false">"简介（选填）"</string>
+    <string name="ui_up_to_120_characters" formatted="false">"最多 120 字"</string>
+    <string name="ui_greeting_example_optional" formatted="false">"开场示例（选填）"</string>
+    <string name="ui_up_to_1_000_characters" formatted="false">"最多 1000 字"</string>
+    <string name="ui_saving" formatted="false">"正在保存…"</string>
+    <string name="ui_save_persona" formatted="false">"保存人设"</string>
+    <string name="ui_cancel" formatted="false">"取消"</string>
+    <string name="ui_automatic_update_checks" formatted="false">"自动检查更新"</string>
+    <string name="ui_on" formatted="false">"已开启"</string>
+    <string name="ui_off" formatted="false">"已关闭"</string>
+    <string name="ui_automatic_update_checks_switch" formatted="false">"自动检查更新开关"</string>
+    <string name="ui_check_for_compatible_astrbot_updates_at_most_once_a" formatted="false">"打开应用且网络可用时，最多每天检查一次兼容的 AstrBot 更新。检查失败或中断后，至少间隔一小时再尝试。"</string>
+    <string name="ui_review_release_notes_when_an_update_is_found_downloads" formatted="false">"发现更新后可查看版本说明，下载和安装仍由你确认。"</string>
+    <string name="ui_this_build_has_no_online_update_channel_configured_you" formatted="false">"当前安装包尚未配置在线更新通道，暂不可开启。可在程序更新页导入可信维护包。"</string>
+    <string name="ui_done" formatted="false">"完成"</string>
+    <string name="ui_service_notifications" formatted="false">"运行通知"</string>
+    <string name="ui_battery_optimization" formatted="false">"忽略电池优化"</string>
+    <string name="ui_background_battery_limits" formatted="false">"后台耗电与无限制"</string>
+    <string name="ui_auto_start_permissions" formatted="false">"自启动与关联启动"</string>
+    <string name="ui_lock_recent_task" formatted="false">"锁定最近任务"</string>
+    <string name="ui_background_operation_guide" formatted="false">"后台运行说明"</string>
+    <string name="ui_notifications_are_blocked_enable_them" formatted="false">"通知未允许，建议开启"</string>
+    <string name="ui_app_notifications_are_allowed_but_the_service_notification_channel" formatted="false">"应用通知已允许，但运行通知类别已关闭"</string>
+    <string name="ui_service_notifications_are_allowed" formatted="false">"运行通知已允许"</string>
+    <string name="ui_exempt_from_system_battery_optimization" formatted="false">"已不受系统电池优化限制"</string>
+    <string name="ui_system_battery_optimization_still_applies" formatted="false">"仍受系统电池优化限制"</string>
+    <string name="ui_allow_background_activity_and_remove_app_battery_limits" formatted="false">"允许后台活动，关闭应用省电限制"</string>
+    <string name="ui_check_manufacturer_permissions_in_system_settings" formatted="false">"厂商权限，需到系统中确认"</string>
+    <string name="ui_keep_the_app_task_to_reduce_accidental_cleanup" formatted="false">"保留任务卡片，减少一键清理影响"</string>
+    <string name="ui_view_setup_steps_and_limitations">"查看 %1$s 设置步骤与限制"</string>
+    <string name="ui_vivo_iqoo_settings_battery_background_power_consumption_management_find" formatted="false">"vivo / iQOO：设置 → 电池 → 后台耗电管理，找到本应用并选择“允许后台高耗电”；在 i 管家 → 应用管理 → 权限管理 → 自启动，允许本应用。不同系统版本也可能位于“应用与权限”。"</string>
+    <string name="ui_xiaomi_redmi_settings_apps_manage_apps_this_app_enable" formatted="false">"小米 / Redmi：设置 → 应用设置 → 应用管理 → 本应用，开启“自启动”；在“省电策略”选择“无限制”。HyperOS 可在“后台自启动”管理中开启。"</string>
+    <string name="ui_huawei_honor_settings_apps_app_launch_disable_automatic_management" formatted="false">"华为 / 荣耀：设置 → 应用 → 应用启动管理，关闭本应用的自动管理，手动允许“自启动、关联启动、后台活动”；电池设置中允许后台运行。"</string>
+    <string name="ui_oppo_realme_oneplus_settings_apps_app_management_this_app" formatted="false">"OPPO / realme / 一加：设置 → 应用 → 应用管理 → 本应用，开启“允许自启动、允许关联启动、允许后台活动”；在电池耗电管理中选择“不限制”。"</string>
+    <string name="ui_samsung_settings_apps_this_app_battery_unrestricted_in_device" formatted="false">"三星：设置 → 应用程序 → 本应用 → 电池，选择“不受限制”；在设备维护 → 电池 → 后台使用限制中，将本应用加入“从不休眠的应用程序”。"</string>
+    <string name="ui_settings_apps_this_app_battery_choose_unrestricted_or_allow" formatted="false">"设置 → 应用 → 本应用 → 电池，选择“不受限制”或“允许后台活动”。如果系统有自启动、后台耗电或应用启动管理，请允许本应用。"</string>
+    <string name="ui_1_open_notification_settings_for_this_app_and_allow" formatted="false">"1. 打开本应用通知设置，允许发送通知。\n2. 向下查看通知类别，保持“本地服务运行”开启。部分系统把类别设置合并在应用通知页中。\n3. 服务启动后检查通知栏，可查看状态和停止服务。"</string>
+    <string name="ui_1_use_the_button_below_to_request_exemption_from" formatted="false">"1. 点击下方按钮，直接申请本应用不受系统电池优化限制。\n2. 在系统确认窗口选择“允许”。若已经允许，将打开优化列表，可切换“所有应用”查看。\n3. 返回后本页自动刷新系统状态。厂商后台耗电还需单独设置。"</string>
+    <string name="ui_1_open_manufacturer_background_battery_management_and_find_this" formatted="false">"1. 打开厂商后台耗电管理，找到本应用。\n2. 选择“允许后台高耗电 / 无限制 / 不限制”，或允许后台活动。\n3. 也可打开“本应用电池设置”，检查单应用限制。"</string>
+    <string name="ui_allowing_auto_start_and_secondary_launch_helps_the_system" formatted="false">"允许本应用自启动、关联启动，有助于系统在后台恢复应用。该授权不等于本应用已经设置开机运行；设备重启后请解锁并打开应用确认服务。"</string>
+    <string name="ui_1_return_to_the_home_screen_then_open_recent" formatted="false">"1. 点击下方按钮返回桌面，再使用最近任务键或手势打开任务列表。\n2. 找到本应用卡片，通过长按、菜单或下拉卡片选择“锁定”。\n3. 以后清理任务时保留此卡片。\n\n系统没有通用的直接锁定接口，需在任务列表中操作。"</string>
+    <string name="ui_check_notifications_battery_optimization_background_battery_limits_auto" formatted="false">"推荐依次检查通知、电池优化、后台耗电、自启动与最近任务锁定。运行时保持服务通知，不要在系统应用详情中强行停止。"</string>
+    <string name="ui_n_nsetting_names_vary_by_system_version_auto_start">"%1$s\n\n%2$s设置名称随系统版本不同。自启动、后台耗电和任务锁定通常没有公开查询接口，请在系统页面确认；它们不能保证系统强行停止后自动恢复。"</string>
+    <string name="ui_open_app_notification_settings" formatted="false">"打开本应用通知设置"</string>
+    <string name="ui_view_battery_optimization_list" formatted="false">"查看电池优化列表"</string>
+    <string name="ui_request_battery_exemption" formatted="false">"申请本应用不优化"</string>
+    <string name="ui_open_background_battery_settings" formatted="false">"打开后台耗电设置"</string>
+    <string name="ui_open_app_details_and_follow_the_steps" formatted="false">"打开应用详情并按步骤设置"</string>
+    <string name="ui_open_auto_start_management" formatted="false">"打开自启动管理"</string>
+    <string name="ui_go_home_then_lock_the_recent_task" formatted="false">"返回桌面后锁定任务"</string>
+    <string name="ui_ok" formatted="false">"知道了"</string>
+    <string name="ui_page_zoom" formatted="false">"页面缩放"</string>
+    <string name="ui_data_and_uninstallation" formatted="false">"数据与卸载说明"</string>
+    <string name="ui_uninstalling_the_app_or_selecting_clear_data_deletes_the" formatted="false">"卸载应用或在系统中“清除数据”，会删除运行环境、配置、数据库、QQ 登录资料，以及应用内的全部本机备份。"</string>
+    <string name="ui_before_uninstalling_clearing_data_or_moving_to_another_phone" formatted="false">"准备卸载、清除数据或换手机前，请先导出便携备份到应用外，并确认文件已保存。"</string>
+    <string name="ui_portable_backups_contain_configuration_and_credentials_but_exclude_qq" formatted="false">"便携备份包含业务配置和密钥，不含 QQ 登录会话，只能导入相同运行组合。换机或卸载重装后需要重新登录 QQ。请妥善保管备份文件。"</string>
+    <string name="ui_for_normal_updates_install_an_apk_with_the_same" formatted="false">"正常更新请使用同包名、同签名的 APK 覆盖安装，保留应用数据。"</string>
+    <string name="ui_open_portable_backups" formatted="false">"前往便携备份"</string>
+    <string name="ui_close" formatted="false">"关闭"</string>
+    <string name="ui_environment_check_and_repair" formatted="false">"环境检查与修复"</string>
+    <string name="ui_checking_runtime_resources_and_webui_configuration_this_does_not" formatted="false">"正在检查运行资源和后台配置，不会启动 AstrBot / NapCat 或重置配置。"</string>
+    <string name="ui_checked_at">"检查于 %1$s"</string>
+    <string name="ui_passed" formatted="false">"通过"</string>
+    <string name="ui_notice" formatted="false">"提示"</string>
+    <string name="ui_action_needed" formatted="false">"需处理"</string>
+    <string name="ui_repair_runtime_resources" formatted="false">"修复运行资源"</string>
+    <string name="ui_runtime_upgrade_and_rollback" formatted="false">"运行环境升级与回退"</string>
+    <string name="ui_check_again" formatted="false">"重新检查"</string>
+    <string name="ui_ssh_terminal" formatted="false">"SSH 终端"</string>
+    <string name="ui_connection" formatted="false">"连接信息"</string>
+    <string name="ui_login_password" formatted="false">"登录密码"</string>
+    <string name="ui_help_and_uninstall" formatted="false">"使用说明与卸载"</string>
+    <string name="ui_paused_for_maintenance" formatted="false">"维护暂停"</string>
+    <string name="ui_running" formatted="false">"运行中"</string>
+    <string name="ui_not_installed" formatted="false">"未安装"</string>
+    <string name="ui_stopped" formatted="false">"已停止"</string>
+    <string name="ui_back" formatted="false">"返回"</string>
+    <string name="ui_runtime_extensions" formatted="false">"运行扩展"</string>
+    <string name="ui_manage_optional_ubuntu_features" formatted="false">"管理 Ubuntu 的可选功能"</string>
+    <string name="ui_available_extensions" formatted="false">"已提供的扩展"</string>
+    <string name="ui_remote_ubuntu_access_included_with_the_app" formatted="false">"远程进入 Ubuntu · 随应用内置"</string>
+    <string name="ui_manage_runtime_extensions_here_manage_bot_plugins_in_the" formatted="false">"此处管理运行环境扩展。机器人业务插件请在 AstrBot 后台管理。"</string>
+    <string name="ui_unable_to_read_the_password_set_a_new_password" formatted="false">"密码无法读取，请重新设置密码或重装扩展"</string>
+    <string name="ui_ssh_password" formatted="false">"SSH 密码"</string>
+    <string name="ui_uninstall_the_ssh_extension" formatted="false">"卸载 SSH 扩展？"</string>
+    <string name="ui_ssh_will_stop_and_terminal_sessions_will_disconnect_the" formatted="false">"将停止 SSH、断开终端，并删除 SSH 密码、主机密钥和连接设置。AstrBot、NapCat 和 Ubuntu 数据会保留。内置资源随 APK 保留，可随时重新安装。"</string>
+    <string name="ui_uninstall" formatted="false">"卸载"</string>
+    <string name="ui_ssh_host_fingerprint" formatted="false">"SSH 主机指纹"</string>
+    <string name="ui_the_host_fingerprint_is_generated_when_ssh_starts_for" formatted="false">"首次启动 SSH 后生成主机指纹"</string>
+    <string name="ui_disconnected_during_maintenance" formatted="false">"维护中，暂时断开"</string>
+    <string name="ui_service_running" formatted="false">"服务运行中"</string>
+    <string name="ui_installed_not_started" formatted="false">"已安装 · 未启动"</string>
+    <string name="ui_not_installed_yet" formatted="false">"尚未安装"</string>
+    <string name="ui_remote_access_to_ubuntu_controlled_independently_of_astrbot_and" formatted="false">"远程进入 Ubuntu，与 AstrBot、NapCat 分别启停。"</string>
+    <string name="ui_install_ssh" formatted="false">"安装 SSH 扩展"</string>
+    <string name="ui_stop_ssh" formatted="false">"停止 SSH"</string>
+    <string name="ui_start_ssh" formatted="false">"启动 SSH"</string>
+    <string name="ui_username_port_and_connection_command" formatted="false">"登录账号、端口与连接命令"</string>
+    <string name="ui_show_hide_and_copy_the_password" formatted="false">"显示、隐藏和复制密码"</string>
+    <string name="ui_edit_ssh_settings" formatted="false">"修改 SSH 设置"</string>
+    <string name="ui_port_lan_access_and_password" formatted="false">"端口、局域网与密码"</string>
+    <string name="ui_terminal_help_and_extension_management" formatted="false">"终端使用说明和扩展管理"</string>
+    <string name="ui_username_root" formatted="false">"登录账号：root"</string>
+    <string name="ui_port">"端口：%1$s · %2$s"</string>
+    <string name="ui_lan_access_enabled" formatted="false">"局域网可访问"</string>
+    <string name="ui_this_device_only" formatted="false">"仅本机访问"</string>
+    <string name="ui_view_host_fingerprint" formatted="false">"查看主机指纹"</string>
+    <string name="ui_copy_local_ssh_command" formatted="false">"复制本机连接命令"</string>
+    <string name="ui_copy_lan_ssh_command" formatted="false">"复制局域网连接命令"</string>
+    <string name="ui_ssh_connection_command" formatted="false">"SSH 连接命令"</string>
+    <string name="ui_ssh_login_password" formatted="false">"SSH 登录密码"</string>
+    <string name="ui_show_ssh_password" formatted="false">"显示 SSH 密码"</string>
+    <string name="ui_hide_ssh_password" formatted="false">"隐藏 SSH 密码"</string>
+    <string name="ui_copy_password" formatted="false">"复制密码"</string>
+    <string name="ui_hidden_automatically_when_you_leave_this_page_or_switch" formatted="false">"离开此页或切到后台后自动隐藏。修改密码并保存设置会断开已有 SSH 连接。"</string>
+    <string name="ui_help" formatted="false">"使用说明"</string>
+    <string name="ui_verify_the_host_fingerprint_on_first_connection_the_root" formatted="false">"首次连接时请核对主机指纹。root 是 Ubuntu 中的账号，不代表手机已获取 Root 权限。\n\n维护、备份和更新会临时断开 SSH，完成后按原偏好恢复。操作前请保存终端工作。\n\n支持交互终端和远程命令，暂不提供 SFTP。"</string>
+    <string name="ui_uninstall_ssh" formatted="false">"卸载 SSH 扩展"</string>
+    <string name="ui_ssh_settings" formatted="false">"SSH 设置"</string>
+    <string name="ui_ssh_port" formatted="false">"SSH 端口"</string>
+    <string name="ui_allow_lan_connections" formatted="false">"允许局域网连接"</string>
+    <string name="ui_devices_on_the_same_network_can_access_ubuntu_using" formatted="false">"同一网络内的设备可使用密码进入 Ubuntu，请在可信网络中开启。"</string>
+    <string name="ui_new_password_leave_blank_to_keep_current" formatted="false">"新密码（留空保留原密码）"</string>
+    <string name="ui_toggle_new_password_visibility" formatted="false">"切换新密码可见性"</string>
+    <string name="ui_use_12_128_characters_saving_disconnects_existing_ssh_sessions" formatted="false">"密码 12–128 个字符。保存后会断开已有 SSH 连接；正在运行的 SSH 会重新启动。"</string>
+    <string name="ui_save" formatted="false">"保存"</string>
+    <string name="ui_copied">"已复制%1$s"</string>
+    <string name="ui_redacted_logs_exported" formatted="false">"脱敏日志已导出"</string>
+    <string name="ui_log_export_failed_please_retry" formatted="false">"日志导出失败，请重试"</string>
+    <string name="ui_export_interrupted_export_the_logs_again" formatted="false">"导出已中断，请重新导出日志"</string>
+    <string name="ui_logs">"%1$s日志"</string>
+    <string name="ui_current_logs" formatted="false">"当前日志"</string>
+    <string name="ui_resume" formatted="false">"继续刷新"</string>
+    <string name="ui_pause" formatted="false">"暂停刷新"</string>
+    <string name="ui_copy" formatted="false">"复制当前"</string>
+    <string name="ui_export" formatted="false">"导出"</string>
+    <string name="ui_paused_select_text_to_copy" formatted="false">"已暂停 · 可选择文字复制"</string>
+    <string name="ui_following_latest_logs_refreshing_every_2_seconds" formatted="false">"实时跟随最新日志 · 每 2 秒刷新"</string>
+    <string name="ui_log_content" formatted="false">"日志内容"</string>
+    <string name="ui_no_logs_yet" formatted="false">"暂无日志"</string>
+    <string name="ui_copy_the_displayed_content_or_export_all_retained_redacted" formatted="false">"复制当前显示内容；导出保留范围内的完整脱敏日志。"</string>
+    <string name="ui_settings" formatted="false">"设置"</string>
+    <string name="ui_astrbot_updates" formatted="false">"AstrBot 程序更新"</string>
+    <string name="ui_napcat_updates" formatted="false">"NapCat 程序更新"</string>
+    <string name="ui_runtime_upgrades" formatted="false">"运行环境升级"</string>
+    <string name="ui_backup_and_restore" formatted="false">"备份与恢复"</string>
+    <string name="ui_portable_backups" formatted="false">"便携备份"</string>
+    <string name="ui_logs_and_diagnostics" formatted="false">"日志与诊断"</string>
+    <string name="ui_background_operation" formatted="false">"后台运行"</string>
+    <string name="ui_about" formatted="false">"关于"</string>
+    <string name="ui_overview" formatted="false">"概览"</string>
+    <string name="ui_connection_eebb5" formatted="false">"连接"</string>
+    <string name="ui_credentials" formatted="false">"凭据"</string>
+    <string name="ui_logs_894b8" formatted="false">"日志"</string>
+    <string name="ui_previous" formatted="false">"上一页"</string>
+    <string name="ui_next" formatted="false">"下一页"</string>
+    <string name="ui_operation_incomplete" formatted="false">"操作未完成"</string>
+    <string name="ui_operation_notice" formatted="false">"操作提示"</string>
+    <string name="ui_home_content" formatted="false">"首页内容"</string>
+    <string name="ui_initialize_runtime" formatted="false">"初始化环境"</string>
+    <string name="ui_view_card">"查看 %1$s 卡片"</string>
+    <string name="ui_my_services" formatted="false">"我的服务"</string>
+    <string name="ui_manage_connections_in_details" formatted="false">"点击详情管理连接"</string>
+    <string name="ui_system_network_status" formatted="false">"系统网络状态"</string>
+    <string name="ui_runtime_overview" formatted="false">"运行概况"</string>
+    <string name="ui_start_all" formatted="false">"启动全部"</string>
+    <string name="ui_stop_all" formatted="false">"停止全部"</string>
+    <string name="ui_restart_all" formatted="false">"重启全部"</string>
+    <string name="ui_service_details">"%1$s 服务详情"</string>
+    <string name="ui_initialize_the_runtime_to_use_the_webui" formatted="false">"初始化后可使用后台"</string>
+    <string name="ui_manage_models_platforms_and_plugins_in_the_webui" formatted="false">"模型、平台与插件，请进入后台管理"</string>
+    <string name="ui_onebot_to_astrbot" formatted="false">"OneBot 与 AstrBot："</string>
+    <string name="ui_not_configured" formatted="false">"尚未配置"</string>
+    <string name="ui_connecting" formatted="false">"连接中"</string>
+    <string name="ui_connected" formatted="false">"已连接"</string>
+    <string name="ui_disconnected" formatted="false">"未连接"</string>
+    <string name="ui_pending" formatted="false">"待确认"</string>
+    <string name="ui_webui" formatted="false">"打开后台"</string>
+    <string name="ui_open_webui">"%1$s 打开后台"</string>
+    <string name="ui_stop" formatted="false">"停止"</string>
+    <string name="ui_start" formatted="false">"启动"</string>
+    <string name="ui_details" formatted="false">"详情"</string>
+    <string name="ui_details_2ee06">"%1$s 详情"</string>
+    <string name="ui_extensions" formatted="false">"扩展组件"</string>
+    <string name="ui_ssh_terminal_and_other_optional_features" formatted="false">"SSH 终端、cpolar 等可选功能"</string>
+    <string name="ui_local_snapshots_portable_backups_and_limits" formatted="false">"本机快照、便携备份与容量"</string>
+    <string name="ui_runtime_logs_and_diagnostic_exports" formatted="false">"运行日志与诊断导出"</string>
+    <string name="ui_permissions_auto_start_and_battery_management" formatted="false">"权限、自启动与电池管理"</string>
+    <string name="ui_updates_app_version_and_licenses" formatted="false">"检查更新、应用版本与许可"</string>
+    <string name="ui_check_astrbot_updates" formatted="false">"检查 AstrBot 更新"</string>
+    <string name="ui_find_packages_compatible_with_the_current_runtime" formatted="false">"检查适配当前运行环境的程序包"</string>
+    <string name="ui_available_version_and_download" formatted="false">"在线版本与下载"</string>
+    <string name="ui_astrbot_download_or_reinstall">"AstrBot %1$s · 可下载或重新安装"</string>
+    <string name="ui_check_for_updates_to_view_release_notes_and_downloads" formatted="false">"点击检查后获取版本说明与下载"</string>
+    <string name="ui_import_update_package" formatted="false">"导入更新包"</string>
+    <string name="ui_select_a_signed_local_maintenance_package" formatted="false">"选择已签名的本地维护包"</string>
+    <string name="ui_view_prepared_update" formatted="false">"查看待安装更新"</string>
+    <string name="ui_no_update_package_prepared" formatted="false">"尚未准备更新包"</string>
+    <string name="ui_review_before_installation" formatted="false">"核对后确认安装"</string>
+    <string name="ui_roll_back_astrbot" formatted="false">"回退 AstrBot 程序"</string>
+    <string name="ui_restore_version">"回退到 %1$s"</string>
+    <string name="ui_no_program_rollback_available" formatted="false">"暂无程序回退点"</string>
+    <string name="ui_no_online_update_channel_configured" formatted="false">"尚未配置在线更新通道"</string>
+    <string name="ui_on_check_daily_when_opening_the_app" formatted="false">"已开启 · 打开应用时每天检查"</string>
+    <string name="ui_off_tap_to_configure" formatted="false">"已关闭 · 点击设置"</string>
+    <string name="ui_check_napcat_updates" formatted="false">"检查 NapCat 更新"</string>
+    <string name="ui_update_independently_without_reinstalling_the_app" formatted="false">"独立更新，无需重新安装管理器"</string>
+    <string name="ui_napcat_version_and_download" formatted="false">"NapCat 在线版本与下载"</string>
+    <string name="ui_napcat_official_upstream_package">"NapCat %1$s · 上游正式程序包"</string>
+    <string name="ui_install_napcat_update" formatted="false">"安装 NapCat 更新"</string>
+    <string name="ui_verified_back_up_before_installing">"已校验 %1$s · 先备份再安装"</string>
+    <string name="ui_download_and_verify_a_package_first" formatted="false">"先下载并校验程序包"</string>
+    <string name="ui_roll_back_napcat" formatted="false">"回退 NapCat 程序"</string>
+    <string name="ui_restore_and_its_data">"回退到 %1$s 及对应数据"</string>
+    <string name="ui_no_napcat_rollback_available" formatted="false">"暂无 NapCat 回退点"</string>
+    <string name="ui_distinguish_runtime_issues_from_webui_configuration_issues" formatted="false">"区分运行资源与后台配置问题"</string>
+    <string name="ui_upgrade_bundled_runtime" formatted="false">"升级 APK 内置环境"</string>
+    <string name="ui_runtime_matches_the_bundled_resources" formatted="false">"当前环境已匹配内置资源"</string>
+    <string name="ui_roll_back_the_entire_runtime" formatted="false">"回退整个运行环境"</string>
+    <string name="ui_no_runtime_rollback_available" formatted="false">"暂无环境回退点"</string>
+    <string name="ui_restore_the_previous_runtime_and_its_data" formatted="false">"恢复旧环境及对应数据"</string>
+    <string name="ui_create_local_backup" formatted="false">"创建本机备份"</string>
+    <string name="ui_includes_qq_sessions_services_resume_afterward" formatted="false">"含 QQ 会话 · 完成后恢复服务"</string>
+    <string name="ui_manage_backups">"备份管理（%1$s）"</string>
+    <string name="ui_view_restore_and_delete_local_backups" formatted="false">"查看、恢复与删除本机备份"</string>
+    <string name="ui_automatic_snapshot_limits" formatted="false">"自动快照上限"</string>
+    <string name="ui_keep_remove_oldest_snapshots_automatically">"%1$s 份 · 自动清理最旧快照"</string>
+    <string name="ui_transfer_between_devices_excludes_qq_sessions" formatted="false">"跨设备导入导出 · 不含 QQ 会话"</string>
+    <string name="ui_save_backups_outside_the_app_before_uninstalling" formatted="false">"卸载前先将备份保存到应用外"</string>
+    <string name="ui_export_portable_backup" formatted="false">"导出便携备份"</string>
+    <string name="ui_save_configuration_and_data_to_a_file" formatted="false">"保存配置与数据到文件"</string>
+    <string name="ui_import_portable_backup" formatted="false">"导入便携备份"</string>
+    <string name="ui_select_a_zip_and_review_what_will_be_restored" formatted="false">"选择 ZIP 并核对恢复范围"</string>
+    <string name="ui_view_import_scope" formatted="false">"查看导入范围"</string>
+    <string name="ui_no_backup_file_selected" formatted="false">"尚未选择备份文件"</string>
+    <string name="ui_review_before_restoring" formatted="false">"核对后确认恢复"</string>
+    <string name="ui_discard_pending_import" formatted="false">"移除待导入备份"</string>
+    <string name="ui_remove_only_the_pending_temporary_copy" formatted="false">"仅移除待处理的临时副本"</string>
+    <string name="ui_check_resources_dependencies_and_webui_settings" formatted="false">"检查资源、依赖与后台配置"</string>
+    <string name="ui_storage_usage" formatted="false">"存储使用"</string>
+    <string name="ui_view_data_cache_and_backup_sizes" formatted="false">"查看数据、缓存和备份占用"</string>
+    <string name="ui_manager_logs" formatted="false">"管理器日志"</string>
+    <string name="ui_service_controls_updates_and_backup_events" formatted="false">"启停、更新与备份记录"</string>
+    <string name="ui_runtime_logs" formatted="false">"运行环境日志"</string>
+    <string name="ui_initialization_and_runtime_maintenance" formatted="false">"初始化与环境维护记录"</string>
+    <string name="ui_export_diagnostics" formatted="false">"导出诊断包"</string>
+    <string name="ui_device_information_status_and_redacted_logs" formatted="false">"设备信息、状态和脱敏日志"</string>
+    <string name="ui_allow_status_notifications_and_notification_channels" formatted="false">"允许状态通知与通知类别"</string>
+    <string name="ui_check_system_battery_optimization" formatted="false">"检查系统电池优化状态"</string>
+    <string name="ui_guidance_for_this_phone_s_system" formatted="false">"按当前手机系统引导设置"</string>
+    <string name="ui_manufacturer_permissions_and_manual_checks" formatted="false">"厂商权限与手动确认"</string>
+    <string name="ui_reduce_accidental_task_cleanup" formatted="false">"防止一键清理误关"</string>
+    <string name="ui_setup_recommendations_and_runtime_limitations" formatted="false">"查看设置建议和运行限制"</string>
+    <string name="ui_check_for_updates" formatted="false">"检查更新"</string>
+    <string name="ui_app_apk_updates_and_installation" formatted="false">"管理器 APK 更新与安装"</string>
+    <string name="ui_app_and_component_versions" formatted="false">"应用与组件版本"</string>
+    <string name="ui_release_notes_maintenance_packages_and_rollback" formatted="false">"在线说明、维护包与程序回退"</string>
+    <string name="ui_independent_updates_retaining_configuration_and_sessions" formatted="false">"独立更新、保留配置与会话"</string>
+    <string name="ui_qq_python_and_underlying_dependencies" formatted="false">"QQ、Python 与底层依赖"</string>
+    <string name="ui_third_party_licenses" formatted="false">"第三方许可"</string>
+    <string name="ui_open_source_licenses_and_source_materials" formatted="false">"开源许可与来源材料"</string>
+    <string name="ui_settings_content" formatted="false">"设置内容"</string>
+    <string name="ui_all" formatted="false">"全部"</string>
+    <string name="ui_unable_to_read_the_persona_library" formatted="false">"无法读取人设库"</string>
+    <string name="ui_persona_library_content" formatted="false">"人设库内容"</string>
+    <string name="ui_give_your_chats_a_new_personality" formatted="false">"给聊天换个性格"</string>
+    <string name="ui_local_personas_add_delete_and_switch">"%1$s 款本地人设 · 可添加、删除和切换"</string>
+    <string name="ui_restore_previous" formatted="false">"恢复上次"</string>
+    <string name="ui_default">"默认：%1$s"</string>
+    <string name="ui_not_loaded_yet" formatted="false">"尚未读取"</string>
+    <string name="ui_marketplace" formatted="false">"人设市场 ↗"</string>
+    <string name="ui_open_external_persona_marketplace" formatted="false">"打开外部人设市场"</string>
+    <string name="ui_search_personas" formatted="false">"搜索人设，例如 大肥鱼"</string>
+    <string name="ui_loading_personas" formatted="false">"正在读取人设…"</string>
+    <string name="ui_no_personas_yet_select_add_persona_to_create_one" formatted="false">"还没有人设，点击“新增人设”添加"</string>
+    <string name="ui_no_matching_personas" formatted="false">"没有找到匹配的人设"</string>
+    <string name="ui_retry" formatted="false">"重试"</string>
+    <string name="ui_persona_card_list" formatted="false">"人设卡片列表"</string>
+    <string name="ui_preview_persona">"预览人设 %1$s"</string>
+    <string name="ui_in_use">"正在使用 · %1$s"</string>
+    <string name="ui_added">"已添加 · %1$s"</string>
+    <string name="ui_view_persona">"%1$s · 查看人设 ›"</string>
+    <string name="ui_personas_scroll_to_browse">"%1$s 款人设 · 上下滑动浏览"</string>
+    <string name="ui_greeting_example">"开场示例：%1$s"</string>
+    <string name="ui_add_only" formatted="false">"仅添加"</string>
+    <string name="ui_set_default" formatted="false">"设为默认"</string>
+    <string name="ui_copy_prompt" formatted="false">"复制提示词"</string>
+    <string name="ui_source" formatted="false">"参考来源"</string>
+    <string name="ui_delete_persona">"删除人设 %1$s"</string>
+    <string name="ui_delete" formatted="false">"删除"</string>
+    <string name="ui_astrbot_webui" formatted="false">"AstrBot 后台"</string>
+    <string name="ui_restore_previous_default_persona" formatted="false">"恢复上次默认人设"</string>
+    <string name="ui_apply">"应用 %1$s"</string>
+    <string name="ui_this_will_astrbot_briefly_stops_then_resumes_its_previous">"将%1$s。操作期间 AstrBot 会短暂停止，完成后恢复原运行状态，NapCat 继续运行。\n\n已有同名人设及后台修改会保留。会话单独指定的人设不变，建议新建会话体验。"</string>
+    <string name="ui_add_this_persona_to_astrbot_without_changing_the_default" formatted="false">"添加到 AstrBot 人设列表，保持当前默认人设"</string>
+    <string name="ui_restore_the_previous_default_persona" formatted="false">"恢复上一次默认人设"</string>
+    <string name="ui_add_this_persona_and_make_it_the_default" formatted="false">"添加并设为默认人设"</string>
+    <string name="ui_apply_a62df" formatted="false">"确认应用"</string>
+    <string name="ui_unable_to_save_please_retry" formatted="false">"保存失败，请重试"</string>
+    <string name="ui_delete_persona_f6f53" formatted="false">"删除人设？"</string>
+    <string name="ui_remove_from_the_local_list_copies_already_added_to">"将从本地列表删除“%1$s”。已添加到 AstrBot 的副本和当前默认人设会保留，可在 AstrBot 后台管理。"</string>
+    <string name="ui_unable_to_delete_please_retry" formatted="false">"删除失败，请重试"</string>
+    <string name="ui_deleting" formatted="false">"正在删除…"</string>
+    <string name="ui_confirm_deletion" formatted="false">"确认删除"</string>
+    <string name="ui_home" formatted="false">"首页"</string>
+    <string name="ui_personas" formatted="false">"人设"</string>
+    <string name="ui_go_back" formatted="false">"返回上一级"</string>
+    <string name="ui_manager" formatted="false">"运行管理"</string>
+    <string name="ui_page">"%1$s页面"</string>
+    <string name="ui_app_icon" formatted="false">"应用图标"</string>
+    <string name="ui_logo">"%1$s 标识"</string>
+    <string name="ui_starting" formatted="false">"启动中"</string>
+    <string name="ui_stopping" formatted="false">"停止中"</string>
+    <string name="ui_crashed" formatted="false">"异常退出"</string>
+    <string name="ui_service_overview" formatted="false">"服务概览"</string>
+    <string name="ui_both_service_processes_are_running" formatted="false">"两个服务进程运行中"</string>
+    <string name="ui_start_your_bot_services_on_this_phone" formatted="false">"启动服务，开启手机上的机器人"</string>
+    <string name="ui_some_services_are_running" formatted="false">"部分服务正在运行"</string>
+    <string name="ui_running_services_2">"运行中的服务：%1$s / 2"</string>
+    <string name="ui_app_memory" formatted="false">"本应用内存"</string>
+    <string name="ui_device_ram" formatted="false">"手机总内存"</string>
+    <string name="ui_app_share" formatted="false">"应用占比"</string>
+    <string name="ui_reading_resource_usage" formatted="false">"正在读取资源信息"</string>
+    <string name="ui_measured_processes">"已统计 %1$s 个进程"</string>
+    <string name="ui_partial_processes">"部分统计 · %1$s/%2$s 个进程"</string>
+    <string name="ui_memory_usage_unavailable" formatted="false">"暂时无法读取内存"</string>
+    <string name="ui_about_resource_usage" formatted="false">"资源统计说明"</string>
+    <string name="ui_app_memory_is_the_total_pss_of_the_manager" formatted="false">"本应用内存为管理器及同一应用用户下托管进程的 PSS 合计，共享内存按比例计算。包含 AstrBot、NapCat 和运行中的扩展；不含系统隔离的 WebView 渲染进程。\n\n手机总内存是 Android 报告的物理内存，不含存储和内存扩展。应用占比为完整 PSS 合计除以手机总内存；部分统计或读取失败时不显示占比。\n\n首页可见时每 15 秒更新，离开首页或进入后台暂停。存储容量可在设置的存储使用页查看。"</string>
+    <string name="ui_service_page">"服务%1$s页面"</string>
+    <string name="ui_service_details_content" formatted="false">"服务详情内容"</string>
+    <string name="ui_version">"版本 %1$s"</string>
+    <string name="ui_unknown" formatted="false">"未知"</string>
+    <string name="ui_start_a820c">"启动 %1$s"</string>
+    <string name="ui_stop_b02dd">"停止 %1$s"</string>
+    <string name="ui_restart" formatted="false">"重启"</string>
+    <string name="ui_restart_e3383">"重启 %1$s"</string>
+    <string name="ui_none" formatted="false">"暂无"</string>
+    <string name="ui_no_records" formatted="false">"暂无记录"</string>
+    <string name="ui_runtime_status" formatted="false">"运行状态"</string>
+    <string name="ui_history">"%1$s 运行记录"</string>
+    <string name="ui_last_checked_n_nlast_issue_n_nlast_recovery_n">"最近检查：%1$s\n\n最近异常：%2$s\n\n最近恢复：%3$s\n\n记录仅表示当时的观测结果，当前运行情况以上方状态为准。"</string>
+    <string name="ui_last_check">"最近检查 %1$s"</string>
+    <string name="ui_last_recovery">"最近恢复 %1$s"</string>
+    <string name="ui_last_issue">"最近异常 %1$s"</string>
+    <string name="ui_local_webui_address" formatted="false">"本机后台地址"</string>
+    <string name="ui_generated_on_first_start" formatted="false">"首次启动后生成"</string>
+    <string name="ui_copy_address" formatted="false">"复制地址"</string>
+    <string name="ui_webui_address" formatted="false">"后台地址"</string>
+    <string name="ui_browser" formatted="false">"外部浏览器"</string>
+    <string name="ui_lan_access" formatted="false">"局域网访问"</string>
+    <string name="ui_on_accessible_on_the_same_network" formatted="false">"已开启 · 同一网络可访问"</string>
+    <string name="ui_access_restricted_to_this_phone" formatted="false">"仅允许手机本机访问"</string>
+    <string name="ui_disable_lan_access">"关闭 %1$s 局域网访问"</string>
+    <string name="ui_enable_lan_access">"开启 %1$s 局域网访问"</string>
+    <string name="ui_no_address_available_connect_to_wi_fi_or_ethernet" formatted="false">"暂无地址，请连接 Wi-Fi 或以太网"</string>
+    <string name="ui_copy_lan_address" formatted="false">"复制局域网地址"</string>
+    <string name="ui_lan_address">"%1$s 局域网地址"</string>
+    <string name="ui_total">"（共 %1$s 个）"</string>
+    <string name="ui_view_logs" formatted="false">"查看日志"</string>
+    <string name="ui_login_credentials">"%1$s 登录凭据"</string>
+    <string name="ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first" formatted="false">"初始用户名：astrbot。首次登录会自动预填初始凭据；修改用户名或密码后不再预填，请使用你设置的账号。"</string>
+    <string name="ui_the_login_page_prefills_the_current_access_token_select" formatted="false">"登录页会预填当前访问口令，点击登录即可。离开此页或进入后台后，显示的口令会自动隐藏。"</string>
+    <string name="ui_loading_update_information" formatted="false">"正在读取更新信息"</string>
+    <string name="ui_read_apk_update_information" formatted="false">"读取 APK 更新信息"</string>
+    <string name="ui_manager_b28f4">"管理器 %1$s"</string>
+    <string name="ui_check_app_updates" formatted="false">"检查管理器更新"</string>
+    <string name="ui_find_verified_apk_releases" formatted="false">"获取已验证的 APK 版本"</string>
+    <string name="ui_release_notes" formatted="false">"版本说明"</string>
+    <string name="ui_no_applicable_updates" formatted="false">"暂无适用的新版本"</string>
+    <string name="ui_resume_apk_download" formatted="false">"继续下载 APK"</string>
+    <string name="ui_download_apk" formatted="false">"下载 APK"</string>
+    <string name="ui_verify_after_downloading_installation_is_separate" formatted="false">"下载后校验，暂不安装"</string>
+    <string name="ui_download_app_apk" formatted="false">"下载管理器 APK"</string>
+    <string name="ui_install_verified_apk" formatted="false">"安装已校验 APK"</string>
+    <string name="ui_confirm_installation_in_the_system_installer" formatted="false">"交给系统安装器确认"</string>
+    <string name="ui_allow_this_app_to_install_updates_first" formatted="false">"安装前需允许此应用安装更新"</string>
+    <string name="ui_clear_apk_downloads" formatted="false">"清理 APK 下载"</string>
+    <string name="ui_keep_the_current_app_bot_runtime_and_data" formatted="false">"保留当前应用、机器人环境与数据"</string>
+    <string name="ui_cancel_this_operation" formatted="false">"取消本次操作"</string>
+    <string name="ui_for_astrbot_updates_return_to_the_corresponding_entry_under" formatted="false">"AstrBot 程序更新请返回“关于”中的对应入口。"</string>
+    <string name="ui_update_information" formatted="false">"更新信息"</string>
+    <string name="ui_delete_incomplete_and_completed_app_apk_downloads_to_free" formatted="false">"删除未完成和已下载的管理器安装包，释放手机空间。"</string>
+    <string name="ui_clear" formatted="false">"清理"</string>
+    <string name="ui_install_app_update" formatted="false">"安装管理器更新"</string>
+    <string name="ui_services_will_briefly_stop_to_create_a_data_snapshot" formatted="false">"安装前先短暂停止服务创建数据快照，再恢复原启停设置。系统安装会重启应用，服务可能再次中断；更新后请重新打开应用。是否继续？"</string>
+    <string name="ui_continue_installation" formatted="false">"继续安装"</string>
+    <string name="ui_allow_update_installation" formatted="false">"允许安装更新"</string>
+    <string name="ui_allow_this_app_to_install_apks_in_system_settings" formatted="false">"在系统设置中允许本应用安装 APK，返回后再点击安装。系统仍会要求确认。"</string>
+    <string name="ui_unable_to_open_installation_permissions_allow_unknown_app_installation" formatted="false">"无法打开安装权限设置，请在系统应用设置中允许安装未知应用"</string>
+    <string name="ui_open_settings" formatted="false">"前往设置"</string>
+    <string name="ui_started">"%1$s · 开始"</string>
+    <string name="ui_finished">"%1$s · 完成"</string>
+    <string name="ui_cancelled_download_progress_retained">"%1$s · 取消，保留下载进度"</string>
+    <string name="ui_operation_cancelled_download_progress_is_retained_so_you_can" formatted="false">"本次操作已取消，下载进度保留，可稍后继续"</string>
+    <string name="ui_incomplete">"%1$s · 未完成（%2$s）"</string>
+    <string name="ui_update_incomplete_check_your_network_or_retry_later_the" formatted="false">"更新操作未完成，请检查网络或稍后重试，现有应用保持不变"</string>
+    <string name="ui_verify_apk_and_open_installer" formatted="false">"校验并打开 APK 安装器"</string>
+    <string name="ui_wait_for_the_current_runtime_operation_to_finish_before" formatted="false">"请等待当前环境操作完成后再安装"</string>
+    <string name="ui_verifying_apk_again" formatted="false">"正在重新校验 APK"</string>
+    <string name="ui_apk_update" formatted="false">"APK 更新"</string>
+    <string name="ui_opened_the_system_installer_if_you_cancel_select_install" formatted="false">"已交给系统安装器；若取消，可再次点击安装"</string>
+    <string name="ui_version_18ab8">"版本：%1$s"</string>
+    <string name="ui_developed_and_maintained_by">"开发与维护：%1$s"</string>
+    <string name="ui_project_license">"项目许可：%1$s"</string>
+    <string name="ui_author_s_github_profile" formatted="false">"作者 GitHub 主页"</string>
+    <string name="ui_astrbot_and_napcat_support_independent_online_updates_retaining_configur" formatted="false">"AstrBot 与 NapCat 支持独立在线更新，保留配置并提供回退。Linux QQ、Python 或底层依赖变化时，再升级匹配的运行环境。"</string>
+    <string name="ui_third_party_projects_retain_their_authorship_licenses_and_trademarks" formatted="false">"第三方项目保留各自作者、许可与商标，完整声明见“第三方许可”。"</string>
+    <string name="ui_reading_storage_information" formatted="false">"正在读取存储信息"</string>
+    <string name="ui_measurement_complete_files_in_use_may_continue_to_change" formatted="false">"统计已完成；运行中的文件可能继续变化"</string>
+    <string name="ui_license_materials_saved" formatted="false">"许可材料已保存"</string>
+    <string name="ui_license_materials_are_unavailable_check_the_project_releases_or" formatted="false">"许可材料暂不可用，请查看项目发行记录或重新安装完整包。"</string>
+    <string name="ui_unable_to_read_this_file_export_the_license_materials" formatted="false">"无法读取此文件，请导出许可材料后查看。"</string>
+    <string name="ui_back_to_manager" formatted="false">"返回管理器"</string>
+    <string name="ui_export_license_materials" formatted="false">"导出许可材料"</string>
+    <string name="ui_license_texts_and_source_records_bundled_with_this_apk" formatted="false">"当前安装包随附的许可原文与来源记录"</string>
+    <string name="ui_filter_filenames" formatted="false">"筛选文件名"</string>
+    <string name="ui_files">"%1$s 个文件"</string>
+    <string name="ui_back_to_file_list" formatted="false">"返回文件列表"</string>
+    <string name="ui_page_a43ad">"第 %1$s / %2$s 页"</string>
+    <string name="ui_the_page_was_recreated_select_the_file_to_upload" formatted="false">"页面已重建，请重新选择上传文件"</string>
+    <string name="ui_webui_66d31">"%1$s 后台"</string>
+    <string name="ui_models" formatted="false">"模型配置"</string>
+    <string name="ui_refresh" formatted="false">"刷新"</string>
+    <string name="ui_more_actions" formatted="false">"更多操作"</string>
+    <string name="ui_open_in_browser" formatted="false">"外部浏览器打开"</string>
+    <string name="ui_save_page_image" formatted="false">"保存页面图片"</string>
+    <string name="ui_close_webui" formatted="false">"关闭后台"</string>
+    <string name="ui_page_zoom_b29fc">"页面缩放 · %1$s%%"</string>
+    <string name="ui_webui_address_copied" formatted="false">"已复制后台地址"</string>
+    <string name="ui_connecting_to">"正在连接 %1$s…"</string>
+    <string name="ui_this_download_method_is_not_supported_yet_try_an" formatted="false">"此下载方式尚未支持，可尝试外部浏览器"</string>
+    <string name="ui_unable_to_read_the_file_generated_by_this_page" formatted="false">"无法读取网页生成的文件，可尝试外部浏览器"</string>
+    <string name="ui_unable_to_submit_the_request_return_to_home_and" formatted="false">"无法提交请求，请返回首页重试"</string>
+    <string name="ui_this_system_webview_does_not_support_this_download_update" formatted="false">"当前系统 WebView 不支持此下载，请更新 WebView 或使用外部浏览器"</string>
+    <string name="ui_web_download_timed_out_please_retry" formatted="false">"网页文件下载超时，请重试"</string>
+    <string name="ui_unable_to_capture_the_page_image_or_the_image" formatted="false">"页面图片未能捕获或过大，请调整显示后重试"</string>
+    <string name="ui_page_generated_files_must_use_base64_and_be_no" formatted="false">"网页生成的文件需为 Base64 格式且不超过 8 MB，可尝试外部浏览器"</string>
+    <string name="ui_export_interrupted_export_again" formatted="false">"导出已中断，请重新导出"</string>
+    <string name="ui_unable_to_prepare_the_export_check_available_space_and" formatted="false">"无法准备导出文件，请检查可用空间后重试"</string>
+    <string name="ui_the_webui_address_changed_export_again" formatted="false">"后台地址已变更，请重新导出"</string>
+    <string name="ui_page_image_saved" formatted="false">"页面图片已保存"</string>
+    <string name="ui_file_saved" formatted="false">"文件已保存"</string>
+    <string name="ui_export_expired_or_save_failed_export_again" formatted="false">"导出内容已失效或保存失败，请重新导出"</string>
+    <string name="ui_export_expired_export_again" formatted="false">"导出内容已失效，请重新导出"</string>
+    <string name="ui_download_endpoint_returned">"下载接口返回 %1$s"</string>
+    <string name="ui_download_exceeds_the_256_mb_limit" formatted="false">"下载文件超出 256 MB 限制"</string>
+    <string name="ui_download_incomplete_please_retry" formatted="false">"下载未完成，请重试"</string>
+    <string name="ui_you_may_need_to_sign_in_separately_in_the" formatted="false">"外部浏览器可能需要单独登录后台"</string>
+    <string name="ui_no_browser_available" formatted="false">"没有可用的浏览器"</string>
+    <string name="ui_runtime_not_ready" formatted="false">"运行环境尚未就绪"</string>
+    <string name="ui_webui_is_disabled">"%1$s 后台已关闭"</string>
+    <string name="ui_check_the_webui_address" formatted="false">"后台地址需要检查"</string>
+    <string name="ui_stopping_984e8">"正在停止 %1$s"</string>
+    <string name="ui_preparing">"正在准备 %1$s"</string>
+    <string name="ui_is_stopped">"%1$s 已停止"</string>
+    <string name="ui_crashed_8f2c0">"%1$s 异常退出"</string>
+    <string name="ui_webui_is_not_responding" formatted="false">"后台暂时无响应"</string>
+    <string name="ui_waiting_for_webui_readiness" formatted="false">"正在等待后台就绪"</string>
+    <string name="ui_webui_address_changed" formatted="false">"后台地址已更新"</string>
+    <string name="ui_webui_certificate_verification_failed" formatted="false">"后台证书未通过验证"</string>
+    <string name="ui_webui_loading_timed_out" formatted="false">"后台页面加载超时"</string>
+    <string name="ui_unable_to_load_the_webui" formatted="false">"后台页面加载失败"</string>
+    <string name="ui_return_to_home_to_check_or_initialize_the_runtime" formatted="false">"返回首页检查或完成运行环境初始化。"</string>
+    <string name="ui_return_to_home_to_check_webui_settings_existing_configuration" formatted="false">"请返回首页检查后台设置，现有配置会保留。"</string>
+    <string name="ui_processing_your_request_the_webui_opens_automatically_when_ready" formatted="false">"正在处理请求，后台就绪后会自动打开。"</string>
+    <string name="ui_start_this_service_to_continue_using_the_webui" formatted="false">"启动此服务后继续使用后台。"</string>
+    <string name="ui_try_restarting_the_service_or_view_logs_to_investigate" formatted="false">"可尝试重新启动，或查看日志了解退出原因。"</string>
+    <string name="ui_the_service_process_is_still_running_the_webui_opens" formatted="false">"服务进程仍在运行。后台就绪后会自动打开，也可以先查看日志。"</string>
+    <string name="ui_reopen_the_webui_to_use_its_current_configured_address" formatted="false">"重新打开后台以使用当前配置的地址。"</string>
+    <string name="ui_check_the_webui_https_certificate_or_use_an_external" formatted="false">"请检查后台 HTTPS 证书，或使用外部浏览器处理。"</string>
+    <string name="ui_the_page_did_not_finish_loading_within_45_seconds" formatted="false">"页面在 45 秒内未完成加载，可重试连接或查看日志。"</string>
+    <string name="ui_the_webui_did_not_return_a_page_retry_or" formatted="false">"后台未能返回页面，可重试连接或查看日志。"</string>
+    <string name="ui_connection_incomplete_please_retry_view_service_status_on_home" formatted="false">"连接未完成，请重试；服务运行状态可在首页查看。"</string>
+    <string name="ui_webui_recovery_page">"%1$s 后台恢复页"</string>
+    <string name="ui_start_service" formatted="false">"启动服务"</string>
+    <string name="ui_restart_service" formatted="false">"重启服务"</string>
+    <string name="ui_retry_connection" formatted="false">"重试连接"</string>
+    <string name="ui_reopen_webui" formatted="false">"重新打开后台"</string>
+    <string name="ui_back_to_home" formatted="false">"返回首页"</string>
+    <string name="ui_recent_logs" formatted="false">"最近日志"</string>
+    <string name="ui_no_logs_yet_check_the_runtime_on_home" formatted="false">"暂无日志，可在首页检查运行环境。"</string>
+    <string name="ui_network_status_unknown" formatted="false">"网络状态待确认"</string>
+    <string name="ui_network_disconnected" formatted="false">"网络已断开"</string>
+    <string name="ui_network_sign_in_required" formatted="false">"网络需要认证"</string>
+    <string name="ui_internet_access_unverified" formatted="false">"外网连接待确认"</string>
+    <string name="ui_network_connected" formatted="false">"网络已连通"</string>
+    <string name="ui_system_network_status_is_unavailable_local_webui_health_is" formatted="false">"暂时无法确认系统网络，本机后台状态单独检查。"</string>
+    <string name="ui_no_default_network_qq_models_and_online_updates_may" formatted="false">"当前没有默认网络，QQ、模型和在线更新可能无法连接；本机后台可继续使用。"</string>
+    <string name="ui_complete_network_sign_in_in_system_settings_then_check" formatted="false">"请先在系统中完成网络认证，再检查 QQ 和模型连接。"</string>
+    <string name="ui_the_system_has_not_confirmed_internet_access_check_your" formatted="false">"系统尚未确认互联网可用，请检查网络；本机后台可继续使用。"</string>
+    <string name="ui_the_system_confirmed_internet_access_qq_onebot_and_model" formatted="false">"系统已确认互联网连接，QQ、OneBot 和模型需分别检查。"</string>
+    <string name="ui_storage_not_checked" formatted="false">"存储待检查"</string>
+    <string name="ui_storage_space_normal" formatted="false">"存储空间正常"</string>
+    <string name="ui_storage_space_low" formatted="false">"存储空间偏低"</string>
+    <string name="ui_storage_critically_low" formatted="false">"存储空间严重不足"</string>
+    <string name="ui_view_usage_in_settings_logs_and_diagnostics_storage_usage">"%1$s，请在设置的“日志与诊断 → 存储使用”查看占用"</string>
+    <string name="ui_a_warning_appears_below_512_mib_of_free_internal" formatted="false">"手机内部存储可用空间低于 512 MiB 时提醒，低于 128 MiB 时标记严重不足。"</string>
+    <string name="ui_free_other_phone_files_or_review_and_delete_unneeded" formatted="false">"请先释放手机其他文件，或在备份管理中核对后删除不再需要的备份；已下载的管理器 APK 可在检查更新页清理。"</string>
+    <string name="ui_do_not_use_the_system_clear_data_action_it" formatted="false">"不要使用系统“清除数据”：它会删除运行环境、配置和账号资料。"</string>
+    <string name="ui_warnings_do_not_automatically_stop_services_or_delete_qq" formatted="false">"提醒不会自动停止服务或删除 QQ 缓存、会话、数据库及未知文件。更新和备份继续执行各自的准确空间检查。"</string>
+    <string name="ui_apk_launch_components" formatted="false">"APK 启动组件"</string>
+    <string name="ui_bundled_launch_files_are_readable_and_executable" formatted="false">"内置启动文件可读取和执行"</string>
+    <string name="ui_apk_launch_components_are_missing_or_not_executable_install" formatted="false">"APK 启动组件缺失或不可执行，请覆盖安装同签名 APK，保留应用数据"</string>
+    <string name="ui_runtime_installation_record" formatted="false">"环境安装记录"</string>
+    <string name="ui_complete_runtime_recognized" formatted="false">"已识别完整运行环境"</string>
+    <string name="ui_complete_initialization_is_unfinished_or_its_record_is_unrecognized" formatted="false">"未完成完整环境初始化，或安装记录无法识别；已有文件会保留"</string>
+    <string name="ui_maintenance_recovery_records" formatted="false">"维护恢复记录"</string>
+    <string name="ui_an_unfinished_operation_exists_return_to_the_manager_to" formatted="false">"存在未完成操作，请返回管理页处理恢复后重新检查；本次检查不更改操作记录"</string>
+    <string name="ui_no_pending_maintenance_recovery_found" formatted="false">"未发现待恢复的维护记录"</string>
+    <string name="ui_python_virtual_environment" formatted="false">"Python 虚拟环境"</string>
+    <string name="ui_astrbot_entry_point" formatted="false">"AstrBot 入口"</string>
+    <string name="ui_runtime_resource_files" formatted="false">"运行资源文件"</string>
+    <string name="ui_key_entry_files_exist_this_does_not_verify_complete" formatted="false">"关键入口文件存在；不等同于完整文件摘要或业务验证"</string>
+    <string name="ui_missing_or_unreadable">"缺失或不可读取：%1$s"</string>
+    <string name="ui_version_and_backup_identity" formatted="false">"版本与备份标识"</string>
+    <string name="ui_component_combination_and_backup_compatibility_identity_are_readable" formatted="false">"可读取当前组件组合和备份兼容标识"</string>
+    <string name="ui_version_information_is_incomplete_so_a_repair_transaction_cannot" formatted="false">"版本依据不完整，不能安全地创建修复事务；请导出诊断并使用匹配的维护资源"</string>
+    <string name="ui_webui_configuration">"%1$s 后台配置"</string>
+    <string name="ui_not_created_yet_first_start_prepares_default_configuration" formatted="false">"尚未创建，首次启动会准备默认配置"</string>
+    <string name="ui_configuration_format_listen_address_or_port_is_unrecognized_repairing" formatted="false">"配置格式、监听地址或端口无法识别；修复运行资源不会重置此配置"</string>
+    <string name="ui_the_webui_is_disabled_in_project_configuration" formatted="false">"用户已在项目配置中关闭后台，属于配置状态"</string>
+    <string name="ui_local_endpoint_configuration_is_recognized_login_models_qq_and" formatted="false">"本机入口配置可识别；本项不验证登录、模型、QQ 或 OneBot 消息"</string>
+    <string name="ui_runtime_version_record_is_missing_complete_initialization_first" formatted="false">"运行版本记录缺失，请先完成初始化"</string>
+    <string name="ui_runtime" formatted="false">"运行环境"</string>
+    <string name="ui_unknown_unsupported_by_this_build" formatted="false">"未知（当前代码未适配）"</string>
+    <string name="ui_component_versions_match" formatted="false">"组件版本匹配"</string>
+    <string name="ui_version_combination_unverified_some_component_versions_are_unrecognized" formatted="false">"版本组合待验证：部分组件版本无法识别，请查看日志或导出诊断包；现有数据已保留"</string>
+    <string name="ui_version_combination_unverified_astrbot_and_its_webui_have_different" formatted="false">"版本组合待验证：AstrBot 与 WebUI 版本不同，请在维护页使用匹配的更新包"</string>
+    <string name="ui_version_combination_unverified_independent_updates_or_different_version" formatted="false">"版本组合待验证：检测到独立更新或版本声明不同，请通过维护页使用匹配的运行包"</string>
+    <string name="ui_configuration_file_too_large" formatted="false">"配置文件过大"</string>
+    <string name="ui_webui_is_disabled_in_project_configuration_the_service_process" formatted="false">"WebUI 已在项目配置中关闭，服务进程仍可运行"</string>
+    <string name="ui_the_listen_address_cannot_be_used_as_a_local" formatted="false">"监听地址不能作为本机入口，请在项目配置中使用回环或通配地址；原配置已保留"</string>
+    <string name="ui_webui_port_must_be_an_integer_existing_configuration_is" formatted="false">"WebUI 端口须为整数；原配置已保留"</string>
+    <string name="ui_https_uses_system_certificate_verification_for_untrusted_certificates_ch" formatted="false">"HTTPS 使用系统证书验证；证书不受信任时请检查证书或使用外部浏览器"</string>
+    <string name="ui_webui_address_or_configuration_is_unrecognized_the_original_file" formatted="false">"无法识别 WebUI 地址或配置，原文件已保留。请检查项目配置中的 host、port 和启用状态"</string>
+    <string name="ui_unable_to_save_lan_settings_check_webui_configuration_file" formatted="false">"无法保存局域网设置，请检查 WebUI 配置、文件权限和可用空间；原配置已保留"</string>
+    <string name="ui_local_services" formatted="false">"本地服务运行"</string>
+    <string name="ui_preparing_runtime_tasks" formatted="false">"正在准备运行任务"</string>
+    <string name="ui_ssh_running" formatted="false">" · SSH 运行中"</string>
+    <string name="ui_unable_to_save_stop_preferences" formatted="false">"无法保存停止偏好"</string>
+    <string name="ui_astrbot_manager" formatted="false">"AstrBot 运行管理器"</string>
+    <string name="ui_stop_bots" formatted="false">"停止机器人"</string>
+    <string name="ui_checking_runtime" formatted="false">"检查运行环境"</string>
+    <string name="ui_manager_7ad33" formatted="false">"管理器"</string>
+    <string name="ui_ssh_extension_settings_are_unavailable_configure_ssh_again_or" formatted="false">"SSH 扩展设置暂不可用，请重新设置或重装扩展"</string>
+    <string name="ui_runtime_ready" formatted="false">"运行环境已就绪"</string>
+    <string name="ui_base_runtime_ready_complete_components_still_required" formatted="false">"基础环境已就绪，完整组件待准备"</string>
+    <string name="ui_waiting_for_initialization" formatted="false">"等待初始化"</string>
+    <string name="ui_unable_to_save_history_check_storage_space">"%1$s 运行记录保存失败，请检查存储空间"</string>
+    <string name="ui_astrbot_upstream_restart_detected_checking_local_endpoints_and_versions" formatted="false">"检测到 AstrBot 上游重启，重新检查本机接口与版本"</string>
+    <string name="ui_webui_configuration_changed_restart_this_service_to_apply_it" formatted="false">"后台配置已变更，重启此服务后生效"</string>
+    <string name="ui_start_1ae95">"开始 %1$s %2$s"</string>
+    <string name="ui_checking_runtime_resources_and_webui_configuration" formatted="false">"正在检查运行资源与后台配置"</string>
+    <string name="ui_environment_check_complete_review_results_and_recommended_actions" formatted="false">"环境检查完成，可查看分类结果与处理建议"</string>
+    <string name="ui_no_diagnostic_export_location_selected" formatted="false">"未选择诊断包保存位置"</string>
+    <string name="ui_diagnostics_exported_review_log_contents_before_sharing" formatted="false">"诊断包已导出，请检查日志内容后再分享"</string>
+    <string name="ui_restored_persona_settings_from_before_the_interruption" formatted="false">"已恢复中断前的人设设置"</string>
+    <string name="ui_checking_and_restoring">"核对并恢复 %1$s 运行"</string>
+    <string name="ui_ssh_settings_saved" formatted="false">"SSH 设置已保存"</string>
+    <string name="ui_existing_sessions_disconnected_connect_again" formatted="false">"，原连接已断开，请重新连接"</string>
+    <string name="ui_applies_when_the_service_starts" formatted="false">"，启动后生效"</string>
+    <string name="ui_this_apk_contains_only_the_base_runtime_complete_resources" formatted="false">"当前安装包仅含基础环境，完整运行资源尚未准备好"</string>
+    <string name="ui_unable_to_save_runtime_preferences_check_storage_space" formatted="false">"无法保存运行偏好，请检查存储空间"</string>
+    <string name="ui_starting_d784e">"正在启动 %1$s"</string>
+    <string name="ui_unable_to_save_stop_preferences_check_storage_space" formatted="false">"无法保存停止偏好，请检查存储空间"</string>
+    <string name="ui_select_a_webui_to_configure" formatted="false">"请选择需要调整的后台"</string>
+    <string name="ui_initialize_the_complete_runtime_first" formatted="false">"请先完成完整运行环境初始化"</string>
+    <string name="ui_enable_a_valid_webui_endpoint_in_project_configuration_first" formatted="false">"请先在项目配置中启用有效的 WebUI 地址"</string>
+    <string name="ui_updating_lan_access">"正在调整 %1$s 局域网访问"</string>
+    <string name="ui_formatted_text">"%1$s 已"</string>
+    <string name="ui_lan_access_enabled_bc976" formatted="false">"开启局域网访问"</string>
+    <string name="ui_access_restricted_to_this_device" formatted="false">"限制为本机访问"</string>
+    <string name="ui_local_endpoint_checked_again" formatted="false">"；已重新检查本机接口"</string>
+    <string name="ui_applies_when_the_service_starts_884b1" formatted="false">"；启动服务后生效"</string>
+    <string name="ui_automatic_snapshot_limits_saved_future_snapshots_will_remove_the" formatted="false">"自动快照上限已保存，下次新建自动快照时按上限清理最旧且未受保护的快照"</string>
+    <string name="ui_no_portable_backup_selected" formatted="false">"未选择便携备份"</string>
+    <string name="ui_portable_backup_verified_but_not_restored_review_its_scope" formatted="false">"便携备份已校验，尚未恢复。请查看范围并确认导入"</string>
+    <string name="ui_pending_backup_import_cancelled_current_data_is_unchanged" formatted="false">"已取消待导入备份，当前数据保持原样"</string>
+    <string name="ui_no_update_package_selected" formatted="false">"未选择更新包"</string>
+    <string name="ui_check_for_updates_first" formatted="false">"请先检查更新"</string>
+    <string name="ui_update_package_downloaded_and_verified_review_release_notes_before" formatted="false">"更新包已下载并校验，确认版本说明后再安装"</string>
+    <string name="ui_napcat_update_downloaded_and_verified_review_backup_and_installation" formatted="false">"NapCat 更新包已下载并校验，可确认备份和安装"</string>
+    <string name="ui_this_snapshot_is_required_for_program_or_runtime_rollback" formatted="false">"此快照用于程序或环境回退，请保留；后续成功更新后会解除保护"</string>
+    <string name="ui_no_backup_selected" formatted="false">"未选择备份"</string>
+    <string name="ui_backup_deleted" formatted="false">"备份已删除"</string>
+    <string name="ui_unknown_runtime_operation" formatted="false">"未知运行操作"</string>
+    <string name="ui_services_did_not_become_ready_after_import_recovery_of" formatted="false">"导入后的服务就绪检查超时，已尝试恢复操作前数据和原运行状态；请查看管理日志及服务状态"</string>
+    <string name="ui_the_new_version_did_not_become_ready_recovery_of" formatted="false">"新版本就绪检查超时，已尝试恢复旧程序与对应数据；请查看管理日志及服务状态"</string>
+    <string name="ui_webui_readiness_timed_out_process_monitoring_continues_view_logs" formatted="false">"等待后台就绪超时，进程状态会继续检查；可查看日志、继续等待或停止服务"</string>
+    <string name="ui_napcat_resource_check_exited_with">"NapCat 资源检查退出 %1$s：%2$s"</string>
+    <string name="ui_napcat_resources_or_qq_runtime_dependencies_are_incompatible_restoring" formatted="false">"NapCat 资源或 QQ 运行依赖不兼容，正在恢复原版本"</string>
+    <string name="ui_napcat_complete_configuration_and_qq_sessions_retained_webui_responding">"NapCat %1$s完成，配置与 QQ 会话已保留，后台接口已恢复"</string>
+    <string name="ui_rollback" formatted="false">"回退"</string>
+    <string name="ui_update" formatted="false">"更新"</string>
+    <string name="ui_napcat_complete_resource_and_dependency_checks_passed_qq_remains">"NapCat %1$s完成，资源与依赖检查通过；QQ 保持停止，启动后可检查后台"</string>
+    <string name="ui_napcat_recovery_incomplete_program_files_and_data_snapshots_are" formatted="false">"NapCat 恢复未完成，程序与数据快照已保留，请查看管理日志后重试"</string>
+    <string name="ui_this_shortcut_is_unavailable_follow_the_steps_above_to" formatted="false">"系统未开放此入口，请按上方路径手动设置。"</string>
+    <string name="ui_opened_an_alternative_settings_page_follow_the_steps_above" formatted="false">"直达入口不可用，已打开备用设置页；请按上方路径继续。"</string>
+    <string name="ui_device">"当前手机：%1$s %2$s"</string>
+    <string name="ui_app_to_configure">"要设置的应用：%1$s"</string>
+    <string name="ui_open_app_battery_settings" formatted="false">"打开本应用电池设置"</string>
+    <string name="ui_open_runtime_notification_settings" formatted="false">"打开运行通知类别"</string>
+    <string name="ui_open_app_info_alternative" formatted="false">"打开应用详情（备用）"</string>
+    <string name="ui_back_to_background_settings" formatted="false">"返回后台设置清单"</string>
+    <string name="ui_find_this_app_in_recent_apps_open_its_card" formatted="false">"请使用最近任务键或手势找到本应用，打开卡片菜单并锁定。"</string>
+    <string name="ui_update_preferences_were_not_saved" formatted="false">"更新偏好未保存"</string>
+    <string name="ui_check_available_storage_and_try_again" formatted="false">"请检查可用存储后重试。"</string>
+    <string name="ui_no_browser_found_visit">"未找到浏览器，请访问 %1$s"</string>
+    <string name="ui_view_manager_logs" formatted="false">"查看管理日志"</string>
+    <string name="ui_redeploy_runtime_resources" formatted="false">"重新部署运行资源？"</string>
+    <string name="ui_roll_back_the_entire_runtime_6833c" formatted="false">"回退整个运行环境？"</string>
+    <string name="ui_upgrade_the_bundled_runtime" formatted="false">"升级 APK 内置环境？"</string>
+    <string name="ui_prepare_the_runtime_bundled_with_this_apk_stop_both" formatted="false">"将准备 APK 内置的同版本环境，停止两个服务与 SSH，备份配置、数据库和 QQ 会话，再重新部署运行资源并验证双服务。仅在组件组合完全匹配时执行，配置不重置。\n\n在 Ubuntu 程序目录内手动安装的依赖或修改将被替换；AstrBot 数据目录中的插件保留。成功后保留一次环境回退，完成后恢复原运行状态。失败则恢复原环境与数据快照。"</string>
+    <string name="ui_back_up_current_data_then_restore_the_previous_runtime" formatted="false">"将先备份当前数据，再恢复旧环境与对应快照。恢复点之后的数据不会合并。完成后恢复原先的运行状态。"</string>
+    <string name="ui_verify_and_prepare_the_full_bundled_runtime_stop_both" formatted="false">"将校验并准备 APK 内的完整环境，停止两个服务并备份配置、数据库和 QQ 会话，再切换环境并检查两个服务。失败时恢复原环境与对应快照；成功后保留一次回退。"</string>
+    <string name="ui_back_up_and_repair" formatted="false">"备份并修复"</string>
+    <string name="ui_back_up_and_roll_back" formatted="false">"备份并回退环境"</string>
+    <string name="ui_back_up_and_upgrade" formatted="false">"备份并升级环境"</string>
+    <string name="ui_lan_access_for">"%1$s %2$s 局域网访问？"</string>
+    <string name="ui_enable" formatted="false">"开启"</string>
+    <string name="ui_allow_other_devices_to_access_this_dashboard_through_the" formatted="false">"允许其他设备通过手机 IPv4 地址访问此后台，请在可信局域网开启，仍需原有登录凭据。正在运行的服务会重启，端口及其他配置保留。"</string>
+    <string name="ui_restrict_this_dashboard_to_the_phone_the_service_will" formatted="false">"将此后台限制为手机本机访问。正在运行的服务会重启，端口及其他配置保留。"</string>
+    <string name="ui_enable_and_apply" formatted="false">"开启并应用"</string>
+    <string name="ui_disable_and_apply" formatted="false">"关闭并应用"</string>
+    <string name="ui_export_diagnostics_2f10a" formatted="false">"导出诊断包？"</string>
+    <string name="ui_includes_the_device_model_versions_runtime_status_and_redacted" formatted="false">"包含设备型号、版本、运行状态和脱敏日志，不附带配置、数据库或 QQ 登录文件。导出不会停止服务。日志仍可能包含聊天内容或个人信息，请检查后再分享。"</string>
+    <string name="ui_choose_destination" formatted="false">"选择保存位置"</string>
+    <string name="ui_export_portable_backup_47820" formatted="false">"导出便携备份？"</string>
+    <string name="ui_includes_astrbot_configuration_database_plugins_and_data_plus_napcat" formatted="false">"包含 AstrBot 配置、数据库、插件和数据，以及 NapCat 配置；不包含 QQ 登录会话、运行环境和本机快照。会暂时停止两个服务制作一致性备份，再恢复原状态并保存到所选位置。文件含密码和业务密钥，不做脱敏；文件上限为 2 GiB。"</string>
+    <string name="ui_restore_this_portable_backup" formatted="false">"恢复此便携备份？"</string>
+    <string name="ui_backup_date_stop_services_and_create_a_local_recovery">"备份时间：%1$s。将先停机创建本机恢复前快照，再替换 AstrBot 数据与 NapCat 配置，保留当前手机的 QQ 会话。备份点之后的数据不会合并；导入后请使用备份中的后台凭据检查业务配置。"</string>
+    <string name="ui_back_up_and_import" formatted="false">"备份当前数据并导入"</string>
+    <string name="ui_when_creating_a_snapshot_before_an_update_or_restore" formatted="false">"新建更新前或恢复前快照时，按上限自动清理最旧且未受保护的自动快照。新快照校验成功后才清理旧快照。"</string>
+    <string name="ui_maximum_snapshots" formatted="false">"最多保留（份）"</string>
+    <string name="ui_1_to_100_snapshots" formatted="false">"1 至 100 份"</string>
+    <string name="ui_storage_limit_mib" formatted="false">"容量上限（MiB）"</string>
+    <string name="ui_64_to_65536_mib_1024_mib_1_gib" formatted="false">"64 至 65536 MiB；1024 MiB = 1 GiB"</string>
+    <string name="ui_manual_backups_are_excluded_and_are_never_deleted_automatically" formatted="false">"手动备份不计入上限且不会自动删除。回退所需和本次选中的恢复快照会保留；若仍无法满足上限，将暂停操作并提示调整。降低上限从下次自动快照生效。"</string>
+    <string name="ui_local_backups" formatted="false">"本机备份"</string>
+    <string name="ui_total_backup_size">"备份文件合计 %1$s"</string>
+    <string name="ui_automatic_snapshots_mib">"自动快照 %1$s / %2$s 份 · %3$s / %4$s MiB"</string>
+    <string name="ui_no_backups_yet" formatted="false">"暂无备份"</string>
+    <string name="ui_mb_entries">"%1$s · %2$s MB · %3$s 个文件项"</string>
+    <string name="ui_manual_backup" formatted="false">"手动备份"</string>
+    <string name="ui_pre_restore_snapshot" formatted="false">"恢复前快照"</string>
+    <string name="ui_pre_update_snapshot" formatted="false">"更新前快照"</string>
+    <string name="ui_required_for_rollback_protected" formatted="false">"回退所需 · 受保护"</string>
+    <string name="ui_restore" formatted="false">"恢复"</string>
+    <string name="ui_restore_this_backup" formatted="false">"恢复此备份？"</string>
+    <string name="ui_both_services_will_stop_briefly_current_data_is_backed" formatted="false">"两个服务将暂时停止，当前数据会先备份，然后替换为此恢复点的配置、数据库、插件与 QQ 会话。恢复点之后的数据不会合并；仅允许恢复与当前程序版本匹配的备份。"</string>
+    <string name="ui_back_up_and_restore" formatted="false">"备份当前数据并恢复"</string>
+    <string name="ui_delete_this_local_backup" formatted="false">"删除此本机备份？"</string>
+    <string name="ui_only_the_selected_backup_file_is_deleted_data_currently" formatted="false">"仅删除选中的备份文件，服务当前使用的数据不受影响。此操作无法撤销。"</string>
+    <string name="ui_update_to">"更新 %1$s 至 %2$s？"</string>
+    <string name="ui_n_n_nboth_services_will_stop_briefly_data_is">"%1$s\n%2$s\n\n将暂时停止两个服务，先备份数据，再切换程序。配置与 QQ 会话会保留，失败会恢复原程序及对应数据。"</string>
+    <string name="ui_qq_remains_stopped_if_it_was_stopped_otherwise_it" formatted="false">"QQ 原本停止时保持停止；原本运行时会重启检查后台接口。"</string>
+    <string name="ui_astrbot_starts_to_check_its_local_dashboard" formatted="false">"AstrBot 会启动检查本机后台。"</string>
+    <string name="ui_back_up_and_update" formatted="false">"备份并更新"</string>
+    <string name="ui_this_version_is_already_installed_you_can_download_or" formatted="false">"当前已是此版本，可重新下载或安装。\n"</string>
+    <string name="ui_services_keep_running_during_download_and_verification_backup_and" formatted="false">"下载和校验期间服务继续运行。下载完成后需另行确认备份和安装。"</string>
+    <string name="ui_download_and_verify" formatted="false">"下载并校验"</string>
+    <string name="ui_roll_back_and_its_data">"回退 %1$s 及对应数据？"</string>
+    <string name="ui_back_up_current_data_then_restore_the_program_and" formatted="false">"当前数据会先备份，然后恢复上次更新前的程序与数据快照。恢复点之后的数据不会合并，两个服务将暂时停止。"</string>
+    <string name="ui_back_up_and_roll_back_65fe8" formatted="false">"备份当前数据并回退"</string>
+    <string name="ui_napcat_access_token" formatted="false">"NapCat 访问口令"</string>
+    <string name="ui_astrbot_initial_password" formatted="false">"AstrBot 初始密码"</string>
+    <string name="ui_credentials_are_generated_at_first_startup_use_your_existing" formatted="false">"首次启动后生成凭据；已有配置请使用原密码"</string>
+    <string name="ui_show" formatted="false">"显示"</string>
+    <string name="ui_hide" formatted="false">"隐藏"</string>
+    <string name="ui_copy_f4880">"复制%1$s"</string>
+    <string name="ui_statistics_could_not_be_completed_refresh_to_try_again" formatted="false">"本次统计未完成，请刷新重试；现有数据已保留"</string>
+    <string name="ui_refresh_statistics" formatted="false">"刷新统计"</string>
+    <string name="ui_unavailable" formatted="false">"暂不可读取"</string>
+    <string name="ui_free_internal_storage" formatted="false">"手机内部可用"</string>
+    <string name="ui_currently_available_n_n">"当前可用 %1$s\n\n%2$s"</string>
+    <string name="ui_total_app_storage" formatted="false">"应用总占用"</string>
+    <string name="ui_system_accounting_napp_code_napp_data_ncache_included_n">"系统记账：\n安装代码 %1$s\n应用数据 %2$s\n其中缓存 %3$s\n\n"</string>
+    <string name="ui_cache_is_already_included_in_app_data_and_is" formatted="false">"缓存已包含在应用数据中，不再重复相加。系统统计可能延迟，与下方各目录文件的逻辑大小口径不同。"</string>
+    <string name="ui_not_provided_by_the_system" formatted="false">"系统暂未提供"</string>
+    <string name="ui_system_accounting_is_unavailable_individual_directories_can_still_be" formatted="false">"系统记账暂不可读取。下方目录仍可单独统计；不能把部分目录相加当作完整应用大小。"</string>
+    <string name="ui_at_least" formatted="false">"至少 "</string>
+    <string name="ui_partial_scan" formatted="false">" · 部分统计"</string>
+    <string name="ui_n_regular_files_n_n_n_n">"%1$s\n%2$s 个普通文件\n\n%3$s\n\n"</string>
+    <string name="ui_logical_file_sizes_each_inode_is_counted_once_per" formatted="false">"这是文件逻辑大小，每组内相同 inode 只计算一次；不跟随链接、不计算特殊文件和目录自身占用。"</string>
+    <string name="ui_skipped_links_and_special_files">"已跳过 %1$s 个链接、%2$s 个特殊文件。"</string>
+    <string name="ui_n_nsome_paths_were_unreadable_files_changed_or_the" formatted="false">"\n\n部分路径不可读、文件变化或达到扫描预算，当前值只表示已读取部分，请稍后刷新。"</string>
+    <string name="ui_n_nscanning_does_not_pause_services_this_directory_cannot" formatted="false">"\n\n统计不会暂停服务，也不提供删除此目录的操作。"</string>
+    <string name="ui_about_storage_and_cleanup" formatted="false">"统计与清理说明"</string>
+    <string name="ui_accounting_methods_and_recommendations" formatted="false">"两种统计口径及处理建议"</string>
+    <string name="ui_the_system_total_includes_app_code_data_and_cache" formatted="false">"系统总量涵盖当前应用的安装代码、数据和缓存；目录统计只覆盖列出的普通文件，不应与系统总量相加。"</string>
+    <string name="ui_each_directory_scan_is_limited_to_100_000_entries" formatted="false">"每次目录扫描最多 10 万项、8 秒，超限或不可读时显示“部分统计”。"</string>
+    <string name="ui_services_keep_running_during_scanning_so_files_can_change" formatted="false">"统计期间不锁住服务维护，文件会变化，这些读数并非同一时刻的快照。"</string>
+    <string name="ui_system_storage_settings" formatted="false">"系统存储设置"</string>
+    <string name="ui_view_storage_usage_for_the_whole_phone" formatted="false">"查看整台手机的空间使用"</string>
+    <string name="ui_free_storage_has_recovered_above_the_warning_threshold" formatted="false">"存储可用空间已恢复到提醒阈值以上"</string>
+    <string name="ui_astrbot_data" formatted="false">"AstrBot 数据"</string>
+    <string name="ui_configuration_plugins_databases_trace_data_and_upstream_logs" formatted="false">"配置、插件、数据库、追踪数据及上游日志"</string>
+    <string name="ui_napcat_data" formatted="false">"NapCat 数据"</string>
+    <string name="ui_dashboard_configuration_and_upstream_logs" formatted="false">"后台配置及上游日志"</string>
+    <string name="ui_qq_and_user_directory" formatted="false">"QQ 与用户目录"</string>
+    <string name="ui_qq_sessions_cache_attachments_and_the_ubuntu_user_directory" formatted="false">"QQ 会话、缓存、附件及 Ubuntu 用户目录"</string>
+    <string name="ui_manual_backups_and_automatic_snapshots_including_protected_snapshots" formatted="false">"手动备份和自动快照；受保护快照也计入"</string>
+    <string name="ui_update_and_import_staging" formatted="false">"更新与导入暂存"</string>
+    <string name="ui_downloaded_apks_programs_and_backups_awaiting_import" formatted="false">"下载的 APK、程序及待导入备份"</string>
+    <string name="ui_manager_output_logs" formatted="false">"管理输出日志"</string>
+    <string name="ui_rotated_output_from_the_manager_runtime_and_both_services" formatted="false">"管理器、环境和两个项目的轮转输出"</string>
+    <string name="ui_app_cache" formatted="false">"应用缓存"</string>
+    <string name="ui_private_app_cache_including_exports_and_browser_data" formatted="false">"导出及浏览器等应用私有缓存"</string>
+    <string name="ui_runtime_resources_and_rollback" formatted="false">"运行资源与回退"</string>
+    <string name="ui_current_and_rollback_runtime_and_program_resources" formatted="false">"当前及回退运行环境、程序资源"</string>
+    <string name="ui_scanning">"正在统计%1$s"</string>
+    <string name="ui_python_dependencies" formatted="false">"Python 基础依赖"</string>
+    <string name="ui_loaded_quart_fastapi_and_faiss_in_isolated_mode_without" formatted="false">"隔离模式加载 quart、fastapi、faiss 成功，未启动机器人服务"</string>
+    <string name="ui_python_or_a_dependency_failed_to_load_check_runtime" formatted="false">"Python 或基础依赖加载失败，查看环境日志；未修改用户配置"</string>
+    <string name="ui_installation_launch_files_and_maintenance_conditions_must_pass_first" formatted="false">"需先满足安装、启动文件与维护条件，本次未执行依赖加载"</string>
+    <string name="ui_repair_staging_space" formatted="false">"修复暂存空间"</string>
+    <string name="ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot">"可用 %1$s MiB；环境准备至少预留 %2$s MiB，数据快照另行精确检查"</string>
+    <string name="ui_cannot_determine_the_full_resource_size_in_this_apk" formatted="false">"当前 APK 的完整资源大小无法识别"</string>
+    <string name="ui_complete_the_pending_maintenance_operation_then_check_again" formatted="false">"先完成未结束的维护操作，再重新检查"</string>
+    <string name="ui_install_an_apk_with_the_same_signing_certificate_to" formatted="false">"请覆盖安装同签名 APK，修复内置启动组件；不要卸载清除数据"</string>
+    <string name="ui_initialize_the_runtime_first_an_unrecognized_existing_runtime_will" formatted="false">"请先完成初始化；无法识别的已有环境不会被自动覆盖"</string>
+    <string name="ui_version_information_is_incomplete_export_diagnostics_first_the_runtime" formatted="false">"版本依据不完整，先导出诊断；不会用猜测的版本覆盖环境"</string>
+    <string name="ui_the_installed_runtime_differs_from_the_bundled_resources_use" formatted="false">"当前环境与 APK 内置资源不同，请使用运行环境升级或匹配版本的 APK"</string>
+    <string name="ui_resolve_dashboard_configuration_issues_first_redeploying_resources_does" formatted="false">"请先处理后台配置，资源重部署不会修复配置内容"</string>
+    <string name="ui_free_staging_space_first_data_snapshot_space_will_also" formatted="false">"请先释放暂存空间，修复前还会检查数据快照容量"</string>
+    <string name="ui_no_resource_damage_was_identified_by_this_check_manage" formatted="false">"未发现此检查可定位的资源损坏；业务问题请在对应后台处理"</string>
+    <string name="ui_the_same_version_bundled_resources_can_be_redeployed_the" formatted="false">"可重新部署 APK 内置的同版本资源；准备后还会核对完整版本组合，保留配置、数据库和 QQ 会话"</string>
+    <string name="ui_ssh_operation_failed_check_the_port_runtime_and_free" formatted="false">"SSH 操作失败，请检查端口是否被占用、运行环境及可用存储后重试"</string>
+    <string name="ui_diagnostic_export_failed_check_free_space_or_choose_another" formatted="false">"诊断包导出失败，请检查可用空间或重新选择保存位置；现有运行环境与数据已保留"</string>
+    <string name="ui_the_update_connection_was_interrupted_or_the_server_is" formatted="false">"更新连接中断或服务器不可用，已保留当前程序和下载进度，可稍后重试"</string>
+    <string name="ui_cannot_verify_the_update_catalog_or_package_check_for" formatted="false">"无法验证更新目录或更新包，请重新检查更新"</string>
+    <string name="ui_update_information_failed_format_or_integrity_checks_check_for" formatted="false">"更新信息格式或完整性检查失败，请重新检查更新"</string>
+    <string name="ui_the_backup_could_not_be_read_or_written_or" formatted="false">"备份文件读写失败或被截断，请重新选择文件后重试；现有数据已保留"</string>
+    <string name="ui_the_portable_backup_manifest_is_unrecognized_existing_data_was" formatted="false">"便携备份清单无法识别，未修改现有数据"</string>
+    <string name="ui_portable_backup_verification_or_restore_failed_existing_data_and" formatted="false">"便携备份校验或恢复失败，现有数据与恢复记录已保留"</string>
+    <string name="ui_operation_failed" formatted="false">"操作失败"</string>
+    <string name="ui_operation_failed_6846d">"操作失败：%1$s"</string>
+    <string name="ui_maintenance_finished_but_ssh_could_not_restart_check_the" formatted="false">"维护已结束，但 SSH 恢复失败，请检查端口后重试"</string>
+    <string name="ui_finished_072d2">"结束 %1$s"</string>
+    <string name="ui_no_backup_destination_selected" formatted="false">"未选择备份保存位置"</string>
+    <string name="ui_stopping_services_to_prepare_a_consistent">"正在停止服务，准备一致性%1$s"</string>
+    <string name="ui_preserving_this_phone_s_qq_session_and_preparing_imported" formatted="false">"正在保留当前手机 QQ 会话并准备导入数据"</string>
+    <string name="ui_portable_backup_exported_without_the_qq_login_session_it" formatted="false">"便携备份已导出，不包含 QQ 登录会话；包含业务配置及密钥，请妥善保管"</string>
+    <string name="ui_portable_backup_restored_this_phone_s_qq_session_and" formatted="false">"便携备份已恢复，已保留本机 QQ 会话及恢复前快照；请使用备份中的后台凭据核对业务配置"</string>
+    <string name="ui_stopping_both_services_and_creating_a_snapshot_before_switching" formatted="false">"正在停止两个服务并创建环境切换前快照"</string>
+    <string name="ui_switching_runtime_and_components" formatted="false">"正在切换运行环境及组件"</string>
+    <string name="ui_checking_the_actual_astrbot_and_napcat_services" formatted="false">"正在验证实际 AstrBot 与 NapCat 服务"</string>
+    <string name="ui_napcat_startup_check_failed" formatted="false">"NapCat 启动检查失败"</string>
+    <string name="ui_runtime_completed_previous_running_states_restored_check_qq_login">"运行环境%1$s完成，已恢复原运行状态；QQ 登录与业务连接请在后台确认"</string>
+    <string name="ui_repair" formatted="false">"修复"</string>
+    <string name="ui_upgrade" formatted="false">"升级"</string>
+    <string name="ui_runtime_maintenance_error">"环境维护异常：%1$s"</string>
+    <string name="ui_the_new_runtime_passed_checks_and_was_committed_old" formatted="false">"新环境已通过检查并提交，旧文件清理未完成。记录已保留，重新打开管理器可重试清理"</string>
+    <string name="ui_runtime_switch_did_not_complete_restoring_the_original_runtime" formatted="false">"环境切换未完成，正在恢复原环境与数据"</string>
+    <string name="ui_original_runtime_recovery_is_incomplete_files_and_snapshots_are" formatted="false">"原环境恢复尚未完成，已保留文件与快照，请查看管理日志后重试"</string>
+    <string name="ui_stopping_services_and_creating_a_pre_update_napcat_snapshot" formatted="false">"正在停止服务并创建 NapCat 更新前快照"</string>
+    <string name="ui_checking_napcat_resources_qq_dependencies_and_existing_data" formatted="false">"正在检查 NapCat 资源、QQ 运行依赖与现有数据"</string>
+    <string name="ui_stopping_services_and_creating_a_pre_update_snapshot" formatted="false">"正在停止服务并创建更新前快照"</string>
+    <string name="ui_switching_program">"正在切换程序%1$s"</string>
+    <string name="ui_and_its_data" formatted="false">"及对应数据"</string>
+    <string name="ui_checking_the_new_program_and_its_dashboard" formatted="false">"正在检查新程序与实际后台"</string>
+    <string name="ui_new_program_check_exited_with">"新程序检查退出 %1$s：%2$s"</string>
+    <string name="ui_new_program_startup_verification_failed" formatted="false">"新程序启动验证失败"</string>
+    <string name="ui_the_new_program_did_not_stay_running" formatted="false">"新程序未保持运行"</string>
+    <string name="ui_committing_records">"正在提交%1$s记录"</string>
+    <string name="ui_restored_the_program_data_snapshot_and_previous_running_state" formatted="false">"已恢复对应程序和数据快照，并恢复原运行状态"</string>
+    <string name="ui_update_completed_the_previous_program_and_its_data_snapshot" formatted="false">"更新完成，已保留旧程序与对应数据快照；QQ 与业务连接请在后台确认"</string>
+    <string name="ui_update_did_not_complete_restoring_the_previous_program_and" formatted="false">"更新未完成，正在恢复旧程序及对应数据"</string>
+    <string name="ui_update_rollback_is_incomplete_files_and_records_are_preserved" formatted="false">"更新回退未完成，文件与记录已保留，请查看管理日志后重试"</string>
+    <string name="ui_stopping_services_to_prepare_a_consistent_snapshot" formatted="false">"正在停止服务，准备一致性快照"</string>
+    <string name="ui_copying_and_verifying_backup" formatted="false">"正在复制并校验备份"</string>
+    <string name="ui_backing_up_data_before_restore" formatted="false">"正在备份恢复前的数据"</string>
+    <string name="ui_verifying_backup_and_switching_data" formatted="false">"校验备份并切换数据"</string>
+    <string name="ui_restored_database_check_failed_restoring_original_data" formatted="false">"恢复后的数据库检查失败，正在恢复原数据"</string>
+    <string name="ui_local_backup_completed_previous_running_states_restored" formatted="false">"本机备份已完成，已恢复原先的运行状态"</string>
+    <string name="ui_data_restored_and_verified_previous_running_states_restored" formatted="false">"数据已恢复并校验，已恢复原先的运行状态"</string>
+    <string name="ui_initialize_the_runtime_first" formatted="false">"请先完成运行环境初始化"</string>
+    <string name="ui_persona_preset_not_found" formatted="false">"未找到此人设预设"</string>
+    <string name="ui_saving_astrbot_persona_settings" formatted="false">"正在保存 AstrBot 人设设置"</string>
+    <string name="ui_persona_added_to_astrbot_existing_personas_with_the_same" formatted="false">"人设已添加到 AstrBot，原有同名人设和后台修改已保留"</string>
+    <string name="ui_previous_default_persona_restored_added_presets_are_preserved" formatted="false">"已恢复上一次默认人设，已添加的预设保留"</string>
+    <string name="ui_default_persona_changed_for_new_conversations_conversations_with_an" formatted="false">"默认人设已切换，新会话会使用此人设；单独指定人设的会话不受影响"</string>
+    <string name="ui_resuming">"正在恢复 %1$s 运行"</string>
+    <string name="ui_historical_log_cleanup_files_kib">"历史日志清理：%1$s 个文件，%2$s KiB"</string>
+    <string name="ui_some_logs_cannot_be_cleaned_yet_active_recently_written" formatted="false">"部分日志暂不能清理，已保留正在使用、最近写入或无法检查的文件；停止服务后将再次检查"</string>
+    <string name="ui_historical_log_check_did_not_complete_it_will_retry" formatted="false">"历史日志检查未完成，将在下次维护时重试；现有文件已保留"</string>
+    <string name="ui_service_startup_canceled" formatted="false">"服务启动已取消"</string>
+    <string name="ui_the_new_program_exited_unexpectedly_after_startup_rolling_back" formatted="false">"新程序启动后异常退出，正在回退"</string>
+    <string name="ui_new_program_data_migration_failed_restoring_the_previous_program" formatted="false">"新程序数据迁移失败，正在恢复旧程序及对应数据"</string>
+    <string name="ui_this_migration_state_cannot_be_verified_yet_use_a" formatted="false">"新程序迁移状态暂不支持验证，请使用已验证的版本组合"</string>
+    <string name="ui_local_port_is_in_use_stop_the_service_using">"本机端口 %1$s 已被占用，请先停止占用端口的服务"</string>
+    <string name="component_astrbot" translatable="false">AstrBot</string>
+    <string name="component_napcat_qq" translatable="false">NapCat / QQ</string>
+    <string name="ui_could_not_save_update_preferences_check_free_storage" formatted="false">"无法保存更新偏好，请检查可用存储"</string>
+    <string name="ui_could_not_save_snapshot_limits_check_free_storage" formatted="false">"无法保存快照上限，请检查存储空间"</string>
+    <string name="ui_invalid_backup_id" formatted="false">"备份编号无效"</string>
+    <string name="ui_a_restore_or_backup_cleanup_is_pending_resolve_its" formatted="false">"有未完成的恢复或备份清理，请先处理操作记录"</string>
+    <string name="ui_insufficient_space_backup_requires_at_least_mb">"空间不足，备份至少需要 %1$s MB"</string>
+    <string name="ui_data_changed_during_backup_or_verification_failed_the_backup" formatted="false">"备份期间数据发生变化或校验失败，未提交备份"</string>
+    <string name="ui_unrecognized_backup_type_all_backups_are_preserved" formatted="false">"存在无法识别的备份类型，已保留全部备份"</string>
+    <string name="ui_a_backup_record_is_unreadable_all_backups_are_preserved" formatted="false">"存在无法读取的备份记录，已保留全部备份；请导出诊断后处理，未创建新快照"</string>
+    <string name="ui_cannot_delete_backups_during_restore" formatted="false">"恢复过程中不能删除备份"</string>
+    <string name="ui_an_unresolved_restore_record_exists_current_data_is_preserved" formatted="false">"存在未处理的恢复记录，已保留现有数据"</string>
+    <string name="ui_the_backup_does_not_match_the_installed_program_versions" formatted="false">"备份与当前运行版本组合不同，不能仅恢复数据。请先恢复对应程序版本"</string>
+    <string name="ui_the_backup_is_damaged_or_was_modified_current_data" formatted="false">"备份文件损坏或内容被修改，已保留当前数据"</string>
+    <string name="ui_insufficient_restore_staging_space" formatted="false">"恢复暂存空间不足"</string>
+    <string name="ui_restore_staging_verification_failed" formatted="false">"恢复暂存校验失败"</string>
+    <string name="ui_restore_record_missing" formatted="false">"恢复记录缺失"</string>
+    <string name="ui_invalid_pre_restore_snapshot_id" formatted="false">"恢复前快照编号无效"</string>
+    <string name="ui_the_pre_restore_snapshot_does_not_match_the_current" formatted="false">"恢复前快照与当前环境不匹配"</string>
+    <string name="ui_insufficient_staging_space_for_portable_backup_restore" formatted="false">"便携备份恢复暂存空间不足"</string>
+    <string name="ui_the_configuration_parent_directory_is_a_link_current_data" formatted="false">"当前配置父目录为链接，已保留现有数据"</string>
+    <string name="ui_cannot_prepare_configuration_directory" formatted="false">"无法准备配置目录"</string>
+    <string name="ui_an_unrecognized_old_data_directory_exists_operation_stopped_files" formatted="false">"存在未识别的旧数据目录，已停止操作并保留文件"</string>
+    <string name="ui_previous_automatic_snapshot_cleanup_completed_protected_backups_are_pres" formatted="false">"已完成上次自动快照清理，受保护备份已保留"</string>
+    <string name="ui_unrecognized_restore_record_all_data_is_preserved" formatted="false">"恢复记录无法识别，已保留全部数据"</string>
+    <string name="ui_cleanup_from_the_previous_restore_completed" formatted="false">"已完成上次恢复操作的清理"</string>
+    <string name="ui_unexpected_old_data_directory_files_are_preserved" formatted="false">"旧数据目录异常，已保留文件"</string>
+    <string name="ui_old_data_required_for_recovery_is_missing_operation_stopped" formatted="false">"恢复所需的旧数据缺失，已停止操作"</string>
+    <string name="ui_the_previous_restore_was_incomplete_original_data_has_been" formatted="false">"上次恢复未完成，已恢复操作前的数据"</string>
+    <string name="ui_restored_data_directory_is_missing_old_data_is_preserved" formatted="false">"恢复后的数据目录缺失，保留旧数据"</string>
+    <string name="ui_unrecognized_backup_cleanup_record_backups_are_preserved" formatted="false">"备份清理记录无法识别，已保留备份"</string>
+    <string name="ui_the_new_snapshot_is_missing_old_backups_and_cleanup" formatted="false">"新快照缺失，已保留旧备份与清理记录"</string>
+    <string name="ui_invalid_new_automatic_snapshot_record_old_backups_are_preserved" formatted="false">"新自动快照记录异常，已保留旧备份"</string>
+    <string name="ui_unexpected_snapshot_directory_awaiting_cleanup_files_are_preserved" formatted="false">"待清理快照目录异常，已保留文件"</string>
+    <string name="ui_unrecognized_backup_cleanup_directory_files_are_preserved" formatted="false">"备份清理目录无法识别，已保留文件"</string>
+    <string name="ui_unexpected_backup_cleanup_directory_files_are_preserved" formatted="false">"备份清理目录异常，已保留文件"</string>
+    <string name="ui_backup_information_is_missing_or_too_large" formatted="false">"备份信息缺失或过大"</string>
+    <string name="ui_unsupported_backup_format" formatted="false">"备份格式不支持"</string>
+    <string name="ui_invalid_backup_size_record" formatted="false">"备份容量记录无效"</string>
+    <string name="ui_data_directory_is_missing_or_invalid" formatted="false">"数据目录缺失或无效"</string>
+    <string name="ui_data_contains_special_files_that_cannot_be_backed_up" formatted="false">"数据中存在无法备份的特殊文件，请停止相关插件后重试"</string>
+    <string name="ui_too_many_files_for_backup" formatted="false">"数据文件数量超出备份范围"</string>
+    <string name="ui_cannot_switch_data_directories_recovery_records_are_preserved" formatted="false">"无法切换数据目录，已保留恢复记录"</string>
+    <string name="ui_the_installed_runtime_architecture_differs_from_this_apk_files" formatted="false">"现有环境架构与安装包不同，已保留文件"</string>
+    <string name="ui_ubuntu_runtime_is_ready" formatted="false">"Ubuntu 环境已就绪"</string>
+    <string name="ui_unrecognized_existing_runtime_initialization_stopped_data_is_preserved" formatted="false">"存在未识别环境，保留数据并停止初始化"</string>
+    <string name="ui_bundled_runtime_architecture_mismatch" formatted="false">"内置环境架构不匹配"</string>
+    <string name="ui_verifying_bundled_ubuntu_resources" formatted="false">"校验内置 Ubuntu 资源"</string>
+    <string name="ui_ubuntu_resource_integrity_check_failed" formatted="false">"Ubuntu 资源完整性校验失败"</string>
+    <string name="ui_resource_size_exceeds_the_supported_limit" formatted="false">"资源大小超出支持范围"</string>
+    <string name="ui_insufficient_storage_at_least_mb_is_required">"存储空间不足，至少需要 %1$s MB"</string>
+    <string name="ui_cannot_create_runtime_staging_directory" formatted="false">"无法创建环境准备目录"</string>
+    <string name="ui_extracting_ubuntu_runtime" formatted="false">"正在解包 Ubuntu 环境"</string>
+    <string name="ui_verifying_extracted_runtime" formatted="false">"验证解包后的运行环境"</string>
+    <string name="ui_runtime_verification_failed">"环境验证失败：%1$s"</string>
+    <string name="ui_extracting_ubuntu_entries">"正在解包 Ubuntu：%1$s 个文件项"</string>
+    <string name="ui_invalid_resource_file_size" formatted="false">"资源文件大小异常"</string>
+    <string name="ui_invalid_extracted_resource_size" formatted="false">"资源解包大小异常"</string>
+    <string name="ui_preparing_ubuntu_links_entries">"正在准备 Ubuntu 链接：%1$s 项"</string>
+    <string name="ui_hard_link_outside_permitted_paths">"硬链接越界：%1$s -&gt; %2$s"</string>
+    <string name="ui_symbolic_link_parent_outside_permitted_paths">"符号链接父路径越界：%1$s"</string>
+    <string name="ui_cannot_prepare_link">"无法准备链接：%1$s -&gt; %2$s"</string>
+    <string name="ui_command_timed_out" formatted="false">"运行命令超时"</string>
+    <string name="ui_cannot_prepare_diagnostic_cache" formatted="false">"无法准备诊断包缓存"</string>
+    <string name="ui_insufficient_diagnostic_cache_space" formatted="false">"诊断包缓存空间不足"</string>
+    <string name="ui_collecting_system_version_and_runtime_information" formatted="false">"正在收集系统、版本和运行状态"</string>
+    <string name="ui_collecting_redacted_logs">"正在收集%1$s脱敏日志"</string>
+    <string name="ui_some_logs_are_unreadable_partial_content_and_original_errors" formatted="false">"日志暂无法读取，未附带部分内容或原始异常。\n"</string>
+    <string name="ui_diagnostic_logs_exceed_the_collection_limit" formatted="false">"诊断日志超出采集上限"</string>
+    <string name="ui_diagnostic_archive_exceeds_the_size_limit" formatted="false">"诊断包超过大小上限"</string>
+    <string name="ui_writing_diagnostics_to_the_selected_file" formatted="false">"正在写入所选诊断包文件"</string>
+    <string name="ui_cannot_write_the_selected_diagnostic_file" formatted="false">"无法写入所选诊断包"</string>
+    <string name="ui_diagnostics_include_device_model_system_and_component_versions_runtime" formatted="false">"诊断包包含设备型号、系统/组件版本、运行状态、管理事件和受限大小的脱敏日志。"</string>
+    <string name="ui_configuration_files_databases_plugins_qq_login_session_files_and" formatted="false">"不附带配置文件、数据库、插件文件、QQ 登录会话文件或设备唯一标识。"</string>
+    <string name="ui_only_recognized_credentials_and_login_qr_codes_are_hidden" formatted="false">"仅隐藏已识别的凭据和登录二维码；日志仍可能包含聊天内容、账号或其他个人信息，请检查后再分享。"</string>
+    <string name="ui_up_to_two_historical_logs_and_the_current_log" formatted="false">"每类最多采集两份历史日志和当前日志，每文件最近 512 KiB；超长行、截断行及链接文件会省略。"</string>
+    <string name="ui_this_file_is_for_troubleshooting_and_cannot_restore_data" formatted="false">"此文件用于排查问题，不能用于恢复数据。\n"</string>
+    <string name="ui_cannot_switch_program_directories_recovery_records_are_preserved" formatted="false">"无法切换程序目录，已保留恢复记录"</string>
+    <string name="ui_the_program_contains_unsupported_files_the_old_version_is" formatted="false">"程序中存在不支持的文件，已保留旧版本"</string>
+    <string name="ui_creating_a_data_snapshot_before_the_apk_update" formatted="false">"正在创建 APK 更新前的数据快照"</string>
+    <string name="ui_the_pre_update_backup_is_incomplete_resolve_it_in" formatted="false">"更新前备份未完成，请在日志与备份页面处理后重试安装"</string>
+    <string name="ui_this_apk_has_no_manager_update_channel_configured" formatted="false">"当前安装包尚未配置管理器在线更新通道"</string>
+    <string name="ui_check_for_signed_manager_version_information" formatted="false">"点击检查，获取已签名的管理器版本信息"</string>
+    <string name="ui_checking_the_signed_manager_catalog" formatted="false">"正在检查管理器签名目录"</string>
+    <string name="ui_manager_update_catalog_is_temporarily_unavailable" formatted="false">"管理器更新目录暂不可用"</string>
+    <string name="ui_manager_update_catalog_is_too_large" formatted="false">"管理器更新目录过大"</string>
+    <string name="ui_signed_catalog_checked_no_applicable_app_update_is_available" formatted="false">"已检查签名目录，当前应用没有适用的新版本"</string>
+    <string name="ui_check_for_manager_updates_again_first" formatted="false">"请先重新检查管理器更新"</string>
+    <string name="ui_version_information_has_changed_review_it_again" formatted="false">"版本信息已变化，请重新查看"</string>
+    <string name="ui_insufficient_download_and_system_installation_staging_space_free_storage" formatted="false">"下载与系统安装暂存所需空间不足，请先清理手机存储"</string>
+    <string name="ui_download_failed_progress_is_preserved_you_can_retry" formatted="false">"下载失败，已保留进度，可重试"</string>
+    <string name="ui_server_download_range_mismatch" formatted="false">"服务器返回的下载范围不匹配"</string>
+    <string name="ui_the_server_returned_an_unsupported_transfer_encoding" formatted="false">"服务器返回了不支持的传输编码"</string>
+    <string name="ui_download_size_differs_from_the_signed_catalog" formatted="false">"下载大小与签名目录不一致"</string>
+    <string name="ui_download_exceeds_the_signed_size" formatted="false">"下载资源超出签名大小"</string>
+    <string name="ui_storage_ran_out_during_download" formatted="false">"下载时存储空间不足"</string>
+    <string name="ui_downloading_mib">"正在下载 %1$s（%2$s / %3$s MiB）"</string>
+    <string name="ui_download_interrupted_progress_is_preserved_you_can_resume" formatted="false">"下载中断，已保留进度，可继续下载"</string>
+    <string name="ui_verifying_apk_digest_version_and_signing_certificate" formatted="false">"正在校验 APK 摘要、版本和应用签名"</string>
+    <string name="ui_catalog_expired_or_changed_check_again" formatted="false">"目录已过期或变化，请重新检查"</string>
+    <string name="ui_apk_verified_confirm_to_open_system_installation_running_services" formatted="false">"APK 已校验，通过确认后由系统安装；现有服务尚未改变"</string>
+    <string name="ui_version_information_has_expired_check_again" formatted="false">"版本信息已过期，请重新检查"</string>
+    <string name="ui_download_and_verify_the_apk_first" formatted="false">"请先下载并校验 APK"</string>
+    <string name="ui_insufficient_system_installation_staging_space_free_storage_first" formatted="false">"系统安装暂存空间不足，请先清理手机存储"</string>
+    <string name="ui_update_source_has_changed" formatted="false">"更新来源已变化"</string>
+    <string name="ui_apk_ready_it_will_be_verified_again_before_installation" formatted="false">"APK 已就绪；安装前会再次校验"</string>
+    <string name="ui_manager_is_available_download_and_installation_require_your_confirmation">"发现管理器 %1$s，下载与安装由你确认"</string>
+    <string name="ui_unsupported_manager_update_catalog_format" formatted="false">"管理器更新目录格式不支持"</string>
+    <string name="ui_this_is_not_the_stable_manager_update_catalog" formatted="false">"此目录不是管理器稳定更新目录"</string>
+    <string name="ui_update_catalog_expired_or_device_time_is_incorrect" formatted="false">"更新目录已过期或设备时间不正确"</string>
+    <string name="ui_update_catalog_contains_duplicate_versions" formatted="false">"更新目录存在重复版本"</string>
+    <string name="ui_update_catalog_is_outdated_or_its_sequence_number_conflicts" formatted="false">"更新目录版本已过时或序号冲突"</string>
+    <string name="ui_apk_size_differs_from_the_signed_catalog" formatted="false">"APK 大小与签名目录不一致"</string>
+    <string name="ui_apk_digest_verification_failed_download_it_again" formatted="false">"APK 摘要校验失败，请重新下载"</string>
+    <string name="ui_cannot_read_apk_installation_information" formatted="false">"无法识别 APK 安装信息"</string>
+    <string name="ui_apk_package_name_or_version_does_not_match_this" formatted="false">"APK 包名或版本与当前应用不匹配"</string>
+    <string name="ui_apk_signing_certificate_differs_from_the_installed_app" formatted="false">"APK 应用签名与当前安装不一致"</string>
+    <string name="ui_apk_android_version_requirements_are_incompatible" formatted="false">"APK 系统版本要求不匹配"</string>
+    <string name="ui_apk_architecture_differs_from_the_signed_catalog" formatted="false">"APK 架构与签名目录不一致"</string>
+    <string name="ui_apk_does_not_contain_the_complete_runtime" formatted="false">"APK 不包含完整运行资源"</string>
+    <string name="ui_too_many_update_server_redirects" formatted="false">"更新服务器重定向次数过多"</string>
+    <string name="ui_updates_require_https_urls_without_embedded_credentials" formatted="false">"更新仅支持无凭据的 HTTPS 地址"</string>
+    <string name="ui_napcat_updates_must_use_an_official_upstream_shell_release" formatted="false">"NapCat 更新必须来自上游正式发布的 Shell 包"</string>
+    <string name="ui_this_napcat_version_requires_different_qq_or_runtime_dependencies" formatted="false">"此 NapCat 版本需要不同的 QQ 或运行依赖，已保留现有程序；请先升级匹配的运行环境"</string>
+    <string name="ui_napcat_update_package_size_mismatch" formatted="false">"NapCat 更新包大小不符"</string>
+    <string name="ui_napcat_update_package_digest_mismatch_current_program_is_preserved" formatted="false">"NapCat 更新包摘要不符，当前程序已保留"</string>
+    <string name="ui_invalid_extracted_napcat_update_size" formatted="false">"NapCat 更新包解压大小异常"</string>
+    <string name="ui_insufficient_napcat_update_staging_space" formatted="false">"NapCat 更新暂存空间不足"</string>
+    <string name="ui_napcat_update_contains_duplicate_or_invalid_paths" formatted="false">"NapCat 更新包含重复或异常路径"</string>
+    <string name="ui_napcat_update_package_exceeds_its_declared_size" formatted="false">"NapCat 更新包超出声明大小"</string>
+    <string name="ui_napcat_main_program_differs_from_the_signed_version" formatted="false">"NapCat 主程序与签名版本不符"</string>
+    <string name="ui_napcat_update_package_lacks_dashboard_or_runtime_resources" formatted="false">"NapCat 更新包缺少后台或运行资源"</string>
+    <string name="ui_stable_update" formatted="false">"稳定更新"</string>
+    <string name="ui_the_new_version_contains_a_plugin_directory_with_the" formatted="false">"新版包含同名插件目录，请先将自定义插件移到 NapCat 工作目录后更新"</string>
+    <string name="ui_the_connection_observer_plugin_is_missing_or_modified_connection" formatted="false">"连接观察插件未安装或已被修改，连接状态可能显示未知；现有插件及启用设置已保留"</string>
+    <string name="ui_this_apk_has_no_online_update_url_configured_import" formatted="false">"此安装包尚未配置在线更新地址，可导入可信更新包或安装新版 APK"</string>
+    <string name="ui_checking_the_signed_update_catalog" formatted="false">"正在检查签名更新目录"</string>
+    <string name="ui_this_apk_has_no_online_update_url_configured" formatted="false">"当前安装包尚未配置在线更新地址"</string>
+    <string name="ui_update_catalog_is_temporarily_unavailable_try_again_later" formatted="false">"更新目录暂不可用，请稍后重试"</string>
+    <string name="ui_update_catalog_is_too_large" formatted="false">"更新目录过大"</string>
+    <string name="ui_is_available_to_download_and_verify">"发现 %1$s %2$s，可下载并校验"</string>
+    <string name="ui_is_the_latest_compatible_version_you_can_download_and">"%1$s %2$s 已是最新兼容版本，可重新下载并校验"</string>
+    <string name="ui_installed_is_newer_than_the_channel_release_and_has">"%1$s %2$s 高于通道已发布版本，已保留当前程序；需要回退时使用对应快照"</string>
+    <string name="ui_the_upstream_version_requires_a_different_runtime_or_newer">"上游版本需要不同的运行环境或新版管理器，当前 %1$s %2$s 已保留"</string>
+    <string name="ui_no_compatible_package_is_published_on_this_channel">"%1$s 当前通道尚无已发布的兼容程序包"</string>
+    <string name="ui_update_source_has_changed_check_again" formatted="false">"更新来源已变化，请重新检查"</string>
+    <string name="ui_no_package_matches_the_current_runtime_check_for_updates" formatted="false">"没有适配当前环境的程序包，请重新检查更新"</string>
+    <string name="ui_update_catalog_has_changed_review_the_release_information_again" formatted="false">"更新目录已变化，请重新查看版本说明"</string>
+    <string name="ui_insufficient_space_to_download_the_update" formatted="false">"下载更新所需空间不足"</string>
+    <string name="ui_downloading_mb">"正在下载 %1$s %2$s（%3$s / %4$s MB）"</string>
+    <string name="ui_update_download_failed_progress_is_preserved_you_can_retry" formatted="false">"更新下载失败，已保留进度，可重试"</string>
+    <string name="ui_download_range_differs_from_signed_resources_check_for_updates" formatted="false">"下载范围与签名资源不一致，可重新检查更新"</string>
+    <string name="ui_update_server_returned_an_unsupported_transfer_encoding" formatted="false">"更新服务器返回了不支持的传输编码"</string>
+    <string name="ui_storage_ran_out_while_downloading_the_update" formatted="false">"下载更新时存储空间不足"</string>
+    <string name="ui_download_interrupted_progress_is_preserved_download_again_to_resume" formatted="false">"下载中断，已保留进度，可再次下载继续"</string>
+    <string name="ui_checking_the_downloaded_file_digest" formatted="false">"正在核对下载文件摘要"</string>
+    <string name="ui_downloaded_file_verification_failed_current_program_is_unchanged_downloa" formatted="false">"下载文件校验失败，未改变当前程序；可重新下载"</string>
+    <string name="ui_unsupported_update_catalog_format_or_channel" formatted="false">"更新目录格式或通道不支持"</string>
+    <string name="ui_update_catalog_expired_or_device_time_is_incorrect_check" formatted="false">"更新目录已过期或设备时间不正确，请重新检查更新"</string>
+    <string name="ui_update_catalog_component_does_not_match_this_page" formatted="false">"更新目录的组件与当前页面不一致"</string>
+    <string name="ui_update_catalog_is_outdated_or_its_sequence_number_conflicts_233b9" formatted="false">"更新目录版本已过时或序号冲突，请稍后重试"</string>
+    <string name="ui_online_updates_require_https_urls_without_embedded_credentials" formatted="false">"在线更新仅支持无凭据的 HTTPS 地址"</string>
+    <string name="ui_this_is_not_a_supported_stable_update_version" formatted="false">"更新版本不属于受支持的稳定版本"</string>
+    <string name="ui_recovering_an_interrupted_persona_operation_please_wait" formatted="false">"正在恢复中断的人设操作，请稍候"</string>
+    <string name="ui_this_persona_database_version_is_incompatible_copy_the_prompt" formatted="false">"当前版本的人设数据暂不兼容，可复制提示词到 AstrBot 后台"</string>
+    <string name="ui_an_unfinished_persona_operation_must_be_recovered_first" formatted="false">"有未完成的人设操作，请先恢复"</string>
+    <string name="ui_the_default_persona_was_changed_in_the_dashboard_select" formatted="false">"默认人设已在后台变更，请在后台选择人设"</string>
+    <string name="ui_the_original_persona_was_deleted_choose_another_in_the" formatted="false">"原人设已被删除，请在后台选择其他人设"</string>
+    <string name="ui_incompatible_persona_recovery_record_data_is_preserved" formatted="false">"人设恢复记录格式不兼容，已保留数据"</string>
+    <string name="ui_start_astrbot_once_and_wait_for_the_dashboard_to" formatted="false">"请先启动一次 AstrBot，等待后台就绪后再应用人设"</string>
+    <string name="ui_initialize_the_astrbot_runtime_first" formatted="false">"请先初始化 AstrBot 运行环境"</string>
+    <string name="ui_a_remote_agent_is_active_configure_personas_in_astrbot" formatted="false">"当前使用远程 Agent，请在 AstrBot 后台配置人设；预设仍可复制"</string>
+    <string name="ui_incompatible_astrbot_persona_configuration_format_copy_the_prompt_into" formatted="false">"当前 AstrBot 人设配置格式不兼容，可复制提示词到后台"</string>
+    <string name="ui_this_astrbot_database_is_incompatible_copy_the_prompt_into" formatted="false">"当前 AstrBot 数据库暂不兼容，可复制提示词到后台"</string>
+    <string name="ui_portable_backup_manifest_is_too_large" formatted="false">"便携备份清单过大"</string>
+    <string name="ui_insufficient_portable_backup_staging_space" formatted="false">"便携备份暂存空间不足"</string>
+    <string name="ui_portable_backup_exceeds_the_2_gib_limit" formatted="false">"便携备份文件超过 2 GiB 上限"</string>
+    <string name="ui_data_changed_during_portable_backup_no_backup_was_created" formatted="false">"便携备份期间数据发生变化，未生成备份"</string>
+    <string name="ui_invalid_portable_backup_size_or_size_exceeds_2_gib" formatted="false">"便携备份大小无效或超过 2 GiB"</string>
+    <string name="ui_portable_backup_staging_directory_already_exists" formatted="false">"便携备份暂存目录已存在"</string>
+    <string name="ui_this_portable_backup_is_not_supported_by_this_app" formatted="false">"不是本应用支持的便携备份"</string>
+    <string name="ui_insufficient_space_to_extract_the_portable_backup" formatted="false">"便携备份解包空间不足"</string>
+    <string name="ui_portable_backup_entries_are_missing_duplicated_or_out_of" formatted="false">"便携备份文件项缺失、重复或顺序异常"</string>
+    <string name="ui_portable_backup_file_digest_mismatch_existing_data_was_not" formatted="false">"便携备份文件摘要不符，未修改现有数据"</string>
+    <string name="ui_portable_backup_is_incomplete" formatted="false">"便携备份不完整"</string>
+    <string name="ui_portable_backup_completion_record_mismatch" formatted="false">"便携备份完成记录不符"</string>
+    <string name="ui_portable_backup_contains_undeclared_files" formatted="false">"便携备份包含未声明文件"</string>
+    <string name="ui_portable_backup_staging_contains_data_outside_its_scope_import" formatted="false">"便携备份暂存包含范围之外的数据，请重新导入"</string>
+    <string name="ui_portable_backup_staged_files_have_changed_import_it_again" formatted="false">"便携备份暂存文件发生变化，请重新导入"</string>
+    <string name="ui_unsupported_portable_backup_format" formatted="false">"便携备份格式不支持"</string>
+    <string name="ui_invalid_portable_backup_id" formatted="false">"便携备份标识无效"</string>
+    <string name="ui_unsupported_portable_backup_data_scope" formatted="false">"便携备份的数据范围不支持"</string>
+    <string name="ui_portable_backup_does_not_match_installed_program_versions_install" formatted="false">"便携备份与当前运行版本组合不同，请先安装匹配的运行环境"</string>
+    <string name="ui_too_many_portable_backup_files" formatted="false">"便携备份文件数量超出范围"</string>
+    <string name="ui_portable_backup_file_paths_are_duplicated_or_out_of" formatted="false">"便携备份文件路径重复或顺序异常"</string>
+    <string name="ui_portable_backup_data_directory_is_missing" formatted="false">"便携备份数据目录缺失"</string>
+    <string name="ui_portable_backup_contains_paths_outside_its_scope_or_unsupported" formatted="false">"便携备份包含越界或不支持的路径"</string>
+    <string name="ui_unexpected_napcat_configuration_parent_directory" formatted="false">"NapCat 配置父目录异常"</string>
+    <string name="ui_portable_backup_contains_linked_parent_directories_or_missing_directorie" formatted="false">"便携备份包含链接父目录或缺失目录"</string>
+    <string name="ui_invalid_portable_backup_file_size_or_digest" formatted="false">"便携备份文件大小或摘要异常"</string>
+    <string name="ui_invalid_portable_backup_directory_record" formatted="false">"便携备份目录记录异常"</string>
+    <string name="ui_invalid_portable_backup_link_record" formatted="false">"便携备份链接记录异常"</string>
+    <string name="ui_portable_backup_contains_absolute_or_invalid_links" formatted="false">"便携备份不支持绝对或异常链接"</string>
+    <string name="ui_portable_backup_link_targets_a_qq_session_or_a" formatted="false">"便携备份链接指向 QQ 会话或备份范围之外"</string>
+    <string name="ui_unsupported_portable_backup_file_type" formatted="false">"便携备份文件类型不支持"</string>
+    <string name="ui_extracted_portable_backup_exceeds_the_8_gib_limit" formatted="false">"便携备份解包数据超过 8 GiB 上限"</string>
+    <string name="ui_portable_backup_root_cannot_be_a_link" formatted="false">"便携备份根目录不能为链接"</string>
+    <string name="ui_portable_backup_scope_roots_must_be_real_directories" formatted="false">"便携备份范围根目录必须为实际目录"</string>
+    <string name="ui_portable_backup_file_exceeds_the_2_gib_limit" formatted="false">"便携备份单文件超过 2 GiB 上限"</string>
+    <string name="ui_portable_backup_contains_unsupported_special_files" formatted="false">"便携备份中存在不支持的特殊文件"</string>
+    <string name="ui_portable_backup_supports_up_to_50_000_entries" formatted="false">"便携备份最多支持 50000 个文件项"</string>
+    <string name="ui_portable_backup_link_target_is_outside_its_data_scope" formatted="false">"便携备份链接目标超出数据范围"</string>
+    <string name="ui_portable_backup_file_size_mismatch" formatted="false">"便携备份文件大小不符"</string>
+    <string name="ui_portable_backup_file_is_missing_or_truncated" formatted="false">"便携备份文件缺失或被截断"</string>
+    <string name="ui_portable_backup_manifest_is_outside_supported_limits" formatted="false">"便携备份清单超出范围"</string>
+    <string name="ui_portable_backup_zip_directory_is_truncated_or_incomplete" formatted="false">"便携备份 ZIP 目录被截断或不完整"</string>
+    <string name="ui_invalid_portable_backup_zip_directory_count_or_split_archive" formatted="false">"便携备份 ZIP 目录数量或分卷格式异常"</string>
+    <string name="ui_invalid_portable_backup_zip_directory_bounds" formatted="false">"便携备份 ZIP 目录范围异常"</string>
+    <string name="ui_portable_backup_zip_directory_is_damaged" formatted="false">"便携备份 ZIP 目录损坏"</string>
+    <string name="ui_cannot_create_portable_backup_staging_directory" formatted="false">"无法创建便携备份暂存目录"</string>
+    <string name="ui_reading_selected_portable_backup" formatted="false">"正在读取所选便携备份"</string>
+    <string name="ui_cannot_read_selected_portable_backup" formatted="false">"无法读取所选便携备份"</string>
+    <string name="ui_verifying_portable_backup_scope_versions_and_file_digests" formatted="false">"正在校验便携备份范围、版本与文件摘要"</string>
+    <string name="ui_import_a_portable_backup_first" formatted="false">"请先导入便携备份"</string>
+    <string name="ui_portable_backup_manifest_is_missing" formatted="false">"便携备份清单缺失"</string>
+    <string name="ui_cannot_create_portable_backup_export_directory" formatted="false">"无法创建便携备份导出目录"</string>
+    <string name="ui_creating_a_portable_backup_without_qq_login_sessions" formatted="false">"正在制作不含 QQ 登录会话的便携备份"</string>
+    <string name="ui_portable_backup_export_file_is_missing" formatted="false">"便携备份导出文件缺失"</string>
+    <string name="ui_services_resumed_writing_to_the_selected_backup_file" formatted="false">"服务已恢复原状态，正在写入所选备份文件"</string>
+    <string name="ui_cannot_write_the_selected_backup_file" formatted="false">"无法写入所选备份文件"</string>
+    <string name="ui_portable_backup_write_is_incomplete_export_it_again" formatted="false">"便携备份写入不完整，请重新导出"</string>
+    <string name="ui_complete_the_previous_maintenance_operation_first" formatted="false">"请先完成上次维护操作"</string>
+    <string name="ui_no_runtime_available_for_rollback" formatted="false">"没有可回退的运行环境"</string>
+    <string name="ui_old_runtime_verification_failed_files_are_preserved" formatted="false">"旧环境校验失败，已保留文件"</string>
+    <string name="ui_the_corresponding_runtime_data_snapshot_is_missing" formatted="false">"对应环境数据快照缺失"</string>
+    <string name="ui_this_apk_s_runtime_is_already_installed" formatted="false">"当前已经使用此 APK 的运行环境"</string>
+    <string name="ui_cannot_identify_the_new_runtime_version" formatted="false">"新环境版本无法识别"</string>
+    <string name="ui_installed_components_differ_from_bundled_resources_the_original_runtime" formatted="false">"当前组件组合与内置资源不同，已保留原环境；请使用匹配的运行环境升级或维护包"</string>
+    <string name="ui_component_versions_changed_during_repair_original_runtime_and_snapshot" formatted="false">"修复期间组件版本发生变化，原环境与快照已保留，请重新检查"</string>
+    <string name="ui_new_runtime_version_changed_during_maintenance_recovery_records_are" formatted="false">"新环境版本在维护期间发生变化，已保留恢复记录"</string>
+    <string name="ui_unrecognized_runtime_upgrade_record_all_files_are_preserved" formatted="false">"运行环境升级记录无法识别，已保留全部文件"</string>
+    <string name="ui_previous_runtime_upgrade_commit_and_cleanup_completed" formatted="false">"已完成上次运行环境升级的提交与清理"</string>
+    <string name="ui_rollback_runtime_directory_conflict_recovery_records_are_preserved" formatted="false">"回退环境目录冲突，已保留恢复记录"</string>
+    <string name="ui_original_runtime_required_for_recovery_is_missing_or_has" formatted="false">"恢复所需的原环境缺失或版本不符，已保留全部文件与快照"</string>
+    <string name="ui_runtime_upgrade_was_incomplete_original_runtime_and_its_data" formatted="false">"运行环境升级未完成，已恢复原环境与对应数据快照"</string>
+    <string name="ui_files_required_to_commit_the_runtime_are_missing_recovery" formatted="false">"环境提交所需文件缺失，已保留恢复记录"</string>
+    <string name="ui_invalid_runtime_record_id" formatted="false">"运行环境记录编号无效"</string>
+    <string name="ui_install_the_ssh_extension_first" formatted="false">"请先安装 SSH 扩展"</string>
+    <string name="ui_initialize_the_ubuntu_runtime_first" formatted="false">"请先初始化 Ubuntu 环境"</string>
+    <string name="ui_ssh_session_limit_reached_or_the_server_is_stopping" formatted="false">"SSH 终端数量已达上限或服务正在停止"</string>
+    <string name="ui_ssh_command_is_too_long" formatted="false">"SSH 命令过长"</string>
+    <string name="ui_cannot_save_ssh_installation_state" formatted="false">"无法保存 SSH 安装状态"</string>
+    <string name="ui_ssh_port_must_be_between_1024_and_65535" formatted="false">"SSH 端口范围为 1024–65535"</string>
+    <string name="ui_password_must_contain_12_128_characters_without_newlines_or" formatted="false">"密码需为 12–128 个字符，不能含换行或控制字符"</string>
+    <string name="ui_cannot_save_ssh_uninstallation_state" formatted="false">"无法保存 SSH 卸载状态"</string>
+    <string name="ui_cannot_save_ssh_running_preference" formatted="false">"无法保存 SSH 运行偏好"</string>
+    <string name="ui_ssh_settings_unavailable_configure_or_reinstall_the_extension" formatted="false">"SSH 设置不可用，请重新设置或重装扩展"</string>
+    <string name="ui_unrecognized_ssh_settings_format" formatted="false">"SSH 设置格式无法识别"</string>
+    <string name="ui_ssh_key_unavailable_reset_the_password_or_reinstall_the" formatted="false">"SSH 密钥不可用，请重新设置密码或重装扩展"</string>
+    <string name="ui_reading_update_package" formatted="false">"正在读取更新包"</string>
+    <string name="ui_cannot_read_the_selected_update_package" formatted="false">"无法读取所选更新包"</string>
+    <string name="ui_an_unfinished_update_record_exists" formatted="false">"有未完成的更新记录"</string>
+    <string name="ui_verifying_update_signature_and_compatibility" formatted="false">"正在校验更新签名及兼容性"</string>
+    <string name="ui_update_package_is_missing_or_too_large" formatted="false">"更新包缺失或过大"</string>
+    <string name="ui_invalid_update_package_structure" formatted="false">"更新包结构无效"</string>
+    <string name="ui_invalid_update_package_field_size" formatted="false">"更新包字段大小异常"</string>
+    <string name="ui_unsupported_update_format_or_component" formatted="false">"更新格式或组件不支持"</string>
+    <string name="ui_invalid_update_version" formatted="false">"更新版本无效"</string>
+    <string name="ui_update_package_version_differs_from_the_signed_catalog" formatted="false">"更新包版本与签名目录不一致"</string>
+    <string name="ui_this_update_requires_a_newer_manager_apk" formatted="false">"此更新需要新版管理器 APK"</string>
+    <string name="ui_this_update_does_not_match_the_current_runtime_or" formatted="false">"此更新与当前运行环境或依赖不匹配，请使用对应运行包或 APK"</string>
+    <string name="ui_insufficient_update_staging_space" formatted="false">"更新暂存空间不足"</string>
+    <string name="ui_update_resource_size_mismatch" formatted="false">"更新资源大小不符"</string>
+    <string name="ui_update_resource_digest_mismatch_current_version_is_preserved" formatted="false">"更新资源摘要不符，已保留当前版本"</string>
+    <string name="ui_extracting_and_verifying_astrbot">"正在解包并校验 AstrBot %1$s"</string>
+    <string name="ui_project_source_record_differs_from_the_signed_manifest" formatted="false">"项目来源记录与签名清单不一致"</string>
+    <string name="ui_update_archive_contains_duplicate_or_invalid_paths" formatted="false">"更新归档含重复或异常路径"</string>
+    <string name="ui_update_package_contains_unsupported_links_or_parent_directory_paths" formatted="false">"更新包不支持链接或父目录路径"</string>
+    <string name="ui_extracted_update_size_exceeds_the_signed_manifest" formatted="false">"更新解包大小超出签名清单"</string>
+    <string name="ui_update_archive_contains_special_files" formatted="false">"更新归档含特殊文件"</string>
+    <string name="ui_extracted_update_count_or_size_mismatch" formatted="false">"更新解包数量或大小不符"</string>
+    <string name="ui_no_program_and_data_snapshot_available_for_rollback" formatted="false">"没有可回退的程序与数据快照"</string>
+    <string name="ui_other_components_have_changed_so_this_old_combination_cannot" formatted="false">"其他组件已更新，无法单独恢复此旧组合；请使用匹配的完整环境与备份"</string>
+    <string name="ui_rollback_program_or_data_snapshot_is_missing" formatted="false">"回退程序或数据快照缺失"</string>
+    <string name="ui_insufficient_rollback_preparation_space" formatted="false">"回退准备空间不足"</string>
+    <string name="ui_preparing_previous_program_and_its_data" formatted="false">"正在准备旧程序与对应数据"</string>
+    <string name="ui_unrecognized_update_record_all_files_are_preserved" formatted="false">"更新记录无法识别，已保留全部文件"</string>
+    <string name="ui_previous_update_commit_and_cleanup_completed" formatted="false">"已完成上次更新的提交与清理"</string>
+    <string name="ui_previous_program_required_for_recovery_is_missing_data_is" formatted="false">"恢复所需旧程序缺失，已保留数据"</string>
+    <string name="ui_previous_program_version_check_failed_update_snapshot_is_preserved" formatted="false">"旧程序版本校验失败，已保留更新快照"</string>
+    <string name="ui_update_was_incomplete_previous_program_and_original_data_snapshot" formatted="false">"更新未完成，已恢复旧程序及操作前的数据快照"</string>
+    <string name="ui_sqlite_verification_failed_for_the_data_snapshot_recovery_records" formatted="false">"数据快照的 SQLite 检查失败，已保留恢复记录"</string>
+    <string name="ui_napcat_rollback_program_version_or_dashboard_mismatch" formatted="false">"NapCat 回退程序版本或界面不匹配"</string>
+    <string name="ui_update_lacks_required_program_or_dashboard_files" formatted="false">"更新缺少必要程序或界面文件"</string>
+    <string name="ui_program_version_mismatch" formatted="false">"程序版本不匹配"</string>
+    <string name="ui_dashboard_and_program_version_mismatch" formatted="false">"Dashboard 与程序版本不匹配"</string>
+    <string name="ui_dashboard_resources_missing" formatted="false">"Dashboard 资源缺失"</string>
+    <string name="ui_update_resources_exceed_the_allowed_size" formatted="false">"更新资源超出允许大小"</string>
+    <string name="ui_storage_ran_out_while_reading_update_resources" formatted="false">"读取更新资源时空间不足"</string>
+    <string name="ui_this_apk_has_no_trusted_update_key_configured_update" formatted="false">"当前安装包未配置可信更新密钥，请使用对应 APK 更新"</string>
+    <string name="ui_invalid_update_signature_current_version_is_preserved" formatted="false">"更新签名无效，已保留当前版本"</string>
+    <string name="status_starting" formatted="false">"启动中"</string>
+    <string name="status_stopping" formatted="false">"停止中"</string>
+    <string name="status_crashed" formatted="false">"异常退出"</string>
+    <string name="status_stopped" formatted="false">"已停止"</string>
+    <string name="status_web_ui_disabled" formatted="false">"运行中，WebUI 已关闭"</string>
+    <string name="status_rechecking" formatted="false">"后台复查中"</string>
+    <string name="status_unresponsive" formatted="false">"后台无响应"</string>
+    <string name="status_waiting" formatted="false">"等待后台就绪"</string>
+    <string name="status_available" formatted="false">"后台可访问"</string>
+    <string name="status_qq_login" formatted="false">"QQ 需要登录"</string>
+    <string name="status_qq_verify" formatted="false">"QQ 需要验证"</string>
+    <string name="status_qq_offline" formatted="false">"QQ 已离线"</string>
+    <string name="status_qq_unknown" formatted="false">"QQ 状态待确认"</string>
+    <string name="status_onebot_config" formatted="false">"等待配置 OneBot"</string>
+    <string name="status_connected" formatted="false">"QQ 在线，OneBot 已连接"</string>
+    <string name="status_onebot_offline" formatted="false">"OneBot 已断开"</string>
+    <string name="status_onebot_connecting" formatted="false">"OneBot 连接中"</string>
+    <string name="status_onebot_unknown" formatted="false">"OneBot 状态待确认"</string>
+    <string name="persona_local_source" formatted="false">"本地添加的人设"</string>
+    <string name="persona_limit" formatted="false">"最多保存 200 个自建人设，请先删除不需要的人设"</string>
+    <string name="persona_duplicate" formatted="false">"已有同名人设，请换一个名称"</string>
+    <string name="persona_read_error" formatted="false">"本地人设库读取失败，原文件已保留，请重试"</string>
+    <string name="persona_invalid_id" formatted="false">"人设标识无效"</string>
+    <string name="persona_invalid_name" formatted="false">"名称需为 1–30 个字符，不能包含换行"</string>
+    <string name="persona_invalid_category" formatted="false">"请选择人设分类"</string>
+    <string name="persona_invalid_prompt" formatted="false">"提示词需为 1–12000 个字符"</string>
+    <string name="persona_invalid_intro" formatted="false">"简介最多 120 字，开场白最多 1000 字"</string>
+    <string name="persona_initialize" formatted="false">"先启动一次 AstrBot，即可导入和切换人设"</string>
+</resources>

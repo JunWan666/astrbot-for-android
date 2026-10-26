@@ -1,5 +1,12 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.LocalizedStateException
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.os.Build
 import android.system.Os
@@ -32,16 +39,16 @@ class BootstrapRuntime(private val context: Context) {
             if (marker.isFile) {
                 val installed = JSONObject(marker.readText())
                 // An APK replacement does not authorize replacing a user's working guest.
-                require(installed.getString("abi") == abi) { "现有环境架构与安装包不同，已保留文件" }
-                progress("Ubuntu 环境已就绪")
+                requireLocalized(installed.getString("abi") == abi) { AppText.get(R.string.ui_the_installed_runtime_architecture_differs_from_this_apk_files) }
+                progress(AppText.get(R.string.ui_ubuntu_runtime_is_ready))
                 return@withLock
             }
             val staging = File(rootfs.parentFile, "ubuntu.installing")
             prepareAt(staging, manifest, progress)
             // Only an interrupted, uncommitted bootstrap can exist here.
-            check(!rootfs.exists()) { "存在未识别环境，保留数据并停止初始化" }
+            checkLocalized(!rootfs.exists()) { AppText.get(R.string.ui_unrecognized_existing_runtime_initialization_stopped_data_is_preserved) }
             DurableFiles.move(staging, rootfs)
-            progress("Ubuntu 环境已就绪")
+            progress(AppText.get(R.string.ui_ubuntu_runtime_is_ready))
         }
     }
 
@@ -55,8 +62,8 @@ class BootstrapRuntime(private val context: Context) {
 
     private suspend fun prepareAt(staging: File, manifest: JSONObject, progress: (String) -> Unit) {
             val assetBase = "bootstrap/$abi"
-            require(manifest.getString("abi") == abi) { "内置环境架构不匹配" }
-            progress("校验内置 Ubuntu 资源")
+            requireLocalized(manifest.getString("abi") == abi) { AppText.get(R.string.ui_bundled_runtime_architecture_mismatch) }
+            progress(AppText.get(R.string.ui_verifying_bundled_ubuntu_resources))
             val digest = MessageDigest.getInstance("SHA-256")
             context.assets.open("$assetBase/ubuntu.tar.bin").use { input ->
                 val buffer = ByteArray(128 * 1024)
@@ -68,26 +75,26 @@ class BootstrapRuntime(private val context: Context) {
                 }
             }
             val actual = digest.digest().joinToString("") { "%02x".format(it) }
-            require(actual == manifest.getString("sha256")) { "Ubuntu 资源完整性校验失败" }
-            require(manifest.getLong("unpackedBytes") in 1..(12L * 1024 * 1024 * 1024)) { "资源大小超出支持范围" }
+            requireLocalized(actual == manifest.getString("sha256")) { AppText.get(R.string.ui_ubuntu_resource_integrity_check_failed) }
+            requireLocalized(manifest.getLong("unpackedBytes") in 1..(12L * 1024 * 1024 * 1024)) { AppText.get(R.string.ui_resource_size_exceeds_the_supported_limit) }
             val required = manifest.getLong("unpackedBytes") * 2 + 64L * 1024 * 1024
-            require(context.filesDir.usableSpace >= required) { "存储空间不足，至少需要 ${required / 1024 / 1024} MB" }
+            requireLocalized(context.filesDir.usableSpace >= required) { AppText.get(R.string.ui_insufficient_storage_at_least_mb_is_required, required / 1024 / 1024) }
             DurableFiles.delete(staging, writableGuestDirectories = true)
-            check(staging.mkdirs()) { "无法创建环境准备目录" }
+            checkLocalized(staging.mkdirs()) { AppText.get(R.string.ui_cannot_create_runtime_staging_directory) }
             try {
-                progress("正在解包 Ubuntu 环境")
+                progress(AppText.get(R.string.ui_extracting_ubuntu_runtime))
                 extract(assetBase, staging, manifest.getLong("unpackedBytes"), progress)
                 listOf("root", "tmp", "proc", "sys", "dev", "run", "var/tmp", "var/log", "var/cache", "persistent").forEach { File(staging, it).mkdirs() }
                 Os.chmod(File(staging, "tmp").path, 1023)
                 Os.chmod(File(staging, "var/tmp").path, 1023)
                 File(staging, "etc/resolv.conf").writeText("nameserver 1.1.1.1\nnameserver 8.8.8.8\n")
-                progress("验证解包后的运行环境")
+                progress(AppText.get(R.string.ui_verifying_extracted_runtime))
                 val verification = if (manifest.optString("kind") == "complete") {
                     "test -x /opt/qq/qq && test -f /opt/astrbot/main.py && " +
                         "/opt/astrbot-venv/bin/python -c 'import quart, fastapi, faiss; print(\"runtime-ok\")'"
                 } else "test -f /etc/os-release && /bin/echo bootstrap-ok"
                 val check = runCommand(processBuilderAt(staging, "/bin/sh", "-lc", verification), 180)
-                require(check.exitCode == 0) { "环境验证失败：${check.output.takeLast(3000)}" }
+                requireLocalized(check.exitCode == 0) { AppText.get(R.string.ui_runtime_verification_failed, check.output.takeLast(3000)) }
                 DurableFiles.write(File(staging, ".astrbot-bootstrap.json"), manifest)
             } catch (failure: Throwable) {
                 DurableFiles.delete(staging, writableGuestDirectories = true)
@@ -107,15 +114,15 @@ class BootstrapRuntime(private val context: Context) {
                     currentCoroutineContext().ensureActive()
                     val entry = archive.nextEntry ?: break
                     entries++
-                    if (entries % 500 == 0) progress("正在解包 Ubuntu：$entries 个文件项")
+                    if (entries % 500 == 0) progress(AppText.get(R.string.ui_extracting_ubuntu_entries, entries))
                     val path = ArchivePaths.entry(root, entry.name, allowUnixEscapes = true)
                     when {
                         entry.isSymbolicLink || entry.isLink -> links += Link(entry.name, entry.linkName, entry.isLink)
                         entry.isDirectory -> check(path.toFile().isDirectory || path.toFile().mkdirs())
                         entry.isFile -> {
-                            require(entry.size >= 0 && entry.size <= 1024L * 1024 * 1024) { "资源文件大小异常" }
+                            requireLocalized(entry.size >= 0 && entry.size <= 1024L * 1024 * 1024) { AppText.get(R.string.ui_invalid_resource_file_size) }
                             written += entry.size
-                            require(written <= expectedBytes + 1024 * 1024) { "资源解包大小异常" }
+                            requireLocalized(written <= expectedBytes + 1024 * 1024) { AppText.get(R.string.ui_invalid_extracted_resource_size) }
                             path.parent.toFile().mkdirs()
                             path.toFile().outputStream().use { archive.copyTo(it) }
                             Os.chmod(path.toString(), entry.mode and 511)
@@ -125,11 +132,11 @@ class BootstrapRuntime(private val context: Context) {
                 }
             }
         }
-        progress("正在准备 Ubuntu 链接：${links.size} 项")
+        progress(AppText.get(R.string.ui_preparing_ubuntu_links_entries, links.size))
         links.filter { it.hard }.forEach {
             val path = ArchivePaths.entry(root, it.name, allowUnixEscapes = true)
             val target = ArchivePaths.entry(root, it.target, allowUnixEscapes = true)
-            require(target.toFile().canonicalFile.toPath().startsWith(root)) { "硬链接越界：${it.name} -> ${it.target}" }
+            requireLocalized(target.toFile().canonicalFile.toPath().startsWith(root)) { AppText.get(R.string.ui_hard_link_outside_permitted_paths, it.name, it.target) }
             path.parent.toFile().mkdirs()
             // Android app SELinux policy can forbid hard links, even inside the app's data.
             target.toFile().copyTo(path.toFile(), overwrite = false)
@@ -138,12 +145,12 @@ class BootstrapRuntime(private val context: Context) {
         links.filterNot { it.hard }.forEach {
             val path = ArchivePaths.entry(root, it.name, allowUnixEscapes = true)
             // A previously created link must not redirect creation outside staging.
-            require(path.parent.toFile().canonicalFile.toPath().startsWith(root)) { "符号链接父路径越界：${it.name}" }
+            requireLocalized(path.parent.toFile().canonicalFile.toPath().startsWith(root)) { AppText.get(R.string.ui_symbolic_link_parent_outside_permitted_paths, it.name) }
             val target = ArchivePaths.link(root, path, it.target, allowUnixEscapes = true)
             path.parent.toFile().mkdirs()
             try { Os.symlink(target.toString(), path.toString()) }
             catch (failure: android.system.ErrnoException) {
-                throw IllegalStateException("无法准备链接：${it.name} -> ${it.target}", failure)
+                throw LocalizedStateException(AppText.get(R.string.ui_cannot_prepare_link, it.name, it.target), failure)
             }
         }
     }
@@ -211,7 +218,7 @@ class BootstrapRuntime(private val context: Context) {
                 try {
                     if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
                         stopOwnedProcess(process)
-                        throw IllegalStateException("运行命令超时")
+                        throw LocalizedStateException(AppText.get(R.string.ui_command_timed_out))
                     }
                     CommandResult(process.exitValue(), output.await())
                 } finally {

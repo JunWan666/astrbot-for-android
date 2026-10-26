@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.requireNotNullLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -46,18 +52,18 @@ internal class ManagerApkRepository(private val context: Context,
         val abis: Set<String>, val signers: Set<String>, val packageName: String, val runtimeKind: String)
 
     suspend fun cached(): ManagerApkStatus = gate.withLock { withContext(Dispatchers.IO) {
-        if (!configured) return@withContext ManagerApkStatus(null, false, 0, "当前安装包尚未配置管理器在线更新通道")
+        if (!configured) return@withContext ManagerApkStatus(null, false, 0, AppText.get(R.string.ui_this_apk_has_no_manager_update_channel_configured))
         runCatching { savedCandidate()?.let(::status) }.getOrNull()
-            ?: ManagerApkStatus(null, false, 0, "点击检查，获取已签名的管理器版本信息")
+            ?: ManagerApkStatus(null, false, 0, AppText.get(R.string.ui_check_for_signed_manager_version_information))
     } }
 
     suspend fun check(progress: (String) -> Unit): ManagerApkStatus = gate.withLock { withContext(Dispatchers.IO) {
-        require(configured) { "当前安装包尚未配置管理器在线更新通道" }
-        progress("正在检查管理器签名目录")
+        requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_manager_update_channel_configured) }
+        progress(AppText.get(R.string.ui_checking_the_signed_manager_catalog))
         val envelope = response(https(source)) { result ->
-            require(result.isSuccessful) { "管理器更新目录暂不可用" }
+            requireLocalized(result.isSuccessful) { AppText.get(R.string.ui_manager_update_catalog_is_temporarily_unavailable) }
             val body = requireNotNull(result.body)
-            require(body.contentLength() <= MAX_CATALOG) { "管理器更新目录过大" }
+            requireLocalized(body.contentLength() <= MAX_CATALOG) { AppText.get(R.string.ui_manager_update_catalog_is_too_large) }
             val bytes = ByteArrayOutputStream()
             body.byteStream().use { input ->
                 val buffer = ByteArray(8192)
@@ -65,7 +71,7 @@ internal class ManagerApkRepository(private val context: Context,
                     currentCoroutineContext().ensureActive()
                     val count = input.read(buffer)
                     if (count < 0) break
-                    require(bytes.size() + count <= MAX_CATALOG) { "管理器更新目录过大" }
+                    requireLocalized(bytes.size() + count <= MAX_CATALOG) { AppText.get(R.string.ui_manager_update_catalog_is_too_large) }
                     bytes.write(buffer, 0, count)
                 }
             }
@@ -73,12 +79,12 @@ internal class ManagerApkRepository(private val context: Context,
         }
         val entry = verify(envelope, commitSequence = true)
         DurableFiles.write(catalog, JSONObject().put("source", source).put("envelope", envelope))
-        entry?.let(::status) ?: ManagerApkStatus(null, false, 0, "已检查签名目录，当前应用没有适用的新版本")
+        entry?.let(::status) ?: ManagerApkStatus(null, false, 0, AppText.get(R.string.ui_signed_catalog_checked_no_applicable_app_update_is_available))
     } }
 
     suspend fun download(id: String, progress: (String) -> Unit): ManagerApkStatus = gate.withLock { withContext(Dispatchers.IO) {
-        val entry = requireNotNull(savedCandidate()) { "请先重新检查管理器更新" }
-        require(entry.info.id == id) { "版本信息已变化，请重新查看" }
+        val entry = requireNotNullLocalized(savedCandidate()) { AppText.get(R.string.ui_check_for_manager_updates_again_first) }
+        requireLocalized(entry.info.id == id) { AppText.get(R.string.ui_version_information_has_changed_review_it_again) }
         directory.mkdirs()
         val previous = runCatching { DurableFiles.read(receipt) }.getOrNull()
         if (previous?.optString("sha256") != entry.info.sha256 || partial.length() > entry.info.bytes) {
@@ -86,19 +92,19 @@ internal class ManagerApkRepository(private val context: Context,
         }
         DurableFiles.write(receipt, JSONObject().put("sha256", entry.info.sha256))
         val offset = partial.length()
-        require(context.filesDir.usableSpace >= entry.info.bytes - offset + entry.info.bytes + 64L * 1024 * 1024) {
-            "下载与系统安装暂存所需空间不足，请先清理手机存储"
+        requireLocalized(context.filesDir.usableSpace >= entry.info.bytes - offset + entry.info.bytes + 64L * 1024 * 1024) {
+            AppText.get(R.string.ui_insufficient_download_and_system_installation_staging_space_free_storage)
         }
         if (offset != entry.info.bytes) response(entry.url, offset) { result ->
-            require(result.code == 200 || result.code == 206) { "下载失败，已保留进度，可重试" }
+            requireLocalized(result.code == 200 || result.code == 206) { AppText.get(R.string.ui_download_failed_progress_is_preserved_you_can_retry) }
             val append = offset > 0 && result.code == 206
             val start = if (append) offset else 0L
-            if (result.code == 206) require(result.header("Content-Range") == "bytes $start-${entry.info.bytes - 1}/${entry.info.bytes}") {
-                "服务器返回的下载范围不匹配"
+            if (result.code == 206) requireLocalized(result.header("Content-Range") == "bytes $start-${entry.info.bytes - 1}/${entry.info.bytes}") {
+                AppText.get(R.string.ui_server_download_range_mismatch)
             }
-            require(result.header("Content-Encoding").let { it == null || it == "identity" }) { "服务器返回了不支持的传输编码" }
+            requireLocalized(result.header("Content-Encoding").let { it == null || it == "identity" }) { AppText.get(R.string.ui_the_server_returned_an_unsupported_transfer_encoding) }
             val body = requireNotNull(result.body)
-            require(body.contentLength() == -1L || body.contentLength() == entry.info.bytes - start) { "下载大小与签名目录不一致" }
+            requireLocalized(body.contentLength() == -1L || body.contentLength() == entry.info.bytes - start) { AppText.get(R.string.ui_download_size_differs_from_the_signed_catalog) }
             var received = start
             var lastProgress = -1L
             FileOutputStream(partial, append).use { output ->
@@ -108,36 +114,36 @@ internal class ManagerApkRepository(private val context: Context,
                         currentCoroutineContext().ensureActive()
                         val count = input.read(buffer)
                         if (count < 0) break
-                        require(received + count <= entry.info.bytes) { "下载资源超出签名大小" }
-                        require(context.filesDir.usableSpace >= 16L * 1024 * 1024) { "下载时存储空间不足" }
+                        requireLocalized(received + count <= entry.info.bytes) { AppText.get(R.string.ui_download_exceeds_the_signed_size) }
+                        requireLocalized(context.filesDir.usableSpace >= 16L * 1024 * 1024) { AppText.get(R.string.ui_storage_ran_out_during_download) }
                         output.write(buffer, 0, count); received += count
                         if (received / (1024 * 1024) != lastProgress) {
                             lastProgress = received / (1024 * 1024)
-                            progress("正在下载 ${entry.info.versionName}（${received / 1024 / 1024} / ${entry.info.bytes / 1024 / 1024} MiB）")
+                            progress(AppText.get(R.string.ui_downloading_mib, entry.info.versionName, received / 1024 / 1024, entry.info.bytes / 1024 / 1024))
                         }
                     }
                 } } finally { output.fd.sync() }
             }
-            require(received == entry.info.bytes) { "下载中断，已保留进度，可继续下载" }
+            requireLocalized(received == entry.info.bytes) { AppText.get(R.string.ui_download_interrupted_progress_is_preserved_you_can_resume) }
         }
-        progress("正在校验 APK 摘要、版本和应用签名")
+        progress(AppText.get(R.string.ui_verifying_apk_digest_version_and_signing_certificate))
         verifyFile(partial, entry)
-        require(savedCandidate()?.info == entry.info) { "目录已过期或变化，请重新检查" }
+        requireLocalized(savedCandidate()?.info == entry.info) { AppText.get(R.string.ui_catalog_expired_or_changed_check_again) }
         apkFile.parentFile!!.mkdirs()
         // Only the narrowly scoped share directory is exposed to the Android installer.
         if (apkFile.exists()) check(apkFile.delete())
         DurableFiles.move(partial, apkFile)
         DurableFiles.write(prepared, JSONObject().put("sha256", entry.info.sha256).put("scope", scope))
         DurableFiles.removeRecord(receipt)
-        status(entry).copy(message = "APK 已校验，通过确认后由系统安装；现有服务尚未改变")
+        status(entry).copy(message = AppText.get(R.string.ui_apk_verified_confirm_to_open_system_installation_running_services))
     } }
 
     /** Always rehash and reparse immediately before granting an installer access. */
     suspend fun forInstaller(id: String): File = gate.withLock { withContext(Dispatchers.IO) {
-        val entry = requireNotNull(savedCandidate()) { "版本信息已过期，请重新检查" }
-        require(entry.info.id == id && isPrepared(entry)) { "请先下载并校验 APK" }
+        val entry = requireNotNullLocalized(savedCandidate()) { AppText.get(R.string.ui_version_information_has_expired_check_again) }
+        requireLocalized(entry.info.id == id && isPrepared(entry)) { AppText.get(R.string.ui_download_and_verify_the_apk_first) }
         verifyFile(apkFile, entry)
-        require(context.filesDir.usableSpace >= entry.info.bytes + 64L * 1024 * 1024) { "系统安装暂存空间不足，请先清理手机存储" }
+        requireLocalized(context.filesDir.usableSpace >= entry.info.bytes + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_system_installation_staging_space_free_storage_first) }
         apkFile
     } }
 
@@ -151,7 +157,7 @@ internal class ManagerApkRepository(private val context: Context,
     private fun savedCandidate(): Entry? {
         if (!configured) return null
         val saved = DurableFiles.read(catalog) ?: return null
-        require(saved.getString("source") == source) { "更新来源已变化" }
+        requireLocalized(saved.getString("source") == source) { AppText.get(R.string.ui_update_source_has_changed) }
         return verify(saved.getJSONObject("envelope"), commitSequence = false)
     }
     private fun isPrepared(entry: Entry): Boolean = runCatching {
@@ -164,24 +170,24 @@ internal class ManagerApkRepository(private val context: Context,
         val offset = if (runCatching { DurableFiles.read(receipt)?.optString("sha256") == entry.info.sha256 }.getOrDefault(false))
             partial.length().coerceIn(0, entry.info.bytes) else 0
         return ManagerApkStatus(entry.info, ready, if (ready) entry.info.bytes else offset,
-            if (ready) "APK 已就绪；安装前会再次校验" else "发现管理器 ${entry.info.versionName}，下载与安装由你确认")
+            if (ready) AppText.get(R.string.ui_apk_ready_it_will_be_verified_again_before_installation) else AppText.get(R.string.ui_manager_is_available_download_and_installation_require_your_confirmation, entry.info.versionName))
     }
 
     private fun verify(envelope: JSONObject, commitSequence: Boolean): Entry? {
-        require(envelope.toString().toByteArray().size <= MAX_CATALOG) { "管理器更新目录过大" }
+        requireLocalized(envelope.toString().toByteArray().size <= MAX_CATALOG) { AppText.get(R.string.ui_manager_update_catalog_is_too_large) }
         val raw = Base64.decode(envelope.getString("payload"), Base64.NO_WRAP)
-        require(raw.size in 1..128 * 1024) { "管理器更新目录格式不支持" }
+        requireLocalized(raw.size in 1..128 * 1024) { AppText.get(R.string.ui_unsupported_manager_update_catalog_format) }
         UpdateTrust(context).verify(raw, Base64.decode(envelope.getString("signature"), Base64.NO_WRAP))
         val document = JSONObject(raw.toString(Charsets.UTF_8))
-        require(document.getInt("schema") == 1 && document.getString("component") == "manager" && document.getString("channel") == "stable") {
-            "此目录不是管理器稳定更新目录"
+        requireLocalized(document.getInt("schema") == 1 && document.getString("component") == "manager" && document.getString("channel") == "stable") {
+            AppText.get(R.string.ui_this_is_not_the_stable_manager_update_catalog)
         }
         val sequence = document.getLong("sequence")
         require(sequence in 1..9_007_199_254_740_991L)
         val from = document.getLong("issuedAtMs"); val until = document.getLong("expiresAtMs")
         val window = 31L * 24 * 60 * 60 * 1000
-        require(from in 1..Long.MAX_VALUE - window && until in from + 1..from + window && now() in from..until) {
-            "更新目录已过期或设备时间不正确"
+        requireLocalized(from in 1..Long.MAX_VALUE - window && until in from + 1..from + window && now() in from..until) {
+            AppText.get(R.string.ui_update_catalog_expired_or_device_time_is_incorrect)
         }
         val own = installed()
         val entries = document.getJSONArray("entries")
@@ -208,12 +214,12 @@ internal class ManagerApkRepository(private val context: Context,
             val kind = value.getString("runtimeKind"); require(kind in setOf("bundled", "bootstrap"))
             Entry(ManagerApkInfo(id, code, name, notes, bytes, sha), https(value.getString("url")), min, abis, signers, packageName, kind)
         }
-        require(parsed.map { it.info.id }.toSet().size == parsed.size &&
-            parsed.map { it.packageName to it.info.versionCode }.toSet().size == parsed.size) { "更新目录存在重复版本" }
+        requireLocalized(parsed.map { it.info.id }.toSet().size == parsed.size &&
+            parsed.map { it.packageName to it.info.versionCode }.toSet().size == parsed.size) { AppText.get(R.string.ui_update_catalog_contains_duplicate_versions) }
         val fingerprint = UpdateTrust.sha256(raw)
         val previous = DurableFiles.read(sequenceFile)
-        if (previous != null) require(sequence > previous.getLong("sequence") ||
-            sequence == previous.getLong("sequence") && fingerprint == previous.getString("fingerprint")) { "更新目录版本已过时或序号冲突" }
+        if (previous != null) requireLocalized(sequence > previous.getLong("sequence") ||
+            sequence == previous.getLong("sequence") && fingerprint == previous.getString("fingerprint")) { AppText.get(R.string.ui_update_catalog_is_outdated_or_its_sequence_number_conflicts) }
         if (commitSequence) DurableFiles.write(sequenceFile, JSONObject().put("sequence", sequence).put("fingerprint", fingerprint))
         val kind = if (BuildConfig.BUNDLED_RUNTIME) "bundled" else "bootstrap"
         return parsed.filter { it.packageName == context.packageName && it.info.versionCode > code(own) &&
@@ -222,7 +228,7 @@ internal class ManagerApkRepository(private val context: Context,
     }
 
     private suspend fun verifyFile(file: File, entry: Entry) {
-        require(file.isFile && file.length() == entry.info.bytes) { "APK 大小与签名目录不一致" }
+        requireLocalized(file.isFile && file.length() == entry.info.bytes) { AppText.get(R.string.ui_apk_size_differs_from_the_signed_catalog) }
         val digest = MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->
             val buffer = ByteArray(128 * 1024)
@@ -234,24 +240,24 @@ internal class ManagerApkRepository(private val context: Context,
             }
         }
         if (digest.digest().joinToString("") { "%02x".format(it) } != entry.info.sha256) {
-            check(file.delete()); error("APK 摘要校验失败，请重新下载")
+            check(file.delete()); error(AppText.get(R.string.ui_apk_digest_verification_failed_download_it_again))
         }
-        val info = requireNotNull(context.packageManager.getPackageArchiveInfo(file.path, signingFlags())) { "无法识别 APK 安装信息" }
-        require(info.packageName == context.packageName && info.packageName == entry.packageName &&
+        val info = requireNotNullLocalized(context.packageManager.getPackageArchiveInfo(file.path, signingFlags())) { AppText.get(R.string.ui_cannot_read_apk_installation_information) }
+        requireLocalized(info.packageName == context.packageName && info.packageName == entry.packageName &&
             code(info) == entry.info.versionCode && info.versionName == entry.info.versionName && code(info) > code(installed())) {
-            "APK 包名或版本与当前应用不匹配"
+            AppText.get(R.string.ui_apk_package_name_or_version_does_not_match_this)
         }
-        require(signers(info).isNotEmpty() && signers(info) == signers(installed()) && signers(info) == entry.signers) { "APK 应用签名与当前安装不一致" }
-        require(info.applicationInfo?.minSdkVersion == entry.minSdk && entry.minSdk <= Build.VERSION.SDK_INT) { "APK 系统版本要求不匹配" }
+        requireLocalized(signers(info).isNotEmpty() && signers(info) == signers(installed()) && signers(info) == entry.signers) { AppText.get(R.string.ui_apk_signing_certificate_differs_from_the_installed_app) }
+        requireLocalized(info.applicationInfo?.minSdkVersion == entry.minSdk && entry.minSdk <= Build.VERSION.SDK_INT) { AppText.get(R.string.ui_apk_android_version_requirements_are_incompatible) }
         ZipFile(file).use { archive ->
             val entries = archive.entries().asSequence().map { it.name }.toList()
             val abis = entries.filter { it.startsWith("lib/") && it.endsWith(".so") }.map { it.split('/')[1] }.toSet()
-            require(abis == entry.abis) { "APK 架构与签名目录不一致" }
+            requireLocalized(abis == entry.abis) { AppText.get(R.string.ui_apk_architecture_differs_from_the_signed_catalog) }
             if (entry.runtimeKind == "bundled") {
                 val manifest = requireNotNull(archive.getEntry("assets/bootstrap/arm64-v8a/manifest.json"))
                 require(manifest.size in 1..64 * 1024 && archive.getEntry("assets/bootstrap/arm64-v8a/ubuntu.tar.bin") != null)
                 val json = archive.getInputStream(manifest).use { JSONObject(it.bufferedReader().readText()) }
-                require(json.getString("kind") == "complete") { "APK 不包含完整运行资源" }
+                requireLocalized(json.getString("kind") == "complete") { AppText.get(R.string.ui_apk_does_not_contain_the_complete_runtime) }
             }
         }
     }
@@ -278,14 +284,14 @@ internal class ManagerApkRepository(private val context: Context,
                 }
             } finally { cancellation.cancel() }
         }
-        error("更新服务器重定向次数过多")
+        error(AppText.get(R.string.ui_too_many_update_server_redirects))
     }
     fun close() { if (providedClient == null && clientDelegate.isInitialized()) { client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown() } }
     companion object {
         private val gate = Mutex()
         private const val MAX_CATALOG = 256 * 1024
         private fun https(value: String): HttpUrl = value.toHttpUrl().also {
-            require(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.fragment == null && value.length <= 4096) { "更新仅支持无凭据的 HTTPS 地址" }
+            requireLocalized(it.isHttps && it.username.isEmpty() && it.password.isEmpty() && it.fragment == null && value.length <= 4096) { AppText.get(R.string.ui_updates_require_https_urls_without_embedded_credentials) }
         }
     }
 }

@@ -37,30 +37,30 @@ internal fun webUiNeedsRecovery(id: ServiceId, state: ManagerState, origin: Stri
     val preparing = state.busy || pending != null || service.process in setOf(ProcessState.STARTING, ProcessState.STOPPING)
     val addressChanged = connection.endpoint != null && connection.endpoint.origin != origin
     val title = when {
-        !state.componentsReady -> "运行环境尚未就绪"
-        !connection.enabled -> "${id.label} 后台已关闭"
-        connection.endpoint == null -> "后台地址需要检查"
-        preparing -> if (service.process == ProcessState.STOPPING) "正在停止 ${id.label}" else "正在准备 ${id.label}"
-        service.process == ProcessState.STOPPED -> "${id.label} 已停止"
-        service.process == ProcessState.CRASHED -> "${id.label} 异常退出"
-        !service.canOpenWebUi -> if (service.health == HealthState.UNRESPONSIVE) "后台暂时无响应" else "正在等待后台就绪"
-        addressChanged -> "后台地址已更新"
-        failure == WebUiFailure.CERTIFICATE -> "后台证书未通过验证"
-        failure == WebUiFailure.TIMEOUT -> "后台页面加载超时"
-        else -> "后台页面加载失败"
+        !state.componentsReady -> AppText.get(R.string.ui_runtime_not_ready)
+        !connection.enabled -> AppText.get(R.string.ui_webui_is_disabled, id.label)
+        connection.endpoint == null -> AppText.get(R.string.ui_check_the_webui_address)
+        preparing -> if (service.process == ProcessState.STOPPING) AppText.get(R.string.ui_stopping_984e8, id.label) else AppText.get(R.string.ui_preparing, id.label)
+        service.process == ProcessState.STOPPED -> AppText.get(R.string.ui_is_stopped, id.label)
+        service.process == ProcessState.CRASHED -> AppText.get(R.string.ui_crashed_8f2c0, id.label)
+        !service.canOpenWebUi -> if (service.health == HealthState.UNRESPONSIVE) AppText.get(R.string.ui_webui_is_not_responding) else AppText.get(R.string.ui_waiting_for_webui_readiness)
+        addressChanged -> AppText.get(R.string.ui_webui_address_changed)
+        failure == WebUiFailure.CERTIFICATE -> AppText.get(R.string.ui_webui_certificate_verification_failed)
+        failure == WebUiFailure.TIMEOUT -> AppText.get(R.string.ui_webui_loading_timed_out)
+        else -> AppText.get(R.string.ui_unable_to_load_the_webui)
     }
     val description = when {
-        !state.componentsReady -> "返回首页检查或完成运行环境初始化。"
-        !connection.enabled || connection.endpoint == null -> connection.note ?: "请返回首页检查后台设置，现有配置会保留。"
-        preparing -> if (state.busy) state.phase else "正在处理请求，后台就绪后会自动打开。"
-        service.process == ProcessState.STOPPED -> "启动此服务后继续使用后台。"
-        service.process == ProcessState.CRASHED -> "可尝试重新启动，或查看日志了解退出原因。"
-        !service.canOpenWebUi -> "服务进程仍在运行。后台就绪后会自动打开，也可以先查看日志。"
-        addressChanged -> "重新打开后台以使用当前配置的地址。"
-        failure == WebUiFailure.CERTIFICATE -> "请检查后台 HTTPS 证书，或使用外部浏览器处理。"
-        failure == WebUiFailure.TIMEOUT -> "页面在 45 秒内未完成加载，可重试连接或查看日志。"
-        failure == WebUiFailure.HTTP -> "后台未能返回页面，可重试连接或查看日志。"
-        else -> "连接未完成，请重试；服务运行状态可在首页查看。"
+        !state.componentsReady -> AppText.get(R.string.ui_return_to_home_to_check_or_initialize_the_runtime)
+        !connection.enabled || connection.endpoint == null -> connection.note ?: AppText.get(R.string.ui_return_to_home_to_check_webui_settings_existing_configuration)
+        preparing -> if (state.busy) state.phase else AppText.get(R.string.ui_processing_your_request_the_webui_opens_automatically_when_ready)
+        service.process == ProcessState.STOPPED -> AppText.get(R.string.ui_start_this_service_to_continue_using_the_webui)
+        service.process == ProcessState.CRASHED -> AppText.get(R.string.ui_try_restarting_the_service_or_view_logs_to_investigate)
+        !service.canOpenWebUi -> AppText.get(R.string.ui_the_service_process_is_still_running_the_webui_opens)
+        addressChanged -> AppText.get(R.string.ui_reopen_the_webui_to_use_its_current_configured_address)
+        failure == WebUiFailure.CERTIFICATE -> AppText.get(R.string.ui_check_the_webui_https_certificate_or_use_an_external)
+        failure == WebUiFailure.TIMEOUT -> AppText.get(R.string.ui_the_page_did_not_finish_loading_within_45_seconds)
+        failure == WebUiFailure.HTTP -> AppText.get(R.string.ui_the_webui_did_not_return_a_page_retry_or)
+        else -> AppText.get(R.string.ui_connection_incomplete_please_retry_view_service_status_on_home)
     }
     val action = when {
         !state.componentsReady || !connection.enabled || connection.endpoint == null || preparing -> null
@@ -82,7 +82,7 @@ internal fun webUiNeedsRecovery(id: ServiceId, state: ManagerState, origin: Stri
             }
         }
     }
-    Surface(Modifier.fillMaxSize().semantics { contentDescription = "${id.label} 后台恢复页" }, color = MaterialTheme.colorScheme.background) {
+    Surface(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_webui_recovery_page, id.label) }, color = MaterialTheme.colorScheme.background) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Spacer(Modifier.height(10.dp))
             ManagerServiceLogo(id)
@@ -93,18 +93,18 @@ internal fun webUiNeedsRecovery(id: ServiceId, state: ManagerState, origin: Stri
             }
             if (action != null) Button(onClick = { onAction(action) }, shape = MaterialTheme.shapes.small) {
                 Text(when (action) {
-                    WebUiRecoveryAction.START -> "启动服务"
-                    WebUiRecoveryAction.RESTART -> "重启服务"
-                    WebUiRecoveryAction.RELOAD -> "重试连接"
-                    WebUiRecoveryAction.REOPEN -> "重新打开后台"
+                    WebUiRecoveryAction.START -> AppText.get(R.string.ui_start_service)
+                    WebUiRecoveryAction.RESTART -> AppText.get(R.string.ui_restart_service)
+                    WebUiRecoveryAction.RELOAD -> AppText.get(R.string.ui_retry_connection)
+                    WebUiRecoveryAction.REOPEN -> AppText.get(R.string.ui_reopen_webui)
                 })
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = onHome, shape = MaterialTheme.shapes.small) { Text("返回首页") }
-                TextButton(onClick = onLogs) { Text("查看日志") }
+                OutlinedButton(onClick = onHome, shape = MaterialTheme.shapes.small) { Text(AppText.get(R.string.ui_back_to_home)) }
+                TextButton(onClick = onLogs) { Text(AppText.get(R.string.ui_view_logs)) }
             }
-            ManagerSection("最近日志") {
-                Text(excerpt.ifBlank { "暂无日志，可在首页检查运行环境。" }, fontFamily = FontFamily.Monospace,
+            ManagerSection(AppText.get(R.string.ui_recent_logs)) {
+                Text(excerpt.ifBlank { AppText.get(R.string.ui_no_logs_yet_check_the_runtime_on_home) }, fontFamily = FontFamily.Monospace,
                     style = MaterialTheme.typography.bodySmall, maxLines = 6, overflow = TextOverflow.Ellipsis)
             }
         }

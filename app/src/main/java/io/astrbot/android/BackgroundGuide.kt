@@ -23,9 +23,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
-internal enum class BackgroundTopic(val title: String) {
-    NOTIFICATIONS("运行通知"), BATTERY("忽略电池优化"), UNRESTRICTED("后台耗电与无限制"),
-    AUTOSTART("自启动与关联启动"), TASKS("锁定最近任务"), HELP("后台运行说明")
+internal enum class BackgroundTopic(private val titleResource: Int) {
+    NOTIFICATIONS(R.string.ui_service_notifications), BATTERY(R.string.ui_battery_optimization), UNRESTRICTED(R.string.ui_background_battery_limits),
+    AUTOSTART(R.string.ui_auto_start_permissions), TASKS(R.string.ui_lock_recent_task), HELP(R.string.ui_background_operation_guide)
+;
+    val title: String get() = AppText.get(titleResource)
 }
 
 internal object BackgroundGuide {
@@ -33,37 +35,37 @@ internal object BackgroundGuide {
     fun status(context: Context, topic: BackgroundTopic): String = when (topic) {
         BackgroundTopic.NOTIFICATIONS -> context.getSystemService(NotificationManager::class.java).let {
             when {
-                !it.areNotificationsEnabled() -> "通知未允许，建议开启"
-                it.getNotificationChannel(CHANNEL)?.importance == NotificationManager.IMPORTANCE_NONE -> "应用通知已允许，但运行通知类别已关闭"
-                else -> "运行通知已允许"
+                !it.areNotificationsEnabled() -> AppText.get(R.string.ui_notifications_are_blocked_enable_them)
+                it.getNotificationChannel(CHANNEL)?.importance == NotificationManager.IMPORTANCE_NONE -> AppText.get(R.string.ui_app_notifications_are_allowed_but_the_service_notification_channel)
+                else -> AppText.get(R.string.ui_service_notifications_are_allowed)
             }
         }
-        BackgroundTopic.BATTERY -> if (context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)) "已不受系统电池优化限制" else "仍受系统电池优化限制"
-        BackgroundTopic.UNRESTRICTED -> "允许后台活动，关闭应用省电限制"
-        BackgroundTopic.AUTOSTART -> "厂商权限，需到系统中确认"
-        BackgroundTopic.TASKS -> "保留任务卡片，减少一键清理影响"
-        BackgroundTopic.HELP -> "查看 ${Build.MANUFACTURER} 设置步骤与限制"
+        BackgroundTopic.BATTERY -> if (context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)) AppText.get(R.string.ui_exempt_from_system_battery_optimization) else AppText.get(R.string.ui_system_battery_optimization_still_applies)
+        BackgroundTopic.UNRESTRICTED -> AppText.get(R.string.ui_allow_background_activity_and_remove_app_battery_limits)
+        BackgroundTopic.AUTOSTART -> AppText.get(R.string.ui_check_manufacturer_permissions_in_system_settings)
+        BackgroundTopic.TASKS -> AppText.get(R.string.ui_keep_the_app_task_to_reduce_accidental_cleanup)
+        BackgroundTopic.HELP -> AppText.get(R.string.ui_view_setup_steps_and_limitations, Build.MANUFACTURER)
     }
 
     fun steps(topic: BackgroundTopic, manufacturer: String = Build.MANUFACTURER): String {
         val vendor = manufacturer.lowercase(java.util.Locale.ROOT)
         val path = when {
-            "vivo" in vendor || "iqoo" in vendor -> "vivo / iQOO：设置 → 电池 → 后台耗电管理，找到本应用并选择“允许后台高耗电”；在 i 管家 → 应用管理 → 权限管理 → 自启动，允许本应用。不同系统版本也可能位于“应用与权限”。"
-            "xiaomi" in vendor || "redmi" in vendor || "poco" in vendor -> "小米 / Redmi：设置 → 应用设置 → 应用管理 → 本应用，开启“自启动”；在“省电策略”选择“无限制”。HyperOS 可在“后台自启动”管理中开启。"
-            "huawei" in vendor || "honor" in vendor -> "华为 / 荣耀：设置 → 应用 → 应用启动管理，关闭本应用的自动管理，手动允许“自启动、关联启动、后台活动”；电池设置中允许后台运行。"
-            "oppo" in vendor || "realme" in vendor || "oneplus" in vendor -> "OPPO / realme / 一加：设置 → 应用 → 应用管理 → 本应用，开启“允许自启动、允许关联启动、允许后台活动”；在电池耗电管理中选择“不限制”。"
-            "samsung" in vendor -> "三星：设置 → 应用程序 → 本应用 → 电池，选择“不受限制”；在设备维护 → 电池 → 后台使用限制中，将本应用加入“从不休眠的应用程序”。"
-            else -> "设置 → 应用 → 本应用 → 电池，选择“不受限制”或“允许后台活动”。如果系统有自启动、后台耗电或应用启动管理，请允许本应用。"
+            "vivo" in vendor || "iqoo" in vendor -> AppText.get(R.string.ui_vivo_iqoo_settings_battery_background_power_consumption_management_find)
+            "xiaomi" in vendor || "redmi" in vendor || "poco" in vendor -> AppText.get(R.string.ui_xiaomi_redmi_settings_apps_manage_apps_this_app_enable)
+            "huawei" in vendor || "honor" in vendor -> AppText.get(R.string.ui_huawei_honor_settings_apps_app_launch_disable_automatic_management)
+            "oppo" in vendor || "realme" in vendor || "oneplus" in vendor -> AppText.get(R.string.ui_oppo_realme_oneplus_settings_apps_app_management_this_app)
+            "samsung" in vendor -> AppText.get(R.string.ui_samsung_settings_apps_this_app_battery_unrestricted_in_device)
+            else -> AppText.get(R.string.ui_settings_apps_this_app_battery_choose_unrestricted_or_allow)
         }
         val introduction = when (topic) {
-            BackgroundTopic.NOTIFICATIONS -> "1. 打开本应用通知设置，允许发送通知。\n2. 向下查看通知类别，保持“本地服务运行”开启。部分系统把类别设置合并在应用通知页中。\n3. 服务启动后检查通知栏，可查看状态和停止服务。"
-            BackgroundTopic.BATTERY -> "1. 点击下方按钮，直接申请本应用不受系统电池优化限制。\n2. 在系统确认窗口选择“允许”。若已经允许，将打开优化列表，可切换“所有应用”查看。\n3. 返回后本页自动刷新系统状态。厂商后台耗电还需单独设置。"
-            BackgroundTopic.UNRESTRICTED -> "1. 打开厂商后台耗电管理，找到本应用。\n2. 选择“允许后台高耗电 / 无限制 / 不限制”，或允许后台活动。\n3. 也可打开“本应用电池设置”，检查单应用限制。"
-            BackgroundTopic.AUTOSTART -> "允许本应用自启动、关联启动，有助于系统在后台恢复应用。该授权不等于本应用已经设置开机运行；设备重启后请解锁并打开应用确认服务。"
-            BackgroundTopic.TASKS -> "1. 点击下方按钮返回桌面，再使用最近任务键或手势打开任务列表。\n2. 找到本应用卡片，通过长按、菜单或下拉卡片选择“锁定”。\n3. 以后清理任务时保留此卡片。\n\n系统没有通用的直接锁定接口，需在任务列表中操作。"
-            BackgroundTopic.HELP -> "推荐依次检查通知、电池优化、后台耗电、自启动与最近任务锁定。运行时保持服务通知，不要在系统应用详情中强行停止。"
+            BackgroundTopic.NOTIFICATIONS -> AppText.get(R.string.ui_1_open_notification_settings_for_this_app_and_allow)
+            BackgroundTopic.BATTERY -> AppText.get(R.string.ui_1_use_the_button_below_to_request_exemption_from)
+            BackgroundTopic.UNRESTRICTED -> AppText.get(R.string.ui_1_open_manufacturer_background_battery_management_and_find_this)
+            BackgroundTopic.AUTOSTART -> AppText.get(R.string.ui_allowing_auto_start_and_secondary_launch_helps_the_system)
+            BackgroundTopic.TASKS -> AppText.get(R.string.ui_1_return_to_the_home_screen_then_open_recent)
+            BackgroundTopic.HELP -> AppText.get(R.string.ui_check_notifications_battery_optimization_background_battery_limits_auto)
         }
-        return "$introduction\n\n${if (topic in setOf(BackgroundTopic.AUTOSTART, BackgroundTopic.UNRESTRICTED, BackgroundTopic.HELP)) path + "\n\n" else ""}设置名称随系统版本不同。自启动、后台耗电和任务锁定通常没有公开查询接口，请在系统页面确认；它们不能保证系统强行停止后自动恢复。"
+        return AppText.get(R.string.ui_n_nsetting_names_vary_by_system_version_auto_start, introduction, if (topic in setOf(BackgroundTopic.AUTOSTART, BackgroundTopic.UNRESTRICTED, BackgroundTopic.HELP)) path + "\n\n" else "")
     }
 
     fun appDetails(context: Context) = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))
@@ -72,13 +74,13 @@ internal object BackgroundGuide {
         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName).putExtra(Settings.EXTRA_CHANNEL_ID, CHANNEL)
 
     fun buttonLabel(context: Context, topic: BackgroundTopic): String = when (topic) {
-        BackgroundTopic.NOTIFICATIONS -> "打开本应用通知设置"
-        BackgroundTopic.BATTERY -> if (context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)) "查看电池优化列表" else "申请本应用不优化"
-        BackgroundTopic.UNRESTRICTED -> "打开后台耗电设置"
+        BackgroundTopic.NOTIFICATIONS -> AppText.get(R.string.ui_open_app_notification_settings)
+        BackgroundTopic.BATTERY -> if (context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)) AppText.get(R.string.ui_view_battery_optimization_list) else AppText.get(R.string.ui_request_battery_exemption)
+        BackgroundTopic.UNRESTRICTED -> AppText.get(R.string.ui_open_background_battery_settings)
         BackgroundTopic.AUTOSTART -> if (intents(context, topic).firstOrNull()?.action == Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            "打开应用详情并按步骤设置" else "打开自启动管理"
-        BackgroundTopic.TASKS -> "返回桌面后锁定任务"
-        BackgroundTopic.HELP -> "知道了"
+            AppText.get(R.string.ui_open_app_details_and_follow_the_steps) else AppText.get(R.string.ui_open_auto_start_management)
+        BackgroundTopic.TASKS -> AppText.get(R.string.ui_go_home_then_lock_the_recent_task)
+        BackgroundTopic.HELP -> AppText.get(R.string.ui_ok)
     }
 
     fun intents(context: Context, topic: BackgroundTopic, manufacturer: String = Build.MANUFACTURER,
@@ -143,16 +145,16 @@ internal object BackgroundGuide {
     fun open(candidates: List<Intent>) {
         val result = BackgroundGuide.open(context, candidates)
         feedback = when {
-            result < 0 -> "系统未开放此入口，请按上方路径手动设置。"
-            result > 0 -> "直达入口不可用，已打开备用设置页；请按上方路径继续。"
+            result < 0 -> AppText.get(R.string.ui_this_shortcut_is_unavailable_follow_the_steps_above_to)
+            result > 0 -> AppText.get(R.string.ui_opened_an_alternative_settings_page_follow_the_steps_above)
             else -> null
         }
     }
     AlertDialog(onDismissRequest = onDismiss, title = { Text(selected.title) }, text = {
         Column(Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("当前手机：${Build.MANUFACTURER} ${Build.MODEL}", style = MaterialTheme.typography.labelMedium,
+            Text(AppText.get(R.string.ui_device, Build.MANUFACTURER, Build.MODEL), style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("要设置的应用：${context.applicationInfo.loadLabel(context.packageManager)}", style = MaterialTheme.typography.bodyMedium)
+            Text(AppText.get(R.string.ui_app_to_configure, context.applicationInfo.loadLabel(context.packageManager)), style = MaterialTheme.typography.bodyMedium)
             Text(remember(selected, revision) { BackgroundGuide.status(context, selected) }, color = MaterialTheme.colorScheme.primary)
             Text(BackgroundGuide.steps(selected))
             feedback?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
@@ -160,15 +162,15 @@ internal object BackgroundGuide {
                 OutlinedButton(onClick = { selected = item }, Modifier.fillMaxWidth()) { Text(item.title + " ›") }
             }
             if (selected == BackgroundTopic.UNRESTRICTED)
-                OutlinedButton(onClick = { open(listOf(BackgroundGuide.appBattery(context), BackgroundGuide.appDetails(context))) }, Modifier.fillMaxWidth()) { Text("打开本应用电池设置") }
+                OutlinedButton(onClick = { open(listOf(BackgroundGuide.appBattery(context), BackgroundGuide.appDetails(context))) }, Modifier.fillMaxWidth()) { Text(AppText.get(R.string.ui_open_app_battery_settings)) }
             // Current vivo firmware redirects the channel action to the same app-wide page.
             if (selected == BackgroundTopic.NOTIFICATIONS && !Build.MANUFACTURER.equals("vivo", true) &&
                 !Build.MANUFACTURER.equals("iqoo", true) && context.getSystemService(NotificationManager::class.java).getNotificationChannel("local-runtime") != null)
-                OutlinedButton(onClick = { open(listOf(BackgroundGuide.channelSettings(context), BackgroundGuide.appDetails(context))) }, Modifier.fillMaxWidth()) { Text("打开运行通知类别") }
+                OutlinedButton(onClick = { open(listOf(BackgroundGuide.channelSettings(context), BackgroundGuide.appDetails(context))) }, Modifier.fillMaxWidth()) { Text(AppText.get(R.string.ui_open_runtime_notification_settings)) }
             if (selected != BackgroundTopic.TASKS && selected != BackgroundTopic.HELP)
-                TextButton(onClick = { open(listOf(BackgroundGuide.appDetails(context))) }) { Text("打开应用详情（备用）") }
+                TextButton(onClick = { open(listOf(BackgroundGuide.appDetails(context))) }) { Text(AppText.get(R.string.ui_open_app_info_alternative)) }
             if (topic == BackgroundTopic.HELP && selected != topic)
-                TextButton(onClick = { selected = topic }) { Text("返回后台设置清单") }
+                TextButton(onClick = { selected = topic }) { Text(AppText.get(R.string.ui_back_to_background_settings)) }
         }
     }, confirmButton = {
         TextButton(onClick = {
@@ -176,12 +178,12 @@ internal object BackgroundGuide {
                 BackgroundTopic.HELP -> onDismiss()
                 BackgroundTopic.TASKS -> {
                     if (context is Activity) context.moveTaskToBack(true)
-                    feedback = "请使用最近任务键或手势找到本应用，打开卡片菜单并锁定。"
+                    feedback = AppText.get(R.string.ui_find_this_app_in_recent_apps_open_its_card)
                 }
                 else -> open(BackgroundGuide.intents(context, selected))
             }
         }) {
             Text(remember(selected, revision) { BackgroundGuide.buttonLabel(context, selected) })
         }
-    }, dismissButton = { TextButton(onClick = onDismiss) { Text("关闭") } })
+    }, dismissButton = { TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_close)) } })
 }

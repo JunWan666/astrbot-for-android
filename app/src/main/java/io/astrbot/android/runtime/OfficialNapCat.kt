@@ -2,6 +2,11 @@
 // Copyright (c) 2026 JunWan666
 package io.astrbot.android.runtime
 
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.system.Os
 import android.util.Base64
@@ -24,8 +29,8 @@ internal object OfficialNapCat {
     fun validateEntry(entry: JSONObject) {
         val version = entry.getString("version")
         require(version.matches(Regex("[0-9]{1,5}\\.[0-9]{1,5}\\.[0-9]{1,5}")))
-        require(entry.getString("url") == "https://github.com/NapNeko/NapCatQQ/releases/download/v$version/NapCat.Shell.zip") {
-            "NapCat 更新必须来自上游正式发布的 Shell 包"
+        requireLocalized(entry.getString("url") == "https://github.com/NapNeko/NapCatQQ/releases/download/v$version/NapCat.Shell.zip") {
+            AppText.get(R.string.ui_napcat_updates_must_use_an_official_upstream_shell_release)
         }
         require(entry.getString("qqVersion").matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+-[0-9]+")))
         require(entry.getString("backendSha256").matches(Regex("[a-f0-9]{64}")))
@@ -45,11 +50,11 @@ internal object OfficialNapCat {
         require(entry.getString("component") == "napcat")
         validateEntry(entry)
         val installed = InstalledVersions.read(context)
-        require(entry.getInt("minAppCode") <= BuildConfig.VERSION_CODE &&
+        requireLocalized(entry.getInt("minAppCode") <= BuildConfig.VERSION_CODE &&
             entry.getString("environmentKey") == installed.environmentKey &&
             entry.getString("abi") == installed.components["架构"] &&
             entry.getString("qqVersion") == installed.components["Linux QQ"]) {
-            "此 NapCat 版本需要不同的 QQ 或运行依赖，已保留现有程序；请先升级匹配的运行环境"
+            AppText.get(R.string.ui_this_napcat_version_requires_different_qq_or_runtime_dependencies)
         }
         // Expiry was enforced when downloading. A verified downloaded package, like an AstrBot
         // maintenance package, remains installable offline after the catalog has expired.
@@ -58,7 +63,7 @@ internal object OfficialNapCat {
 
     suspend fun extract(context: Context, archive: File, destination: File, proof: JSONObject): JSONObject {
         val entry = entry(context, proof)
-        require(entry.getLong("bytes") in 1..256L * 1024 * 1024 && archive.length() == entry.getLong("bytes")) { "NapCat 更新包大小不符" }
+        requireLocalized(entry.getLong("bytes") in 1..256L * 1024 * 1024 && archive.length() == entry.getLong("bytes")) { AppText.get(R.string.ui_napcat_update_package_size_mismatch) }
         val digest = MessageDigest.getInstance("SHA-256")
         archive.inputStream().use { input ->
             val buffer = ByteArray(128 * 1024)
@@ -68,19 +73,19 @@ internal object OfficialNapCat {
                 digest.update(buffer, 0, n)
             }
         }
-        require(digest.digest().joinToString("") { "%02x".format(it) } == entry.getString("sha256")) { "NapCat 更新包摘要不符，当前程序已保留" }
+        requireLocalized(digest.digest().joinToString("") { "%02x".format(it) } == entry.getString("sha256")) { AppText.get(R.string.ui_napcat_update_package_digest_mismatch_current_program_is_preserved) }
         ZipFile(archive).use { zip ->
             val entries = zip.entries().asSequence().toList()
-            require(entries.size in 1..100_000 && entries.sumOf { it.size.coerceAtLeast(0) } <= MAX_UNPACKED) { "NapCat 更新包解压大小异常" }
+            requireLocalized(entries.size in 1..100_000 && entries.sumOf { it.size.coerceAtLeast(0) } <= MAX_UNPACKED) { AppText.get(R.string.ui_invalid_extracted_napcat_update_size) }
             val names = HashSet<String>()
-            require(context.filesDir.usableSpace >= entries.sumOf { it.size.coerceAtLeast(0) } * 2 + 64L * 1024 * 1024) { "NapCat 更新暂存空间不足" }
+            requireLocalized(context.filesDir.usableSpace >= entries.sumOf { it.size.coerceAtLeast(0) } * 2 + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_napcat_update_staging_space) }
             check(destination.mkdirs())
             var total = 0L
             entries.forEach { file ->
                 currentCoroutineContext().ensureActive()
                 val path = ArchivePaths.entry(destination.toPath(), file.name)
-                require(path != destination.toPath() && names.add(path.toString()) &&
-                    !file.name.split('/').contains("..") && file.name != MARKER) { "NapCat 更新包含重复或异常路径" }
+                requireLocalized(path != destination.toPath() && names.add(path.toString()) &&
+                    !file.name.split('/').contains("..") && file.name != MARKER) { AppText.get(R.string.ui_napcat_update_contains_duplicate_or_invalid_paths) }
                 // java.util.zip does not expose Unix file types. The publisher also rejects links;
                 // extraction always creates regular files and never honors archive link attributes.
                 if (file.isDirectory) require(path.toFile().isDirectory || path.toFile().mkdirs()) else {
@@ -95,7 +100,7 @@ internal object OfficialNapCat {
                                 val n = input.read(buffer)
                                 if (n < 0) break
                                 count += n; total += n
-                                require(count <= file.size && total <= MAX_UNPACKED) { "NapCat 更新包超出声明大小" }
+                                requireLocalized(count <= file.size && total <= MAX_UNPACKED) { AppText.get(R.string.ui_napcat_update_package_exceeds_its_declared_size) }
                                 output.write(buffer, 0, n)
                             }
                         }
@@ -107,14 +112,14 @@ internal object OfficialNapCat {
             }
         }
         val backend = File(destination, "napcat.mjs")
-        require(backend.isFile && backend.length() <= 32 * 1024 * 1024 &&
-            UpdateTrust.sha256(backend.readBytes()) == entry.getString("backendSha256")) { "NapCat 主程序与签名版本不符" }
-        require(File(destination, "static/index.html").isFile && File(destination, "package.json").isFile &&
-            File(destination, "node_modules").isDirectory && File(destination, "native").isDirectory) { "NapCat 更新包缺少后台或运行资源" }
+        requireLocalized(backend.isFile && backend.length() <= 32 * 1024 * 1024 &&
+            UpdateTrust.sha256(backend.readBytes()) == entry.getString("backendSha256")) { AppText.get(R.string.ui_napcat_main_program_differs_from_the_signed_version) }
+        requireLocalized(File(destination, "static/index.html").isFile && File(destination, "package.json").isFile &&
+            File(destination, "node_modules").isDirectory && File(destination, "native").isDirectory) { AppText.get(R.string.ui_napcat_update_package_lacks_dashboard_or_runtime_resources) }
         DurableFiles.write(File(destination, MARKER), JSONObject().put("version", entry.getString("version"))
             .put("backendSha256", entry.getString("backendSha256")).put("archiveSha256", entry.getString("sha256")))
         DurableFiles.sync(destination)
-        return JSONObject().put("version", entry.getString("version")).put("channel", "稳定更新")
+        return JSONObject().put("version", entry.getString("version")).put("channel", AppText.get(R.string.ui_stable_update))
             .put("notes", entry.getString("notes")).put("unpackedBytes", destination.walkTopDown().filter { it.isFile }.sumOf { it.length() })
     }
 
@@ -123,7 +128,7 @@ internal object OfficialNapCat {
         val source = File(active, "plugins")
         if (!Files.exists(source.toPath(), java.nio.file.LinkOption.NOFOLLOW_LINKS)) return
         val target = File(staged, "plugins")
-        require(!target.exists()) { "新版包含同名插件目录，请先将自定义插件移到 NapCat 工作目录后更新" }
+        requireLocalized(!target.exists()) { AppText.get(R.string.ui_the_new_version_contains_a_plugin_directory_with_the) }
         DurableFiles.copyProgram(source, target)
     }
 }

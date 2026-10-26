@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.system.Os
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -31,8 +37,8 @@ internal class PortableBackupArchive {
             .put("scopes", JSONArray(SCOPES)).put("qqSessionsIncluded", false)
             .put("entries", JSONArray(entries.map { it.json() }))
         val bytes = manifest.toString().toByteArray(Charsets.UTF_8)
-        require(bytes.size <= MAX_MANIFEST) { "便携备份清单过大" }
-        require(destination.parentFile!!.usableSpace >= entries.sumOf { it.bytes }.coerceAtMost(MAX_ARCHIVE) + RESERVE) { "便携备份暂存空间不足" }
+        requireLocalized(bytes.size <= MAX_MANIFEST) { AppText.get(R.string.ui_portable_backup_manifest_is_too_large) }
+        requireLocalized(destination.parentFile!!.usableSpace >= entries.sumOf { it.bytes }.coerceAtMost(MAX_ARCHIVE) + RESERVE) { AppText.get(R.string.ui_insufficient_portable_backup_staging_space) }
         val coroutine = currentCoroutineContext()
         var written = 0L
         var spaceCheck = 0L
@@ -43,9 +49,9 @@ internal class PortableBackupArchive {
                     override fun write(buffer: ByteArray, offset: Int, length: Int) {
                         coroutine.ensureActive()
                         written += length
-                        require(written <= MAX_ARCHIVE) { "便携备份文件超过 2 GiB 上限" }
+                        requireLocalized(written <= MAX_ARCHIVE) { AppText.get(R.string.ui_portable_backup_exceeds_the_2_gib_limit) }
                         if (written - spaceCheck >= 1024 * 1024) {
-                            require(destination.parentFile!!.usableSpace >= RESERVE) { "便携备份暂存空间不足" }
+                            requireLocalized(destination.parentFile!!.usableSpace >= RESERVE) { AppText.get(R.string.ui_insufficient_portable_backup_staging_space) }
                             spaceCheck = written
                         }
                         out.write(buffer, offset, length)
@@ -57,7 +63,7 @@ internal class PortableBackupArchive {
                         coroutine.ensureActive()
                         zip.putNextEntry(ZipEntry("data/${entry.name}"))
                         File(source, entry.name).inputStream().use { input ->
-                            check(copy(input, zip, entry.bytes) == entry.sha256) { "便携备份期间数据发生变化，未生成备份" }
+                            checkLocalized(copy(input, zip, entry.bytes) == entry.sha256) { AppText.get(R.string.ui_data_changed_during_portable_backup_no_backup_was_created) }
                         }
                         zip.closeEntry()
                     }
@@ -66,23 +72,23 @@ internal class PortableBackupArchive {
                     zip.finish(); zip.flush(); raw.fd.sync()
                 }
             }
-            check(scan(source) == entries) { "便携备份期间数据发生变化，未生成备份" }
+            checkLocalized(scan(source) == entries) { AppText.get(R.string.ui_data_changed_during_portable_backup_no_backup_was_created) }
             return info(manifest)
         } catch (failure: Throwable) { destination.delete(); throw failure }
     }
 
     suspend fun read(archive: File, destination: File, versions: RuntimeVersions): PortableBackupInfo {
-        require(archive.length() in 1..MAX_ARCHIVE) { "便携备份大小无效或超过 2 GiB" }
-        check(!destination.exists()) { "便携备份暂存目录已存在" }
+        requireLocalized(archive.length() in 1..MAX_ARCHIVE) { AppText.get(R.string.ui_invalid_portable_backup_size_or_size_exceeds_2_gib) }
+        checkLocalized(!destination.exists()) { AppText.get(R.string.ui_portable_backup_staging_directory_already_exists) }
         try {
             ZipInputStream(BufferedInputStream(archive.inputStream())).use { zip ->
-                require(zip.nextEntry?.name == "manifest.json") { "不是本应用支持的便携备份" }
+                requireLocalized(zip.nextEntry?.name == "manifest.json") { AppText.get(R.string.ui_this_portable_backup_is_not_supported_by_this_app) }
                 val bytes = limited(zip, MAX_MANIFEST)
                 val manifest = JSONObject(bytes.toString(Charsets.UTF_8))
                 val entries = parse(manifest, versions)
                 validateContainer(archive, entries.count { it.kind == "file" } + 2)
                 val required = entries.sumOf { it.bytes } + RESERVE
-                require(destination.parentFile!!.usableSpace >= required) { "便携备份解包空间不足" }
+                requireLocalized(destination.parentFile!!.usableSpace >= required) { AppText.get(R.string.ui_insufficient_space_to_extract_the_portable_backup) }
                 check(destination.mkdirs())
                 entries.filter { it.kind == "directory" }.sortedBy { it.name.count { c -> c == '/' } }.forEach {
                     check(File(destination, it.name).mkdir() || File(destination, it.name).isDirectory)
@@ -90,18 +96,18 @@ internal class PortableBackupArchive {
                 }
                 entries.filter { it.kind == "file" }.forEach { entry ->
                     currentCoroutineContext().ensureActive()
-                    require(zip.nextEntry?.name == "data/${entry.name}") { "便携备份文件项缺失、重复或顺序异常" }
+                    requireLocalized(zip.nextEntry?.name == "data/${entry.name}") { AppText.get(R.string.ui_portable_backup_entries_are_missing_duplicated_or_out_of) }
                     val file = File(destination, entry.name)
                     FileOutputStream(file).use { output ->
-                        require(copy(zip, output, entry.bytes) == entry.sha256) { "便携备份文件摘要不符，未修改现有数据" }
+                        requireLocalized(copy(zip, output, entry.bytes) == entry.sha256) { AppText.get(R.string.ui_portable_backup_file_digest_mismatch_existing_data_was_not) }
                         output.fd.sync()
                     }
                     Os.chmod(file.path, if (entry.executable) 448 else 384)
                 }
-                require(zip.nextEntry?.name == "complete.json") { "便携备份不完整" }
+                requireLocalized(zip.nextEntry?.name == "complete.json") { AppText.get(R.string.ui_portable_backup_is_incomplete) }
                 val complete = JSONObject(limited(zip, 1024).toString(Charsets.UTF_8))
-                require(complete.getString("manifestSha256") == digest(bytes) && complete.getInt("entries") == entries.size) { "便携备份完成记录不符" }
-                require(zip.nextEntry == null) { "便携备份包含未声明文件" }
+                requireLocalized(complete.getString("manifestSha256") == digest(bytes) && complete.getInt("entries") == entries.size) { AppText.get(R.string.ui_portable_backup_completion_record_mismatch) }
+                requireLocalized(zip.nextEntry == null) { AppText.get(R.string.ui_portable_backup_contains_undeclared_files) }
                 entries.filter { it.kind == "symlink" }.forEach { entry ->
                     Os.symlink(entry.target, File(destination, entry.name).path)
                 }
@@ -114,24 +120,24 @@ internal class PortableBackupArchive {
 
     suspend fun verify(tree: File, manifest: JSONObject, versions: RuntimeVersions, exclusive: Boolean = false): PortableBackupInfo {
         val expected = parse(manifest, versions)
-        if (exclusive) require(tree.list()?.toSet() == setOf("astrbot", "napcat") && File(tree, "napcat").list()?.toSet() == setOf("config")) {
-            "便携备份暂存包含范围之外的数据，请重新导入"
+        if (exclusive) requireLocalized(tree.list()?.toSet() == setOf("astrbot", "napcat") && File(tree, "napcat").list()?.toSet() == setOf("config")) {
+            AppText.get(R.string.ui_portable_backup_staging_contains_data_outside_its_scope_import)
         }
-        require(scan(tree) == expected) { "便携备份暂存文件发生变化，请重新导入" }
+        requireLocalized(scan(tree) == expected) { AppText.get(R.string.ui_portable_backup_staged_files_have_changed_import_it_again) }
         return info(manifest)
     }
 
     private fun parse(manifest: JSONObject, versions: RuntimeVersions): List<Entry> {
-        require(manifest.getInt("schema") == 1 && manifest.getString("format") == FORMAT) { "便携备份格式不支持" }
-        require(UUID.fromString(manifest.getString("id")).toString() == manifest.getString("id") && manifest.getLong("createdAt") >= 0) { "便携备份标识无效" }
-        require(!manifest.getBoolean("qqSessionsIncluded") && manifest.getJSONArray("scopes").let {
+        requireLocalized(manifest.getInt("schema") == 1 && manifest.getString("format") == FORMAT) { AppText.get(R.string.ui_unsupported_portable_backup_format) }
+        requireLocalized(UUID.fromString(manifest.getString("id")).toString() == manifest.getString("id") && manifest.getLong("createdAt") >= 0) { AppText.get(R.string.ui_invalid_portable_backup_id) }
+        requireLocalized(!manifest.getBoolean("qqSessionsIncluded") && manifest.getJSONArray("scopes").let {
             it.length() == SCOPES.size && (0 until it.length()).map(it::getString) == SCOPES
-        }) { "便携备份的数据范围不支持" }
-        require(manifest.getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
-            "便携备份与当前运行版本组合不同，请先安装匹配的运行环境"
+        }) { AppText.get(R.string.ui_unsupported_portable_backup_data_scope) }
+        requireLocalized(manifest.getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
+            AppText.get(R.string.ui_portable_backup_does_not_match_installed_program_versions_install)
         }
         val array = manifest.getJSONArray("entries")
-        require(array.length() in 3..MAX_ENTRIES) { "便携备份文件数量超出范围" }
+        requireLocalized(array.length() in 3..MAX_ENTRIES) { AppText.get(R.string.ui_too_many_portable_backup_files) }
         val entries = (0 until array.length()).map { index ->
             val item = array.getJSONObject(index)
             Entry(item.getString("name"), item.getString("kind"), item.getLong("bytes"), item.getString("sha256"),
@@ -142,47 +148,47 @@ internal class PortableBackupArchive {
     }
 
     private fun validate(entries: List<Entry>) {
-        require(entries.size <= MAX_ENTRIES && entries == entries.sortedBy { it.name } && entries.map { it.name }.toSet().size == entries.size) { "便携备份文件路径重复或顺序异常" }
+        requireLocalized(entries.size <= MAX_ENTRIES && entries == entries.sortedBy { it.name } && entries.map { it.name }.toSet().size == entries.size) { AppText.get(R.string.ui_portable_backup_file_paths_are_duplicated_or_out_of) }
         val byName = entries.associateBy { it.name }
-        require(listOf("astrbot", "napcat", "napcat/config").all { byName[it]?.kind == "directory" }) { "便携备份数据目录缺失" }
+        requireLocalized(listOf("astrbot", "napcat", "napcat/config").all { byName[it]?.kind == "directory" }) { AppText.get(R.string.ui_portable_backup_data_directory_is_missing) }
         var bytes = 0L
         entries.forEach { entry ->
             val parts = entry.name.split('/')
-            require(entry.name.length in 1..1024 && parts.all { it.isNotEmpty() && it !in setOf(".", "..") } &&
-                entry.name.none { it == '\\' || it.code < 32 } && allowed(entry.name)) { "便携备份包含越界或不支持的路径" }
-            require(entry.name != "napcat" || entry.kind == "directory") { "NapCat 配置父目录异常" }
-            for (end in 1 until parts.size) require(byName[parts.take(end).joinToString("/")]?.kind == "directory") { "便携备份包含链接父目录或缺失目录" }
+            requireLocalized(entry.name.length in 1..1024 && parts.all { it.isNotEmpty() && it !in setOf(".", "..") } &&
+                entry.name.none { it == '\\' || it.code < 32 } && allowed(entry.name)) { AppText.get(R.string.ui_portable_backup_contains_paths_outside_its_scope_or_unsupported) }
+            requireLocalized(entry.name != "napcat" || entry.kind == "directory") { AppText.get(R.string.ui_unexpected_napcat_configuration_parent_directory) }
+            for (end in 1 until parts.size) requireLocalized(byName[parts.take(end).joinToString("/")]?.kind == "directory") { AppText.get(R.string.ui_portable_backup_contains_linked_parent_directories_or_missing_directorie) }
             when (entry.kind) {
                 "file" -> {
-                    require(entry.bytes in 0..MAX_FILE && entry.sha256.matches(Regex("[0-9a-f]{64}")) && entry.target.isEmpty()) { "便携备份文件大小或摘要异常" }
+                    requireLocalized(entry.bytes in 0..MAX_FILE && entry.sha256.matches(Regex("[0-9a-f]{64}")) && entry.target.isEmpty()) { AppText.get(R.string.ui_invalid_portable_backup_file_size_or_digest) }
                     bytes += entry.bytes
                 }
-                "directory" -> require(entry.bytes == 0L && entry.sha256.isEmpty() && entry.target.isEmpty() && !entry.executable) { "便携备份目录记录异常" }
+                "directory" -> requireLocalized(entry.bytes == 0L && entry.sha256.isEmpty() && entry.target.isEmpty() && !entry.executable) { AppText.get(R.string.ui_invalid_portable_backup_directory_record) }
                 "symlink" -> {
-                    require(entry.bytes == 0L && entry.sha256.isEmpty() && !entry.executable) { "便携备份链接记录异常" }
-                    require(entry.target.isNotEmpty() && entry.target.length <= 1024 && !entry.target.startsWith('/') && entry.target.none { it == '\\' || it.code < 32 }) { "便携备份不支持绝对或异常链接" }
+                    requireLocalized(entry.bytes == 0L && entry.sha256.isEmpty() && !entry.executable) { AppText.get(R.string.ui_invalid_portable_backup_link_record) }
+                    requireLocalized(entry.target.isNotEmpty() && entry.target.length <= 1024 && !entry.target.startsWith('/') && entry.target.none { it == '\\' || it.code < 32 }) { AppText.get(R.string.ui_portable_backup_contains_absolute_or_invalid_links) }
                     val resolved = Paths.get(entry.name).parent.resolve(entry.target).normalize().toString()
-                    require(allowed(resolved) && resolved != "napcat") { "便携备份链接指向 QQ 会话或备份范围之外" }
+                    requireLocalized(allowed(resolved) && resolved != "napcat") { AppText.get(R.string.ui_portable_backup_link_targets_a_qq_session_or_a) }
                 }
-                else -> error("便携备份文件类型不支持")
+                else -> error(AppText.get(R.string.ui_unsupported_portable_backup_file_type))
             }
         }
-        require(bytes <= MAX_UNPACKED) { "便携备份解包数据超过 8 GiB 上限" }
+        requireLocalized(bytes <= MAX_UNPACKED) { AppText.get(R.string.ui_extracted_portable_backup_exceeds_the_8_gib_limit) }
     }
 
     private suspend fun scan(root: File): List<Entry> {
-        require(!Files.isSymbolicLink(root.toPath())) { "便携备份根目录不能为链接" }
+        requireLocalized(!Files.isSymbolicLink(root.toPath())) { AppText.get(R.string.ui_portable_backup_root_cannot_be_a_link) }
         val coroutine = currentCoroutineContext()
         val entries = mutableListOf(Entry("napcat", "directory"))
         var totalBytes = 0L
         val base = root.toPath()
         val napcat = File(root, "napcat")
-        require(!Files.isSymbolicLink(napcat.toPath()) && (!napcat.exists() || napcat.isDirectory)) { "NapCat 配置父目录异常" }
+        requireLocalized(!Files.isSymbolicLink(napcat.toPath()) && (!napcat.exists() || napcat.isDirectory)) { AppText.get(R.string.ui_unexpected_napcat_configuration_parent_directory) }
         SCOPES.forEach { scope ->
             val path = File(root, scope).toPath()
             if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)) entries += Entry(scope, "directory")
             else {
-                require(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) { "便携备份范围根目录必须为实际目录" }
+                requireLocalized(Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) { AppText.get(R.string.ui_portable_backup_scope_roots_must_be_real_directories) }
                 Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
                     override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
                         add(Entry(base.relativize(dir).toString(), "directory")); return FileVisitResult.CONTINUE
@@ -191,20 +197,20 @@ internal class PortableBackupArchive {
                         val name = base.relativize(file).toString()
                         when {
                             attrs.isRegularFile -> {
-                                require(attrs.size() <= MAX_FILE) { "便携备份单文件超过 2 GiB 上限" }
+                                requireLocalized(attrs.size() <= MAX_FILE) { AppText.get(R.string.ui_portable_backup_file_exceeds_the_2_gib_limit) }
                                 totalBytes += attrs.size()
-                                require(totalBytes <= MAX_UNPACKED) { "便携备份解包数据超过 8 GiB 上限" }
+                                requireLocalized(totalBytes <= MAX_UNPACKED) { AppText.get(R.string.ui_extracted_portable_backup_exceeds_the_8_gib_limit) }
                                 val hash = file.toFile().inputStream().use { copyBlocking(it, null, attrs.size(), coroutine) }
                                 add(Entry(name, "file", attrs.size(), hash, Os.lstat(file.toString()).st_mode and 64 != 0))
                             }
                             attrs.isSymbolicLink -> add(Entry(name, "symlink", target = Files.readSymbolicLink(file).toString()))
-                            else -> error("便携备份中存在不支持的特殊文件")
+                            else -> error(AppText.get(R.string.ui_portable_backup_contains_unsupported_special_files))
                         }
                         return FileVisitResult.CONTINUE
                     }
                     private fun add(entry: Entry) {
                         coroutine.ensureActive()
-                        require(entries.size < MAX_ENTRIES) { "便携备份最多支持 50000 个文件项" }
+                        requireLocalized(entries.size < MAX_ENTRIES) { AppText.get(R.string.ui_portable_backup_supports_up_to_50_000_entries) }
                         entries += entry
                     }
                 })
@@ -216,7 +222,7 @@ internal class PortableBackupArchive {
         sorted.filter { it.kind == "symlink" }.forEach {
             val resolved = File(root, it.name).canonicalFile.toPath()
             val canonicalRoot = root.canonicalFile.toPath()
-            require(resolved.startsWith(canonicalRoot) && allowed(canonicalRoot.relativize(resolved).toString())) { "便携备份链接目标超出数据范围" }
+            requireLocalized(resolved.startsWith(canonicalRoot) && allowed(canonicalRoot.relativize(resolved).toString())) { AppText.get(R.string.ui_portable_backup_link_target_is_outside_its_data_scope) }
         }
         return sorted
     }
@@ -233,10 +239,10 @@ internal class PortableBackupArchive {
             val count = input.read(buffer)
             if (count < 0) break
             size += count
-            require(size <= expected) { "便携备份文件大小不符" }
+            requireLocalized(size <= expected) { AppText.get(R.string.ui_portable_backup_file_size_mismatch) }
             output?.write(buffer, 0, count); hash.update(buffer, 0, count)
         }
-        require(size == expected) { "便携备份文件缺失或被截断" }
+        requireLocalized(size == expected) { AppText.get(R.string.ui_portable_backup_file_is_missing_or_truncated) }
         return hash.digest().joinToString("") { "%02x".format(it) }
     }
 
@@ -247,7 +253,7 @@ internal class PortableBackupArchive {
             currentCoroutineContext().ensureActive()
             val count = input.read(buffer)
             if (count < 0) break
-            require(output.size() + count <= max) { "便携备份清单超出范围" }
+            requireLocalized(output.size() + count <= max) { AppText.get(R.string.ui_portable_backup_manifest_is_outside_supported_limits) }
             output.write(buffer, 0, count)
         }
         return output.toByteArray()
@@ -276,15 +282,15 @@ internal class PortableBackupArchive {
             val end = (tail.size - 22 downTo 0).firstOrNull { at ->
                 long(at) == 0x06054b50L && at + 22 + short(at + 20) == tail.size
             }
-            require(end != null) { "便携备份 ZIP 目录被截断或不完整" }
-            require(short(end + 4) == 0 && short(end + 6) == 0 && short(end + 8) == expectedEntries && short(end + 10) == expectedEntries) {
-                "便携备份 ZIP 目录数量或分卷格式异常"
+            requireLocalized(end != null) { AppText.get(R.string.ui_portable_backup_zip_directory_is_truncated_or_incomplete) }
+            requireLocalized(short(end + 4) == 0 && short(end + 6) == 0 && short(end + 8) == expectedEntries && short(end + 10) == expectedEntries) {
+                AppText.get(R.string.ui_invalid_portable_backup_zip_directory_count_or_split_archive)
             }
             val bytes = long(end + 12)
             val offset = long(end + 16)
-            require(bytes >= expectedEntries * 46L && offset > 0 && offset + bytes == start + end) { "便携备份 ZIP 目录范围异常" }
+            requireLocalized(bytes >= expectedEntries * 46L && offset > 0 && offset + bytes == start + end) { AppText.get(R.string.ui_invalid_portable_backup_zip_directory_bounds) }
             input.seek(offset)
-            require(input.read() == 0x50 && input.read() == 0x4b && input.read() == 0x01 && input.read() == 0x02) { "便携备份 ZIP 目录损坏" }
+            requireLocalized(input.read() == 0x50 && input.read() == 0x4b && input.read() == 0x01 && input.read() == 0x02) { AppText.get(R.string.ui_portable_backup_zip_directory_is_damaged) }
         }
     }
 

@@ -20,7 +20,7 @@ import io.astrbot.android.runtime.*
             ServiceRoute.CREDENTIALS to R.drawable.ic_visibility, ServiceRoute.LOGS to R.drawable.ic_logs).forEach { (item, icon) ->
             NavigationBarItem(selected = (if (route == ServiceRoute.LAN) ServiceRoute.CONNECTION else route) == item,
                 onClick = { onSelect(item) }, icon = { Icon(painterResource(icon), null) }, label = { Text(item.title) },
-                modifier = Modifier.semantics { contentDescription = "服务${item.title}页面" })
+                modifier = Modifier.semantics { contentDescription = AppText.get(R.string.ui_service_page, item.title) })
         }
     }
 }
@@ -32,59 +32,59 @@ import io.astrbot.android.runtime.*
     val status = state.services.getValue(id)
     val connection = state.webUis.getValue(id)
     val endpoint = connection.endpoint
-    BoxWithConstraints(Modifier.fillMaxSize().semantics { contentDescription = "服务详情内容" }) {
+    BoxWithConstraints(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_service_details_content) }) {
     val short = maxHeight < 400.dp || LocalDensity.current.fontScale > 1.25f
     val sideBySide = maxWidth >= 580.dp && maxHeight < 450.dp
     @Composable fun statusActions() {
         ManagerSection(id.label) {
-            Text(status.summary(), style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            if (!short) Text("版本 ${state.versions[id.label] ?: "未知"}", style = MaterialTheme.typography.bodySmall)
+            Text(status.localizedSummary(), style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            if (!short) Text(AppText.get(R.string.ui_version, state.versions[id.label] ?: AppText.get(R.string.ui_unknown)), style = MaterialTheme.typography.bodySmall)
         }
-        ManagerActionButton("打开后台", onOpen, Modifier.fillMaxWidth(), enabled = status.canOpenWebUi, description = "${id.label} 打开后台")
+        ManagerActionButton(AppText.get(R.string.ui_webui), onOpen, Modifier.fillMaxWidth(), enabled = status.canOpenWebUi, description = AppText.get(R.string.ui_open_webui, id.label))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ManagerActionButton("启动", { onCommand("start") }, Modifier.weight(1f), ActionTone.START, state.componentsReady && !state.busy, "启动 ${id.label}")
-            ManagerActionButton("停止", { onCommand("stop") }, Modifier.weight(1f), ActionTone.STOP, state.canStop(id), "停止 ${id.label}")
-            ManagerActionButton("重启", { onCommand("restart") }, Modifier.weight(1f), ActionTone.RESTART, state.componentsReady && !state.busy, "重启 ${id.label}")
+            ManagerActionButton(AppText.get(R.string.ui_start), { onCommand("start") }, Modifier.weight(1f), ActionTone.START, state.componentsReady && !state.busy, AppText.get(R.string.ui_start_a820c, id.label))
+            ManagerActionButton(AppText.get(R.string.ui_stop), { onCommand("stop") }, Modifier.weight(1f), ActionTone.STOP, state.canStop(id), AppText.get(R.string.ui_stop_b02dd, id.label))
+            ManagerActionButton(AppText.get(R.string.ui_restart), { onCommand("restart") }, Modifier.weight(1f), ActionTone.RESTART, state.componentsReady && !state.busy, AppText.get(R.string.ui_restart_e3383, id.label))
         }
     }
     @Composable fun runtimeStatus() {
-        fun time(value: Long?) = value?.let { java.text.SimpleDateFormat("MM-dd HH:mm:ss", java.util.Locale.CHINA).format(java.util.Date(it)) } ?: "暂无"
-        fun record(event: ServiceEvent?) = event?.let { "${time(it.atMillis)} · ${it.summary}" } ?: "暂无记录"
-        ManagerSection("运行状态", padded = false) {
+        fun time(value: Long?) = value?.let { java.text.SimpleDateFormat("MM-dd HH:mm:ss", AppText.locale).format(java.util.Date(it)) } ?: AppText.get(R.string.ui_none)
+        fun record(event: ServiceEvent?) = event?.let { "${time(it.atMillis)} · ${it.summary}" } ?: AppText.get(R.string.ui_no_records)
+        ManagerSection(AppText.get(R.string.ui_runtime_status), padded = false) {
           Column(Modifier.fillMaxWidth().clickable {
-              onNotice("${id.label} 运行记录", "最近检查：${time(status.checkedAtMillis)}\n\n最近异常：${record(status.history.lastAnomaly)}\n\n最近恢复：${record(status.history.lastRecovery)}\n\n记录仅表示当时的观测结果，当前运行情况以上方状态为准。")
-          }.semantics { contentDescription = "${id.label} 运行记录" }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+              onNotice(AppText.get(R.string.ui_history, id.label), AppText.get(R.string.ui_last_checked_n_nlast_issue_n_nlast_recovery_n, time(status.checkedAtMillis), record(status.history.lastAnomaly), record(status.history.lastRecovery)))
+          }.semantics { contentDescription = AppText.get(R.string.ui_history, id.label) }.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (status.detail.isNotBlank()) Text(status.detail, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("OneBot：${when (status.oneBot) {
-                OneBotState.UNCONFIGURED -> "尚未配置"; OneBotState.CONNECTING -> "连接中"; OneBotState.CONNECTED -> "已连接"
-                OneBotState.DISCONNECTED -> "未连接"; OneBotState.UNKNOWN -> "待确认"
+                OneBotState.UNCONFIGURED -> AppText.get(R.string.ui_not_configured); OneBotState.CONNECTING -> AppText.get(R.string.ui_connecting); OneBotState.CONNECTED -> AppText.get(R.string.ui_connected)
+                OneBotState.DISCONNECTED -> AppText.get(R.string.ui_disconnected); OneBotState.UNKNOWN -> AppText.get(R.string.ui_pending)
             }}", style = MaterialTheme.typography.bodySmall)
-            Text("最近检查 ${time(status.checkedAtMillis)}", style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text("最近恢复 ${record(status.history.lastRecovery)}", style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text("最近异常 ${record(status.history.lastAnomaly)}", style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(AppText.get(R.string.ui_last_check, time(status.checkedAtMillis)), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(AppText.get(R.string.ui_last_recovery, record(status.history.lastRecovery)), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(AppText.get(R.string.ui_last_issue, record(status.history.lastAnomaly)), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
           }
         }
     }
     @Composable fun localConnection() {
-        ManagerSection("本机后台地址") {
-            Text(endpoint?.origin ?: "首次启动后生成", style = MaterialTheme.typography.bodyMedium)
+        ManagerSection(AppText.get(R.string.ui_local_webui_address)) {
+            Text(endpoint?.origin ?: AppText.get(R.string.ui_generated_on_first_start), style = MaterialTheme.typography.bodyMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ManagerActionButton("复制地址", { endpoint?.let { onCopy("后台地址", it.origin) } }, Modifier.weight(1f), ActionTone.NEUTRAL, endpoint != null)
-                ManagerActionButton("外部浏览器", { endpoint?.let { onExternal(it.origin) } }, Modifier.weight(1f), enabled = status.canOpenWebUi && endpoint != null)
+                ManagerActionButton(AppText.get(R.string.ui_copy_address), { endpoint?.let { onCopy(AppText.get(R.string.ui_webui_address), it.origin) } }, Modifier.weight(1f), ActionTone.NEUTRAL, endpoint != null)
+                ManagerActionButton(AppText.get(R.string.ui_browser), { endpoint?.let { onExternal(it.origin) } }, Modifier.weight(1f), enabled = status.canOpenWebUi && endpoint != null)
             }
         }
     }
     @Composable fun lanConnection() {
-        ManagerSection("局域网访问") {
-            Text(if (connection.lanEnabled) "已开启 · 同一网络可访问" else "仅允许手机本机访问", style = MaterialTheme.typography.bodyMedium)
-            ManagerActionButton(if (connection.lanEnabled) "关闭 ${id.label} 局域网访问" else "开启 ${id.label} 局域网访问",
+        ManagerSection(AppText.get(R.string.ui_lan_access)) {
+            Text(if (connection.lanEnabled) AppText.get(R.string.ui_on_accessible_on_the_same_network) else AppText.get(R.string.ui_access_restricted_to_this_phone), style = MaterialTheme.typography.bodyMedium)
+            ManagerActionButton(if (connection.lanEnabled) AppText.get(R.string.ui_disable_lan_access, id.label) else AppText.get(R.string.ui_enable_lan_access, id.label),
                 { onLan(!connection.lanEnabled) }, Modifier.fillMaxWidth(), if (connection.lanEnabled) ActionTone.STOP else ActionTone.PRIMARY,
                 state.componentsReady && !state.busy)
             if (connection.lanEnabled && endpoint != null) {
                 val urls = addresses.map { "${endpoint.scheme}://$it:${endpoint.port}" }
-                if (urls.isEmpty()) Text("暂无地址，请连接 Wi-Fi 或以太网", style = MaterialTheme.typography.bodySmall)
-                else ManagerActionButton("复制局域网地址", { onCopy("${id.label} 局域网地址", urls.joinToString("\n")) }, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
-                urls.firstOrNull()?.let { Text(it + if (urls.size > 1) "（共 ${urls.size} 个）" else "", style = MaterialTheme.typography.bodySmall, maxLines = 2) }
+                if (urls.isEmpty()) Text(AppText.get(R.string.ui_no_address_available_connect_to_wi_fi_or_ethernet), style = MaterialTheme.typography.bodySmall)
+                else ManagerActionButton(AppText.get(R.string.ui_copy_lan_address), { onCopy(AppText.get(R.string.ui_lan_address, id.label), urls.joinToString("\n")) }, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
+                urls.firstOrNull()?.let { Text(it + if (urls.size > 1) AppText.get(R.string.ui_total, urls.size) else "", style = MaterialTheme.typography.bodySmall, maxLines = 2) }
             }
         }
     }
@@ -94,11 +94,11 @@ import io.astrbot.android.runtime.*
                 if (sideBySide) Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) { statusActions() }
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        runtimeStatus(); ManagerActionButton("查看日志", onLogs, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
+                        runtimeStatus(); ManagerActionButton(AppText.get(R.string.ui_view_logs), onLogs, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
                     }
                 } else {
                     statusActions(); runtimeStatus()
-                    if (!short) ManagerActionButton("查看日志", onLogs, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
+                    if (!short) ManagerActionButton(AppText.get(R.string.ui_view_logs), onLogs, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
                 }
             }
             ServiceRoute.CONNECTION, ServiceRoute.LAN -> {
@@ -108,9 +108,9 @@ import io.astrbot.android.runtime.*
                 connection.note?.let { Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 2) }
             }
             ServiceRoute.CREDENTIALS -> {
-                ManagerSection("${id.label} 登录凭据") { credentialContent() }
-                Text(if (id == ServiceId.ASTRBOT) "初始用户名：astrbot。首次登录会自动预填初始凭据；修改用户名或密码后不再预填，请使用你设置的账号。"
-                    else "登录页会预填当前访问口令，点击登录即可。离开此页或进入后台后，显示的口令会自动隐藏。",
+                ManagerSection(AppText.get(R.string.ui_login_credentials, id.label)) { credentialContent() }
+                Text(if (id == ServiceId.ASTRBOT) AppText.get(R.string.ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first)
+                    else AppText.get(R.string.ui_the_login_page_prefills_the_current_access_token_select),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

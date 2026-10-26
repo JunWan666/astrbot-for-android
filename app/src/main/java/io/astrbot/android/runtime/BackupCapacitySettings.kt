@@ -1,5 +1,10 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.content.SharedPreferences
 import io.astrbot.android.core.BackupLimits
@@ -16,7 +21,7 @@ class BackupCapacitySettings(private val preferences: SharedPreferences) {
 
     fun save(limits: BackupLimits) {
         val raw = JSONObject().put("count", limits.automaticCount).put("bytes", limits.automaticBytes).toString()
-        check(preferences.edit().putString(KEY, raw).commit()) { "无法保存快照上限，请检查存储空间" }
+        checkLocalized(preferences.edit().putString(KEY, raw).commit()) { AppText.get(R.string.ui_could_not_save_snapshot_limits_check_free_storage) }
     }
 
     companion object { const val KEY = "backup_limits_v1" }

@@ -23,17 +23,21 @@ import io.astrbot.android.core.*
 import io.astrbot.android.runtime.*
 import kotlin.math.floor
 
-internal enum class SettingsRoute(val title: String) {
-    ROOT("设置"), PROGRAMS("AstrBot 程序更新"), NAPCAT("NapCat 程序更新"), ENVIRONMENT("运行环境升级"),
-    BACKUPS("备份与恢复"), PORTABLE("便携备份"), DIAGNOSTICS("日志与诊断"), BACKGROUND("后台运行"), ABOUT("关于");
+internal enum class SettingsRoute(private val titleResource: Int) {
+    ROOT(R.string.ui_settings), PROGRAMS(R.string.ui_astrbot_updates), NAPCAT(R.string.ui_napcat_updates), ENVIRONMENT(R.string.ui_runtime_upgrades),
+    BACKUPS(R.string.ui_backup_and_restore), PORTABLE(R.string.ui_portable_backups), DIAGNOSTICS(R.string.ui_logs_and_diagnostics), BACKGROUND(R.string.ui_background_operation), ABOUT(R.string.ui_about);
+    val title: String get() = AppText.get(titleResource)
+
     val parent get() = when (this) { PROGRAMS, NAPCAT, ENVIRONMENT -> ABOUT; PORTABLE -> BACKUPS; else -> ROOT }
 }
-internal enum class ServiceRoute(val title: String) { STATUS("概览"), CONNECTION("连接"), CREDENTIALS("凭据"), LOGS("日志"), LAN("连接") }
+internal enum class ServiceRoute(private val titleResource: Int) { STATUS(R.string.ui_overview), CONNECTION(R.string.ui_connection_eebb5), CREDENTIALS(R.string.ui_credentials), LOGS(R.string.ui_logs_894b8), LAN(R.string.ui_connection_eebb5) ;
+    val title: String get() = AppText.get(titleResource)
+}
 internal enum class SettingAction { VERSIONS, CHECK_UPDATE, CHECK_APP_UPDATE, IMPORT_UPDATE, ONLINE_UPDATE, APPLY_UPDATE, ROLLBACK,
     CHECK_NAPCAT, ONLINE_NAPCAT, APPLY_NAPCAT, ROLLBACK_NAPCAT,
     APPLY_RUNTIME, ROLLBACK_RUNTIME, CREATE_BACKUP, BACKUPS, BACKUP_LIMITS, EXPORT_PORTABLE, IMPORT_PORTABLE,
     PORTABLE_SCOPE, DISCARD_PORTABLE, LOGS, RUNTIME_LOGS, DIAGNOSTICS, EXTENSIONS, APP_SETTINGS, BATTERY, LICENSES,
-    NOTIFICATIONS, UNRESTRICTED, AUTOSTART, TASK_LOCK, BACKGROUND_HELP, AUTOMATIC_UPDATES, ENVIRONMENT_CHECK, STORAGE_USAGE, DATA_RETENTION }
+    NOTIFICATIONS, UNRESTRICTED, AUTOSTART, TASK_LOCK, BACKGROUND_HELP, AUTOMATIC_UPDATES, ENVIRONMENT_CHECK, STORAGE_USAGE, DATA_RETENTION, LANGUAGE }
 internal enum class ActionTone { PRIMARY, START, STOP, RESTART, NEUTRAL }
 
 internal fun ManagerState.canStop(id: ServiceId? = null): Boolean = busy ||
@@ -101,10 +105,10 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
             Spacer(Modifier.weight(1f))
             if (pages > 1) Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ManagerActionButton("上一页", { selectedPage = current - 1 }, tone = ActionTone.NEUTRAL, enabled = current > 0)
+                ManagerActionButton(AppText.get(R.string.ui_previous), { selectedPage = current - 1 }, tone = ActionTone.NEUTRAL, enabled = current > 0)
                 Text("${current + 1} / $pages", Modifier.weight(1f), style = MaterialTheme.typography.bodySmall,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                ManagerActionButton("下一页", { selectedPage = current + 1 }, tone = ActionTone.NEUTRAL, enabled = current + 1 < pages)
+                ManagerActionButton(AppText.get(R.string.ui_next), { selectedPage = current + 1 }, tone = ActionTone.NEUTRAL, enabled = current + 1 < pages)
             }
         }
     }
@@ -116,7 +120,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
     val error = state.error != null || storageWarning != null
     val color = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     Surface(Modifier.fillMaxWidth().clickable {
-        onNotice(if (state.error != null) "操作未完成" else if (storageWarning != null) state.storageSpace.pressure.title else "操作提示",
+        onNotice(if (state.error != null) AppText.get(R.string.ui_operation_incomplete) else if (storageWarning != null) state.storageSpace.pressure.title else AppText.get(R.string.ui_operation_notice),
             if (state.error == null && storageWarning != null) "$text\n\n${StorageSpace.HELP}" else text)
     },
         color = color.copy(alpha = .08f), shape = MaterialTheme.shapes.small) {
@@ -131,7 +135,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
 
 @Composable internal fun FixedManagerHome(state: ManagerState, network: NetworkSnapshot, resources: ResourceSnapshot,
     onCommand: (String, ServiceId?) -> Unit, onDetails: (ServiceId) -> Unit, onOpen: (ServiceId) -> Unit, onNotice: (String, String) -> Unit) {
-    BoxWithConstraints(Modifier.fillMaxSize().semantics { contentDescription = "首页内容" }) {
+    BoxWithConstraints(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_home_content) }) {
         val landscape = maxWidth >= 600.dp && maxHeight < 500.dp
         val tight = maxHeight < 600.dp || LocalDensity.current.fontScale > 1.25f
         @Composable fun overview() {
@@ -139,7 +143,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
             else ManagerOverview(state, network) { onCommand(it, null) }
             ManagerResources(resources, compact = true)
             ManagerStatusStrip(state, onNotice)
-            if (!state.componentsReady) ManagerActionButton("初始化环境",
+            if (!state.componentsReady) ManagerActionButton(AppText.get(R.string.ui_initialize_runtime),
                 { onCommand("initialize", null) }, Modifier.fillMaxWidth(), enabled = !state.busy)
         }
         @Composable fun services(modifier: Modifier) {
@@ -151,7 +155,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
                 if (paged) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ServiceId.entries.forEach { id ->
                         ManagerActionButton(id.label, { selected = id }, Modifier.weight(1f),
-                            if (selected == id) ActionTone.PRIMARY else ActionTone.NEUTRAL, description = "查看 ${id.label} 卡片")
+                            if (selected == id) ActionTone.PRIMARY else ActionTone.NEUTRAL, description = AppText.get(R.string.ui_view_card, id.label))
                     }
                 }
                 (if (paged) listOf(selected) else ServiceId.entries).forEach { id ->
@@ -167,8 +171,8 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
         } else Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(if (tight) 8.dp else 12.dp)) {
             overview()
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("我的服务", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
-                Text("点击详情管理连接", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(AppText.get(R.string.ui_my_services), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                Text(AppText.get(R.string.ui_manage_connections_in_details), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             services(Modifier.weight(1f))
         }
@@ -181,17 +185,17 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
     Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Color(0xFF386BF6), Color(0xFF5686FF))),
         MaterialTheme.shapes.large).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f).clickable { onNotice("系统网络状态", network.detail) }) {
-                Text("运行概况", style = MaterialTheme.typography.titleSmall, color = Color.White)
-                Text(network.title, Modifier.semantics { contentDescription = "系统网络状态" }, style = MaterialTheme.typography.labelSmall,
+            Column(Modifier.weight(1f).clickable { onNotice(AppText.get(R.string.ui_system_network_status), network.detail) }) {
+                Text(AppText.get(R.string.ui_runtime_overview), style = MaterialTheme.typography.titleSmall, color = Color.White)
+                Text(network.title, Modifier.semantics { contentDescription = AppText.get(R.string.ui_system_network_status) }, style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = .85f), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             ManagerRunningCount(running, compact = true)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ManagerOverviewCommand("start", "启动全部", R.drawable.ic_play, state, false, Modifier.weight(1f), onCommand)
-            ManagerOverviewCommand("stop", "停止全部", R.drawable.ic_stop, state, false, Modifier.weight(1f), onCommand)
-            ManagerOverviewCommand("restart", "重启全部", R.drawable.ic_restart, state, false, Modifier.weight(1f), onCommand)
+            ManagerOverviewCommand("start", AppText.get(R.string.ui_start_all), R.drawable.ic_play, state, false, Modifier.weight(1f), onCommand)
+            ManagerOverviewCommand("stop", AppText.get(R.string.ui_stop_all), R.drawable.ic_stop, state, false, Modifier.weight(1f), onCommand)
+            ManagerOverviewCommand("restart", AppText.get(R.string.ui_restart_all), R.drawable.ic_restart, state, false, Modifier.weight(1f), onCommand)
         }
     }
 }
@@ -202,28 +206,28 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
         BoxWithConstraints(Modifier.fillMaxSize()) {
         val spacious = maxHeight >= 150.dp
         Column(Modifier.fillMaxSize().padding(if (spacious) 16.dp else 12.dp), verticalArrangement = Arrangement.SpaceBetween) {
-            Row(Modifier.fillMaxWidth().clickable(onClick = onDetails).semantics { contentDescription = "${id.label} 服务详情" },
+            Row(Modifier.fillMaxWidth().clickable(onClick = onDetails).semantics { contentDescription = AppText.get(R.string.ui_service_details, id.label) },
                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 ManagerServiceLogo(id)
                 Column(Modifier.weight(1f)) {
                     Text(id.label + (version?.takeIf { it.length <= 24 && it.firstOrNull()?.isDigit() == true }?.let { "  $it" } ?: ""),
                         style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(status.summary(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    Text(status.localizedSummary(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 ManagerProcessBadge(status.process)
             }
-            if (spacious) Text(if (!ready) "初始化后可使用后台" else if (id == ServiceId.ASTRBOT) "模型、平台与插件，请进入后台管理"
-                else "OneBot 与 AstrBot：" + when (status.oneBot) {
-                    OneBotState.UNCONFIGURED -> "尚未配置"; OneBotState.CONNECTING -> "连接中"; OneBotState.CONNECTED -> "已连接"
-                    OneBotState.DISCONNECTED -> "未连接"; OneBotState.UNKNOWN -> "待确认"
+            if (spacious) Text(if (!ready) AppText.get(R.string.ui_initialize_the_runtime_to_use_the_webui) else if (id == ServiceId.ASTRBOT) AppText.get(R.string.ui_manage_models_platforms_and_plugins_in_the_webui)
+                else AppText.get(R.string.ui_onebot_to_astrbot) + when (status.oneBot) {
+                    OneBotState.UNCONFIGURED -> AppText.get(R.string.ui_not_configured); OneBotState.CONNECTING -> AppText.get(R.string.ui_connecting); OneBotState.CONNECTED -> AppText.get(R.string.ui_connected)
+                    OneBotState.DISCONNECTED -> AppText.get(R.string.ui_disconnected); OneBotState.UNKNOWN -> AppText.get(R.string.ui_pending)
                 }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ManagerActionButton("打开后台", onOpen, Modifier.weight(1.4f), enabled = status.canOpenWebUi, description = "${id.label} 打开后台")
+                ManagerActionButton(AppText.get(R.string.ui_webui), onOpen, Modifier.weight(1.4f), enabled = status.canOpenWebUi, description = AppText.get(R.string.ui_open_webui, id.label))
                 val stop = status.desiredRunning || status.process != ProcessState.STOPPED
-                ManagerActionButton(if (stop) "停止" else "启动", { onCommand(if (stop) "stop" else "start") }, Modifier.weight(.8f),
-                    if (stop) ActionTone.STOP else ActionTone.START, stop || ready && !busy, "${if (stop) "停止" else "启动"} ${id.label}")
-                ManagerActionButton("详情", onDetails, Modifier.weight(.8f), ActionTone.NEUTRAL, description = "${id.label} 详情")
+                ManagerActionButton(if (stop) AppText.get(R.string.ui_stop) else AppText.get(R.string.ui_start), { onCommand(if (stop) "stop" else "start") }, Modifier.weight(.8f),
+                    if (stop) ActionTone.STOP else ActionTone.START, stop || ready && !busy, "${if (stop) AppText.get(R.string.ui_stop) else AppText.get(R.string.ui_start)} ${id.label}")
+                ManagerActionButton(AppText.get(R.string.ui_details), onDetails, Modifier.weight(.8f), ActionTone.NEUTRAL, description = AppText.get(R.string.ui_details_2ee06, id.label))
             }
         }
         }
@@ -240,64 +244,65 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
     val ready = state.componentsReady && !state.busy
     val items = when (route) {
         SettingsRoute.ROOT -> listOf(
-            action("扩展组件", R.drawable.ic_settings, "SSH 终端等可选功能", action = SettingAction.EXTENSIONS),
-            destination("备份与恢复", R.drawable.ic_backup, "本机快照、便携备份与容量", SettingsRoute.BACKUPS),
-            destination("日志与诊断", R.drawable.ic_logs, "运行日志与诊断导出", SettingsRoute.DIAGNOSTICS),
-            destination("后台运行", R.drawable.ic_battery, "权限、自启动与电池管理", SettingsRoute.BACKGROUND),
-            destination("关于", R.drawable.ic_info, "检查更新、应用版本与许可", SettingsRoute.ABOUT))
+            action(AppText.get(R.string.ui_extensions), R.drawable.ic_settings, AppText.get(R.string.ui_ssh_terminal_and_other_optional_features), action = SettingAction.EXTENSIONS),
+            destination(AppText.get(R.string.ui_backup_and_restore), R.drawable.ic_backup, AppText.get(R.string.ui_local_snapshots_portable_backups_and_limits), SettingsRoute.BACKUPS),
+            destination(AppText.get(R.string.ui_logs_and_diagnostics), R.drawable.ic_logs, AppText.get(R.string.ui_runtime_logs_and_diagnostic_exports), SettingsRoute.DIAGNOSTICS),
+            destination(AppText.get(R.string.ui_background_operation), R.drawable.ic_battery, AppText.get(R.string.ui_permissions_auto_start_and_battery_management), SettingsRoute.BACKGROUND),
+            action(AppText.get(R.string.language_title), R.drawable.ic_settings, AppText.get(R.string.language_subtitle), action = SettingAction.LANGUAGE),
+            destination(AppText.get(R.string.ui_about), R.drawable.ic_info, AppText.get(R.string.ui_updates_app_version_and_licenses), SettingsRoute.ABOUT))
         SettingsRoute.PROGRAMS -> listOf(
-            action("检查 AstrBot 更新", R.drawable.ic_update, "检查适配当前运行环境的程序包", ready, SettingAction.CHECK_UPDATE),
-            action("在线版本与下载", R.drawable.ic_document, state.latestUpdate?.let { "AstrBot ${it.version} · 可下载或重新安装" } ?: "点击检查后获取版本说明与下载", ready, SettingAction.ONLINE_UPDATE),
-            action("导入更新包", R.drawable.ic_import, "选择已签名的本地维护包", ready, SettingAction.IMPORT_UPDATE),
-            action("查看待安装更新", R.drawable.ic_update, if (state.preparedUpdate == null) "尚未准备更新包" else "核对后确认安装", state.preparedUpdate != null && !state.busy, SettingAction.APPLY_UPDATE),
-            action("回退 AstrBot 程序", R.drawable.ic_restart, state.rollback?.let { "回退到 ${it.version}" } ?: "暂无程序回退点", state.rollback != null && !state.busy, SettingAction.ROLLBACK),
-            action("自动检查更新", R.drawable.ic_settings, when {
-                !updateChannelConfigured -> "尚未配置在线更新通道"
-                automaticUpdateEnabled -> "已开启 · 打开应用时每天检查"
-                else -> "已关闭 · 点击设置"
+            action(AppText.get(R.string.ui_check_astrbot_updates), R.drawable.ic_update, AppText.get(R.string.ui_find_packages_compatible_with_the_current_runtime), ready, SettingAction.CHECK_UPDATE),
+            action(AppText.get(R.string.ui_available_version_and_download), R.drawable.ic_document, state.latestUpdate?.let { AppText.get(R.string.ui_astrbot_download_or_reinstall, it.version) } ?: AppText.get(R.string.ui_check_for_updates_to_view_release_notes_and_downloads), ready, SettingAction.ONLINE_UPDATE),
+            action(AppText.get(R.string.ui_import_update_package), R.drawable.ic_import, AppText.get(R.string.ui_select_a_signed_local_maintenance_package), ready, SettingAction.IMPORT_UPDATE),
+            action(AppText.get(R.string.ui_view_prepared_update), R.drawable.ic_update, if (state.preparedUpdate == null) AppText.get(R.string.ui_no_update_package_prepared) else AppText.get(R.string.ui_review_before_installation), state.preparedUpdate != null && !state.busy, SettingAction.APPLY_UPDATE),
+            action(AppText.get(R.string.ui_roll_back_astrbot), R.drawable.ic_restart, state.rollback?.let { AppText.get(R.string.ui_restore_version, it.version) } ?: AppText.get(R.string.ui_no_program_rollback_available), state.rollback != null && !state.busy, SettingAction.ROLLBACK),
+            action(AppText.get(R.string.ui_automatic_update_checks), R.drawable.ic_settings, when {
+                !updateChannelConfigured -> AppText.get(R.string.ui_no_online_update_channel_configured)
+                automaticUpdateEnabled -> AppText.get(R.string.ui_on_check_daily_when_opening_the_app)
+                else -> AppText.get(R.string.ui_off_tap_to_configure)
             }, action = SettingAction.AUTOMATIC_UPDATES))
         SettingsRoute.NAPCAT -> listOf(
-            action("检查 NapCat 更新", R.drawable.ic_update, "独立更新，无需重新安装管理器", ready, SettingAction.CHECK_NAPCAT),
-            action("NapCat 在线版本与下载", R.drawable.ic_document, state.latestNapCat?.let { "NapCat ${it.version} · 上游正式程序包" } ?: "点击检查后获取版本说明与下载", ready, SettingAction.ONLINE_NAPCAT),
-            action("安装 NapCat 更新", R.drawable.ic_update, state.preparedNapCat?.let { "已校验 ${it.version} · 先备份再安装" } ?: "先下载并校验程序包", state.preparedNapCat != null && !state.busy, SettingAction.APPLY_NAPCAT),
-            action("回退 NapCat 程序", R.drawable.ic_restart, state.napCatRollback?.let { "回退到 ${it.version} 及对应数据" } ?: "暂无 NapCat 回退点", state.napCatRollback != null && !state.busy, SettingAction.ROLLBACK_NAPCAT))
+            action(AppText.get(R.string.ui_check_napcat_updates), R.drawable.ic_update, AppText.get(R.string.ui_update_independently_without_reinstalling_the_app), ready, SettingAction.CHECK_NAPCAT),
+            action(AppText.get(R.string.ui_napcat_version_and_download), R.drawable.ic_document, state.latestNapCat?.let { AppText.get(R.string.ui_napcat_official_upstream_package, it.version) } ?: AppText.get(R.string.ui_check_for_updates_to_view_release_notes_and_downloads), ready, SettingAction.ONLINE_NAPCAT),
+            action(AppText.get(R.string.ui_install_napcat_update), R.drawable.ic_update, state.preparedNapCat?.let { AppText.get(R.string.ui_verified_back_up_before_installing, it.version) } ?: AppText.get(R.string.ui_download_and_verify_a_package_first), state.preparedNapCat != null && !state.busy, SettingAction.APPLY_NAPCAT),
+            action(AppText.get(R.string.ui_roll_back_napcat), R.drawable.ic_restart, state.napCatRollback?.let { AppText.get(R.string.ui_restore_and_its_data, it.version) } ?: AppText.get(R.string.ui_no_napcat_rollback_available), state.napCatRollback != null && !state.busy, SettingAction.ROLLBACK_NAPCAT))
         SettingsRoute.ENVIRONMENT -> listOf(
-            action("环境检查与修复", R.drawable.ic_settings, "区分运行资源与后台配置问题", !state.busy, SettingAction.ENVIRONMENT_CHECK),
-            action("升级 APK 内置环境", R.drawable.ic_update, state.runtimeUpdate?.name ?: "当前环境已匹配内置资源", state.runtimeUpdate != null && !state.busy, SettingAction.APPLY_RUNTIME),
-            action("回退整个运行环境", R.drawable.ic_restart, if (state.runtimeRollback == null) "暂无环境回退点" else "恢复旧环境及对应数据", state.runtimeRollback != null && !state.busy, SettingAction.ROLLBACK_RUNTIME))
+            action(AppText.get(R.string.ui_environment_check_and_repair), R.drawable.ic_settings, AppText.get(R.string.ui_distinguish_runtime_issues_from_webui_configuration_issues), !state.busy, SettingAction.ENVIRONMENT_CHECK),
+            action(AppText.get(R.string.ui_upgrade_bundled_runtime), R.drawable.ic_update, state.runtimeUpdate?.name ?: AppText.get(R.string.ui_runtime_matches_the_bundled_resources), state.runtimeUpdate != null && !state.busy, SettingAction.APPLY_RUNTIME),
+            action(AppText.get(R.string.ui_roll_back_the_entire_runtime), R.drawable.ic_restart, if (state.runtimeRollback == null) AppText.get(R.string.ui_no_runtime_rollback_available) else AppText.get(R.string.ui_restore_the_previous_runtime_and_its_data), state.runtimeRollback != null && !state.busy, SettingAction.ROLLBACK_RUNTIME))
         SettingsRoute.BACKUPS -> listOf(
-            action("创建本机备份", R.drawable.ic_backup, "含 QQ 会话 · 完成后恢复服务", ready, SettingAction.CREATE_BACKUP),
-            action("备份管理（${state.backups.size}）", R.drawable.ic_document, "查看、恢复与删除本机备份", action = SettingAction.BACKUPS),
-            action("自动快照上限", R.drawable.ic_settings, "${state.backupLimits.automaticCount} 份 · 自动清理最旧快照", !state.busy, SettingAction.BACKUP_LIMITS),
-            destination("便携备份", R.drawable.ic_export, "跨设备导入导出 · 不含 QQ 会话", SettingsRoute.PORTABLE),
-            action("数据与卸载说明", R.drawable.ic_info, "卸载前先将备份保存到应用外", action = SettingAction.DATA_RETENTION))
+            action(AppText.get(R.string.ui_create_local_backup), R.drawable.ic_backup, AppText.get(R.string.ui_includes_qq_sessions_services_resume_afterward), ready, SettingAction.CREATE_BACKUP),
+            action(AppText.get(R.string.ui_manage_backups, state.backups.size), R.drawable.ic_document, AppText.get(R.string.ui_view_restore_and_delete_local_backups), action = SettingAction.BACKUPS),
+            action(AppText.get(R.string.ui_automatic_snapshot_limits), R.drawable.ic_settings, AppText.get(R.string.ui_keep_remove_oldest_snapshots_automatically, state.backupLimits.automaticCount), !state.busy, SettingAction.BACKUP_LIMITS),
+            destination(AppText.get(R.string.ui_portable_backups), R.drawable.ic_export, AppText.get(R.string.ui_transfer_between_devices_excludes_qq_sessions), SettingsRoute.PORTABLE),
+            action(AppText.get(R.string.ui_data_and_uninstallation), R.drawable.ic_info, AppText.get(R.string.ui_save_backups_outside_the_app_before_uninstalling), action = SettingAction.DATA_RETENTION))
         SettingsRoute.PORTABLE -> listOf(
-            action("导出便携备份", R.drawable.ic_export, "保存配置与数据到文件", ready, SettingAction.EXPORT_PORTABLE),
-            action("导入便携备份", R.drawable.ic_import, "选择 ZIP 并核对恢复范围", ready, SettingAction.IMPORT_PORTABLE),
-            action("查看导入范围", R.drawable.ic_info, if (state.portableImport == null) "尚未选择备份文件" else "核对后确认恢复", state.portableImport != null && !state.busy, SettingAction.PORTABLE_SCOPE),
-            action("移除待导入备份", R.drawable.ic_backup, "仅移除待处理的临时副本", state.portableImport != null && !state.busy, SettingAction.DISCARD_PORTABLE))
+            action(AppText.get(R.string.ui_export_portable_backup), R.drawable.ic_export, AppText.get(R.string.ui_save_configuration_and_data_to_a_file), ready, SettingAction.EXPORT_PORTABLE),
+            action(AppText.get(R.string.ui_import_portable_backup), R.drawable.ic_import, AppText.get(R.string.ui_select_a_zip_and_review_what_will_be_restored), ready, SettingAction.IMPORT_PORTABLE),
+            action(AppText.get(R.string.ui_view_import_scope), R.drawable.ic_info, if (state.portableImport == null) AppText.get(R.string.ui_no_backup_file_selected) else AppText.get(R.string.ui_review_before_restoring), state.portableImport != null && !state.busy, SettingAction.PORTABLE_SCOPE),
+            action(AppText.get(R.string.ui_discard_pending_import), R.drawable.ic_backup, AppText.get(R.string.ui_remove_only_the_pending_temporary_copy), state.portableImport != null && !state.busy, SettingAction.DISCARD_PORTABLE))
         SettingsRoute.DIAGNOSTICS -> listOf(
-            action("环境检查与修复", R.drawable.ic_settings, "检查资源、依赖与后台配置", !state.busy, SettingAction.ENVIRONMENT_CHECK),
-            action("存储使用", R.drawable.ic_backup, "查看数据、缓存和备份占用", action = SettingAction.STORAGE_USAGE),
-            action("管理器日志", R.drawable.ic_logs, "启停、更新与备份记录", action = SettingAction.LOGS),
-            action("运行环境日志", R.drawable.ic_logs, "初始化与环境维护记录", action = SettingAction.RUNTIME_LOGS),
-            action("导出诊断包", R.drawable.ic_export, "设备信息、状态和脱敏日志", !state.busy, SettingAction.DIAGNOSTICS))
+            action(AppText.get(R.string.ui_environment_check_and_repair), R.drawable.ic_settings, AppText.get(R.string.ui_check_resources_dependencies_and_webui_settings), !state.busy, SettingAction.ENVIRONMENT_CHECK),
+            action(AppText.get(R.string.ui_storage_usage), R.drawable.ic_backup, AppText.get(R.string.ui_view_data_cache_and_backup_sizes), action = SettingAction.STORAGE_USAGE),
+            action(AppText.get(R.string.ui_manager_logs), R.drawable.ic_logs, AppText.get(R.string.ui_service_controls_updates_and_backup_events), action = SettingAction.LOGS),
+            action(AppText.get(R.string.ui_runtime_logs), R.drawable.ic_logs, AppText.get(R.string.ui_initialization_and_runtime_maintenance), action = SettingAction.RUNTIME_LOGS),
+            action(AppText.get(R.string.ui_export_diagnostics), R.drawable.ic_export, AppText.get(R.string.ui_device_information_status_and_redacted_logs), !state.busy, SettingAction.DIAGNOSTICS))
         SettingsRoute.BACKGROUND -> listOf(
-            action("运行通知", R.drawable.ic_info, "允许状态通知与通知类别", action = SettingAction.NOTIFICATIONS),
-            action("忽略电池优化", R.drawable.ic_battery, "检查系统电池优化状态", action = SettingAction.BATTERY),
-            action("后台耗电与无限制", R.drawable.ic_battery, "按当前手机系统引导设置", action = SettingAction.UNRESTRICTED),
-            action("自启动与关联启动", R.drawable.ic_settings, "厂商权限与手动确认", action = SettingAction.AUTOSTART),
-            action("锁定最近任务", R.drawable.ic_info, "防止一键清理误关", action = SettingAction.TASK_LOCK),
-            action("后台运行说明", R.drawable.ic_document, "查看设置建议和运行限制", action = SettingAction.BACKGROUND_HELP))
+            action(AppText.get(R.string.ui_service_notifications), R.drawable.ic_info, AppText.get(R.string.ui_allow_status_notifications_and_notification_channels), action = SettingAction.NOTIFICATIONS),
+            action(AppText.get(R.string.ui_battery_optimization), R.drawable.ic_battery, AppText.get(R.string.ui_check_system_battery_optimization), action = SettingAction.BATTERY),
+            action(AppText.get(R.string.ui_background_battery_limits), R.drawable.ic_battery, AppText.get(R.string.ui_guidance_for_this_phone_s_system), action = SettingAction.UNRESTRICTED),
+            action(AppText.get(R.string.ui_auto_start_permissions), R.drawable.ic_settings, AppText.get(R.string.ui_manufacturer_permissions_and_manual_checks), action = SettingAction.AUTOSTART),
+            action(AppText.get(R.string.ui_lock_recent_task), R.drawable.ic_info, AppText.get(R.string.ui_reduce_accidental_task_cleanup), action = SettingAction.TASK_LOCK),
+            action(AppText.get(R.string.ui_background_operation_guide), R.drawable.ic_document, AppText.get(R.string.ui_setup_recommendations_and_runtime_limitations), action = SettingAction.BACKGROUND_HELP))
         SettingsRoute.ABOUT -> listOf(
-            action("检查更新", R.drawable.ic_update, "管理器 APK 更新与安装", true, SettingAction.CHECK_APP_UPDATE),
-            action("应用与组件版本", R.drawable.ic_info, BuildConfig.VERSION_NAME, action = SettingAction.VERSIONS),
-            destination("AstrBot 程序更新", R.drawable.ic_update, "在线说明、维护包与程序回退", SettingsRoute.PROGRAMS),
-            destination("NapCat 程序更新", R.drawable.ic_update, "独立更新、保留配置与会话", SettingsRoute.NAPCAT),
-            destination("运行环境升级", R.drawable.ic_restart, "QQ、Python 与底层依赖", SettingsRoute.ENVIRONMENT),
-            action("第三方许可", R.drawable.ic_document, "开源许可与来源材料", action = SettingAction.LICENSES))
+            action(AppText.get(R.string.ui_check_for_updates), R.drawable.ic_update, AppText.get(R.string.ui_app_apk_updates_and_installation), true, SettingAction.CHECK_APP_UPDATE),
+            action(AppText.get(R.string.ui_app_and_component_versions), R.drawable.ic_info, BuildConfig.VERSION_NAME, action = SettingAction.VERSIONS),
+            destination(AppText.get(R.string.ui_astrbot_updates), R.drawable.ic_update, AppText.get(R.string.ui_release_notes_maintenance_packages_and_rollback), SettingsRoute.PROGRAMS),
+            destination(AppText.get(R.string.ui_napcat_updates), R.drawable.ic_update, AppText.get(R.string.ui_independent_updates_retaining_configuration_and_sessions), SettingsRoute.NAPCAT),
+            destination(AppText.get(R.string.ui_runtime_upgrades), R.drawable.ic_restart, AppText.get(R.string.ui_qq_python_and_underlying_dependencies), SettingsRoute.ENVIRONMENT),
+            action(AppText.get(R.string.ui_third_party_licenses), R.drawable.ic_document, AppText.get(R.string.ui_open_source_licenses_and_source_materials), action = SettingAction.LICENSES))
     }
-    Column(Modifier.fillMaxSize().semantics { contentDescription = "设置内容" }, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_settings_content) }, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         ManagerStatusStrip(state, onNotice)
         FixedManagerMenu(items, Modifier.weight(1f))
         if (route == SettingsRoute.ROOT || route == SettingsRoute.ABOUT) Text("${ProjectIdentity.AUTHOR} · v${BuildConfig.VERSION_NAME}", Modifier.fillMaxWidth(),

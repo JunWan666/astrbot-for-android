@@ -37,11 +37,11 @@ internal class BrowserScale(private val context: Context, private val key: Strin
     }
 
     fun choose(view: WebView, onChanged: () -> Unit = {}) {
-        AlertDialog.Builder(context).setTitle("页面缩放")
+        AlertDialog.Builder(context).setTitle(AppText.get(R.string.ui_page_zoom))
             .setSingleChoiceItems(levels.map { "$it%" }.toTypedArray(), levels.indexOf(percent)) { dialog, index ->
                 preferences.edit().putInt(key, levels[index]).apply()
                 apply(view); onChanged(); dialog.dismiss()
-            }.setNegativeButton("取消", null).show()
+            }.setNegativeButton(AppText.get(R.string.ui_cancel), null).show()
     }
 
     companion object { val levels = listOf(100, 75, 50, 25) }

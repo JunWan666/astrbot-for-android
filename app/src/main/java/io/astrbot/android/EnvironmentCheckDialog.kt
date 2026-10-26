@@ -14,12 +14,12 @@ import java.util.Date
 @Composable internal fun EnvironmentCheckDialog(state: ManagerState, onCheck: () -> Unit, onRepair: () -> Unit,
     onMaintenance: () -> Unit, onDismiss: () -> Unit) {
     val report = state.environmentCheck
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("环境检查与修复") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(AppText.get(R.string.ui_environment_check_and_repair)) }, text = {
         Column(Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (state.busy) Text(state.phase, color = MaterialTheme.colorScheme.primary)
-            if (report == null) Text("正在检查运行资源和后台配置，不会启动 AstrBot / NapCat 或重置配置。")
+            if (report == null) Text(AppText.get(R.string.ui_checking_runtime_resources_and_webui_configuration_this_does_not))
             else {
-                Text("检查于 ${DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(report.checkedAtMillis))}",
+                Text(AppText.get(R.string.ui_checked_at, DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, AppText.locale).format(Date(report.checkedAtMillis))),
                     style = MaterialTheme.typography.bodySmall)
                 report.items.forEach { item ->
                     val color = when (item.status) {
@@ -29,17 +29,17 @@ import java.util.Date
                     }
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(item.title + " · " + when (item.status) {
-                            EnvironmentCheckStatus.OK -> "通过"; EnvironmentCheckStatus.ATTENTION -> "提示"; EnvironmentCheckStatus.FAILED -> "需处理"
+                            EnvironmentCheckStatus.OK -> AppText.get(R.string.ui_passed); EnvironmentCheckStatus.ATTENTION -> AppText.get(R.string.ui_notice); EnvironmentCheckStatus.FAILED -> AppText.get(R.string.ui_action_needed)
                         }, color = color, style = MaterialTheme.typography.labelLarge)
                         Text(item.detail, style = MaterialTheme.typography.bodySmall)
                     }
                 }
                 HorizontalDivider()
                 Text(report.repairExplanation, style = MaterialTheme.typography.bodySmall)
-                ManagerActionButton("修复运行资源", onRepair, Modifier.fillMaxWidth(), enabled = !state.busy && report.canRepair)
-                TextButton(onClick = onMaintenance, enabled = !state.busy) { Text("运行环境升级与回退") }
+                ManagerActionButton(AppText.get(R.string.ui_repair_runtime_resources), onRepair, Modifier.fillMaxWidth(), enabled = !state.busy && report.canRepair)
+                TextButton(onClick = onMaintenance, enabled = !state.busy) { Text(AppText.get(R.string.ui_runtime_upgrade_and_rollback)) }
             }
         }
-    }, confirmButton = { TextButton(onClick = onDismiss) { Text("关闭") } },
-        dismissButton = { TextButton(onClick = onCheck, enabled = !state.busy) { Text("重新检查") } })
+    }, confirmButton = { TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_close)) } },
+        dismissButton = { TextButton(onClick = onCheck, enabled = !state.busy) { Text(AppText.get(R.string.ui_check_again)) } })
 }

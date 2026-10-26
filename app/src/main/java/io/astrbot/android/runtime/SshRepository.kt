@@ -1,5 +1,11 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -48,16 +54,16 @@ class SshRepository(context: Context) {
             val password = encode(ByteArray(18).also { SecureRandom().nextBytes(it) })
             writeSettings(SshConfiguration(), password)
         }
-        check(preferences.edit().putBoolean(INSTALLED, true).commit()) { "无法保存 SSH 安装状态" }
+        checkLocalized(preferences.edit().putBoolean(INSTALLED, true).commit()) { AppText.get(R.string.ui_cannot_save_ssh_installation_state) }
     }
 
     fun ensureDefault() { if (preferences.getBoolean(INSTALLED, true) && !DurableFiles.exists(settings)) install() }
 
     fun save(port: Int, lanEnabled: Boolean, password: String?) {
-        require(configuration().installed) { "请先安装 SSH 扩展" }
-        require(port in 1024..65535) { "SSH 端口范围为 1024–65535" }
-        if (password != null) require(password.length in 12..128 && password.none { it.isISOControl() }) {
-            "密码需为 12–128 个字符，不能含换行或控制字符"
+        requireLocalized(configuration().installed) { AppText.get(R.string.ui_install_the_ssh_extension_first) }
+        requireLocalized(port in 1024..65535) { AppText.get(R.string.ui_ssh_port_must_be_between_1024_and_65535) }
+        if (password != null) requireLocalized(password.length in 12..128 && password.none { it.isISOControl() }) {
+            AppText.get(R.string.ui_password_must_contain_12_128_characters_without_newlines_or)
         }
         writeSettings(SshConfiguration(port = port, lanEnabled = lanEnabled), password ?: password())
     }
@@ -87,21 +93,21 @@ class SshRepository(context: Context) {
 
     fun uninstall() {
         // This tombstone prevents default provisioning after an interrupted uninstall.
-        check(preferences.edit().putBoolean(INSTALLED, false).putBoolean(DESIRED, false).commit()) { "无法保存 SSH 卸载状态" }
+        checkLocalized(preferences.edit().putBoolean(INSTALLED, false).putBoolean(DESIRED, false).commit()) { AppText.get(R.string.ui_cannot_save_ssh_uninstallation_state) }
         DurableFiles.delete(directory)
         val store = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         if (store.containsAlias(alias)) store.deleteEntry(alias)
     }
 
     fun desired(): Boolean = preferences.getBoolean(INSTALLED, true) && preferences.getBoolean(DESIRED, false)
-    fun setDesired(value: Boolean) { check(preferences.edit().putBoolean(DESIRED, value).commit()) { "无法保存 SSH 运行偏好" } }
+    fun setDesired(value: Boolean) { checkLocalized(preferences.edit().putBoolean(DESIRED, value).commit()) { AppText.get(R.string.ui_cannot_save_ssh_running_preference) } }
 
     private fun readSettings(): JSONObject {
-        require(DurableFiles.exists(settings) && settings.length() <= 16 * 1024 && File(settings.path + ".bak").length() <= 16 * 1024) {
-            "SSH 设置不可用，请重新设置或重装扩展"
+        requireLocalized(DurableFiles.exists(settings) && settings.length() <= 16 * 1024 && File(settings.path + ".bak").length() <= 16 * 1024) {
+            AppText.get(R.string.ui_ssh_settings_unavailable_configure_or_reinstall_the_extension)
         }
         return requireNotNull(DurableFiles.read(settings)).also {
-            require(it.getInt("schemaVersion") == 1 && it.getInt("port") in 1024..65535) { "SSH 设置格式无法识别" }
+            requireLocalized(it.getInt("schemaVersion") == 1 && it.getInt("port") in 1024..65535) { AppText.get(R.string.ui_unrecognized_ssh_settings_format) }
         }
     }
 
@@ -118,7 +124,7 @@ class SshRepository(context: Context) {
     private fun encryptionKey(create: Boolean = false): SecretKey {
         val store = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         (store.getKey(alias, null) as? SecretKey)?.let { return it }
-        check(create) { "SSH 密钥不可用，请重新设置密码或重装扩展" }
+        checkLocalized(create) { AppText.get(R.string.ui_ssh_key_unavailable_reset_the_password_or_reinstall_the) }
         return KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore").apply {
             init(KeyGenParameterSpec.Builder(alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
                 .setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build())

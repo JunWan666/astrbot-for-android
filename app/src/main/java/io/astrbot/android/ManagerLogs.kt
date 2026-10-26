@@ -20,20 +20,20 @@ import androidx.compose.ui.unit.dp
         val compact = maxHeight < 320.dp
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ManagerActionButton(if (paused) "继续刷新" else "暂停刷新", onPause, Modifier.weight(1f), ActionTone.NEUTRAL)
-                ManagerActionButton("复制当前", onCopy, Modifier.weight(1f), ActionTone.NEUTRAL, text.isNotBlank())
-                ManagerActionButton("导出", onExport, Modifier.weight(1f))
+                ManagerActionButton(if (paused) AppText.get(R.string.ui_resume) else AppText.get(R.string.ui_pause), onPause, Modifier.weight(1f), ActionTone.NEUTRAL)
+                ManagerActionButton(AppText.get(R.string.ui_copy), onCopy, Modifier.weight(1f), ActionTone.NEUTRAL, text.isNotBlank())
+                ManagerActionButton(AppText.get(R.string.ui_export), onExport, Modifier.weight(1f))
             }
-            if (!compact) Text(if (paused) "已暂停 · 可选择文字复制" else "实时跟随最新日志 · 每 2 秒刷新",
+            if (!compact) Text(if (paused) AppText.get(R.string.ui_paused_select_text_to_copy) else AppText.get(R.string.ui_following_latest_logs_refreshing_every_2_seconds),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Surface(Modifier.fillMaxWidth().weight(1f).semantics { contentDescription = "日志内容" },
+            Surface(Modifier.fillMaxWidth().weight(1f).semantics { contentDescription = AppText.get(R.string.ui_log_content) },
                 shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
                 SelectionContainer {
-                    Text(text.ifBlank { "暂无日志" }, Modifier.fillMaxSize().verticalScroll(scroll).padding(14.dp),
+                    Text(text.ifBlank { AppText.get(R.string.ui_no_logs_yet) }, Modifier.fillMaxSize().verticalScroll(scroll).padding(14.dp),
                         style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
                 }
             }
-            if (!compact) Text("复制当前显示内容；导出保留范围内的完整脱敏日志。",
+            if (!compact) Text(AppText.get(R.string.ui_copy_the_displayed_content_or_export_all_retained_redacted),
                 style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

@@ -8,7 +8,13 @@ import io.astrbot.android.runtime.AppVisibility
 class ManagerApplication : Application(), Application.ActivityLifecycleCallbacks {
     override fun onCreate() {
         super.onCreate()
+        AppText.initialize(this)
         registerActivityLifecycleCallbacks(this)
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        AppText.invalidate()
     }
 
     override fun onActivityStarted(activity: Activity) = AppVisibility.started(activity)

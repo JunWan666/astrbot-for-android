@@ -1,5 +1,10 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.requireLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import io.astrbot.android.BuildConfig
 import org.json.JSONObject
@@ -16,7 +21,7 @@ object InstalledVersions {
     fun read(root: File): RuntimeVersions {
         fun text(path: String, limit: Long = 32 * 1024 * 1024): String {
             val file = File(root, path)
-            require(file.isFile && file.length() <= limit) { "运行版本记录缺失，请先完成初始化" }
+            requireLocalized(file.isFile && file.length() <= limit) { AppText.get(R.string.ui_runtime_version_record_is_missing_complete_initialization_first) }
             return file.readText()
         }
         val bootstrap = JSONObject(text(".astrbot-bootstrap.json"))
@@ -31,9 +36,9 @@ object InstalledVersions {
             "App" to BuildConfig.VERSION_NAME,
             "运行环境" to bootstrap.getString("id"),
             "架构" to bootstrap.getString("abi"),
-            "Python" to (Regex("(?m)^version\\s*=\\s*(.+)$").find(python)?.groupValues?.get(1)?.trim() ?: "未知"),
-            "AstrBot" to (Regex("__version__\\s*=\\s*[\"']([^\"']+)").find(astrbotSource)?.groupValues?.get(1) ?: "未知"),
-            "NapCat" to (NapCatVersion.read(File(root, "opt/qq/resources/app/app_launcher/napcat"), napcatSource) ?: "未知（当前代码未适配）"),
+            "Python" to (Regex("(?m)^version\\s*=\\s*(.+)$").find(python)?.groupValues?.get(1)?.trim() ?: AppText.get(R.string.ui_unknown)),
+            "AstrBot" to (Regex("__version__\\s*=\\s*[\"']([^\"']+)").find(astrbotSource)?.groupValues?.get(1) ?: AppText.get(R.string.ui_unknown)),
+            "NapCat" to (NapCatVersion.read(File(root, "opt/qq/resources/app/app_launcher/napcat"), napcatSource) ?: AppText.get(R.string.ui_unknown_unsupported_by_this_build)),
             "Linux QQ" to JSONObject(qqPackage).getString("version"),
         )
         fun digest(parts: List<String>): String {

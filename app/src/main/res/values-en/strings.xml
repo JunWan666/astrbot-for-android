@@ -1,0 +1,1137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" formatted="false">"AstrBot Manager"</string>
+    <string name="language_title" formatted="false">"Language"</string>
+    <string name="language_subtitle" formatted="false">"System default, 简体中文 or English"</string>
+    <string name="language_system" formatted="false">"System default"</string>
+    <string name="action_cancel" formatted="false">"Cancel"</string>
+    <string name="persona_category_fun" formatted="false">"Fun"</string>
+    <string name="persona_category_company" formatted="false">"Companion"</string>
+    <string name="persona_category_productivity" formatted="false">"Productivity"</string>
+    <string name="persona_category_creative" formatted="false">"Creative"</string>
+    <string name="persona_category_all" formatted="false">"All"</string>
+    <string name="component_runtime" formatted="false">"Runtime"</string>
+    <string name="component_architecture" formatted="false">"Architecture"</string>
+    <string name="ui_add_persona" formatted="false">"Add persona"</string>
+    <string name="ui_paste_a_prompt_from_the_persona_marketplace_save_it" formatted="false">"Paste a prompt from the persona marketplace, save it, then add it to AstrBot."</string>
+    <string name="ui_persona_name" formatted="false">"Persona name"</string>
+    <string name="ui_persona_prompt" formatted="false">"Persona prompt"</string>
+    <string name="ui_description_optional" formatted="false">"Description (optional)"</string>
+    <string name="ui_up_to_120_characters" formatted="false">"Up to 120 characters"</string>
+    <string name="ui_greeting_example_optional" formatted="false">"Greeting example (optional)"</string>
+    <string name="ui_up_to_1_000_characters" formatted="false">"Up to 1,000 characters"</string>
+    <string name="ui_saving" formatted="false">"Saving…"</string>
+    <string name="ui_save_persona" formatted="false">"Save persona"</string>
+    <string name="ui_cancel" formatted="false">"Cancel"</string>
+    <string name="ui_automatic_update_checks" formatted="false">"Automatic update checks"</string>
+    <string name="ui_on" formatted="false">"On"</string>
+    <string name="ui_off" formatted="false">"Off"</string>
+    <string name="ui_automatic_update_checks_switch" formatted="false">"Automatic update checks switch"</string>
+    <string name="ui_check_for_compatible_astrbot_updates_at_most_once_a" formatted="false">"Check for compatible AstrBot updates at most once a day when the app is open and a network is available. After a failed or interrupted check, wait at least one hour before retrying."</string>
+    <string name="ui_review_release_notes_when_an_update_is_found_downloads" formatted="false">"Review release notes when an update is found. Downloads and installation still require your confirmation."</string>
+    <string name="ui_this_build_has_no_online_update_channel_configured_you" formatted="false">"This build has no online update channel configured. You can import a trusted maintenance package from the program updates page."</string>
+    <string name="ui_done" formatted="false">"Done"</string>
+    <string name="ui_service_notifications" formatted="false">"Service notifications"</string>
+    <string name="ui_battery_optimization" formatted="false">"Battery optimization"</string>
+    <string name="ui_background_battery_limits" formatted="false">"Background battery limits"</string>
+    <string name="ui_auto_start_permissions" formatted="false">"Auto-start permissions"</string>
+    <string name="ui_lock_recent_task" formatted="false">"Lock recent task"</string>
+    <string name="ui_background_operation_guide" formatted="false">"Background operation guide"</string>
+    <string name="ui_notifications_are_blocked_enable_them" formatted="false">"Notifications are blocked; enable them"</string>
+    <string name="ui_app_notifications_are_allowed_but_the_service_notification_channel" formatted="false">"App notifications are allowed, but the service notification channel is blocked"</string>
+    <string name="ui_service_notifications_are_allowed" formatted="false">"Service notifications are allowed"</string>
+    <string name="ui_exempt_from_system_battery_optimization" formatted="false">"Exempt from system battery optimization"</string>
+    <string name="ui_system_battery_optimization_still_applies" formatted="false">"System battery optimization still applies"</string>
+    <string name="ui_allow_background_activity_and_remove_app_battery_limits" formatted="false">"Allow background activity and remove app battery limits"</string>
+    <string name="ui_check_manufacturer_permissions_in_system_settings" formatted="false">"Check manufacturer permissions in system settings"</string>
+    <string name="ui_keep_the_app_task_to_reduce_accidental_cleanup" formatted="false">"Keep the app task to reduce accidental cleanup"</string>
+    <string name="ui_view_setup_steps_and_limitations">"View %1$s setup steps and limitations"</string>
+    <string name="ui_vivo_iqoo_settings_battery_background_power_consumption_management_find" formatted="false">"vivo / iQOO: Settings → Battery → Background power consumption management. Find this app and allow high background power consumption. In iManager → App management → Permissions → Auto-start, allow this app. Some versions use Apps and permissions instead."</string>
+    <string name="ui_xiaomi_redmi_settings_apps_manage_apps_this_app_enable" formatted="false">"Xiaomi / Redmi: Settings → Apps → Manage apps → this app. Enable Auto-start and set Battery saver to No restrictions. HyperOS may place the option under Background auto-start."</string>
+    <string name="ui_huawei_honor_settings_apps_app_launch_disable_automatic_management" formatted="false">"Huawei / HONOR: Settings → Apps → App launch. Disable automatic management for this app and manually allow auto-launch, secondary launch and running in the background. Also allow background operation in battery settings."</string>
+    <string name="ui_oppo_realme_oneplus_settings_apps_app_management_this_app" formatted="false">"OPPO / realme / OnePlus: Settings → Apps → App management → this app. Allow auto-launch, secondary launch and background activity. Select Unrestricted in battery management."</string>
+    <string name="ui_samsung_settings_apps_this_app_battery_unrestricted_in_device" formatted="false">"Samsung: Settings → Apps → this app → Battery → Unrestricted. In Device care → Battery → Background usage limits, add this app to Never sleeping apps."</string>
+    <string name="ui_settings_apps_this_app_battery_choose_unrestricted_or_allow" formatted="false">"Settings → Apps → this app → Battery. Choose Unrestricted or Allow background activity. Also allow this app in any auto-start, background battery or app launch management settings."</string>
+    <string name="ui_1_open_notification_settings_for_this_app_and_allow" formatted="false">"1. Open notification settings for this app and allow notifications.\n2. Keep the Local services channel enabled. Some devices combine channel settings with app notification settings.\n3. Once services start, check the notification shade to view status or stop them."</string>
+    <string name="ui_1_use_the_button_below_to_request_exemption_from" formatted="false">"1. Use the button below to request exemption from system battery optimization.\n2. Choose Allow in the system dialog. If already exempt, the optimization list opens; select All apps if needed.\n3. This page refreshes when you return. Manufacturer battery limits must be configured separately."</string>
+    <string name="ui_1_open_manufacturer_background_battery_management_and_find_this" formatted="false">"1. Open manufacturer background battery management and find this app.\n2. Allow high background power consumption, choose Unrestricted, or allow background activity.\n3. You can also open this app\'s battery settings to check individual restrictions."</string>
+    <string name="ui_allowing_auto_start_and_secondary_launch_helps_the_system" formatted="false">"Allowing auto-start and secondary launch helps the system restore the app in the background. This permission does not enable starting services at boot. After restarting the phone, unlock it and open the app to check services."</string>
+    <string name="ui_1_return_to_the_home_screen_then_open_recent" formatted="false">"1. Return to the home screen, then open recent apps with the button or gesture.\n2. Find this app and use a long press, menu or downward swipe to select Lock.\n3. Keep this task when clearing recent apps.\n\nAndroid has no universal API for locking a task; configure it in the recent apps screen."</string>
+    <string name="ui_check_notifications_battery_optimization_background_battery_limits_auto" formatted="false">"Check notifications, battery optimization, background battery limits, auto-start and the recent task lock. Keep service notifications enabled and avoid force-stopping the app in system settings."</string>
+    <string name="ui_n_nsetting_names_vary_by_system_version_auto_start">"%1$s\n\n%2$sSetting names vary by system version. Auto-start, manufacturer battery limits and task locks usually have no public status API; verify them in system settings. They cannot guarantee recovery after a force stop."</string>
+    <string name="ui_open_app_notification_settings" formatted="false">"Open app notification settings"</string>
+    <string name="ui_view_battery_optimization_list" formatted="false">"View battery optimization list"</string>
+    <string name="ui_request_battery_exemption" formatted="false">"Request battery exemption"</string>
+    <string name="ui_open_background_battery_settings" formatted="false">"Open background battery settings"</string>
+    <string name="ui_open_app_details_and_follow_the_steps" formatted="false">"Open app details and follow the steps"</string>
+    <string name="ui_open_auto_start_management" formatted="false">"Open auto-start management"</string>
+    <string name="ui_go_home_then_lock_the_recent_task" formatted="false">"Go home, then lock the recent task"</string>
+    <string name="ui_ok" formatted="false">"OK"</string>
+    <string name="ui_page_zoom" formatted="false">"Page zoom"</string>
+    <string name="ui_data_and_uninstallation" formatted="false">"Data and uninstallation"</string>
+    <string name="ui_uninstalling_the_app_or_selecting_clear_data_deletes_the" formatted="false">"Uninstalling the app or selecting Clear data deletes the runtime, configuration, databases, QQ login data and every local backup stored inside the app."</string>
+    <string name="ui_before_uninstalling_clearing_data_or_moving_to_another_phone" formatted="false">"Before uninstalling, clearing data or moving to another phone, export a portable backup outside the app and confirm that the file was saved."</string>
+    <string name="ui_portable_backups_contain_configuration_and_credentials_but_exclude_qq" formatted="false">"Portable backups contain configuration and credentials, but exclude QQ login sessions. Import requires the same runtime combination. Sign in to QQ again after moving devices or reinstalling. Keep backup files private."</string>
+    <string name="ui_for_normal_updates_install_an_apk_with_the_same" formatted="false">"For normal updates, install an APK with the same package name and signing certificate over the existing app to retain data."</string>
+    <string name="ui_open_portable_backups" formatted="false">"Open portable backups"</string>
+    <string name="ui_close" formatted="false">"Close"</string>
+    <string name="ui_environment_check_and_repair" formatted="false">"Environment check and repair"</string>
+    <string name="ui_checking_runtime_resources_and_webui_configuration_this_does_not" formatted="false">"Checking runtime resources and WebUI configuration. This does not start AstrBot / NapCat or reset configuration."</string>
+    <string name="ui_checked_at">"Checked at %1$s"</string>
+    <string name="ui_passed" formatted="false">"Passed"</string>
+    <string name="ui_notice" formatted="false">"Notice"</string>
+    <string name="ui_action_needed" formatted="false">"Action needed"</string>
+    <string name="ui_repair_runtime_resources" formatted="false">"Repair runtime resources"</string>
+    <string name="ui_runtime_upgrade_and_rollback" formatted="false">"Runtime upgrade and rollback"</string>
+    <string name="ui_check_again" formatted="false">"Check again"</string>
+    <string name="ui_ssh_terminal" formatted="false">"SSH terminal"</string>
+    <string name="ui_connection" formatted="false">"Connection"</string>
+    <string name="ui_login_password" formatted="false">"Login password"</string>
+    <string name="ui_help_and_uninstall" formatted="false">"Help and uninstall"</string>
+    <string name="ui_paused_for_maintenance" formatted="false">"Paused for maintenance"</string>
+    <string name="ui_running" formatted="false">"Running"</string>
+    <string name="ui_not_installed" formatted="false">"Not installed"</string>
+    <string name="ui_stopped" formatted="false">"Stopped"</string>
+    <string name="ui_back" formatted="false">"Back"</string>
+    <string name="ui_runtime_extensions" formatted="false">"Runtime extensions"</string>
+    <string name="ui_manage_optional_ubuntu_features" formatted="false">"Manage optional Ubuntu features"</string>
+    <string name="ui_available_extensions" formatted="false">"Available extensions"</string>
+    <string name="ui_remote_ubuntu_access_included_with_the_app" formatted="false">"Remote Ubuntu access · Included with the app"</string>
+    <string name="ui_manage_runtime_extensions_here_manage_bot_plugins_in_the" formatted="false">"Manage runtime extensions here. Manage bot plugins in the AstrBot WebUI."</string>
+    <string name="ui_unable_to_read_the_password_set_a_new_password" formatted="false">"Unable to read the password. Set a new password or reinstall the extension."</string>
+    <string name="ui_ssh_password" formatted="false">"SSH password"</string>
+    <string name="ui_uninstall_the_ssh_extension" formatted="false">"Uninstall the SSH extension?"</string>
+    <string name="ui_ssh_will_stop_and_terminal_sessions_will_disconnect_the" formatted="false">"SSH will stop and terminal sessions will disconnect. The password, host key and connection settings will be deleted. AstrBot, NapCat and Ubuntu data will be retained. Bundled resources remain in the APK, so you can reinstall the extension."</string>
+    <string name="ui_uninstall" formatted="false">"Uninstall"</string>
+    <string name="ui_ssh_host_fingerprint" formatted="false">"SSH host fingerprint"</string>
+    <string name="ui_the_host_fingerprint_is_generated_when_ssh_starts_for" formatted="false">"The host fingerprint is generated when SSH starts for the first time"</string>
+    <string name="ui_disconnected_during_maintenance" formatted="false">"Disconnected during maintenance"</string>
+    <string name="ui_service_running" formatted="false">"Service running"</string>
+    <string name="ui_installed_not_started" formatted="false">"Installed · Not started"</string>
+    <string name="ui_not_installed_yet" formatted="false">"Not installed yet"</string>
+    <string name="ui_remote_access_to_ubuntu_controlled_independently_of_astrbot_and" formatted="false">"Remote access to Ubuntu, controlled independently of AstrBot and NapCat."</string>
+    <string name="ui_install_ssh" formatted="false">"Install SSH"</string>
+    <string name="ui_stop_ssh" formatted="false">"Stop SSH"</string>
+    <string name="ui_start_ssh" formatted="false">"Start SSH"</string>
+    <string name="ui_username_port_and_connection_command" formatted="false">"Username, port and connection command"</string>
+    <string name="ui_show_hide_and_copy_the_password" formatted="false">"Show, hide and copy the password"</string>
+    <string name="ui_edit_ssh_settings" formatted="false">"Edit SSH settings"</string>
+    <string name="ui_port_lan_access_and_password" formatted="false">"Port, LAN access and password"</string>
+    <string name="ui_terminal_help_and_extension_management" formatted="false">"Terminal help and extension management"</string>
+    <string name="ui_username_root" formatted="false">"Username: root"</string>
+    <string name="ui_port">"Port: %1$s · %2$s"</string>
+    <string name="ui_lan_access_enabled" formatted="false">"LAN access enabled"</string>
+    <string name="ui_this_device_only" formatted="false">"This device only"</string>
+    <string name="ui_view_host_fingerprint" formatted="false">"View host fingerprint"</string>
+    <string name="ui_copy_local_ssh_command" formatted="false">"Copy local SSH command"</string>
+    <string name="ui_copy_lan_ssh_command" formatted="false">"Copy LAN SSH command"</string>
+    <string name="ui_ssh_connection_command" formatted="false">"SSH connection command"</string>
+    <string name="ui_ssh_login_password" formatted="false">"SSH login password"</string>
+    <string name="ui_show_ssh_password" formatted="false">"Show SSH password"</string>
+    <string name="ui_hide_ssh_password" formatted="false">"Hide SSH password"</string>
+    <string name="ui_copy_password" formatted="false">"Copy password"</string>
+    <string name="ui_hidden_automatically_when_you_leave_this_page_or_switch" formatted="false">"Hidden automatically when you leave this page or switch to the background. Saving a new password disconnects existing SSH sessions."</string>
+    <string name="ui_help" formatted="false">"Help"</string>
+    <string name="ui_verify_the_host_fingerprint_on_first_connection_the_root" formatted="false">"Verify the host fingerprint on first connection. The root account belongs to Ubuntu; it does not mean the phone is rooted.\n\nMaintenance, backups and updates temporarily disconnect SSH, then restore its previous state. Save your terminal work first.\n\nInteractive terminals and remote commands are supported. SFTP is not currently available."</string>
+    <string name="ui_uninstall_ssh" formatted="false">"Uninstall SSH"</string>
+    <string name="ui_ssh_settings" formatted="false">"SSH settings"</string>
+    <string name="ui_ssh_port" formatted="false">"SSH port"</string>
+    <string name="ui_allow_lan_connections" formatted="false">"Allow LAN connections"</string>
+    <string name="ui_devices_on_the_same_network_can_access_ubuntu_using" formatted="false">"Devices on the same network can access Ubuntu using the password. Enable this on trusted networks."</string>
+    <string name="ui_new_password_leave_blank_to_keep_current" formatted="false">"New password (leave blank to keep current)"</string>
+    <string name="ui_toggle_new_password_visibility" formatted="false">"Toggle new password visibility"</string>
+    <string name="ui_use_12_128_characters_saving_disconnects_existing_ssh_sessions" formatted="false">"Use 12–128 characters. Saving disconnects existing SSH sessions and restarts SSH if it is running."</string>
+    <string name="ui_save" formatted="false">"Save"</string>
+    <string name="ui_copied">"Copied %1$s"</string>
+    <string name="ui_redacted_logs_exported" formatted="false">"Redacted logs exported"</string>
+    <string name="ui_log_export_failed_please_retry" formatted="false">"Log export failed. Please retry."</string>
+    <string name="ui_export_interrupted_export_the_logs_again" formatted="false">"Export interrupted. Export the logs again."</string>
+    <string name="ui_logs">"%1$s logs"</string>
+    <string name="ui_current_logs" formatted="false">"Current logs"</string>
+    <string name="ui_resume" formatted="false">"Resume"</string>
+    <string name="ui_pause" formatted="false">"Pause"</string>
+    <string name="ui_copy" formatted="false">"Copy"</string>
+    <string name="ui_export" formatted="false">"Export"</string>
+    <string name="ui_paused_select_text_to_copy" formatted="false">"Paused · Select text to copy"</string>
+    <string name="ui_following_latest_logs_refreshing_every_2_seconds" formatted="false">"Following latest logs · Refreshing every 2 seconds"</string>
+    <string name="ui_log_content" formatted="false">"Log content"</string>
+    <string name="ui_no_logs_yet" formatted="false">"No logs yet"</string>
+    <string name="ui_copy_the_displayed_content_or_export_all_retained_redacted" formatted="false">"Copy the displayed content, or export all retained redacted logs."</string>
+    <string name="ui_settings" formatted="false">"Settings"</string>
+    <string name="ui_astrbot_updates" formatted="false">"AstrBot updates"</string>
+    <string name="ui_napcat_updates" formatted="false">"NapCat updates"</string>
+    <string name="ui_runtime_upgrades" formatted="false">"Runtime upgrades"</string>
+    <string name="ui_backup_and_restore" formatted="false">"Backup and restore"</string>
+    <string name="ui_portable_backups" formatted="false">"Portable backups"</string>
+    <string name="ui_logs_and_diagnostics" formatted="false">"Logs and diagnostics"</string>
+    <string name="ui_background_operation" formatted="false">"Background operation"</string>
+    <string name="ui_about" formatted="false">"About"</string>
+    <string name="ui_overview" formatted="false">"Overview"</string>
+    <string name="ui_connection_eebb5" formatted="false">"Connection"</string>
+    <string name="ui_credentials" formatted="false">"Credentials"</string>
+    <string name="ui_logs_894b8" formatted="false">"Logs"</string>
+    <string name="ui_previous" formatted="false">"Previous"</string>
+    <string name="ui_next" formatted="false">"Next"</string>
+    <string name="ui_operation_incomplete" formatted="false">"Operation incomplete"</string>
+    <string name="ui_operation_notice" formatted="false">"Operation notice"</string>
+    <string name="ui_home_content" formatted="false">"Home content"</string>
+    <string name="ui_initialize_runtime" formatted="false">"Initialize runtime"</string>
+    <string name="ui_view_card">"View %1$s card"</string>
+    <string name="ui_my_services" formatted="false">"My services"</string>
+    <string name="ui_manage_connections_in_details" formatted="false">"Manage connections in Details"</string>
+    <string name="ui_system_network_status" formatted="false">"System network status"</string>
+    <string name="ui_runtime_overview" formatted="false">"Runtime overview"</string>
+    <string name="ui_start_all" formatted="false">"Start all"</string>
+    <string name="ui_stop_all" formatted="false">"Stop all"</string>
+    <string name="ui_restart_all" formatted="false">"Restart all"</string>
+    <string name="ui_service_details">"%1$s service details"</string>
+    <string name="ui_initialize_the_runtime_to_use_the_webui" formatted="false">"Initialize the runtime to use the WebUI"</string>
+    <string name="ui_manage_models_platforms_and_plugins_in_the_webui" formatted="false">"Manage models, platforms and plugins in the WebUI"</string>
+    <string name="ui_onebot_to_astrbot" formatted="false">"OneBot to AstrBot: "</string>
+    <string name="ui_not_configured" formatted="false">"Not configured"</string>
+    <string name="ui_connecting" formatted="false">"Connecting"</string>
+    <string name="ui_connected" formatted="false">"Connected"</string>
+    <string name="ui_disconnected" formatted="false">"Disconnected"</string>
+    <string name="ui_pending" formatted="false">"Pending"</string>
+    <string name="ui_webui" formatted="false">"WebUI"</string>
+    <string name="ui_open_webui">"Open %1$s WebUI"</string>
+    <string name="ui_stop" formatted="false">"Stop"</string>
+    <string name="ui_start" formatted="false">"Start"</string>
+    <string name="ui_details" formatted="false">"Details"</string>
+    <string name="ui_details_2ee06">"%1$s details"</string>
+    <string name="ui_extensions" formatted="false">"Extensions"</string>
+    <string name="ui_ssh_terminal_and_other_optional_features" formatted="false">"SSH terminal, cpolar and other optional features"</string>
+    <string name="ui_local_snapshots_portable_backups_and_limits" formatted="false">"Local snapshots, portable backups and limits"</string>
+    <string name="ui_runtime_logs_and_diagnostic_exports" formatted="false">"Runtime logs and diagnostic exports"</string>
+    <string name="ui_permissions_auto_start_and_battery_management" formatted="false">"Permissions, auto-start and battery management"</string>
+    <string name="ui_updates_app_version_and_licenses" formatted="false">"Updates, app version and licenses"</string>
+    <string name="ui_check_astrbot_updates" formatted="false">"Check AstrBot updates"</string>
+    <string name="ui_find_packages_compatible_with_the_current_runtime" formatted="false">"Find packages compatible with the current runtime"</string>
+    <string name="ui_available_version_and_download" formatted="false">"Available version and download"</string>
+    <string name="ui_astrbot_download_or_reinstall">"AstrBot %1$s · Download or reinstall"</string>
+    <string name="ui_check_for_updates_to_view_release_notes_and_downloads" formatted="false">"Check for updates to view release notes and downloads"</string>
+    <string name="ui_import_update_package" formatted="false">"Import update package"</string>
+    <string name="ui_select_a_signed_local_maintenance_package" formatted="false">"Select a signed local maintenance package"</string>
+    <string name="ui_view_prepared_update" formatted="false">"View prepared update"</string>
+    <string name="ui_no_update_package_prepared" formatted="false">"No update package prepared"</string>
+    <string name="ui_review_before_installation" formatted="false">"Review before installation"</string>
+    <string name="ui_roll_back_astrbot" formatted="false">"Roll back AstrBot"</string>
+    <string name="ui_restore_version">"Restore version %1$s"</string>
+    <string name="ui_no_program_rollback_available" formatted="false">"No program rollback available"</string>
+    <string name="ui_no_online_update_channel_configured" formatted="false">"No online update channel configured"</string>
+    <string name="ui_on_check_daily_when_opening_the_app" formatted="false">"On · Check daily when opening the app"</string>
+    <string name="ui_off_tap_to_configure" formatted="false">"Off · Tap to configure"</string>
+    <string name="ui_check_napcat_updates" formatted="false">"Check NapCat updates"</string>
+    <string name="ui_update_independently_without_reinstalling_the_app" formatted="false">"Update independently without reinstalling the app"</string>
+    <string name="ui_napcat_version_and_download" formatted="false">"NapCat version and download"</string>
+    <string name="ui_napcat_official_upstream_package">"NapCat %1$s · Official upstream package"</string>
+    <string name="ui_install_napcat_update" formatted="false">"Install NapCat update"</string>
+    <string name="ui_verified_back_up_before_installing">"Verified %1$s · Back up before installing"</string>
+    <string name="ui_download_and_verify_a_package_first" formatted="false">"Download and verify a package first"</string>
+    <string name="ui_roll_back_napcat" formatted="false">"Roll back NapCat"</string>
+    <string name="ui_restore_and_its_data">"Restore %1$s and its data"</string>
+    <string name="ui_no_napcat_rollback_available" formatted="false">"No NapCat rollback available"</string>
+    <string name="ui_distinguish_runtime_issues_from_webui_configuration_issues" formatted="false">"Distinguish runtime issues from WebUI configuration issues"</string>
+    <string name="ui_upgrade_bundled_runtime" formatted="false">"Upgrade bundled runtime"</string>
+    <string name="ui_runtime_matches_the_bundled_resources" formatted="false">"Runtime matches the bundled resources"</string>
+    <string name="ui_roll_back_the_entire_runtime" formatted="false">"Roll back the entire runtime"</string>
+    <string name="ui_no_runtime_rollback_available" formatted="false">"No runtime rollback available"</string>
+    <string name="ui_restore_the_previous_runtime_and_its_data" formatted="false">"Restore the previous runtime and its data"</string>
+    <string name="ui_create_local_backup" formatted="false">"Create local backup"</string>
+    <string name="ui_includes_qq_sessions_services_resume_afterward" formatted="false">"Includes QQ sessions · Services resume afterward"</string>
+    <string name="ui_manage_backups">"Manage backups (%1$s)"</string>
+    <string name="ui_view_restore_and_delete_local_backups" formatted="false">"View, restore and delete local backups"</string>
+    <string name="ui_automatic_snapshot_limits" formatted="false">"Automatic snapshot limits"</string>
+    <string name="ui_keep_remove_oldest_snapshots_automatically">"Keep %1$s · Remove oldest snapshots automatically"</string>
+    <string name="ui_transfer_between_devices_excludes_qq_sessions" formatted="false">"Transfer between devices · Excludes QQ sessions"</string>
+    <string name="ui_save_backups_outside_the_app_before_uninstalling" formatted="false">"Save backups outside the app before uninstalling"</string>
+    <string name="ui_export_portable_backup" formatted="false">"Export portable backup"</string>
+    <string name="ui_save_configuration_and_data_to_a_file" formatted="false">"Save configuration and data to a file"</string>
+    <string name="ui_import_portable_backup" formatted="false">"Import portable backup"</string>
+    <string name="ui_select_a_zip_and_review_what_will_be_restored" formatted="false">"Select a ZIP and review what will be restored"</string>
+    <string name="ui_view_import_scope" formatted="false">"View import scope"</string>
+    <string name="ui_no_backup_file_selected" formatted="false">"No backup file selected"</string>
+    <string name="ui_review_before_restoring" formatted="false">"Review before restoring"</string>
+    <string name="ui_discard_pending_import" formatted="false">"Discard pending import"</string>
+    <string name="ui_remove_only_the_pending_temporary_copy" formatted="false">"Remove only the pending temporary copy"</string>
+    <string name="ui_check_resources_dependencies_and_webui_settings" formatted="false">"Check resources, dependencies and WebUI settings"</string>
+    <string name="ui_storage_usage" formatted="false">"Storage usage"</string>
+    <string name="ui_view_data_cache_and_backup_sizes" formatted="false">"View data, cache and backup sizes"</string>
+    <string name="ui_manager_logs" formatted="false">"Manager logs"</string>
+    <string name="ui_service_controls_updates_and_backup_events" formatted="false">"Service controls, updates and backup events"</string>
+    <string name="ui_runtime_logs" formatted="false">"Runtime logs"</string>
+    <string name="ui_initialization_and_runtime_maintenance" formatted="false">"Initialization and runtime maintenance"</string>
+    <string name="ui_export_diagnostics" formatted="false">"Export diagnostics"</string>
+    <string name="ui_device_information_status_and_redacted_logs" formatted="false">"Device information, status and redacted logs"</string>
+    <string name="ui_allow_status_notifications_and_notification_channels" formatted="false">"Allow status notifications and notification channels"</string>
+    <string name="ui_check_system_battery_optimization" formatted="false">"Check system battery optimization"</string>
+    <string name="ui_guidance_for_this_phone_s_system" formatted="false">"Guidance for this phone\'s system"</string>
+    <string name="ui_manufacturer_permissions_and_manual_checks" formatted="false">"Manufacturer permissions and manual checks"</string>
+    <string name="ui_reduce_accidental_task_cleanup" formatted="false">"Reduce accidental task cleanup"</string>
+    <string name="ui_setup_recommendations_and_runtime_limitations" formatted="false">"Setup recommendations and runtime limitations"</string>
+    <string name="ui_check_for_updates" formatted="false">"Check for updates"</string>
+    <string name="ui_app_apk_updates_and_installation" formatted="false">"App APK updates and installation"</string>
+    <string name="ui_app_and_component_versions" formatted="false">"App and component versions"</string>
+    <string name="ui_release_notes_maintenance_packages_and_rollback" formatted="false">"Release notes, maintenance packages and rollback"</string>
+    <string name="ui_independent_updates_retaining_configuration_and_sessions" formatted="false">"Independent updates retaining configuration and sessions"</string>
+    <string name="ui_qq_python_and_underlying_dependencies" formatted="false">"QQ, Python and underlying dependencies"</string>
+    <string name="ui_third_party_licenses" formatted="false">"Third-party licenses"</string>
+    <string name="ui_open_source_licenses_and_source_materials" formatted="false">"Open-source licenses and source materials"</string>
+    <string name="ui_settings_content" formatted="false">"Settings content"</string>
+    <string name="ui_all" formatted="false">"All"</string>
+    <string name="ui_unable_to_read_the_persona_library" formatted="false">"Unable to read the persona library"</string>
+    <string name="ui_persona_library_content" formatted="false">"Persona library content"</string>
+    <string name="ui_give_your_chats_a_new_personality" formatted="false">"Give your chats a new personality"</string>
+    <string name="ui_local_personas_add_delete_and_switch">"%1$s local personas · Add, delete and switch"</string>
+    <string name="ui_restore_previous" formatted="false">"Restore previous"</string>
+    <string name="ui_default">"Default: %1$s"</string>
+    <string name="ui_not_loaded_yet" formatted="false">"Not loaded yet"</string>
+    <string name="ui_marketplace" formatted="false">"Marketplace ↗"</string>
+    <string name="ui_open_external_persona_marketplace" formatted="false">"Open external persona marketplace"</string>
+    <string name="ui_search_personas" formatted="false">"Search personas"</string>
+    <string name="ui_loading_personas" formatted="false">"Loading personas…"</string>
+    <string name="ui_no_personas_yet_select_add_persona_to_create_one" formatted="false">"No personas yet. Select Add persona to create one."</string>
+    <string name="ui_no_matching_personas" formatted="false">"No matching personas"</string>
+    <string name="ui_retry" formatted="false">"Retry"</string>
+    <string name="ui_persona_card_list" formatted="false">"Persona card list"</string>
+    <string name="ui_preview_persona">"Preview persona %1$s"</string>
+    <string name="ui_in_use">"In use · %1$s"</string>
+    <string name="ui_added">"Added · %1$s"</string>
+    <string name="ui_view_persona">"%1$s · View persona ›"</string>
+    <string name="ui_personas_scroll_to_browse">"%1$s personas · Scroll to browse"</string>
+    <string name="ui_greeting_example">"Greeting example: %1$s"</string>
+    <string name="ui_add_only" formatted="false">"Add only"</string>
+    <string name="ui_set_default" formatted="false">"Set default"</string>
+    <string name="ui_copy_prompt" formatted="false">"Copy prompt"</string>
+    <string name="ui_source" formatted="false">"Source"</string>
+    <string name="ui_delete_persona">"Delete persona %1$s"</string>
+    <string name="ui_delete" formatted="false">"Delete"</string>
+    <string name="ui_astrbot_webui" formatted="false">"AstrBot WebUI"</string>
+    <string name="ui_restore_previous_default_persona" formatted="false">"Restore previous default persona"</string>
+    <string name="ui_apply">"Apply %1$s"</string>
+    <string name="ui_this_will_astrbot_briefly_stops_then_resumes_its_previous">"This will %1$s. AstrBot briefly stops, then resumes its previous state. NapCat keeps running.\n\nExisting personas with the same name and WebUI changes are retained. Conversations with an explicit persona are unaffected. Start a new conversation to try it."</string>
+    <string name="ui_add_this_persona_to_astrbot_without_changing_the_default" formatted="false">"add this persona to AstrBot without changing the default"</string>
+    <string name="ui_restore_the_previous_default_persona" formatted="false">"restore the previous default persona"</string>
+    <string name="ui_add_this_persona_and_make_it_the_default" formatted="false">"add this persona and make it the default"</string>
+    <string name="ui_apply_a62df" formatted="false">"Apply"</string>
+    <string name="ui_unable_to_save_please_retry" formatted="false">"Unable to save. Please retry."</string>
+    <string name="ui_delete_persona_f6f53" formatted="false">"Delete persona?"</string>
+    <string name="ui_remove_from_the_local_list_copies_already_added_to">"Remove “%1$s” from the local list. Copies already added to AstrBot and the current default persona remain available in the AstrBot WebUI."</string>
+    <string name="ui_unable_to_delete_please_retry" formatted="false">"Unable to delete. Please retry."</string>
+    <string name="ui_deleting" formatted="false">"Deleting…"</string>
+    <string name="ui_confirm_deletion" formatted="false">"Confirm deletion"</string>
+    <string name="ui_home" formatted="false">"Home"</string>
+    <string name="ui_personas" formatted="false">"Personas"</string>
+    <string name="ui_go_back" formatted="false">"Go back"</string>
+    <string name="ui_manager" formatted="false">"Manager"</string>
+    <string name="ui_page">"%1$s page"</string>
+    <string name="ui_app_icon" formatted="false">"App icon"</string>
+    <string name="ui_logo">"%1$s logo"</string>
+    <string name="ui_starting" formatted="false">"Starting"</string>
+    <string name="ui_stopping" formatted="false">"Stopping"</string>
+    <string name="ui_crashed" formatted="false">"Crashed"</string>
+    <string name="ui_service_overview" formatted="false">"Service overview"</string>
+    <string name="ui_both_service_processes_are_running" formatted="false">"Both service processes are running"</string>
+    <string name="ui_start_your_bot_services_on_this_phone" formatted="false">"Start your bot services on this phone"</string>
+    <string name="ui_some_services_are_running" formatted="false">"Some services are running"</string>
+    <string name="ui_running_services_2">"Running services: %1$s / 2"</string>
+    <string name="ui_app_memory" formatted="false">"App memory"</string>
+    <string name="ui_device_ram" formatted="false">"Device RAM"</string>
+    <string name="ui_app_share" formatted="false">"App share"</string>
+    <string name="ui_reading_resource_usage" formatted="false">"Reading resource usage"</string>
+    <string name="ui_measured_processes">"Measured %1$s processes"</string>
+    <string name="ui_partial_processes">"Partial · %1$s/%2$s processes"</string>
+    <string name="ui_memory_usage_unavailable" formatted="false">"Memory usage unavailable"</string>
+    <string name="ui_about_resource_usage" formatted="false">"About resource usage"</string>
+    <string name="ui_app_memory_is_the_total_pss_of_the_manager" formatted="false">"App memory is the total PSS of the manager and managed processes under the same app user. Shared memory is counted proportionally. It includes AstrBot, NapCat and running extensions, but excludes isolated system WebView renderer processes.\n\nDevice RAM is the physical memory reported by Android, excluding storage and memory expansion. App share is the complete PSS total divided by device RAM. No percentage is shown for partial or failed measurements.\n\nValues refresh every 15 seconds while Home is visible, and pause when you leave Home or background the app. View storage capacity in Settings → Storage usage."</string>
+    <string name="ui_service_page">"Service %1$s page"</string>
+    <string name="ui_service_details_content" formatted="false">"Service details content"</string>
+    <string name="ui_version">"Version %1$s"</string>
+    <string name="ui_unknown" formatted="false">"Unknown"</string>
+    <string name="ui_start_a820c">"Start %1$s"</string>
+    <string name="ui_stop_b02dd">"Stop %1$s"</string>
+    <string name="ui_restart" formatted="false">"Restart"</string>
+    <string name="ui_restart_e3383">"Restart %1$s"</string>
+    <string name="ui_none" formatted="false">"None"</string>
+    <string name="ui_no_records" formatted="false">"No records"</string>
+    <string name="ui_runtime_status" formatted="false">"Runtime status"</string>
+    <string name="ui_history">"%1$s history"</string>
+    <string name="ui_last_checked_n_nlast_issue_n_nlast_recovery_n">"Last checked: %1$s\n\nLast issue: %2$s\n\nLast recovery: %3$s\n\nRecords describe observations at that time. Refer to the status above for current service state."</string>
+    <string name="ui_last_check">"Last check %1$s"</string>
+    <string name="ui_last_recovery">"Last recovery %1$s"</string>
+    <string name="ui_last_issue">"Last issue %1$s"</string>
+    <string name="ui_local_webui_address" formatted="false">"Local WebUI address"</string>
+    <string name="ui_generated_on_first_start" formatted="false">"Generated on first start"</string>
+    <string name="ui_copy_address" formatted="false">"Copy address"</string>
+    <string name="ui_webui_address" formatted="false">"WebUI address"</string>
+    <string name="ui_browser" formatted="false">"Browser"</string>
+    <string name="ui_lan_access" formatted="false">"LAN access"</string>
+    <string name="ui_on_accessible_on_the_same_network" formatted="false">"On · Accessible on the same network"</string>
+    <string name="ui_access_restricted_to_this_phone" formatted="false">"Access restricted to this phone"</string>
+    <string name="ui_disable_lan_access">"Disable %1$s LAN access"</string>
+    <string name="ui_enable_lan_access">"Enable %1$s LAN access"</string>
+    <string name="ui_no_address_available_connect_to_wi_fi_or_ethernet" formatted="false">"No address available. Connect to Wi-Fi or Ethernet."</string>
+    <string name="ui_copy_lan_address" formatted="false">"Copy LAN address"</string>
+    <string name="ui_lan_address">"%1$s LAN address"</string>
+    <string name="ui_total">"(%1$s total)"</string>
+    <string name="ui_view_logs" formatted="false">"View logs"</string>
+    <string name="ui_login_credentials">"%1$s login credentials"</string>
+    <string name="ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first" formatted="false">"Initial username: astrbot. Initial credentials are prefilled on first login. After changing the username or password, use your own credentials; initial values will no longer be prefilled."</string>
+    <string name="ui_the_login_page_prefills_the_current_access_token_select" formatted="false">"The login page prefills the current access token. Select Log in to continue. A revealed token is hidden automatically when you leave this page or background the app."</string>
+    <string name="ui_loading_update_information" formatted="false">"Loading update information"</string>
+    <string name="ui_read_apk_update_information" formatted="false">"Read APK update information"</string>
+    <string name="ui_manager_b28f4">"Manager %1$s"</string>
+    <string name="ui_check_app_updates" formatted="false">"Check app updates"</string>
+    <string name="ui_find_verified_apk_releases" formatted="false">"Find verified APK releases"</string>
+    <string name="ui_release_notes" formatted="false">"Release notes"</string>
+    <string name="ui_no_applicable_updates" formatted="false">"No applicable updates"</string>
+    <string name="ui_resume_apk_download" formatted="false">"Resume APK download"</string>
+    <string name="ui_download_apk" formatted="false">"Download APK"</string>
+    <string name="ui_verify_after_downloading_installation_is_separate" formatted="false">"Verify after downloading; installation is separate"</string>
+    <string name="ui_download_app_apk" formatted="false">"Download app APK"</string>
+    <string name="ui_install_verified_apk" formatted="false">"Install verified APK"</string>
+    <string name="ui_confirm_installation_in_the_system_installer" formatted="false">"Confirm installation in the system installer"</string>
+    <string name="ui_allow_this_app_to_install_updates_first" formatted="false">"Allow this app to install updates first"</string>
+    <string name="ui_clear_apk_downloads" formatted="false">"Clear APK downloads"</string>
+    <string name="ui_keep_the_current_app_bot_runtime_and_data" formatted="false">"Keep the current app, bot runtime and data"</string>
+    <string name="ui_cancel_this_operation" formatted="false">"Cancel this operation"</string>
+    <string name="ui_for_astrbot_updates_return_to_the_corresponding_entry_under" formatted="false">"For AstrBot updates, return to the corresponding entry under About."</string>
+    <string name="ui_update_information" formatted="false">"Update information"</string>
+    <string name="ui_delete_incomplete_and_completed_app_apk_downloads_to_free" formatted="false">"Delete incomplete and completed app APK downloads to free space."</string>
+    <string name="ui_clear" formatted="false">"Clear"</string>
+    <string name="ui_install_app_update" formatted="false">"Install app update"</string>
+    <string name="ui_services_will_briefly_stop_to_create_a_data_snapshot" formatted="false">"Services will briefly stop to create a data snapshot, then resume their previous state. System installation restarts the app and may interrupt services again. Open the app after updating. Continue?"</string>
+    <string name="ui_continue_installation" formatted="false">"Continue installation"</string>
+    <string name="ui_allow_update_installation" formatted="false">"Allow update installation"</string>
+    <string name="ui_allow_this_app_to_install_apks_in_system_settings" formatted="false">"Allow this app to install APKs in system settings, then return and select Install again. The system still requires confirmation."</string>
+    <string name="ui_unable_to_open_installation_permissions_allow_unknown_app_installation" formatted="false">"Unable to open installation permissions. Allow unknown app installation in system app settings."</string>
+    <string name="ui_open_settings" formatted="false">"Open settings"</string>
+    <string name="ui_started">"%1$s · Started"</string>
+    <string name="ui_finished">"%1$s · Finished"</string>
+    <string name="ui_cancelled_download_progress_retained">"%1$s · Cancelled; download progress retained"</string>
+    <string name="ui_operation_cancelled_download_progress_is_retained_so_you_can" formatted="false">"Operation cancelled. Download progress is retained so you can resume later."</string>
+    <string name="ui_incomplete">"%1$s · Incomplete (%2$s)"</string>
+    <string name="ui_update_incomplete_check_your_network_or_retry_later_the" formatted="false">"Update incomplete. Check your network or retry later. The installed app is unchanged."</string>
+    <string name="ui_verify_apk_and_open_installer" formatted="false">"Verify APK and open installer"</string>
+    <string name="ui_wait_for_the_current_runtime_operation_to_finish_before" formatted="false">"Wait for the current runtime operation to finish before installing"</string>
+    <string name="ui_verifying_apk_again" formatted="false">"Verifying APK again"</string>
+    <string name="ui_apk_update" formatted="false">"APK update"</string>
+    <string name="ui_opened_the_system_installer_if_you_cancel_select_install" formatted="false">"Opened the system installer. If you cancel, select Install again."</string>
+    <string name="ui_version_18ab8">"Version: %1$s"</string>
+    <string name="ui_developed_and_maintained_by">"Developed and maintained by %1$s"</string>
+    <string name="ui_project_license">"Project license: %1$s"</string>
+    <string name="ui_author_s_github_profile" formatted="false">"Author\'s GitHub profile"</string>
+    <string name="ui_astrbot_and_napcat_support_independent_online_updates_retaining_configur" formatted="false">"AstrBot and NapCat support independent online updates, retaining configuration and providing rollback. Upgrade the matching runtime when Linux QQ, Python or underlying dependencies change."</string>
+    <string name="ui_third_party_projects_retain_their_authorship_licenses_and_trademarks" formatted="false">"Third-party projects retain their authorship, licenses and trademarks. See Third-party licenses for complete notices."</string>
+    <string name="ui_reading_storage_information" formatted="false">"Reading storage information"</string>
+    <string name="ui_measurement_complete_files_in_use_may_continue_to_change" formatted="false">"Measurement complete; files in use may continue to change"</string>
+    <string name="ui_license_materials_saved" formatted="false">"License materials saved"</string>
+    <string name="ui_license_materials_are_unavailable_check_the_project_releases_or" formatted="false">"License materials are unavailable. Check the project releases or reinstall the complete package."</string>
+    <string name="ui_unable_to_read_this_file_export_the_license_materials" formatted="false">"Unable to read this file. Export the license materials to view it."</string>
+    <string name="ui_back_to_manager" formatted="false">"Back to manager"</string>
+    <string name="ui_export_license_materials" formatted="false">"Export license materials"</string>
+    <string name="ui_license_texts_and_source_records_bundled_with_this_apk" formatted="false">"License texts and source records bundled with this APK"</string>
+    <string name="ui_filter_filenames" formatted="false">"Filter filenames"</string>
+    <string name="ui_files">"%1$s files"</string>
+    <string name="ui_back_to_file_list" formatted="false">"Back to file list"</string>
+    <string name="ui_page_a43ad">"Page %1$s / %2$s"</string>
+    <string name="ui_the_page_was_recreated_select_the_file_to_upload" formatted="false">"The page was recreated. Select the file to upload again."</string>
+    <string name="ui_webui_66d31">"%1$s WebUI"</string>
+    <string name="ui_models" formatted="false">"Models"</string>
+    <string name="ui_refresh" formatted="false">"Refresh"</string>
+    <string name="ui_more_actions" formatted="false">"More actions"</string>
+    <string name="ui_open_in_browser" formatted="false">"Open in browser"</string>
+    <string name="ui_save_page_image" formatted="false">"Save page image"</string>
+    <string name="ui_close_webui" formatted="false">"Close WebUI"</string>
+    <string name="ui_page_zoom_b29fc">"Page zoom · %1$s%%"</string>
+    <string name="ui_webui_address_copied" formatted="false">"WebUI address copied"</string>
+    <string name="ui_connecting_to">"Connecting to %1$s…"</string>
+    <string name="ui_this_download_method_is_not_supported_yet_try_an" formatted="false">"This download method is not supported yet. Try an external browser."</string>
+    <string name="ui_unable_to_read_the_file_generated_by_this_page" formatted="false">"Unable to read the file generated by this page. Try an external browser."</string>
+    <string name="ui_unable_to_submit_the_request_return_to_home_and" formatted="false">"Unable to submit the request. Return to Home and retry."</string>
+    <string name="ui_this_system_webview_does_not_support_this_download_update" formatted="false">"This system WebView does not support this download. Update WebView or use an external browser."</string>
+    <string name="ui_web_download_timed_out_please_retry" formatted="false">"Web download timed out. Please retry."</string>
+    <string name="ui_unable_to_capture_the_page_image_or_the_image" formatted="false">"Unable to capture the page image, or the image is too large. Adjust the page and retry."</string>
+    <string name="ui_page_generated_files_must_use_base64_and_be_no" formatted="false">"Page-generated files must use Base64 and be no larger than 8 MB. Try an external browser."</string>
+    <string name="ui_export_interrupted_export_again" formatted="false">"Export interrupted. Export again."</string>
+    <string name="ui_unable_to_prepare_the_export_check_available_space_and" formatted="false">"Unable to prepare the export. Check available space and retry."</string>
+    <string name="ui_the_webui_address_changed_export_again" formatted="false">"The WebUI address changed. Export again."</string>
+    <string name="ui_page_image_saved" formatted="false">"Page image saved"</string>
+    <string name="ui_file_saved" formatted="false">"File saved"</string>
+    <string name="ui_export_expired_or_save_failed_export_again" formatted="false">"Export expired or save failed. Export again."</string>
+    <string name="ui_export_expired_export_again" formatted="false">"Export expired. Export again."</string>
+    <string name="ui_download_endpoint_returned">"Download endpoint returned %1$s"</string>
+    <string name="ui_download_exceeds_the_256_mb_limit" formatted="false">"Download exceeds the 256 MB limit"</string>
+    <string name="ui_download_incomplete_please_retry" formatted="false">"Download incomplete. Please retry."</string>
+    <string name="ui_you_may_need_to_sign_in_separately_in_the" formatted="false">"You may need to sign in separately in the external browser"</string>
+    <string name="ui_no_browser_available" formatted="false">"No browser available"</string>
+    <string name="ui_runtime_not_ready" formatted="false">"Runtime not ready"</string>
+    <string name="ui_webui_is_disabled">"%1$s WebUI is disabled"</string>
+    <string name="ui_check_the_webui_address" formatted="false">"Check the WebUI address"</string>
+    <string name="ui_stopping_984e8">"Stopping %1$s"</string>
+    <string name="ui_preparing">"Preparing %1$s"</string>
+    <string name="ui_is_stopped">"%1$s is stopped"</string>
+    <string name="ui_crashed_8f2c0">"%1$s crashed"</string>
+    <string name="ui_webui_is_not_responding" formatted="false">"WebUI is not responding"</string>
+    <string name="ui_waiting_for_webui_readiness" formatted="false">"Waiting for WebUI readiness"</string>
+    <string name="ui_webui_address_changed" formatted="false">"WebUI address changed"</string>
+    <string name="ui_webui_certificate_verification_failed" formatted="false">"WebUI certificate verification failed"</string>
+    <string name="ui_webui_loading_timed_out" formatted="false">"WebUI loading timed out"</string>
+    <string name="ui_unable_to_load_the_webui" formatted="false">"Unable to load the WebUI"</string>
+    <string name="ui_return_to_home_to_check_or_initialize_the_runtime" formatted="false">"Return to Home to check or initialize the runtime."</string>
+    <string name="ui_return_to_home_to_check_webui_settings_existing_configuration" formatted="false">"Return to Home to check WebUI settings. Existing configuration is retained."</string>
+    <string name="ui_processing_your_request_the_webui_opens_automatically_when_ready" formatted="false">"Processing your request. The WebUI opens automatically when ready."</string>
+    <string name="ui_start_this_service_to_continue_using_the_webui" formatted="false">"Start this service to continue using the WebUI."</string>
+    <string name="ui_try_restarting_the_service_or_view_logs_to_investigate" formatted="false">"Try restarting the service, or view logs to investigate the crash."</string>
+    <string name="ui_the_service_process_is_still_running_the_webui_opens" formatted="false">"The service process is still running. The WebUI opens automatically when ready. You can view logs while waiting."</string>
+    <string name="ui_reopen_the_webui_to_use_its_current_configured_address" formatted="false">"Reopen the WebUI to use its current configured address."</string>
+    <string name="ui_check_the_webui_https_certificate_or_use_an_external" formatted="false">"Check the WebUI HTTPS certificate or use an external browser."</string>
+    <string name="ui_the_page_did_not_finish_loading_within_45_seconds" formatted="false">"The page did not finish loading within 45 seconds. Retry or view logs."</string>
+    <string name="ui_the_webui_did_not_return_a_page_retry_or" formatted="false">"The WebUI did not return a page. Retry or view logs."</string>
+    <string name="ui_connection_incomplete_please_retry_view_service_status_on_home" formatted="false">"Connection incomplete. Please retry. View service status on Home."</string>
+    <string name="ui_webui_recovery_page">"%1$s WebUI recovery page"</string>
+    <string name="ui_start_service" formatted="false">"Start service"</string>
+    <string name="ui_restart_service" formatted="false">"Restart service"</string>
+    <string name="ui_retry_connection" formatted="false">"Retry connection"</string>
+    <string name="ui_reopen_webui" formatted="false">"Reopen WebUI"</string>
+    <string name="ui_back_to_home" formatted="false">"Back to Home"</string>
+    <string name="ui_recent_logs" formatted="false">"Recent logs"</string>
+    <string name="ui_no_logs_yet_check_the_runtime_on_home" formatted="false">"No logs yet. Check the runtime on Home."</string>
+    <string name="ui_network_status_unknown" formatted="false">"Network status unknown"</string>
+    <string name="ui_network_disconnected" formatted="false">"Network disconnected"</string>
+    <string name="ui_network_sign_in_required" formatted="false">"Network sign-in required"</string>
+    <string name="ui_internet_access_unverified" formatted="false">"Internet access unverified"</string>
+    <string name="ui_network_connected" formatted="false">"Network connected"</string>
+    <string name="ui_system_network_status_is_unavailable_local_webui_health_is" formatted="false">"System network status is unavailable. Local WebUI health is checked separately."</string>
+    <string name="ui_no_default_network_qq_models_and_online_updates_may" formatted="false">"No default network. QQ, models and online updates may be unavailable. Local WebUIs can still be used."</string>
+    <string name="ui_complete_network_sign_in_in_system_settings_then_check" formatted="false">"Complete network sign-in in system settings, then check QQ and model connectivity."</string>
+    <string name="ui_the_system_has_not_confirmed_internet_access_check_your" formatted="false">"The system has not confirmed internet access. Check your network. Local WebUIs can still be used."</string>
+    <string name="ui_the_system_confirmed_internet_access_qq_onebot_and_model" formatted="false">"The system confirmed internet access. QQ, OneBot and model connections are checked separately."</string>
+    <string name="ui_storage_not_checked" formatted="false">"Storage not checked"</string>
+    <string name="ui_storage_space_normal" formatted="false">"Storage space normal"</string>
+    <string name="ui_storage_space_low" formatted="false">"Storage space low"</string>
+    <string name="ui_storage_critically_low" formatted="false">"Storage critically low"</string>
+    <string name="ui_view_usage_in_settings_logs_and_diagnostics_storage_usage">"%1$s. View usage in Settings → Logs and diagnostics → Storage usage."</string>
+    <string name="ui_a_warning_appears_below_512_mib_of_free_internal" formatted="false">"A warning appears below 512 MiB of free internal storage; below 128 MiB is critically low."</string>
+    <string name="ui_free_other_phone_files_or_review_and_delete_unneeded" formatted="false">"Free other phone files, or review and delete unneeded backups in backup management. Downloaded manager APKs can be cleared on the update page."</string>
+    <string name="ui_do_not_use_the_system_clear_data_action_it" formatted="false">"Do not use the system Clear data action: it deletes the runtime, configuration and account data."</string>
+    <string name="ui_warnings_do_not_automatically_stop_services_or_delete_qq" formatted="false">"Warnings do not automatically stop services or delete QQ caches, sessions, databases or unknown files. Updates and backups perform their own precise space checks."</string>
+    <string name="ui_apk_launch_components" formatted="false">"APK launch components"</string>
+    <string name="ui_bundled_launch_files_are_readable_and_executable" formatted="false">"Bundled launch files are readable and executable"</string>
+    <string name="ui_apk_launch_components_are_missing_or_not_executable_install" formatted="false">"APK launch components are missing or not executable. Install an APK with the same signing certificate over this app to retain data."</string>
+    <string name="ui_runtime_installation_record" formatted="false">"Runtime installation record"</string>
+    <string name="ui_complete_runtime_recognized" formatted="false">"Complete runtime recognized"</string>
+    <string name="ui_complete_initialization_is_unfinished_or_its_record_is_unrecognized" formatted="false">"Complete initialization is unfinished or its record is unrecognized. Existing files are retained."</string>
+    <string name="ui_maintenance_recovery_records" formatted="false">"Maintenance recovery records"</string>
+    <string name="ui_an_unfinished_operation_exists_return_to_the_manager_to" formatted="false">"An unfinished operation exists. Return to the manager to recover it, then check again. This check does not modify operation records."</string>
+    <string name="ui_no_pending_maintenance_recovery_found" formatted="false">"No pending maintenance recovery found"</string>
+    <string name="ui_python_virtual_environment" formatted="false">"Python virtual environment"</string>
+    <string name="ui_astrbot_entry_point" formatted="false">"AstrBot entry point"</string>
+    <string name="ui_runtime_resource_files" formatted="false">"Runtime resource files"</string>
+    <string name="ui_key_entry_files_exist_this_does_not_verify_complete" formatted="false">"Key entry files exist. This does not verify complete file digests or bot functionality."</string>
+    <string name="ui_missing_or_unreadable">"Missing or unreadable: %1$s"</string>
+    <string name="ui_version_and_backup_identity" formatted="false">"Version and backup identity"</string>
+    <string name="ui_component_combination_and_backup_compatibility_identity_are_readable" formatted="false">"Component combination and backup compatibility identity are readable"</string>
+    <string name="ui_version_information_is_incomplete_so_a_repair_transaction_cannot" formatted="false">"Version information is incomplete, so a repair transaction cannot be created safely. Export diagnostics and use matching maintenance resources."</string>
+    <string name="ui_webui_configuration">"%1$s WebUI configuration"</string>
+    <string name="ui_not_created_yet_first_start_prepares_default_configuration" formatted="false">"Not created yet. First start prepares default configuration."</string>
+    <string name="ui_configuration_format_listen_address_or_port_is_unrecognized_repairing" formatted="false">"Configuration format, listen address or port is unrecognized. Repairing runtime resources does not reset this configuration."</string>
+    <string name="ui_the_webui_is_disabled_in_project_configuration" formatted="false">"The WebUI is disabled in project configuration"</string>
+    <string name="ui_local_endpoint_configuration_is_recognized_login_models_qq_and" formatted="false">"Local endpoint configuration is recognized. Login, models, QQ and OneBot messages are not tested here."</string>
+    <string name="ui_runtime_version_record_is_missing_complete_initialization_first" formatted="false">"Runtime version record is missing. Complete initialization first."</string>
+    <string name="ui_runtime" formatted="false">"Runtime"</string>
+    <string name="ui_unknown_unsupported_by_this_build" formatted="false">"Unknown (unsupported by this build)"</string>
+    <string name="ui_component_versions_match" formatted="false">"Component versions match"</string>
+    <string name="ui_version_combination_unverified_some_component_versions_are_unrecognized" formatted="false">"Version combination unverified: some component versions are unrecognized. View logs or export diagnostics. Existing data is retained."</string>
+    <string name="ui_version_combination_unverified_astrbot_and_its_webui_have_different" formatted="false">"Version combination unverified: AstrBot and its WebUI have different versions. Use a matching update package from maintenance settings."</string>
+    <string name="ui_version_combination_unverified_independent_updates_or_different_version" formatted="false">"Version combination unverified: independent updates or different version declarations detected. Use a matching runtime package from maintenance settings."</string>
+    <string name="ui_configuration_file_too_large" formatted="false">"Configuration file too large"</string>
+    <string name="ui_webui_is_disabled_in_project_configuration_the_service_process" formatted="false">"WebUI is disabled in project configuration; the service process can still run"</string>
+    <string name="ui_the_listen_address_cannot_be_used_as_a_local" formatted="false">"The listen address cannot be used as a local endpoint. Use a loopback or wildcard address in project configuration. Existing configuration is retained."</string>
+    <string name="ui_webui_port_must_be_an_integer_existing_configuration_is" formatted="false">"WebUI port must be an integer. Existing configuration is retained."</string>
+    <string name="ui_https_uses_system_certificate_verification_for_untrusted_certificates_ch" formatted="false">"HTTPS uses system certificate verification. For untrusted certificates, check the certificate or use an external browser."</string>
+    <string name="ui_webui_address_or_configuration_is_unrecognized_the_original_file" formatted="false">"WebUI address or configuration is unrecognized. The original file is retained. Check host, port and enabled state in project configuration."</string>
+    <string name="ui_unable_to_save_lan_settings_check_webui_configuration_file" formatted="false">"Unable to save LAN settings. Check WebUI configuration, file permissions and available space. Existing configuration is retained."</string>
+    <string name="ui_local_services" formatted="false">"Local services"</string>
+    <string name="ui_preparing_runtime_tasks" formatted="false">"Preparing runtime tasks"</string>
+    <string name="ui_ssh_running" formatted="false">" · SSH running"</string>
+    <string name="ui_unable_to_save_stop_preferences" formatted="false">"Unable to save stop preferences"</string>
+    <string name="ui_astrbot_manager" formatted="false">"AstrBot Manager"</string>
+    <string name="ui_stop_bots" formatted="false">"Stop bots"</string>
+    <string name="ui_checking_runtime" formatted="false">"Checking runtime"</string>
+    <string name="ui_manager_7ad33" formatted="false">"Manager"</string>
+    <string name="ui_ssh_extension_settings_are_unavailable_configure_ssh_again_or" formatted="false">"SSH extension settings are unavailable. Configure SSH again or reinstall the extension."</string>
+    <string name="ui_runtime_ready" formatted="false">"Runtime ready"</string>
+    <string name="ui_base_runtime_ready_complete_components_still_required" formatted="false">"Base runtime ready; complete components still required"</string>
+    <string name="ui_waiting_for_initialization" formatted="false">"Waiting for initialization"</string>
+    <string name="ui_unable_to_save_history_check_storage_space">"Unable to save %1$s history. Check storage space."</string>
+    <string name="ui_astrbot_upstream_restart_detected_checking_local_endpoints_and_versions" formatted="false">"AstrBot upstream restart detected; checking local endpoints and versions again"</string>
+    <string name="ui_webui_configuration_changed_restart_this_service_to_apply_it" formatted="false">"WebUI configuration changed. Restart this service to apply it."</string>
+    <string name="ui_start_1ae95">"Start %1$s %2$s"</string>
+    <string name="ui_checking_runtime_resources_and_webui_configuration" formatted="false">"Checking runtime resources and WebUI configuration"</string>
+    <string name="ui_environment_check_complete_review_results_and_recommended_actions" formatted="false">"Environment check complete. Review results and recommended actions."</string>
+    <string name="ui_no_diagnostic_export_location_selected" formatted="false">"No diagnostic export location selected"</string>
+    <string name="ui_diagnostics_exported_review_log_contents_before_sharing" formatted="false">"Diagnostics exported. Review log contents before sharing."</string>
+    <string name="ui_restored_persona_settings_from_before_the_interruption" formatted="false">"Restored persona settings from before the interruption"</string>
+    <string name="ui_checking_and_restoring">"Checking and restoring %1$s"</string>
+    <string name="ui_ssh_settings_saved" formatted="false">"SSH settings saved"</string>
+    <string name="ui_existing_sessions_disconnected_connect_again" formatted="false">". Existing sessions disconnected; connect again."</string>
+    <string name="ui_applies_when_the_service_starts" formatted="false">". Applies when the service starts."</string>
+    <string name="ui_this_apk_contains_only_the_base_runtime_complete_resources" formatted="false">"This APK contains only the base runtime; complete resources are not prepared"</string>
+    <string name="ui_unable_to_save_runtime_preferences_check_storage_space" formatted="false">"Unable to save runtime preferences. Check storage space."</string>
+    <string name="ui_starting_d784e">"Starting %1$s"</string>
+    <string name="ui_unable_to_save_stop_preferences_check_storage_space" formatted="false">"Unable to save stop preferences. Check storage space."</string>
+    <string name="ui_select_a_webui_to_configure" formatted="false">"Select a WebUI to configure"</string>
+    <string name="ui_initialize_the_complete_runtime_first" formatted="false">"Initialize the complete runtime first"</string>
+    <string name="ui_enable_a_valid_webui_endpoint_in_project_configuration_first" formatted="false">"Enable a valid WebUI endpoint in project configuration first"</string>
+    <string name="ui_updating_lan_access">"Updating %1$s LAN access"</string>
+    <string name="ui_formatted_text">"%1$s: "</string>
+    <string name="ui_lan_access_enabled_bc976" formatted="false">"LAN access enabled"</string>
+    <string name="ui_access_restricted_to_this_device" formatted="false">"access restricted to this device"</string>
+    <string name="ui_local_endpoint_checked_again" formatted="false">"; local endpoint checked again"</string>
+    <string name="ui_applies_when_the_service_starts_884b1" formatted="false">"; applies when the service starts"</string>
+    <string name="ui_automatic_snapshot_limits_saved_future_snapshots_will_remove_the" formatted="false">"Automatic snapshot limits saved. Future snapshots will remove the oldest unprotected snapshots as needed."</string>
+    <string name="ui_no_portable_backup_selected" formatted="false">"No portable backup selected"</string>
+    <string name="ui_portable_backup_verified_but_not_restored_review_its_scope" formatted="false">"Portable backup verified but not restored. Review its scope and confirm import."</string>
+    <string name="ui_pending_backup_import_cancelled_current_data_is_unchanged" formatted="false">"Pending backup import cancelled. Current data is unchanged."</string>
+    <string name="ui_no_update_package_selected" formatted="false">"No update package selected"</string>
+    <string name="ui_check_for_updates_first" formatted="false">"Check for updates first"</string>
+    <string name="ui_update_package_downloaded_and_verified_review_release_notes_before" formatted="false">"Update package downloaded and verified. Review release notes before installing."</string>
+    <string name="ui_napcat_update_downloaded_and_verified_review_backup_and_installation" formatted="false">"NapCat update downloaded and verified. Review backup and installation confirmation."</string>
+    <string name="ui_this_snapshot_is_required_for_program_or_runtime_rollback" formatted="false">"This snapshot is required for program or runtime rollback. It becomes unprotected after a later successful update."</string>
+    <string name="ui_no_backup_selected" formatted="false">"No backup selected"</string>
+    <string name="ui_backup_deleted" formatted="false">"Backup deleted"</string>
+    <string name="ui_unknown_runtime_operation" formatted="false">"Unknown runtime operation"</string>
+    <string name="ui_services_did_not_become_ready_after_import_recovery_of" formatted="false">"Services did not become ready after import. Recovery of previous data and service state was attempted. Check manager logs and service status."</string>
+    <string name="ui_the_new_version_did_not_become_ready_recovery_of" formatted="false">"The new version did not become ready. Recovery of the previous program and its data was attempted. Check manager logs and service status."</string>
+    <string name="ui_webui_readiness_timed_out_process_monitoring_continues_view_logs" formatted="false">"WebUI readiness timed out. Process monitoring continues. View logs, wait longer or stop the service."</string>
+    <string name="ui_napcat_resource_check_exited_with">"NapCat resource check exited with %1$s: %2$s"</string>
+    <string name="ui_napcat_resources_or_qq_runtime_dependencies_are_incompatible_restoring" formatted="false">"NapCat resources or QQ runtime dependencies are incompatible. Restoring the previous version."</string>
+    <string name="ui_napcat_complete_configuration_and_qq_sessions_retained_webui_responding">"NapCat %1$s complete. Configuration and QQ sessions retained; WebUI responding again."</string>
+    <string name="ui_rollback" formatted="false">"rollback"</string>
+    <string name="ui_update" formatted="false">"update"</string>
+    <string name="ui_napcat_complete_resource_and_dependency_checks_passed_qq_remains">"NapCat %1$s complete. Resource and dependency checks passed. QQ remains stopped; check the WebUI after starting it."</string>
+    <string name="ui_napcat_recovery_incomplete_program_files_and_data_snapshots_are" formatted="false">"NapCat recovery incomplete. Program files and data snapshots are retained. Check manager logs and retry."</string>
+    <string name="ui_this_shortcut_is_unavailable_follow_the_steps_above_to" formatted="false">"This shortcut is unavailable. Follow the steps above to change the setting manually."</string>
+    <string name="ui_opened_an_alternative_settings_page_follow_the_steps_above" formatted="false">"Opened an alternative settings page. Follow the steps above to continue."</string>
+    <string name="ui_device">"Device: %1$s %2$s"</string>
+    <string name="ui_app_to_configure">"App to configure: %1$s"</string>
+    <string name="ui_open_app_battery_settings" formatted="false">"Open app battery settings"</string>
+    <string name="ui_open_runtime_notification_settings" formatted="false">"Open runtime notification settings"</string>
+    <string name="ui_open_app_info_alternative" formatted="false">"Open app info (alternative)"</string>
+    <string name="ui_back_to_background_settings" formatted="false">"Back to background settings"</string>
+    <string name="ui_find_this_app_in_recent_apps_open_its_card" formatted="false">"Find this app in recent apps, open its card menu, and lock the card."</string>
+    <string name="ui_update_preferences_were_not_saved" formatted="false">"Update preferences were not saved"</string>
+    <string name="ui_check_available_storage_and_try_again" formatted="false">"Check available storage and try again."</string>
+    <string name="ui_no_browser_found_visit">"No browser found. Visit %1$s"</string>
+    <string name="ui_view_manager_logs" formatted="false">"View manager logs"</string>
+    <string name="ui_redeploy_runtime_resources" formatted="false">"Redeploy runtime resources?"</string>
+    <string name="ui_roll_back_the_entire_runtime_6833c" formatted="false">"Roll back the entire runtime?"</string>
+    <string name="ui_upgrade_the_bundled_runtime" formatted="false">"Upgrade the bundled runtime?"</string>
+    <string name="ui_prepare_the_runtime_bundled_with_this_apk_stop_both" formatted="false">"Prepare the runtime bundled with this APK, stop both services and SSH, back up configuration, databases and the QQ session, then redeploy resources and check both services. The component versions must match exactly. Configuration is preserved.\n\nDependencies and changes installed manually in Ubuntu program directories will be replaced. Plugins in AstrBot\'s data directory are preserved. On success, one runtime rollback is retained and the previous running state is restored. On failure, the original runtime and data snapshot are restored."</string>
+    <string name="ui_back_up_current_data_then_restore_the_previous_runtime" formatted="false">"Back up current data, then restore the previous runtime and its snapshot. Later data will not be merged. The previous running state will be restored."</string>
+    <string name="ui_verify_and_prepare_the_full_bundled_runtime_stop_both" formatted="false">"Verify and prepare the full bundled runtime, stop both services, back up configuration, databases and the QQ session, then switch runtimes and check both services. On failure, restore the original runtime and snapshot. On success, retain one rollback."</string>
+    <string name="ui_back_up_and_repair" formatted="false">"Back up and repair"</string>
+    <string name="ui_back_up_and_roll_back" formatted="false">"Back up and roll back"</string>
+    <string name="ui_back_up_and_upgrade" formatted="false">"Back up and upgrade"</string>
+    <string name="ui_lan_access_for">"%2$s LAN access for %1$s?"</string>
+    <string name="ui_enable" formatted="false">"Enable"</string>
+    <string name="ui_allow_other_devices_to_access_this_dashboard_through_the" formatted="false">"Allow other devices to access this dashboard through the phone\'s IPv4 address. Enable this only on a trusted LAN. Existing login credentials are still required. The service will restart if running; ports and other settings are preserved."</string>
+    <string name="ui_restrict_this_dashboard_to_the_phone_the_service_will" formatted="false">"Restrict this dashboard to the phone. The service will restart if running; ports and other settings are preserved."</string>
+    <string name="ui_enable_and_apply" formatted="false">"Enable and apply"</string>
+    <string name="ui_disable_and_apply" formatted="false">"Disable and apply"</string>
+    <string name="ui_export_diagnostics_2f10a" formatted="false">"Export diagnostics?"</string>
+    <string name="ui_includes_the_device_model_versions_runtime_status_and_redacted" formatted="false">"Includes the device model, versions, runtime status and redacted logs. Configuration, databases and QQ login files are excluded. Services keep running. Logs may still contain chat messages or personal information; review before sharing."</string>
+    <string name="ui_choose_destination" formatted="false">"Choose destination"</string>
+    <string name="ui_export_portable_backup_47820" formatted="false">"Export portable backup?"</string>
+    <string name="ui_includes_astrbot_configuration_database_plugins_and_data_plus_napcat" formatted="false">"Includes AstrBot configuration, database, plugins and data, plus NapCat configuration. Excludes QQ login sessions, runtime resources and local snapshots. Both services stop briefly for a consistent backup, then resume. The file contains passwords and API keys without redaction. Maximum size: 2 GiB."</string>
+    <string name="ui_restore_this_portable_backup" formatted="false">"Restore this portable backup?"</string>
+    <string name="ui_backup_date_stop_services_and_create_a_local_recovery">"Backup date: %1$s. Stop services and create a local recovery snapshot, then replace AstrBot data and NapCat configuration. The current phone\'s QQ session is preserved. Later data will not be merged. After importing, check settings with the dashboard credentials from this backup."</string>
+    <string name="ui_back_up_and_import" formatted="false">"Back up and import"</string>
+    <string name="ui_when_creating_a_snapshot_before_an_update_or_restore" formatted="false">"When creating a snapshot before an update or restore, automatically remove the oldest unprotected automatic snapshots to meet these limits. Older snapshots are removed only after the new one passes verification."</string>
+    <string name="ui_maximum_snapshots" formatted="false">"Maximum snapshots"</string>
+    <string name="ui_1_to_100_snapshots" formatted="false">"1 to 100 snapshots"</string>
+    <string name="ui_storage_limit_mib" formatted="false">"Storage limit (MiB)"</string>
+    <string name="ui_64_to_65536_mib_1024_mib_1_gib" formatted="false">"64 to 65536 MiB; 1024 MiB = 1 GiB"</string>
+    <string name="ui_manual_backups_are_excluded_and_are_never_deleted_automatically" formatted="false">"Manual backups are excluded and are never deleted automatically. Snapshots required for rollback or selected for this restore are preserved. If the limits still cannot be met, the operation pauses and asks you to adjust them. Lower limits apply from the next automatic snapshot."</string>
+    <string name="ui_local_backups" formatted="false">"Local backups"</string>
+    <string name="ui_total_backup_size">"Total backup size: %1$s"</string>
+    <string name="ui_automatic_snapshots_mib">"Automatic snapshots: %1$s / %2$s · %3$s / %4$s MiB"</string>
+    <string name="ui_no_backups_yet" formatted="false">"No backups yet"</string>
+    <string name="ui_mb_entries">"%1$s · %2$s MB · %3$s entries"</string>
+    <string name="ui_manual_backup" formatted="false">"Manual backup"</string>
+    <string name="ui_pre_restore_snapshot" formatted="false">"Pre-restore snapshot"</string>
+    <string name="ui_pre_update_snapshot" formatted="false">"Pre-update snapshot"</string>
+    <string name="ui_required_for_rollback_protected" formatted="false">"Required for rollback · Protected"</string>
+    <string name="ui_restore" formatted="false">"Restore"</string>
+    <string name="ui_restore_this_backup" formatted="false">"Restore this backup?"</string>
+    <string name="ui_both_services_will_stop_briefly_current_data_is_backed" formatted="false">"Both services will stop briefly. Current data is backed up first, then configuration, databases, plugins and the QQ session are replaced with this recovery point. Later data will not be merged. The backup must match the installed program versions."</string>
+    <string name="ui_back_up_and_restore" formatted="false">"Back up and restore"</string>
+    <string name="ui_delete_this_local_backup" formatted="false">"Delete this local backup?"</string>
+    <string name="ui_only_the_selected_backup_file_is_deleted_data_currently" formatted="false">"Only the selected backup file is deleted. Data currently used by the services is unaffected. This cannot be undone."</string>
+    <string name="ui_update_to">"Update %1$s to %2$s?"</string>
+    <string name="ui_n_n_nboth_services_will_stop_briefly_data_is">"%1$s\n%2$s\n\nBoth services will stop briefly. Data is backed up before switching programs. Configuration and the QQ session are preserved. On failure, the original program and its data are restored."</string>
+    <string name="ui_qq_remains_stopped_if_it_was_stopped_otherwise_it" formatted="false">"QQ remains stopped if it was stopped; otherwise, it restarts to check the dashboard API."</string>
+    <string name="ui_astrbot_starts_to_check_its_local_dashboard" formatted="false">"AstrBot starts to check its local dashboard."</string>
+    <string name="ui_back_up_and_update" formatted="false">"Back up and update"</string>
+    <string name="ui_this_version_is_already_installed_you_can_download_or" formatted="false">"This version is already installed. You can download or install it again.\n"</string>
+    <string name="ui_services_keep_running_during_download_and_verification_backup_and" formatted="false">"Services keep running during download and verification. Backup and installation require separate confirmation afterward."</string>
+    <string name="ui_download_and_verify" formatted="false">"Download and verify"</string>
+    <string name="ui_roll_back_and_its_data">"Roll back %1$s and its data?"</string>
+    <string name="ui_back_up_current_data_then_restore_the_program_and" formatted="false">"Back up current data, then restore the program and data snapshot from before the last update. Later data will not be merged. Both services will stop briefly."</string>
+    <string name="ui_back_up_and_roll_back_65fe8" formatted="false">"Back up and roll back"</string>
+    <string name="ui_napcat_access_token" formatted="false">"NapCat access token"</string>
+    <string name="ui_astrbot_initial_password" formatted="false">"AstrBot initial password"</string>
+    <string name="ui_credentials_are_generated_at_first_startup_use_your_existing" formatted="false">"Credentials are generated at first startup. Use your existing password if already configured."</string>
+    <string name="ui_show" formatted="false">"Show"</string>
+    <string name="ui_hide" formatted="false">"Hide"</string>
+    <string name="ui_copy_f4880">"Copy %1$s"</string>
+    <string name="ui_statistics_could_not_be_completed_refresh_to_try_again" formatted="false">"Statistics could not be completed. Refresh to try again; existing results are preserved."</string>
+    <string name="ui_refresh_statistics" formatted="false">"Refresh statistics"</string>
+    <string name="ui_unavailable" formatted="false">"Unavailable"</string>
+    <string name="ui_free_internal_storage" formatted="false">"Free internal storage"</string>
+    <string name="ui_currently_available_n_n">"Currently available: %1$s\n\n%2$s"</string>
+    <string name="ui_total_app_storage" formatted="false">"Total app storage"</string>
+    <string name="ui_system_accounting_napp_code_napp_data_ncache_included_n">"System accounting:\nApp code: %1$s\nApp data: %2$s\nCache included: %3$s\n\n"</string>
+    <string name="ui_cache_is_already_included_in_app_data_and_is" formatted="false">"Cache is already included in app data and is not added again. System figures may be delayed and use different accounting from the logical file sizes below."</string>
+    <string name="ui_not_provided_by_the_system" formatted="false">"Not provided by the system"</string>
+    <string name="ui_system_accounting_is_unavailable_individual_directories_can_still_be" formatted="false">"System accounting is unavailable. Individual directories can still be scanned; adding some directories does not give the full app size."</string>
+    <string name="ui_at_least" formatted="false">"At least "</string>
+    <string name="ui_partial_scan" formatted="false">" · Partial scan"</string>
+    <string name="ui_n_regular_files_n_n_n_n">"%1$s\n%2$s regular files\n\n%3$s\n\n"</string>
+    <string name="ui_logical_file_sizes_each_inode_is_counted_once_per" formatted="false">"Logical file sizes: each inode is counted once per group. Links, special files and directory metadata are excluded."</string>
+    <string name="ui_skipped_links_and_special_files">"Skipped %1$s links and %2$s special files."</string>
+    <string name="ui_n_nsome_paths_were_unreadable_files_changed_or_the" formatted="false">"\n\nSome paths were unreadable, files changed, or the scan limit was reached. This value covers only files scanned. Refresh later."</string>
+    <string name="ui_n_nscanning_does_not_pause_services_this_directory_cannot" formatted="false">"\n\nScanning does not pause services. This directory cannot be deleted here."</string>
+    <string name="ui_about_storage_and_cleanup" formatted="false">"About storage and cleanup"</string>
+    <string name="ui_accounting_methods_and_recommendations" formatted="false">"Accounting methods and recommendations"</string>
+    <string name="ui_the_system_total_includes_app_code_data_and_cache" formatted="false">"The system total includes app code, data and cache. Directory figures cover only listed regular files and must not be added to the system total."</string>
+    <string name="ui_each_directory_scan_is_limited_to_100_000_entries" formatted="false">"Each directory scan is limited to 100,000 entries and 8 seconds. Incomplete or unreadable scans are marked as partial."</string>
+    <string name="ui_services_keep_running_during_scanning_so_files_can_change" formatted="false">"Services keep running during scanning, so files can change. These readings are not a single consistent snapshot."</string>
+    <string name="ui_system_storage_settings" formatted="false">"System storage settings"</string>
+    <string name="ui_view_storage_usage_for_the_whole_phone" formatted="false">"View storage usage for the whole phone"</string>
+    <string name="ui_free_storage_has_recovered_above_the_warning_threshold" formatted="false">"Free storage has recovered above the warning threshold"</string>
+    <string name="ui_astrbot_data" formatted="false">"AstrBot data"</string>
+    <string name="ui_configuration_plugins_databases_trace_data_and_upstream_logs" formatted="false">"Configuration, plugins, databases, trace data and upstream logs"</string>
+    <string name="ui_napcat_data" formatted="false">"NapCat data"</string>
+    <string name="ui_dashboard_configuration_and_upstream_logs" formatted="false">"Dashboard configuration and upstream logs"</string>
+    <string name="ui_qq_and_user_directory" formatted="false">"QQ and user directory"</string>
+    <string name="ui_qq_sessions_cache_attachments_and_the_ubuntu_user_directory" formatted="false">"QQ sessions, cache, attachments and the Ubuntu user directory"</string>
+    <string name="ui_manual_backups_and_automatic_snapshots_including_protected_snapshots" formatted="false">"Manual backups and automatic snapshots, including protected snapshots"</string>
+    <string name="ui_update_and_import_staging" formatted="false">"Update and import staging"</string>
+    <string name="ui_downloaded_apks_programs_and_backups_awaiting_import" formatted="false">"Downloaded APKs, programs and backups awaiting import"</string>
+    <string name="ui_manager_output_logs" formatted="false">"Manager output logs"</string>
+    <string name="ui_rotated_output_from_the_manager_runtime_and_both_services" formatted="false">"Rotated output from the manager, runtime and both services"</string>
+    <string name="ui_app_cache" formatted="false">"App cache"</string>
+    <string name="ui_private_app_cache_including_exports_and_browser_data" formatted="false">"Private app cache, including exports and browser data"</string>
+    <string name="ui_runtime_resources_and_rollback" formatted="false">"Runtime resources and rollback"</string>
+    <string name="ui_current_and_rollback_runtime_and_program_resources" formatted="false">"Current and rollback runtime and program resources"</string>
+    <string name="ui_scanning">"Scanning %1$s"</string>
+    <string name="ui_python_dependencies" formatted="false">"Python dependencies"</string>
+    <string name="ui_loaded_quart_fastapi_and_faiss_in_isolated_mode_without" formatted="false">"Loaded quart, fastapi and faiss in isolated mode without starting the bot"</string>
+    <string name="ui_python_or_a_dependency_failed_to_load_check_runtime" formatted="false">"Python or a dependency failed to load. Check runtime logs. User configuration was not changed."</string>
+    <string name="ui_installation_launch_files_and_maintenance_conditions_must_pass_first" formatted="false">"Installation, launch files and maintenance conditions must pass first. Dependency loading was skipped."</string>
+    <string name="ui_repair_staging_space" formatted="false">"Repair staging space"</string>
+    <string name="ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot">"Available: %1$s MiB. Runtime preparation requires at least %2$s MiB; snapshot space is checked separately."</string>
+    <string name="ui_cannot_determine_the_full_resource_size_in_this_apk" formatted="false">"Cannot determine the full resource size in this APK"</string>
+    <string name="ui_complete_the_pending_maintenance_operation_then_check_again" formatted="false">"Complete the pending maintenance operation, then check again"</string>
+    <string name="ui_install_an_apk_with_the_same_signing_certificate_to" formatted="false">"Install an APK with the same signing certificate to repair the bundled launcher. Do not uninstall or clear data."</string>
+    <string name="ui_initialize_the_runtime_first_an_unrecognized_existing_runtime_will" formatted="false">"Initialize the runtime first. An unrecognized existing runtime will not be overwritten automatically."</string>
+    <string name="ui_version_information_is_incomplete_export_diagnostics_first_the_runtime" formatted="false">"Version information is incomplete. Export diagnostics first; the runtime will not be overwritten using guessed versions."</string>
+    <string name="ui_the_installed_runtime_differs_from_the_bundled_resources_use" formatted="false">"The installed runtime differs from the bundled resources. Use runtime upgrade or an APK with matching versions."</string>
+    <string name="ui_resolve_dashboard_configuration_issues_first_redeploying_resources_does" formatted="false">"Resolve dashboard configuration issues first. Redeploying resources does not repair configuration contents."</string>
+    <string name="ui_free_staging_space_first_data_snapshot_space_will_also" formatted="false">"Free staging space first. Data snapshot space will also be checked before repair."</string>
+    <string name="ui_no_resource_damage_was_identified_by_this_check_manage" formatted="false">"No resource damage was identified by this check. Manage bot configuration issues in the relevant dashboard."</string>
+    <string name="ui_the_same_version_bundled_resources_can_be_redeployed_the" formatted="false">"The same-version bundled resources can be redeployed. The complete version combination is checked before switching. Configuration, databases and the QQ session are preserved."</string>
+    <string name="ui_ssh_operation_failed_check_the_port_runtime_and_free" formatted="false">"SSH operation failed. Check the port, runtime and free storage, then try again."</string>
+    <string name="ui_diagnostic_export_failed_check_free_space_or_choose_another" formatted="false">"Diagnostic export failed. Check free space or choose another destination. Runtime and data are preserved."</string>
+    <string name="ui_the_update_connection_was_interrupted_or_the_server_is" formatted="false">"The update connection was interrupted or the server is unavailable. The current program and download progress are preserved. Try again later."</string>
+    <string name="ui_cannot_verify_the_update_catalog_or_package_check_for" formatted="false">"Cannot verify the update catalog or package. Check for updates again."</string>
+    <string name="ui_update_information_failed_format_or_integrity_checks_check_for" formatted="false">"Update information failed format or integrity checks. Check for updates again."</string>
+    <string name="ui_the_backup_could_not_be_read_or_written_or" formatted="false">"The backup could not be read or written, or is truncated. Choose the file again and retry. Existing data is preserved."</string>
+    <string name="ui_the_portable_backup_manifest_is_unrecognized_existing_data_was" formatted="false">"The portable backup manifest is unrecognized. Existing data was not changed."</string>
+    <string name="ui_portable_backup_verification_or_restore_failed_existing_data_and" formatted="false">"Portable backup verification or restore failed. Existing data and recovery records are preserved."</string>
+    <string name="ui_operation_failed" formatted="false">"Operation failed"</string>
+    <string name="ui_operation_failed_6846d">"Operation failed: %1$s"</string>
+    <string name="ui_maintenance_finished_but_ssh_could_not_restart_check_the" formatted="false">"Maintenance finished, but SSH could not restart. Check the port and try again."</string>
+    <string name="ui_finished_072d2">"Finished %1$s"</string>
+    <string name="ui_no_backup_destination_selected" formatted="false">"No backup destination selected"</string>
+    <string name="ui_stopping_services_to_prepare_a_consistent">"Stopping services to prepare a consistent %1$s"</string>
+    <string name="ui_preserving_this_phone_s_qq_session_and_preparing_imported" formatted="false">"Preserving this phone\'s QQ session and preparing imported data"</string>
+    <string name="ui_portable_backup_exported_without_the_qq_login_session_it" formatted="false">"Portable backup exported without the QQ login session. It contains configuration and keys; store it securely."</string>
+    <string name="ui_portable_backup_restored_this_phone_s_qq_session_and" formatted="false">"Portable backup restored. This phone\'s QQ session and a recovery snapshot are preserved. Check settings using the dashboard credentials from the backup."</string>
+    <string name="ui_stopping_both_services_and_creating_a_snapshot_before_switching" formatted="false">"Stopping both services and creating a snapshot before switching runtimes"</string>
+    <string name="ui_switching_runtime_and_components" formatted="false">"Switching runtime and components"</string>
+    <string name="ui_checking_the_actual_astrbot_and_napcat_services" formatted="false">"Checking the actual AstrBot and NapCat services"</string>
+    <string name="ui_napcat_startup_check_failed" formatted="false">"NapCat startup check failed"</string>
+    <string name="ui_runtime_completed_previous_running_states_restored_check_qq_login">"Runtime %1$s completed. Previous running states restored. Check QQ login and bot connections in the dashboards."</string>
+    <string name="ui_repair" formatted="false">"repair"</string>
+    <string name="ui_upgrade" formatted="false">"upgrade"</string>
+    <string name="ui_runtime_maintenance_error">"Runtime maintenance error: %1$s"</string>
+    <string name="ui_the_new_runtime_passed_checks_and_was_committed_old" formatted="false">"The new runtime passed checks and was committed. Old files could not be fully removed. Records are preserved; reopen the manager to retry cleanup."</string>
+    <string name="ui_runtime_switch_did_not_complete_restoring_the_original_runtime" formatted="false">"Runtime switch did not complete. Restoring the original runtime and data"</string>
+    <string name="ui_original_runtime_recovery_is_incomplete_files_and_snapshots_are" formatted="false">"Original runtime recovery is incomplete. Files and snapshots are preserved. Check manager logs and try again."</string>
+    <string name="ui_stopping_services_and_creating_a_pre_update_napcat_snapshot" formatted="false">"Stopping services and creating a pre-update NapCat snapshot"</string>
+    <string name="ui_checking_napcat_resources_qq_dependencies_and_existing_data" formatted="false">"Checking NapCat resources, QQ dependencies and existing data"</string>
+    <string name="ui_stopping_services_and_creating_a_pre_update_snapshot" formatted="false">"Stopping services and creating a pre-update snapshot"</string>
+    <string name="ui_switching_program">"Switching program%1$s"</string>
+    <string name="ui_and_its_data" formatted="false">" and its data"</string>
+    <string name="ui_checking_the_new_program_and_its_dashboard" formatted="false">"Checking the new program and its dashboard"</string>
+    <string name="ui_new_program_check_exited_with">"New program check exited with %1$s: %2$s"</string>
+    <string name="ui_new_program_startup_verification_failed" formatted="false">"New program startup verification failed"</string>
+    <string name="ui_the_new_program_did_not_stay_running" formatted="false">"The new program did not stay running"</string>
+    <string name="ui_committing_records">"Committing %1$s records"</string>
+    <string name="ui_restored_the_program_data_snapshot_and_previous_running_state" formatted="false">"Restored the program, data snapshot and previous running state"</string>
+    <string name="ui_update_completed_the_previous_program_and_its_data_snapshot" formatted="false">"Update completed. The previous program and its data snapshot are preserved. Check QQ and bot connections in the dashboards."</string>
+    <string name="ui_update_did_not_complete_restoring_the_previous_program_and" formatted="false">"Update did not complete. Restoring the previous program and its data"</string>
+    <string name="ui_update_rollback_is_incomplete_files_and_records_are_preserved" formatted="false">"Update rollback is incomplete. Files and records are preserved. Check manager logs and try again."</string>
+    <string name="ui_stopping_services_to_prepare_a_consistent_snapshot" formatted="false">"Stopping services to prepare a consistent snapshot"</string>
+    <string name="ui_copying_and_verifying_backup" formatted="false">"Copying and verifying backup"</string>
+    <string name="ui_backing_up_data_before_restore" formatted="false">"Backing up data before restore"</string>
+    <string name="ui_verifying_backup_and_switching_data" formatted="false">"Verifying backup and switching data"</string>
+    <string name="ui_restored_database_check_failed_restoring_original_data" formatted="false">"Restored database check failed. Restoring original data"</string>
+    <string name="ui_local_backup_completed_previous_running_states_restored" formatted="false">"Local backup completed. Previous running states restored."</string>
+    <string name="ui_data_restored_and_verified_previous_running_states_restored" formatted="false">"Data restored and verified. Previous running states restored."</string>
+    <string name="ui_initialize_the_runtime_first" formatted="false">"Initialize the runtime first"</string>
+    <string name="ui_persona_preset_not_found" formatted="false">"Persona preset not found"</string>
+    <string name="ui_saving_astrbot_persona_settings" formatted="false">"Saving AstrBot persona settings"</string>
+    <string name="ui_persona_added_to_astrbot_existing_personas_with_the_same" formatted="false">"Persona added to AstrBot. Existing personas with the same name and dashboard edits are preserved."</string>
+    <string name="ui_previous_default_persona_restored_added_presets_are_preserved" formatted="false">"Previous default persona restored. Added presets are preserved."</string>
+    <string name="ui_default_persona_changed_for_new_conversations_conversations_with_an" formatted="false">"Default persona changed for new conversations. Conversations with an explicitly selected persona are unaffected."</string>
+    <string name="ui_resuming">"Resuming %1$s"</string>
+    <string name="ui_historical_log_cleanup_files_kib">"Historical log cleanup: %1$s files, %2$s KiB"</string>
+    <string name="ui_some_logs_cannot_be_cleaned_yet_active_recently_written" formatted="false">"Some logs cannot be cleaned yet. Active, recently written or unverified files are preserved. Cleanup runs again after services stop."</string>
+    <string name="ui_historical_log_check_did_not_complete_it_will_retry" formatted="false">"Historical log check did not complete. It will retry during the next maintenance operation. Existing files are preserved."</string>
+    <string name="ui_service_startup_canceled" formatted="false">"Service startup canceled"</string>
+    <string name="ui_the_new_program_exited_unexpectedly_after_startup_rolling_back" formatted="false">"The new program exited unexpectedly after startup. Rolling back"</string>
+    <string name="ui_new_program_data_migration_failed_restoring_the_previous_program" formatted="false">"New program data migration failed. Restoring the previous program and data"</string>
+    <string name="ui_this_migration_state_cannot_be_verified_yet_use_a" formatted="false">"This migration state cannot be verified yet. Use a supported version combination."</string>
+    <string name="ui_local_port_is_in_use_stop_the_service_using">"Local port %1$s is in use. Stop the service using it first."</string>
+    <string name="ui_could_not_save_update_preferences_check_free_storage" formatted="false">"Could not save update preferences. Check free storage."</string>
+    <string name="ui_could_not_save_snapshot_limits_check_free_storage" formatted="false">"Could not save snapshot limits. Check free storage."</string>
+    <string name="ui_invalid_backup_id" formatted="false">"Invalid backup ID"</string>
+    <string name="ui_a_restore_or_backup_cleanup_is_pending_resolve_its" formatted="false">"A restore or backup cleanup is pending. Resolve its operation record first."</string>
+    <string name="ui_insufficient_space_backup_requires_at_least_mb">"Insufficient space. Backup requires at least %1$s MB."</string>
+    <string name="ui_data_changed_during_backup_or_verification_failed_the_backup" formatted="false">"Data changed during backup or verification failed. The backup was not committed."</string>
+    <string name="ui_unrecognized_backup_type_all_backups_are_preserved" formatted="false">"Unrecognized backup type. All backups are preserved."</string>
+    <string name="ui_a_backup_record_is_unreadable_all_backups_are_preserved" formatted="false">"A backup record is unreadable. All backups are preserved. Export diagnostics before resolving this issue. No new snapshot was created."</string>
+    <string name="ui_cannot_delete_backups_during_restore" formatted="false">"Cannot delete backups during restore"</string>
+    <string name="ui_an_unresolved_restore_record_exists_current_data_is_preserved" formatted="false">"An unresolved restore record exists. Current data is preserved."</string>
+    <string name="ui_the_backup_does_not_match_the_installed_program_versions" formatted="false">"The backup does not match the installed program versions. Restore matching programs before restoring data."</string>
+    <string name="ui_the_backup_is_damaged_or_was_modified_current_data" formatted="false">"The backup is damaged or was modified. Current data is preserved."</string>
+    <string name="ui_insufficient_restore_staging_space" formatted="false">"Insufficient restore staging space"</string>
+    <string name="ui_restore_staging_verification_failed" formatted="false">"Restore staging verification failed"</string>
+    <string name="ui_restore_record_missing" formatted="false">"Restore record missing"</string>
+    <string name="ui_invalid_pre_restore_snapshot_id" formatted="false">"Invalid pre-restore snapshot ID"</string>
+    <string name="ui_the_pre_restore_snapshot_does_not_match_the_current" formatted="false">"The pre-restore snapshot does not match the current runtime"</string>
+    <string name="ui_insufficient_staging_space_for_portable_backup_restore" formatted="false">"Insufficient staging space for portable backup restore"</string>
+    <string name="ui_the_configuration_parent_directory_is_a_link_current_data" formatted="false">"The configuration parent directory is a link. Current data is preserved."</string>
+    <string name="ui_cannot_prepare_configuration_directory" formatted="false">"Cannot prepare configuration directory"</string>
+    <string name="ui_an_unrecognized_old_data_directory_exists_operation_stopped_files" formatted="false">"An unrecognized old data directory exists. Operation stopped; files are preserved."</string>
+    <string name="ui_previous_automatic_snapshot_cleanup_completed_protected_backups_are_pres" formatted="false">"Previous automatic snapshot cleanup completed. Protected backups are preserved."</string>
+    <string name="ui_unrecognized_restore_record_all_data_is_preserved" formatted="false">"Unrecognized restore record. All data is preserved."</string>
+    <string name="ui_cleanup_from_the_previous_restore_completed" formatted="false">"Cleanup from the previous restore completed"</string>
+    <string name="ui_unexpected_old_data_directory_files_are_preserved" formatted="false">"Unexpected old data directory. Files are preserved."</string>
+    <string name="ui_old_data_required_for_recovery_is_missing_operation_stopped" formatted="false">"Old data required for recovery is missing. Operation stopped."</string>
+    <string name="ui_the_previous_restore_was_incomplete_original_data_has_been" formatted="false">"The previous restore was incomplete. Original data has been restored."</string>
+    <string name="ui_restored_data_directory_is_missing_old_data_is_preserved" formatted="false">"Restored data directory is missing. Old data is preserved."</string>
+    <string name="ui_unrecognized_backup_cleanup_record_backups_are_preserved" formatted="false">"Unrecognized backup cleanup record. Backups are preserved."</string>
+    <string name="ui_the_new_snapshot_is_missing_old_backups_and_cleanup" formatted="false">"The new snapshot is missing. Old backups and cleanup records are preserved."</string>
+    <string name="ui_invalid_new_automatic_snapshot_record_old_backups_are_preserved" formatted="false">"Invalid new automatic snapshot record. Old backups are preserved."</string>
+    <string name="ui_unexpected_snapshot_directory_awaiting_cleanup_files_are_preserved" formatted="false">"Unexpected snapshot directory awaiting cleanup. Files are preserved."</string>
+    <string name="ui_unrecognized_backup_cleanup_directory_files_are_preserved" formatted="false">"Unrecognized backup cleanup directory. Files are preserved."</string>
+    <string name="ui_unexpected_backup_cleanup_directory_files_are_preserved" formatted="false">"Unexpected backup cleanup directory. Files are preserved."</string>
+    <string name="ui_backup_information_is_missing_or_too_large" formatted="false">"Backup information is missing or too large"</string>
+    <string name="ui_unsupported_backup_format" formatted="false">"Unsupported backup format"</string>
+    <string name="ui_invalid_backup_size_record" formatted="false">"Invalid backup size record"</string>
+    <string name="ui_data_directory_is_missing_or_invalid" formatted="false">"Data directory is missing or invalid"</string>
+    <string name="ui_data_contains_special_files_that_cannot_be_backed_up" formatted="false">"Data contains special files that cannot be backed up. Stop the relevant plugins and try again."</string>
+    <string name="ui_too_many_files_for_backup" formatted="false">"Too many files for backup"</string>
+    <string name="ui_cannot_switch_data_directories_recovery_records_are_preserved" formatted="false">"Cannot switch data directories. Recovery records are preserved."</string>
+    <string name="ui_the_installed_runtime_architecture_differs_from_this_apk_files" formatted="false">"The installed runtime architecture differs from this APK. Files are preserved."</string>
+    <string name="ui_ubuntu_runtime_is_ready" formatted="false">"Ubuntu runtime is ready"</string>
+    <string name="ui_unrecognized_existing_runtime_initialization_stopped_data_is_preserved" formatted="false">"Unrecognized existing runtime. Initialization stopped; data is preserved."</string>
+    <string name="ui_bundled_runtime_architecture_mismatch" formatted="false">"Bundled runtime architecture mismatch"</string>
+    <string name="ui_verifying_bundled_ubuntu_resources" formatted="false">"Verifying bundled Ubuntu resources"</string>
+    <string name="ui_ubuntu_resource_integrity_check_failed" formatted="false">"Ubuntu resource integrity check failed"</string>
+    <string name="ui_resource_size_exceeds_the_supported_limit" formatted="false">"Resource size exceeds the supported limit"</string>
+    <string name="ui_insufficient_storage_at_least_mb_is_required">"Insufficient storage. At least %1$s MB is required."</string>
+    <string name="ui_cannot_create_runtime_staging_directory" formatted="false">"Cannot create runtime staging directory"</string>
+    <string name="ui_extracting_ubuntu_runtime" formatted="false">"Extracting Ubuntu runtime"</string>
+    <string name="ui_verifying_extracted_runtime" formatted="false">"Verifying extracted runtime"</string>
+    <string name="ui_runtime_verification_failed">"Runtime verification failed: %1$s"</string>
+    <string name="ui_extracting_ubuntu_entries">"Extracting Ubuntu: %1$s entries"</string>
+    <string name="ui_invalid_resource_file_size" formatted="false">"Invalid resource file size"</string>
+    <string name="ui_invalid_extracted_resource_size" formatted="false">"Invalid extracted resource size"</string>
+    <string name="ui_preparing_ubuntu_links_entries">"Preparing Ubuntu links: %1$s entries"</string>
+    <string name="ui_hard_link_outside_permitted_paths">"Hard link outside permitted paths: %1$s -&gt; %2$s"</string>
+    <string name="ui_symbolic_link_parent_outside_permitted_paths">"Symbolic link parent outside permitted paths: %1$s"</string>
+    <string name="ui_cannot_prepare_link">"Cannot prepare link: %1$s -&gt; %2$s"</string>
+    <string name="ui_command_timed_out" formatted="false">"Command timed out"</string>
+    <string name="ui_cannot_prepare_diagnostic_cache" formatted="false">"Cannot prepare diagnostic cache"</string>
+    <string name="ui_insufficient_diagnostic_cache_space" formatted="false">"Insufficient diagnostic cache space"</string>
+    <string name="ui_collecting_system_version_and_runtime_information" formatted="false">"Collecting system, version and runtime information"</string>
+    <string name="ui_collecting_redacted_logs">"Collecting redacted %1$s logs"</string>
+    <string name="ui_some_logs_are_unreadable_partial_content_and_original_errors" formatted="false">"Some logs are unreadable. Partial content and original errors are excluded.\n"</string>
+    <string name="ui_diagnostic_logs_exceed_the_collection_limit" formatted="false">"Diagnostic logs exceed the collection limit"</string>
+    <string name="ui_diagnostic_archive_exceeds_the_size_limit" formatted="false">"Diagnostic archive exceeds the size limit"</string>
+    <string name="ui_writing_diagnostics_to_the_selected_file" formatted="false">"Writing diagnostics to the selected file"</string>
+    <string name="ui_cannot_write_the_selected_diagnostic_file" formatted="false">"Cannot write the selected diagnostic file"</string>
+    <string name="ui_diagnostics_include_device_model_system_and_component_versions_runtime" formatted="false">"Diagnostics include device model, system and component versions, runtime status, manager events and size-limited redacted logs."</string>
+    <string name="ui_configuration_files_databases_plugins_qq_login_session_files_and" formatted="false">"Configuration files, databases, plugins, QQ login session files and unique device identifiers are excluded."</string>
+    <string name="ui_only_recognized_credentials_and_login_qr_codes_are_hidden" formatted="false">"Only recognized credentials and login QR codes are hidden. Logs may still contain chat messages, account information or other personal data. Review before sharing."</string>
+    <string name="ui_up_to_two_historical_logs_and_the_current_log" formatted="false">"Up to two historical logs and the current log are collected per category, limited to the last 512 KiB per file. Oversized lines, truncated lines and linked files are omitted."</string>
+    <string name="ui_this_file_is_for_troubleshooting_and_cannot_restore_data" formatted="false">"This file is for troubleshooting and cannot restore data.\n"</string>
+    <string name="ui_cannot_switch_program_directories_recovery_records_are_preserved" formatted="false">"Cannot switch program directories. Recovery records are preserved."</string>
+    <string name="ui_the_program_contains_unsupported_files_the_old_version_is" formatted="false">"The program contains unsupported files. The old version is preserved."</string>
+    <string name="ui_creating_a_data_snapshot_before_the_apk_update" formatted="false">"Creating a data snapshot before the APK update"</string>
+    <string name="ui_the_pre_update_backup_is_incomplete_resolve_it_in" formatted="false">"The pre-update backup is incomplete. Resolve it in logs and backups before retrying installation."</string>
+    <string name="ui_this_apk_has_no_manager_update_channel_configured" formatted="false">"This APK has no manager update channel configured"</string>
+    <string name="ui_check_for_signed_manager_version_information" formatted="false">"Check for signed manager version information"</string>
+    <string name="ui_checking_the_signed_manager_catalog" formatted="false">"Checking the signed manager catalog"</string>
+    <string name="ui_manager_update_catalog_is_temporarily_unavailable" formatted="false">"Manager update catalog is temporarily unavailable"</string>
+    <string name="ui_manager_update_catalog_is_too_large" formatted="false">"Manager update catalog is too large"</string>
+    <string name="ui_signed_catalog_checked_no_applicable_app_update_is_available" formatted="false">"Signed catalog checked. No applicable app update is available."</string>
+    <string name="ui_check_for_manager_updates_again_first" formatted="false">"Check for manager updates again first"</string>
+    <string name="ui_version_information_has_changed_review_it_again" formatted="false">"Version information has changed. Review it again."</string>
+    <string name="ui_insufficient_download_and_system_installation_staging_space_free_storage" formatted="false">"Insufficient download and system installation staging space. Free storage first."</string>
+    <string name="ui_download_failed_progress_is_preserved_you_can_retry" formatted="false">"Download failed. Progress is preserved; you can retry."</string>
+    <string name="ui_server_download_range_mismatch" formatted="false">"Server download range mismatch"</string>
+    <string name="ui_the_server_returned_an_unsupported_transfer_encoding" formatted="false">"The server returned an unsupported transfer encoding"</string>
+    <string name="ui_download_size_differs_from_the_signed_catalog" formatted="false">"Download size differs from the signed catalog"</string>
+    <string name="ui_download_exceeds_the_signed_size" formatted="false">"Download exceeds the signed size"</string>
+    <string name="ui_storage_ran_out_during_download" formatted="false">"Storage ran out during download"</string>
+    <string name="ui_downloading_mib">"Downloading %1$s (%2$s / %3$s MiB)"</string>
+    <string name="ui_download_interrupted_progress_is_preserved_you_can_resume" formatted="false">"Download interrupted. Progress is preserved; you can resume."</string>
+    <string name="ui_verifying_apk_digest_version_and_signing_certificate" formatted="false">"Verifying APK digest, version and signing certificate"</string>
+    <string name="ui_catalog_expired_or_changed_check_again" formatted="false">"Catalog expired or changed. Check again."</string>
+    <string name="ui_apk_verified_confirm_to_open_system_installation_running_services" formatted="false">"APK verified. Confirm to open system installation. Running services are unchanged."</string>
+    <string name="ui_version_information_has_expired_check_again" formatted="false">"Version information has expired. Check again."</string>
+    <string name="ui_download_and_verify_the_apk_first" formatted="false">"Download and verify the APK first"</string>
+    <string name="ui_insufficient_system_installation_staging_space_free_storage_first" formatted="false">"Insufficient system installation staging space. Free storage first."</string>
+    <string name="ui_update_source_has_changed" formatted="false">"Update source has changed"</string>
+    <string name="ui_apk_ready_it_will_be_verified_again_before_installation" formatted="false">"APK ready; it will be verified again before installation"</string>
+    <string name="ui_manager_is_available_download_and_installation_require_your_confirmation">"Manager %1$s is available. Download and installation require your confirmation."</string>
+    <string name="ui_unsupported_manager_update_catalog_format" formatted="false">"Unsupported manager update catalog format"</string>
+    <string name="ui_this_is_not_the_stable_manager_update_catalog" formatted="false">"This is not the stable manager update catalog"</string>
+    <string name="ui_update_catalog_expired_or_device_time_is_incorrect" formatted="false">"Update catalog expired or device time is incorrect"</string>
+    <string name="ui_update_catalog_contains_duplicate_versions" formatted="false">"Update catalog contains duplicate versions"</string>
+    <string name="ui_update_catalog_is_outdated_or_its_sequence_number_conflicts" formatted="false">"Update catalog is outdated or its sequence number conflicts"</string>
+    <string name="ui_apk_size_differs_from_the_signed_catalog" formatted="false">"APK size differs from the signed catalog"</string>
+    <string name="ui_apk_digest_verification_failed_download_it_again" formatted="false">"APK digest verification failed. Download it again."</string>
+    <string name="ui_cannot_read_apk_installation_information" formatted="false">"Cannot read APK installation information"</string>
+    <string name="ui_apk_package_name_or_version_does_not_match_this" formatted="false">"APK package name or version does not match this app"</string>
+    <string name="ui_apk_signing_certificate_differs_from_the_installed_app" formatted="false">"APK signing certificate differs from the installed app"</string>
+    <string name="ui_apk_android_version_requirements_are_incompatible" formatted="false">"APK Android version requirements are incompatible"</string>
+    <string name="ui_apk_architecture_differs_from_the_signed_catalog" formatted="false">"APK architecture differs from the signed catalog"</string>
+    <string name="ui_apk_does_not_contain_the_complete_runtime" formatted="false">"APK does not contain the complete runtime"</string>
+    <string name="ui_too_many_update_server_redirects" formatted="false">"Too many update server redirects"</string>
+    <string name="ui_updates_require_https_urls_without_embedded_credentials" formatted="false">"Updates require HTTPS URLs without embedded credentials"</string>
+    <string name="ui_napcat_updates_must_use_an_official_upstream_shell_release" formatted="false">"NapCat updates must use an official upstream Shell release"</string>
+    <string name="ui_this_napcat_version_requires_different_qq_or_runtime_dependencies" formatted="false">"This NapCat version requires different QQ or runtime dependencies. The current program is preserved. Upgrade to a matching runtime first."</string>
+    <string name="ui_napcat_update_package_size_mismatch" formatted="false">"NapCat update package size mismatch"</string>
+    <string name="ui_napcat_update_package_digest_mismatch_current_program_is_preserved" formatted="false">"NapCat update package digest mismatch. Current program is preserved."</string>
+    <string name="ui_invalid_extracted_napcat_update_size" formatted="false">"Invalid extracted NapCat update size"</string>
+    <string name="ui_insufficient_napcat_update_staging_space" formatted="false">"Insufficient NapCat update staging space"</string>
+    <string name="ui_napcat_update_contains_duplicate_or_invalid_paths" formatted="false">"NapCat update contains duplicate or invalid paths"</string>
+    <string name="ui_napcat_update_package_exceeds_its_declared_size" formatted="false">"NapCat update package exceeds its declared size"</string>
+    <string name="ui_napcat_main_program_differs_from_the_signed_version" formatted="false">"NapCat main program differs from the signed version"</string>
+    <string name="ui_napcat_update_package_lacks_dashboard_or_runtime_resources" formatted="false">"NapCat update package lacks dashboard or runtime resources"</string>
+    <string name="ui_stable_update" formatted="false">"stable update"</string>
+    <string name="ui_the_new_version_contains_a_plugin_directory_with_the" formatted="false">"The new version contains a plugin directory with the same name. Move custom plugins to the NapCat working directory before updating."</string>
+    <string name="ui_the_connection_observer_plugin_is_missing_or_modified_connection" formatted="false">"The connection observer plugin is missing or modified. Connection status may be unknown. Existing plugins and enable settings are preserved."</string>
+    <string name="ui_this_apk_has_no_online_update_url_configured_import" formatted="false">"This APK has no online update URL configured. Import a trusted update package or install a newer APK."</string>
+    <string name="ui_checking_the_signed_update_catalog" formatted="false">"Checking the signed update catalog"</string>
+    <string name="ui_this_apk_has_no_online_update_url_configured" formatted="false">"This APK has no online update URL configured"</string>
+    <string name="ui_update_catalog_is_temporarily_unavailable_try_again_later" formatted="false">"Update catalog is temporarily unavailable. Try again later."</string>
+    <string name="ui_update_catalog_is_too_large" formatted="false">"Update catalog is too large"</string>
+    <string name="ui_is_available_to_download_and_verify">"%1$s %2$s is available to download and verify"</string>
+    <string name="ui_is_the_latest_compatible_version_you_can_download_and">"%1$s %2$s is the latest compatible version. You can download and verify it again."</string>
+    <string name="ui_installed_is_newer_than_the_channel_release_and_has">"Installed %1$s %2$s is newer than the channel release and has been preserved. Use the corresponding snapshot to roll back."</string>
+    <string name="ui_the_upstream_version_requires_a_different_runtime_or_newer">"The upstream version requires a different runtime or newer manager. Installed %1$s %2$s is preserved."</string>
+    <string name="ui_no_compatible_package_is_published_on_this_channel">"No compatible %1$s package is published on this channel"</string>
+    <string name="ui_update_source_has_changed_check_again" formatted="false">"Update source has changed. Check again."</string>
+    <string name="ui_no_package_matches_the_current_runtime_check_for_updates" formatted="false">"No package matches the current runtime. Check for updates again."</string>
+    <string name="ui_update_catalog_has_changed_review_the_release_information_again" formatted="false">"Update catalog has changed. Review the release information again."</string>
+    <string name="ui_insufficient_space_to_download_the_update" formatted="false">"Insufficient space to download the update"</string>
+    <string name="ui_downloading_mb">"Downloading %1$s %2$s (%3$s / %4$s MB)"</string>
+    <string name="ui_update_download_failed_progress_is_preserved_you_can_retry" formatted="false">"Update download failed. Progress is preserved; you can retry."</string>
+    <string name="ui_download_range_differs_from_signed_resources_check_for_updates" formatted="false">"Download range differs from signed resources. Check for updates again."</string>
+    <string name="ui_update_server_returned_an_unsupported_transfer_encoding" formatted="false">"Update server returned an unsupported transfer encoding"</string>
+    <string name="ui_storage_ran_out_while_downloading_the_update" formatted="false">"Storage ran out while downloading the update"</string>
+    <string name="ui_download_interrupted_progress_is_preserved_download_again_to_resume" formatted="false">"Download interrupted. Progress is preserved; download again to resume."</string>
+    <string name="ui_checking_the_downloaded_file_digest" formatted="false">"Checking the downloaded file digest"</string>
+    <string name="ui_downloaded_file_verification_failed_current_program_is_unchanged_downloa" formatted="false">"Downloaded file verification failed. Current program is unchanged; download again."</string>
+    <string name="ui_unsupported_update_catalog_format_or_channel" formatted="false">"Unsupported update catalog format or channel"</string>
+    <string name="ui_update_catalog_expired_or_device_time_is_incorrect_check" formatted="false">"Update catalog expired or device time is incorrect. Check for updates again."</string>
+    <string name="ui_update_catalog_component_does_not_match_this_page" formatted="false">"Update catalog component does not match this page"</string>
+    <string name="ui_update_catalog_is_outdated_or_its_sequence_number_conflicts_233b9" formatted="false">"Update catalog is outdated or its sequence number conflicts. Try again later."</string>
+    <string name="ui_online_updates_require_https_urls_without_embedded_credentials" formatted="false">"Online updates require HTTPS URLs without embedded credentials"</string>
+    <string name="ui_this_is_not_a_supported_stable_update_version" formatted="false">"This is not a supported stable update version"</string>
+    <string name="ui_recovering_an_interrupted_persona_operation_please_wait" formatted="false">"Recovering an interrupted persona operation. Please wait."</string>
+    <string name="ui_this_persona_database_version_is_incompatible_copy_the_prompt" formatted="false">"This persona database version is incompatible. Copy the prompt into the AstrBot dashboard."</string>
+    <string name="ui_an_unfinished_persona_operation_must_be_recovered_first" formatted="false">"An unfinished persona operation must be recovered first"</string>
+    <string name="ui_the_default_persona_was_changed_in_the_dashboard_select" formatted="false">"The default persona was changed in the dashboard. Select a persona there."</string>
+    <string name="ui_the_original_persona_was_deleted_choose_another_in_the" formatted="false">"The original persona was deleted. Choose another in the dashboard."</string>
+    <string name="ui_incompatible_persona_recovery_record_data_is_preserved" formatted="false">"Incompatible persona recovery record. Data is preserved."</string>
+    <string name="ui_start_astrbot_once_and_wait_for_the_dashboard_to" formatted="false">"Start AstrBot once and wait for the dashboard to be ready before applying a persona"</string>
+    <string name="ui_initialize_the_astrbot_runtime_first" formatted="false">"Initialize the AstrBot runtime first"</string>
+    <string name="ui_a_remote_agent_is_active_configure_personas_in_astrbot" formatted="false">"A remote Agent is active. Configure personas in AstrBot\'s dashboard; presets can still be copied."</string>
+    <string name="ui_incompatible_astrbot_persona_configuration_format_copy_the_prompt_into" formatted="false">"Incompatible AstrBot persona configuration format. Copy the prompt into the dashboard."</string>
+    <string name="ui_this_astrbot_database_is_incompatible_copy_the_prompt_into" formatted="false">"This AstrBot database is incompatible. Copy the prompt into the dashboard."</string>
+    <string name="ui_portable_backup_manifest_is_too_large" formatted="false">"Portable backup manifest is too large"</string>
+    <string name="ui_insufficient_portable_backup_staging_space" formatted="false">"Insufficient portable backup staging space"</string>
+    <string name="ui_portable_backup_exceeds_the_2_gib_limit" formatted="false">"Portable backup exceeds the 2 GiB limit"</string>
+    <string name="ui_data_changed_during_portable_backup_no_backup_was_created" formatted="false">"Data changed during portable backup. No backup was created."</string>
+    <string name="ui_invalid_portable_backup_size_or_size_exceeds_2_gib" formatted="false">"Invalid portable backup size or size exceeds 2 GiB"</string>
+    <string name="ui_portable_backup_staging_directory_already_exists" formatted="false">"Portable backup staging directory already exists"</string>
+    <string name="ui_this_portable_backup_is_not_supported_by_this_app" formatted="false">"This portable backup is not supported by this app"</string>
+    <string name="ui_insufficient_space_to_extract_the_portable_backup" formatted="false">"Insufficient space to extract the portable backup"</string>
+    <string name="ui_portable_backup_entries_are_missing_duplicated_or_out_of" formatted="false">"Portable backup entries are missing, duplicated or out of order"</string>
+    <string name="ui_portable_backup_file_digest_mismatch_existing_data_was_not" formatted="false">"Portable backup file digest mismatch. Existing data was not changed."</string>
+    <string name="ui_portable_backup_is_incomplete" formatted="false">"Portable backup is incomplete"</string>
+    <string name="ui_portable_backup_completion_record_mismatch" formatted="false">"Portable backup completion record mismatch"</string>
+    <string name="ui_portable_backup_contains_undeclared_files" formatted="false">"Portable backup contains undeclared files"</string>
+    <string name="ui_portable_backup_staging_contains_data_outside_its_scope_import" formatted="false">"Portable backup staging contains data outside its scope. Import it again."</string>
+    <string name="ui_portable_backup_staged_files_have_changed_import_it_again" formatted="false">"Portable backup staged files have changed. Import it again."</string>
+    <string name="ui_unsupported_portable_backup_format" formatted="false">"Unsupported portable backup format"</string>
+    <string name="ui_invalid_portable_backup_id" formatted="false">"Invalid portable backup ID"</string>
+    <string name="ui_unsupported_portable_backup_data_scope" formatted="false">"Unsupported portable backup data scope"</string>
+    <string name="ui_portable_backup_does_not_match_installed_program_versions_install" formatted="false">"Portable backup does not match installed program versions. Install the matching runtime first."</string>
+    <string name="ui_too_many_portable_backup_files" formatted="false">"Too many portable backup files"</string>
+    <string name="ui_portable_backup_file_paths_are_duplicated_or_out_of" formatted="false">"Portable backup file paths are duplicated or out of order"</string>
+    <string name="ui_portable_backup_data_directory_is_missing" formatted="false">"Portable backup data directory is missing"</string>
+    <string name="ui_portable_backup_contains_paths_outside_its_scope_or_unsupported" formatted="false">"Portable backup contains paths outside its scope or unsupported paths"</string>
+    <string name="ui_unexpected_napcat_configuration_parent_directory" formatted="false">"Unexpected NapCat configuration parent directory"</string>
+    <string name="ui_portable_backup_contains_linked_parent_directories_or_missing_directorie" formatted="false">"Portable backup contains linked parent directories or missing directories"</string>
+    <string name="ui_invalid_portable_backup_file_size_or_digest" formatted="false">"Invalid portable backup file size or digest"</string>
+    <string name="ui_invalid_portable_backup_directory_record" formatted="false">"Invalid portable backup directory record"</string>
+    <string name="ui_invalid_portable_backup_link_record" formatted="false">"Invalid portable backup link record"</string>
+    <string name="ui_portable_backup_contains_absolute_or_invalid_links" formatted="false">"Portable backup contains absolute or invalid links"</string>
+    <string name="ui_portable_backup_link_targets_a_qq_session_or_a" formatted="false">"Portable backup link targets a QQ session or a path outside the backup scope"</string>
+    <string name="ui_unsupported_portable_backup_file_type" formatted="false">"Unsupported portable backup file type"</string>
+    <string name="ui_extracted_portable_backup_exceeds_the_8_gib_limit" formatted="false">"Extracted portable backup exceeds the 8 GiB limit"</string>
+    <string name="ui_portable_backup_root_cannot_be_a_link" formatted="false">"Portable backup root cannot be a link"</string>
+    <string name="ui_portable_backup_scope_roots_must_be_real_directories" formatted="false">"Portable backup scope roots must be real directories"</string>
+    <string name="ui_portable_backup_file_exceeds_the_2_gib_limit" formatted="false">"Portable backup file exceeds the 2 GiB limit"</string>
+    <string name="ui_portable_backup_contains_unsupported_special_files" formatted="false">"Portable backup contains unsupported special files"</string>
+    <string name="ui_portable_backup_supports_up_to_50_000_entries" formatted="false">"Portable backup supports up to 50,000 entries"</string>
+    <string name="ui_portable_backup_link_target_is_outside_its_data_scope" formatted="false">"Portable backup link target is outside its data scope"</string>
+    <string name="ui_portable_backup_file_size_mismatch" formatted="false">"Portable backup file size mismatch"</string>
+    <string name="ui_portable_backup_file_is_missing_or_truncated" formatted="false">"Portable backup file is missing or truncated"</string>
+    <string name="ui_portable_backup_manifest_is_outside_supported_limits" formatted="false">"Portable backup manifest is outside supported limits"</string>
+    <string name="ui_portable_backup_zip_directory_is_truncated_or_incomplete" formatted="false">"Portable backup ZIP directory is truncated or incomplete"</string>
+    <string name="ui_invalid_portable_backup_zip_directory_count_or_split_archive" formatted="false">"Invalid portable backup ZIP directory count or split archive format"</string>
+    <string name="ui_invalid_portable_backup_zip_directory_bounds" formatted="false">"Invalid portable backup ZIP directory bounds"</string>
+    <string name="ui_portable_backup_zip_directory_is_damaged" formatted="false">"Portable backup ZIP directory is damaged"</string>
+    <string name="ui_cannot_create_portable_backup_staging_directory" formatted="false">"Cannot create portable backup staging directory"</string>
+    <string name="ui_reading_selected_portable_backup" formatted="false">"Reading selected portable backup"</string>
+    <string name="ui_cannot_read_selected_portable_backup" formatted="false">"Cannot read selected portable backup"</string>
+    <string name="ui_verifying_portable_backup_scope_versions_and_file_digests" formatted="false">"Verifying portable backup scope, versions and file digests"</string>
+    <string name="ui_import_a_portable_backup_first" formatted="false">"Import a portable backup first"</string>
+    <string name="ui_portable_backup_manifest_is_missing" formatted="false">"Portable backup manifest is missing"</string>
+    <string name="ui_cannot_create_portable_backup_export_directory" formatted="false">"Cannot create portable backup export directory"</string>
+    <string name="ui_creating_a_portable_backup_without_qq_login_sessions" formatted="false">"Creating a portable backup without QQ login sessions"</string>
+    <string name="ui_portable_backup_export_file_is_missing" formatted="false">"Portable backup export file is missing"</string>
+    <string name="ui_services_resumed_writing_to_the_selected_backup_file" formatted="false">"Services resumed. Writing to the selected backup file"</string>
+    <string name="ui_cannot_write_the_selected_backup_file" formatted="false">"Cannot write the selected backup file"</string>
+    <string name="ui_portable_backup_write_is_incomplete_export_it_again" formatted="false">"Portable backup write is incomplete. Export it again."</string>
+    <string name="ui_complete_the_previous_maintenance_operation_first" formatted="false">"Complete the previous maintenance operation first"</string>
+    <string name="ui_no_runtime_available_for_rollback" formatted="false">"No runtime available for rollback"</string>
+    <string name="ui_old_runtime_verification_failed_files_are_preserved" formatted="false">"Old runtime verification failed. Files are preserved."</string>
+    <string name="ui_the_corresponding_runtime_data_snapshot_is_missing" formatted="false">"The corresponding runtime data snapshot is missing"</string>
+    <string name="ui_this_apk_s_runtime_is_already_installed" formatted="false">"This APK\'s runtime is already installed"</string>
+    <string name="ui_cannot_identify_the_new_runtime_version" formatted="false">"Cannot identify the new runtime version"</string>
+    <string name="ui_installed_components_differ_from_bundled_resources_the_original_runtime" formatted="false">"Installed components differ from bundled resources. The original runtime is preserved. Use a matching runtime upgrade or maintenance package."</string>
+    <string name="ui_component_versions_changed_during_repair_original_runtime_and_snapshot" formatted="false">"Component versions changed during repair. Original runtime and snapshot are preserved. Check again."</string>
+    <string name="ui_new_runtime_version_changed_during_maintenance_recovery_records_are" formatted="false">"New runtime version changed during maintenance. Recovery records are preserved."</string>
+    <string name="ui_unrecognized_runtime_upgrade_record_all_files_are_preserved" formatted="false">"Unrecognized runtime upgrade record. All files are preserved."</string>
+    <string name="ui_previous_runtime_upgrade_commit_and_cleanup_completed" formatted="false">"Previous runtime upgrade commit and cleanup completed"</string>
+    <string name="ui_rollback_runtime_directory_conflict_recovery_records_are_preserved" formatted="false">"Rollback runtime directory conflict. Recovery records are preserved."</string>
+    <string name="ui_original_runtime_required_for_recovery_is_missing_or_has" formatted="false">"Original runtime required for recovery is missing or has a different version. All files and snapshots are preserved."</string>
+    <string name="ui_runtime_upgrade_was_incomplete_original_runtime_and_its_data" formatted="false">"Runtime upgrade was incomplete. Original runtime and its data snapshot restored."</string>
+    <string name="ui_files_required_to_commit_the_runtime_are_missing_recovery" formatted="false">"Files required to commit the runtime are missing. Recovery records are preserved."</string>
+    <string name="ui_invalid_runtime_record_id" formatted="false">"Invalid runtime record ID"</string>
+    <string name="ui_install_the_ssh_extension_first" formatted="false">"Install the SSH extension first"</string>
+    <string name="ui_initialize_the_ubuntu_runtime_first" formatted="false">"Initialize the Ubuntu runtime first"</string>
+    <string name="ui_ssh_session_limit_reached_or_the_server_is_stopping" formatted="false">"SSH session limit reached or the server is stopping"</string>
+    <string name="ui_ssh_command_is_too_long" formatted="false">"SSH command is too long"</string>
+    <string name="ui_cannot_save_ssh_installation_state" formatted="false">"Cannot save SSH installation state"</string>
+    <string name="ui_ssh_port_must_be_between_1024_and_65535" formatted="false">"SSH port must be between 1024 and 65535"</string>
+    <string name="ui_password_must_contain_12_128_characters_without_newlines_or" formatted="false">"Password must contain 12–128 characters without newlines or control characters"</string>
+    <string name="ui_cannot_save_ssh_uninstallation_state" formatted="false">"Cannot save SSH uninstallation state"</string>
+    <string name="ui_cannot_save_ssh_running_preference" formatted="false">"Cannot save SSH running preference"</string>
+    <string name="ui_ssh_settings_unavailable_configure_or_reinstall_the_extension" formatted="false">"SSH settings unavailable. Configure or reinstall the extension."</string>
+    <string name="ui_unrecognized_ssh_settings_format" formatted="false">"Unrecognized SSH settings format"</string>
+    <string name="ui_ssh_key_unavailable_reset_the_password_or_reinstall_the" formatted="false">"SSH key unavailable. Reset the password or reinstall the extension."</string>
+    <string name="ui_reading_update_package" formatted="false">"Reading update package"</string>
+    <string name="ui_cannot_read_the_selected_update_package" formatted="false">"Cannot read the selected update package"</string>
+    <string name="ui_an_unfinished_update_record_exists" formatted="false">"An unfinished update record exists"</string>
+    <string name="ui_verifying_update_signature_and_compatibility" formatted="false">"Verifying update signature and compatibility"</string>
+    <string name="ui_update_package_is_missing_or_too_large" formatted="false">"Update package is missing or too large"</string>
+    <string name="ui_invalid_update_package_structure" formatted="false">"Invalid update package structure"</string>
+    <string name="ui_invalid_update_package_field_size" formatted="false">"Invalid update package field size"</string>
+    <string name="ui_unsupported_update_format_or_component" formatted="false">"Unsupported update format or component"</string>
+    <string name="ui_invalid_update_version" formatted="false">"Invalid update version"</string>
+    <string name="ui_update_package_version_differs_from_the_signed_catalog" formatted="false">"Update package version differs from the signed catalog"</string>
+    <string name="ui_this_update_requires_a_newer_manager_apk" formatted="false">"This update requires a newer manager APK"</string>
+    <string name="ui_this_update_does_not_match_the_current_runtime_or" formatted="false">"This update does not match the current runtime or dependencies. Use a matching runtime package or APK."</string>
+    <string name="ui_insufficient_update_staging_space" formatted="false">"Insufficient update staging space"</string>
+    <string name="ui_update_resource_size_mismatch" formatted="false">"Update resource size mismatch"</string>
+    <string name="ui_update_resource_digest_mismatch_current_version_is_preserved" formatted="false">"Update resource digest mismatch. Current version is preserved."</string>
+    <string name="ui_extracting_and_verifying_astrbot">"Extracting and verifying AstrBot %1$s"</string>
+    <string name="ui_project_source_record_differs_from_the_signed_manifest" formatted="false">"Project source record differs from the signed manifest"</string>
+    <string name="ui_update_archive_contains_duplicate_or_invalid_paths" formatted="false">"Update archive contains duplicate or invalid paths"</string>
+    <string name="ui_update_package_contains_unsupported_links_or_parent_directory_paths" formatted="false">"Update package contains unsupported links or parent directory paths"</string>
+    <string name="ui_extracted_update_size_exceeds_the_signed_manifest" formatted="false">"Extracted update size exceeds the signed manifest"</string>
+    <string name="ui_update_archive_contains_special_files" formatted="false">"Update archive contains special files"</string>
+    <string name="ui_extracted_update_count_or_size_mismatch" formatted="false">"Extracted update count or size mismatch"</string>
+    <string name="ui_no_program_and_data_snapshot_available_for_rollback" formatted="false">"No program and data snapshot available for rollback"</string>
+    <string name="ui_other_components_have_changed_so_this_old_combination_cannot" formatted="false">"Other components have changed, so this old combination cannot be restored separately. Use a matching full runtime and backup."</string>
+    <string name="ui_rollback_program_or_data_snapshot_is_missing" formatted="false">"Rollback program or data snapshot is missing"</string>
+    <string name="ui_insufficient_rollback_preparation_space" formatted="false">"Insufficient rollback preparation space"</string>
+    <string name="ui_preparing_previous_program_and_its_data" formatted="false">"Preparing previous program and its data"</string>
+    <string name="ui_unrecognized_update_record_all_files_are_preserved" formatted="false">"Unrecognized update record. All files are preserved."</string>
+    <string name="ui_previous_update_commit_and_cleanup_completed" formatted="false">"Previous update commit and cleanup completed"</string>
+    <string name="ui_previous_program_required_for_recovery_is_missing_data_is" formatted="false">"Previous program required for recovery is missing. Data is preserved."</string>
+    <string name="ui_previous_program_version_check_failed_update_snapshot_is_preserved" formatted="false">"Previous program version check failed. Update snapshot is preserved."</string>
+    <string name="ui_update_was_incomplete_previous_program_and_original_data_snapshot" formatted="false">"Update was incomplete. Previous program and original data snapshot restored."</string>
+    <string name="ui_sqlite_verification_failed_for_the_data_snapshot_recovery_records" formatted="false">"SQLite verification failed for the data snapshot. Recovery records are preserved."</string>
+    <string name="ui_napcat_rollback_program_version_or_dashboard_mismatch" formatted="false">"NapCat rollback program version or dashboard mismatch"</string>
+    <string name="ui_update_lacks_required_program_or_dashboard_files" formatted="false">"Update lacks required program or dashboard files"</string>
+    <string name="ui_program_version_mismatch" formatted="false">"Program version mismatch"</string>
+    <string name="ui_dashboard_and_program_version_mismatch" formatted="false">"Dashboard and program version mismatch"</string>
+    <string name="ui_dashboard_resources_missing" formatted="false">"Dashboard resources missing"</string>
+    <string name="ui_update_resources_exceed_the_allowed_size" formatted="false">"Update resources exceed the allowed size"</string>
+    <string name="ui_storage_ran_out_while_reading_update_resources" formatted="false">"Storage ran out while reading update resources"</string>
+    <string name="ui_this_apk_has_no_trusted_update_key_configured_update" formatted="false">"This APK has no trusted update key configured. Update with the appropriate APK."</string>
+    <string name="ui_invalid_update_signature_current_version_is_preserved" formatted="false">"Invalid update signature. Current version is preserved."</string>
+    <string name="status_starting" formatted="false">"Starting"</string>
+    <string name="status_stopping" formatted="false">"Stopping"</string>
+    <string name="status_crashed" formatted="false">"Exited unexpectedly"</string>
+    <string name="status_stopped" formatted="false">"Stopped"</string>
+    <string name="status_web_ui_disabled" formatted="false">"Running · WebUI disabled"</string>
+    <string name="status_rechecking" formatted="false">"Rechecking dashboard"</string>
+    <string name="status_unresponsive" formatted="false">"Dashboard unresponsive"</string>
+    <string name="status_waiting" formatted="false">"Waiting for dashboard"</string>
+    <string name="status_available" formatted="false">"Dashboard available"</string>
+    <string name="status_qq_login" formatted="false">"QQ login required"</string>
+    <string name="status_qq_verify" formatted="false">"QQ verification required"</string>
+    <string name="status_qq_offline" formatted="false">"QQ offline"</string>
+    <string name="status_qq_unknown" formatted="false">"QQ status unknown"</string>
+    <string name="status_onebot_config" formatted="false">"Configure OneBot"</string>
+    <string name="status_connected" formatted="false">"QQ online · OneBot connected"</string>
+    <string name="status_onebot_offline" formatted="false">"OneBot disconnected"</string>
+    <string name="status_onebot_connecting" formatted="false">"OneBot connecting"</string>
+    <string name="status_onebot_unknown" formatted="false">"OneBot status unknown"</string>
+    <string name="persona_local_source" formatted="false">"Locally added persona"</string>
+    <string name="persona_limit" formatted="false">"Up to 200 custom personas. Remove unused personas first."</string>
+    <string name="persona_duplicate" formatted="false">"A persona with this name already exists. Choose another name."</string>
+    <string name="persona_read_error" formatted="false">"Cannot read the local persona library. Original files are preserved. Try again."</string>
+    <string name="persona_invalid_id" formatted="false">"Invalid persona ID"</string>
+    <string name="persona_invalid_name" formatted="false">"Name must contain 1–30 characters without newlines"</string>
+    <string name="persona_invalid_category" formatted="false">"Choose a persona category"</string>
+    <string name="persona_invalid_prompt" formatted="false">"Prompt must contain 1–12,000 characters"</string>
+    <string name="persona_invalid_intro" formatted="false">"Description: up to 120 characters. Greeting: up to 1,000 characters."</string>
+    <string name="persona_initialize" formatted="false">"Start AstrBot once to import and switch personas"</string>
+</resources>

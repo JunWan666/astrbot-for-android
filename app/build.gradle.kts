@@ -57,7 +57,7 @@ android {
         targetSdk = 35
         versionCode = appVersionCode
         versionName = appVersionName
-        manifestPlaceholders["appLabel"] = "AstrBot 运行管理器"
+        manifestPlaceholders["appLabel"] = "@string/app_name"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "UPDATE_CATALOG_URL", "\"${updateCatalogUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("String", "UPDATE_PUBLIC_KEY", "\"$updatePublicKey\"")
@@ -66,6 +66,7 @@ android {
         ndk { abiFilters += if (bundledRuntime) listOf("arm64-v8a") else listOf("arm64-v8a", "x86_64") }
     }
     buildFeatures { compose = true; buildConfig = true }
+    bundle.language.enableSplit = false
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

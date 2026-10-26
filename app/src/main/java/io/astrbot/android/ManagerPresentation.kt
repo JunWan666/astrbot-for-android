@@ -36,10 +36,12 @@ import android.text.format.Formatter
 import java.text.DateFormat
 import java.util.Date
 
-internal enum class ManagerPage(val label: String, val icon: Int) {
-    HOME("首页", R.drawable.ic_home),
-    PERSONAS("人设", R.drawable.ic_persona),
-    SETTINGS("设置", R.drawable.ic_settings),
+internal enum class ManagerPage(private val labelResource: Int, val icon: Int) {
+    HOME(R.string.ui_home, R.drawable.ic_home),
+    PERSONAS(R.string.ui_personas, R.drawable.ic_persona),
+    SETTINGS(R.string.ui_settings, R.drawable.ic_settings),
+;
+    val label: String get() = AppText.get(labelResource)
 }
 
 @Composable internal fun ManagerTheme(content: @Composable () -> Unit) {
@@ -78,11 +80,11 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
 @Composable internal fun ManagerHeader(page: ManagerPage, state: ManagerState, title: String? = null, onBack: (() -> Unit)? = null) {
     Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = if (onBack == null) 20.dp else 8.dp, vertical = if (onBack == null) 12.dp else 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (onBack != null) IconButton(onClick = onBack) { Icon(painterResource(R.drawable.ic_back), "返回上一级", Modifier.size(20.dp)) }
+            if (onBack != null) IconButton(onClick = onBack) { Icon(painterResource(R.drawable.ic_back), AppText.get(R.string.ui_go_back), Modifier.size(20.dp)) }
             if (page == ManagerPage.HOME && title == null) ManagerAppLogo(Modifier.size(30.dp))
             Text(title ?: if (page == ManagerPage.HOME) "AstrBot" else page.label, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 style = if (title == null) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge)
-            if (page == ManagerPage.HOME && title == null) Text("运行管理", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (page == ManagerPage.HOME && title == null) Text(AppText.get(R.string.ui_manager), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (state.busy) {
             Text(state.phase, Modifier.padding(top = 6.dp), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -103,7 +105,7 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
                         verticalArrangement = Arrangement.spacedBy(3.dp)) {
                         Icon(painterResource(destination.icon), null, Modifier.size(22.dp),
                             tint = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(destination.label, Modifier.clearAndSetSemantics { contentDescription = "${destination.label}页面" },
+                        Text(destination.label, Modifier.clearAndSetSemantics { contentDescription = AppText.get(R.string.ui_page, destination.label) },
                             style = MaterialTheme.typography.labelSmall,
                             color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                     }
@@ -120,7 +122,7 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
 }
 
 @Composable internal fun ManagerAppLogo(modifier: Modifier = Modifier.size(32.dp)) {
-    Image(painterResource(R.drawable.app_logo), "应用图标", modifier.clip(MaterialTheme.shapes.small), contentScale = ContentScale.Crop)
+    Image(painterResource(R.drawable.app_logo), AppText.get(R.string.ui_app_icon), modifier.clip(MaterialTheme.shapes.small), contentScale = ContentScale.Crop)
 }
 
 @Composable internal fun ManagerServiceLogo(id: ServiceId) {
@@ -128,7 +130,7 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
     Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(color.copy(alpha = 0.08f)),
         contentAlignment = Alignment.Center) {
         Image(painterResource(if (id == ServiceId.ASTRBOT) R.drawable.logo_astrbot else R.drawable.logo_napcat),
-            contentDescription = "${id.label} 标识", contentScale = ContentScale.Fit,
+            contentDescription = AppText.get(R.string.ui_logo, id.label), contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize().padding(if (id == ServiceId.ASTRBOT) 2.dp else 1.dp))
     }
 }
@@ -188,8 +190,8 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
             horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             Box(Modifier.size(5.dp).background(color, RoundedCornerShape(5.dp)))
             Text(when (process) {
-                ProcessState.STOPPED -> "已停止"; ProcessState.STARTING -> "启动中"; ProcessState.RUNNING -> "运行中"
-                ProcessState.STOPPING -> "停止中"; ProcessState.CRASHED -> "异常退出"
+                ProcessState.STOPPED -> AppText.get(R.string.ui_stopped); ProcessState.STARTING -> AppText.get(R.string.ui_starting); ProcessState.RUNNING -> AppText.get(R.string.ui_running)
+                ProcessState.STOPPING -> AppText.get(R.string.ui_stopping); ProcessState.CRASHED -> AppText.get(R.string.ui_crashed)
             }, style = MaterialTheme.typography.labelSmall, color = color)
         }
     }
@@ -201,14 +203,14 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
         RoundedCornerShape(16.dp)).padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Text("服务概览", style = MaterialTheme.typography.titleMedium, color = Color.White)
-                Text(if (running == 2) "两个服务进程运行中" else if (running == 0) "启动服务，开启手机上的机器人" else "部分服务正在运行",
+                Text(AppText.get(R.string.ui_service_overview), style = MaterialTheme.typography.titleMedium, color = Color.White)
+                Text(if (running == 2) AppText.get(R.string.ui_both_service_processes_are_running) else if (running == 0) AppText.get(R.string.ui_start_your_bot_services_on_this_phone) else AppText.get(R.string.ui_some_services_are_running),
                     style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
             }
             ManagerRunningCount(running)
         }
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(network.title, Modifier.semantics { contentDescription = "系统网络状态" },
+            Text(network.title, Modifier.semantics { contentDescription = AppText.get(R.string.ui_system_network_status) },
                 style = MaterialTheme.typography.labelMedium, color = Color.White)
             if (network.state != InternetState.VALIDATED) Text(network.detail,
                 style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
@@ -218,8 +220,8 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
             val labelWidth = with(LocalDensity.current) { font.toDp() * 4 }
             val column = maxWidth < labelWidth * 3 + 16.dp
             val stackedIcons = !column && maxWidth < (labelWidth + 18.dp) * 3 + 16.dp
-            val commands = listOf(Triple("start", "启动全部", R.drawable.ic_play), Triple("stop", "停止全部", R.drawable.ic_stop),
-                Triple("restart", "重启全部", R.drawable.ic_restart))
+            val commands = listOf(Triple("start", AppText.get(R.string.ui_start_all), R.drawable.ic_play), Triple("stop", AppText.get(R.string.ui_stop_all), R.drawable.ic_stop),
+                Triple("restart", AppText.get(R.string.ui_restart_all), R.drawable.ic_restart))
             if (column) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 commands.forEach { (operation, label, icon) ->
                     ManagerOverviewCommand(operation, label, icon, state, false, Modifier.fillMaxWidth(), onCommand)
@@ -235,7 +237,7 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
 
 @Composable internal fun ManagerRunningCount(running: Int, compact: Boolean = false) {
     Row(Modifier.padding(start = 12.dp).semantics(mergeDescendants = true) {
-        contentDescription = "运行中的服务：$running / 2"
+        contentDescription = AppText.get(R.string.ui_running_services_2, running)
     }, verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Text("$running", style = MaterialTheme.typography.headlineSmall.copy(
             fontSize = if (compact) 28.sp else 34.sp, lineHeight = if (compact) 32.sp else 38.sp), color = Color.White)
@@ -255,38 +257,38 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
         Column(Modifier.padding(if (compact) 12.dp else 16.dp), verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 10.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("本应用内存", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(AppText.get(R.string.ui_app_memory), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(size(amount?.let { it * 1024 }), style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge)
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("手机总内存", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(AppText.get(R.string.ui_device_ram), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(size(snapshot.physicalMemoryBytes), style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge)
                 }
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("应用占比", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(snapshot.memoryPercent?.let { String.format(java.util.Locale.getDefault(), "%.1f%%", it) } ?: "—",
+                    Text(AppText.get(R.string.ui_app_share), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(snapshot.memoryPercent?.let { String.format(AppText.locale, "%.1f%%", it) } ?: "—",
                         style = if (compact) MaterialTheme.typography.titleMedium else MaterialTheme.typography.titleLarge)
                 }
             }
             val status = when {
-                snapshot.checkedAtMillis == null -> "正在读取资源信息"
-                memory.complete -> "已统计 ${memory.measured} 个进程"
-                memory.partialKiB != null -> "部分统计 · ${memory.measured}/${memory.observed} 个进程"
-                else -> "暂时无法读取内存"
+                snapshot.checkedAtMillis == null -> AppText.get(R.string.ui_reading_resource_usage)
+                memory.complete -> AppText.get(R.string.ui_measured_processes, memory.measured)
+                memory.partialKiB != null -> AppText.get(R.string.ui_partial_processes, memory.measured, memory.observed)
+                else -> AppText.get(R.string.ui_memory_usage_unavailable)
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(status, Modifier.weight(1f), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 snapshot.checkedAtMillis?.takeIf { !compact }?.let {
-                    Text(DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(it)), style = MaterialTheme.typography.labelSmall,
+                    Text(DateFormat.getTimeInstance(DateFormat.SHORT, AppText.locale).format(Date(it)), style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Icon(painterResource(R.drawable.ic_info), "资源统计说明", Modifier.size(15.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(painterResource(R.drawable.ic_info), AppText.get(R.string.ui_about_resource_usage), Modifier.size(15.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
-    if (details) AlertDialog(onDismissRequest = { details = false }, title = { Text("资源统计说明") }, text = {
-        Text("本应用内存为管理器及同一应用用户下托管进程的 PSS 合计，共享内存按比例计算。包含 AstrBot、NapCat 和运行中的扩展；不含系统隔离的 WebView 渲染进程。\n\n手机总内存是 Android 报告的物理内存，不含存储和内存扩展。应用占比为完整 PSS 合计除以手机总内存；部分统计或读取失败时不显示占比。\n\n首页可见时每 15 秒更新，离开首页或进入后台暂停。存储容量可在设置的存储使用页查看。")
-    }, confirmButton = { TextButton(onClick = { details = false }) { Text("知道了") } })
+    if (details) AlertDialog(onDismissRequest = { details = false }, title = { Text(AppText.get(R.string.ui_about_resource_usage)) }, text = {
+        Text(AppText.get(R.string.ui_app_memory_is_the_total_pss_of_the_manager))
+    }, confirmButton = { TextButton(onClick = { details = false }) { Text(AppText.get(R.string.ui_ok)) } })
 }
 
 @Composable internal fun ManagerOverviewCommand(operation: String, label: String, icon: Int, state: ManagerState,

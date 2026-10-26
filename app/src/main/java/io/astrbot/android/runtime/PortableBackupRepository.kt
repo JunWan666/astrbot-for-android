@@ -1,5 +1,12 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.requireNotNullLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.*
@@ -23,25 +30,25 @@ class PortableBackupRepository(private val context: Context) {
 
     suspend fun prepareImport(uri: Uri, versions: RuntimeVersions, progress: (String) -> Unit): PortableBackupInfo = withContext(Dispatchers.IO) {
         discardImport()
-        check(imports.mkdirs()) { "无法创建便携备份暂存目录" }
+        checkLocalized(imports.mkdirs()) { AppText.get(R.string.ui_cannot_create_portable_backup_staging_directory) }
         val inputFile = File(imports, "source.zip")
         try {
-            progress("正在读取所选便携备份")
-            require(imports.usableSpace >= RESERVE) { "便携备份暂存空间不足" }
-            requireNotNull(context.contentResolver.openInputStream(uri)) { "无法读取所选便携备份" }.use { input ->
+            progress(AppText.get(R.string.ui_reading_selected_portable_backup))
+            requireLocalized(imports.usableSpace >= RESERVE) { AppText.get(R.string.ui_insufficient_portable_backup_staging_space) }
+            requireNotNullLocalized(context.contentResolver.openInputStream(uri)) { AppText.get(R.string.ui_cannot_read_selected_portable_backup) }.use { input ->
                 FileOutputStream(inputFile).use { output -> transfer(input, output, imports); output.fd.sync() }
             }
-            progress("正在校验便携备份范围、版本与文件摘要")
+            progress(AppText.get(R.string.ui_verifying_portable_backup_scope_versions_and_file_digests))
             archive.read(inputFile, data, versions).also { inputFile.delete() }
         } catch (failure: Throwable) { discardImport(); throw failure }
     }
 
     suspend fun verifyPrepared(versions: RuntimeVersions): PortableBackupInfo = withContext(Dispatchers.IO) {
-        archive.verify(data, requireNotNull(DurableFiles.read(manifest)) { "请先导入便携备份" }, versions, exclusive = true)
+        archive.verify(data, requireNotNullLocalized(DurableFiles.read(manifest)) { AppText.get(R.string.ui_import_a_portable_backup_first) }, versions, exclusive = true)
     }
 
     suspend fun beginRestore(beforeSnapshot: BackupInfo, versions: RuntimeVersions) {
-        val metadata = withContext(Dispatchers.IO) { requireNotNull(DurableFiles.read(manifest)) { "便携备份清单缺失" } }
+        val metadata = withContext(Dispatchers.IO) { requireNotNullLocalized(DurableFiles.read(manifest)) { AppText.get(R.string.ui_portable_backup_manifest_is_missing) } }
         BackupRepository(files).beginPortableRestore(beforeSnapshot.id, versions, data) { candidate ->
             archive.verify(candidate, metadata, versions, exclusive = candidate == data)
         }
@@ -49,19 +56,19 @@ class PortableBackupRepository(private val context: Context) {
 
     suspend fun prepareExport(versions: RuntimeVersions, progress: (String) -> Unit): PortableBackupInfo = withContext(Dispatchers.IO) {
         discardExport()
-        check(export.mkdirs()) { "无法创建便携备份导出目录" }
-        progress("正在制作不含 QQ 登录会话的便携备份")
+        checkLocalized(export.mkdirs()) { AppText.get(R.string.ui_cannot_create_portable_backup_export_directory) }
+        progress(AppText.get(R.string.ui_creating_a_portable_backup_without_qq_login_sessions))
         try { archive.write(File(files, "persistent"), File(export, "backup.zip"), versions) }
         catch (failure: Throwable) { discardExport(); throw failure }
     }
 
     suspend fun deliverExport(uri: Uri, progress: (String) -> Unit) = withContext(Dispatchers.IO) {
         val file = File(export, "backup.zip")
-        require(file.isFile && file.length() in 1..PortableBackupArchive.MAX_ARCHIVE) { "便携备份导出文件缺失" }
-        progress("服务已恢复原状态，正在写入所选备份文件")
-        requireNotNull(context.contentResolver.openOutputStream(uri, "wt")) { "无法写入所选备份文件" }.use { output ->
+        requireLocalized(file.isFile && file.length() in 1..PortableBackupArchive.MAX_ARCHIVE) { AppText.get(R.string.ui_portable_backup_export_file_is_missing) }
+        progress(AppText.get(R.string.ui_services_resumed_writing_to_the_selected_backup_file))
+        requireNotNullLocalized(context.contentResolver.openOutputStream(uri, "wt")) { AppText.get(R.string.ui_cannot_write_the_selected_backup_file) }.use { output ->
             file.inputStream().use { input ->
-                check(transfer(input, output, null) == file.length()) { "便携备份写入不完整，请重新导出" }
+                checkLocalized(transfer(input, output, null) == file.length()) { AppText.get(R.string.ui_portable_backup_write_is_incomplete_export_it_again) }
             }
             output.flush()
         }
@@ -82,8 +89,8 @@ class PortableBackupRepository(private val context: Context) {
             val count = input.read(buffer)
             if (count < 0) break
             size += count
-            require(size <= PortableBackupArchive.MAX_ARCHIVE) { "便携备份文件超过 2 GiB 上限" }
-            require(local == null || local.usableSpace >= RESERVE) { "便携备份暂存空间不足" }
+            requireLocalized(size <= PortableBackupArchive.MAX_ARCHIVE) { AppText.get(R.string.ui_portable_backup_exceeds_the_2_gib_limit) }
+            requireLocalized(local == null || local.usableSpace >= RESERVE) { AppText.get(R.string.ui_insufficient_portable_backup_staging_space) }
             output.write(buffer, 0, count)
         }
         return size

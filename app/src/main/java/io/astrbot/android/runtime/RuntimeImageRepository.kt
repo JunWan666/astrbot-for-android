@@ -1,5 +1,12 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.checkLocalized
+import io.astrbot.android.requireLocalized
+import io.astrbot.android.requireNotNullLocalized
+
+import io.astrbot.android.AppText
+import io.astrbot.android.R
+
 import android.content.Context
 import io.astrbot.android.core.ServiceId
 import kotlinx.coroutines.Dispatchers
@@ -40,20 +47,20 @@ class RuntimeImageRepository(private val context: Context) {
     internal suspend fun prepareRepair(progress: (String) -> Unit) { prepareInternal(false, true, progress) }
 
     private suspend fun prepareInternal(isRollback: Boolean, repair: Boolean, progress: (String) -> Unit): String? = withContext(Dispatchers.IO) {
-        check(!hasPendingUpdate && !backups.hasPendingRestore && !UpdateRepository(context).hasPendingUpdate && !UpdateRepository(context, "napcat").hasPendingUpdate) { "请先完成上次维护操作" }
+        checkLocalized(!hasPendingUpdate && !backups.hasPendingRestore && !UpdateRepository(context).hasPendingUpdate && !UpdateRepository(context, "napcat").hasPendingUpdate) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
         if (isRollback) {
-            val record = requireNotNull(DurableFiles.read(rollback)) { "没有可回退的运行环境" }
-            require(InstalledVersions.read(previous(record)).compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) {
-                "旧环境校验失败，已保留文件"
+            val record = requireNotNullLocalized(DurableFiles.read(rollback)) { AppText.get(R.string.ui_no_runtime_available_for_rollback) }
+            requireLocalized(InstalledVersions.read(previous(record)).compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) {
+                AppText.get(R.string.ui_old_runtime_verification_failed_files_are_preserved)
             }
-            require(backups.list().any { it.id == record.getString("snapshotId") }) { "对应环境数据快照缺失" }
+            requireLocalized(backups.list().any { it.id == record.getString("snapshotId") }) { AppText.get(R.string.ui_the_corresponding_runtime_data_snapshot_is_missing) }
             record.getString("snapshotId")
         } else {
-            if (!repair) require(available != null) { "当前已经使用此 APK 的运行环境" }
+            if (!repair) requireLocalized(available != null) { AppText.get(R.string.ui_this_apk_s_runtime_is_already_installed) }
             runtime.prepareBundled(staged, progress)
-            require(InstalledVersions.read(staged).components["架构"] == runtime.abi) { "新环境版本无法识别" }
-            if (repair) require(InstalledVersions.read(active).compatibilityKey == InstalledVersions.read(staged).compatibilityKey) {
-                "当前组件组合与内置资源不同，已保留原环境；请使用匹配的运行环境升级或维护包"
+            requireLocalized(InstalledVersions.read(staged).components["架构"] == runtime.abi) { AppText.get(R.string.ui_cannot_identify_the_new_runtime_version) }
+            if (repair) requireLocalized(InstalledVersions.read(active).compatibilityKey == InstalledVersions.read(staged).compatibilityKey) {
+                AppText.get(R.string.ui_installed_components_differ_from_bundled_resources_the_original_runtime)
             }
             null
         }
@@ -64,8 +71,8 @@ class RuntimeImageRepository(private val context: Context) {
         val retained = DurableFiles.read(rollback)
         val candidate = if (isRollback) previous(requireNotNull(retained)) else staged
         val next = InstalledVersions.read(candidate)
-        require(!repair || !isRollback && versions.compatibilityKey == next.compatibilityKey) {
-            "修复期间组件版本发生变化，原环境与快照已保留，请重新检查"
+        requireLocalized(!repair || !isRollback && versions.compatibilityKey == next.compatibilityKey) {
+            AppText.get(R.string.ui_component_versions_changed_during_repair_original_runtime_and_snapshot)
         }
         val record = JSONObject().put("schema", 1).put("id", UUID.randomUUID().toString()).put("phase", "prepared")
             .put("snapshotId", snapshot.id).put("oldVersions", versions.json()).put("newVersions", next.json())
@@ -80,8 +87,8 @@ class RuntimeImageRepository(private val context: Context) {
     fun commit() {
         val record = requireNotNull(DurableFiles.read(journal))
         check(record.getString("phase") == "switched")
-        require(InstalledVersions.read(context).compatibilityKey == record.getJSONObject("newVersions").getString("compatibilityKey")) {
-            "新环境版本在维护期间发生变化，已保留恢复记录"
+        requireLocalized(InstalledVersions.read(context).compatibilityKey == record.getJSONObject("newVersions").getString("compatibilityKey")) {
+            AppText.get(R.string.ui_new_runtime_version_changed_during_maintenance_recovery_records_are)
         }
         record.put("phase", "committed"); DurableFiles.write(journal, record)
         finishCommitted(record)
@@ -94,12 +101,12 @@ class RuntimeImageRepository(private val context: Context) {
             DurableFiles.delete(staged, writableGuestDirectories = true)
             return@withContext null
         }
-        require(record.getInt("schema") == 1 && record.getString("phase") in setOf("prepared", "switched", "recovering", "committed")) {
-            "运行环境升级记录无法识别，已保留全部文件"
+        requireLocalized(record.getInt("schema") == 1 && record.getString("phase") in setOf("prepared", "switched", "recovering", "committed")) {
+            AppText.get(R.string.ui_unrecognized_runtime_upgrade_record_all_files_are_preserved)
         }
         if (record.getString("phase") == "committed") {
             finishCommitted(record)
-            return@withContext "已完成上次运行环境升级的提交与清理"
+            return@withContext AppText.get(R.string.ui_previous_runtime_upgrade_commit_and_cleanup_completed)
         }
         record.put("phase", "recovering"); DurableFiles.write(journal, record)
         backups.recover()
@@ -108,26 +115,26 @@ class RuntimeImageRepository(private val context: Context) {
             if (active.exists()) {
                 if (record.getBoolean("isRollback")) {
                     val target = previous(record.getJSONObject("previousRollback"))
-                    check(!target.exists()) { "回退环境目录冲突，已保留恢复记录" }
+                    checkLocalized(!target.exists()) { AppText.get(R.string.ui_rollback_runtime_directory_conflict_recovery_records_are_preserved) }
                     DurableFiles.move(active, target)
                 } else DurableFiles.delete(active, writableGuestDirectories = true)
             }
             DurableFiles.move(old, active)
         }
         val versions = InstalledVersions.read(context)
-        require(versions.compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) {
-            "恢复所需的原环境缺失或版本不符，已保留全部文件与快照"
+        requireLocalized(versions.compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) {
+            AppText.get(R.string.ui_original_runtime_required_for_recovery_is_missing_or_has)
         }
         backups.beginRestore(record.getString("snapshotId"), versions)
         UpdateRepository(context).checkDatabase()
         backups.commitRestore()
         DurableFiles.delete(staged, writableGuestDirectories = true)
         DurableFiles.removeRecord(journal)
-        "运行环境升级未完成，已恢复原环境与对应数据快照"
+        AppText.get(R.string.ui_runtime_upgrade_was_incomplete_original_runtime_and_its_data)
     }
 
     private fun finishCommitted(record: JSONObject) {
-        require(active.isDirectory && previous(record).isDirectory) { "环境提交所需文件缺失，已保留恢复记录" }
+        requireLocalized(active.isDirectory && previous(record).isDirectory) { AppText.get(R.string.ui_files_required_to_commit_the_runtime_are_missing_recovery) }
         DurableFiles.write(rollback, JSONObject(record.toString()).apply { remove("previousRollback") })
         record.optJSONObject("previousRollback")?.let { prior ->
             if (prior.getString("id") != record.getString("id")) DurableFiles.delete(previous(prior), writableGuestDirectories = true)
@@ -141,7 +148,7 @@ class RuntimeImageRepository(private val context: Context) {
 
     private fun previous(record: JSONObject): File {
         val id = record.getString("id")
-        require(UUID.fromString(id).toString() == id) { "运行环境记录编号无效" }
+        requireLocalized(UUID.fromString(id).toString() == id) { AppText.get(R.string.ui_invalid_runtime_record_id) }
         return File(files, "runtime-data/rollback-$id")
     }
 }
