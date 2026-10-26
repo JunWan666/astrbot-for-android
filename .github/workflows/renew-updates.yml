@@ -1,5 +1,8 @@
 name: Renew update catalogs
 on:
+  push:
+    branches: [updates]
+    paths: ['.github/workflows/renew-updates.yml']
   schedule:
     - cron: '23 3 * * 1'
   workflow_dispatch:
