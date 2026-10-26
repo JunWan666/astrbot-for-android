@@ -135,7 +135,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
         val landscape = maxWidth >= 600.dp && maxHeight < 500.dp
         val tight = maxHeight < 600.dp || LocalDensity.current.fontScale > 1.25f
         @Composable fun overview() {
-            if (tight) CompactOverview(state, network, { onCommand(it, null) }, onNotice, true)
+            if (tight) CompactOverview(state, network, { onCommand(it, null) }, onNotice)
             else ManagerOverview(state, network) { onCommand(it, null) }
             ManagerResources(resources, compact = true)
             ManagerStatusStrip(state, onNotice)
@@ -176,17 +176,17 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
 }
 
 @Composable private fun CompactOverview(state: ManagerState, network: NetworkSnapshot, onCommand: (String) -> Unit,
-    onNotice: (String, String) -> Unit, tight: Boolean) {
+    onNotice: (String, String) -> Unit) {
     val running = state.services.values.count { it.process == ProcessState.RUNNING }
     Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Color(0xFF386BF6), Color(0xFF5686FF))),
         MaterialTheme.shapes.large).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f).clickable { onNotice("系统网络状态", network.detail) }) {
-                Text("运行概况 · $running / 2", style = MaterialTheme.typography.titleSmall, color = Color.White)
+                Text("运行概况", style = MaterialTheme.typography.titleSmall, color = Color.White)
                 Text(network.title, Modifier.semantics { contentDescription = "系统网络状态" }, style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = .85f), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-            ManagerAppLogo(Modifier.size(if (tight) 26.dp else 34.dp))
+            ManagerRunningCount(running, compact = true)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ManagerOverviewCommand("start", "启动全部", R.drawable.ic_play, state, false, Modifier.weight(1f), onCommand)

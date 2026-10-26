@@ -3,9 +3,11 @@ package io.astrbot.android.runtime
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.IBinder
 import android.os.PowerManager
 import io.astrbot.android.MainActivity
+import io.astrbot.android.R
 import io.astrbot.android.core.ServiceId
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
@@ -95,7 +97,8 @@ class RuntimeService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopSsh = PendingIntent.getService(this, 2, Intent(this, RuntimeService::class.java).putExtra("operation", "ssh-stop"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        return Notification.Builder(this, CHANNEL).setSmallIcon(android.R.drawable.stat_notify_sync)
+        return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_notification)
+            .setColor(Color.rgb(56, 103, 255))
             .setContentTitle("AstrBot 运行管理器").setContentText(detail).setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText(detail))
             .setOngoing(true).addAction(Notification.Action.Builder(null, "停止机器人", stop).build())

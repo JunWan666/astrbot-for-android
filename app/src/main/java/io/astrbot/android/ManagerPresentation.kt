@@ -205,10 +205,7 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
                 Text(if (running == 2) "两个服务进程运行中" else if (running == 0) "启动服务，开启手机上的机器人" else "部分服务正在运行",
                     style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f))
             }
-            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("$running", style = MaterialTheme.typography.headlineSmall.copy(fontSize = 34.sp, lineHeight = 38.sp), color = Color.White)
-                Text("/ 2", Modifier.padding(bottom = 3.dp), style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.75f))
-            }
+            ManagerRunningCount(running)
         }
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(network.title, Modifier.semantics { contentDescription = "系统网络状态" },
@@ -233,6 +230,17 @@ internal enum class ManagerPage(val label: String, val icon: Int) {
                 }
             }
         }
+    }
+}
+
+@Composable internal fun ManagerRunningCount(running: Int, compact: Boolean = false) {
+    Row(Modifier.padding(start = 12.dp).semantics(mergeDescendants = true) {
+        contentDescription = "运行中的服务：$running / 2"
+    }, verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text("$running", style = MaterialTheme.typography.headlineSmall.copy(
+            fontSize = if (compact) 28.sp else 34.sp, lineHeight = if (compact) 32.sp else 38.sp), color = Color.White)
+        Text("/ 2", Modifier.padding(bottom = 3.dp), style = MaterialTheme.typography.bodySmall,
+            color = Color.White.copy(alpha = 0.75f))
     }
 }
 
