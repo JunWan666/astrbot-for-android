@@ -17,6 +17,9 @@
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
+    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="https://img.shields.io/badge/QQ%E4%BA%A4%E6%B5%81%E7%BE%A4-1132360631-12B7F5?style=flat-square&amp;logo=qq&amp;logoColor=white" alt="加入 QQ 交流群：1132360631" /></a>
+  </p>
+  <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">下载 APK</a> ·
     <a href="#界面预览">界面预览</a> ·
     <a href="#开始使用">开始使用</a> ·
@@ -117,6 +120,10 @@
 “设置 → 关于 → 检查更新”管理 App 安装包，AstrBot 与 NapCat 各有独立的程序更新入口。兼容的组件新版无需重新安装 App。更新支持签名校验、断点续传、安装前快照和失败回退，下载完成后由用户确认安装。
 
 默认接入本项目的 GitHub 签名更新通道：**Releases 存放安装包和 AstrBot 程序包，`updates` 分支托管签名目录，NapCat 直接下载上游官方 Shell 包**。只有 QQ、Python 或底层依赖变化时，才需要匹配的运行环境升级。配置方式见[更新与分发](docs/更新与分发.md)。
+
+## 交流与反馈
+
+欢迎加入 [QQ 交流群：1132360631](https://qm.qq.com/q/fS2CdoBQB2)，交流 App 使用、AstrBot / NapCat 配置、人设分享和功能建议。也可以通过 [GitHub Issues](https://github.com/JunWan666/astrbot-for-android/issues) 反馈问题，便于跟进和检索。
 
 ## 文档
 

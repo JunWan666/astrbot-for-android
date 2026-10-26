@@ -17,6 +17,9 @@
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
+    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="https://img.shields.io/badge/QQ_Group-1132360631-12B7F5?style=flat-square&amp;logo=qq&amp;logoColor=white" alt="Join QQ group: 1132360631" /></a>
+  </p>
+  <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">Download APK</a> ·
     <a href="#screenshots">Screenshots</a> ·
     <a href="#getting-started">Getting started</a> ·
@@ -119,6 +122,10 @@ The keystore and credentials stay in the Git-ignored `.local/signing/` directory
 **Settings → About → Check for updates (设置 → 关于 → 检查更新)** manages app APK updates. AstrBot and NapCat have separate component update entries. Compatible component updates do not require reinstalling the app. Updates support signature verification, resumable downloads, snapshots before installation and rollback on failure. Installation requires user confirmation after the download completes.
 
 The app uses this project's signed GitHub update channels by default: **Releases host app APKs and AstrBot packages, the `updates` branch hosts signed update manifests, and NapCat packages are downloaded directly from upstream official Shell releases**. Changes to Linux QQ, Python or underlying dependencies require a matching runtime environment upgrade. See [updates and distribution (Chinese)](更新与分发.md) for configuration details.
+
+## Community
+
+Join the [QQ group: 1132360631](https://qm.qq.com/q/fS2CdoBQB2) to discuss app usage, AstrBot / NapCat configuration, personas and feature ideas. Group discussions are primarily in Chinese. You can also report issues through [GitHub Issues](https://github.com/JunWan666/astrbot-for-android/issues) for tracking and reference.
 
 ## Documentation
 
