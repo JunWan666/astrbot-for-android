@@ -17,9 +17,6 @@
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
-    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="./images/qq-community.en.svg" alt="Join the QQ community" width="220" /></a>
-  </p>
-  <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">Download APK</a> ·
     <a href="#screenshots">Screenshots</a> ·
     <a href="#getting-started">Getting started</a> ·
@@ -125,7 +122,11 @@ The app uses this project's signed GitHub update channels by default: **Releases
 
 ## Community
 
-Join the [QQ group: 1132360631](https://qm.qq.com/q/fS2CdoBQB2) to discuss app usage, AstrBot / NapCat configuration, personas and feature ideas. Group discussions are primarily in Chinese. You can also report issues through [GitHub Issues](https://github.com/JunWan666/astrbot-for-android/issues) for tracking and reference.
+<p align="center">
+  <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="./images/qq-community.en.svg" alt="Join the QQ community" width="220" /></a>
+</p>
+
+Join the QQ community to discuss app usage, AstrBot / NapCat configuration, personas and feature ideas. Group discussions are primarily in Chinese. You can also report issues through [GitHub Issues](https://github.com/JunWan666/astrbot-for-android/issues) for tracking and reference.
 
 ## Documentation
 

@@ -17,9 +17,6 @@
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
-    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="./docs/images/qq-community.svg" alt="加入 QQ 交流群" width="220" /></a>
-  </p>
-  <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">下载 APK</a> ·
     <a href="#界面预览">界面预览</a> ·
     <a href="#开始使用">开始使用</a> ·
@@ -123,7 +120,11 @@
 
 ## 交流与反馈
 
-欢迎加入 [QQ 交流群：1132360631](https://qm.qq.com/q/fS2CdoBQB2)，交流 App 使用、AstrBot / NapCat 配置、人设分享和功能建议。也可以通过 [GitHub Issues](https://github.com/JunWan666/astrbot-for-android/issues) 反馈问题，便于跟进和检索。
+<p align="center">
+  <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="./docs/images/qq-community.svg" alt="加入 QQ 交流群" width="220" /></a>
+</p>
+
+欢迎加入 QQ 交流群，交流 App 使用、AstrBot / NapCat 配置、人设分享和功能建议。也可以通过 [GitHub Issues](https://github.com/JunWan666/astrbot-for-android/issues) 反馈问题，便于跟进和检索。
 
 ## 文档
 
