@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./docs/images/logo.png" alt="AstrBot for Android" width="120" />
   <h1>AstrBot for Android</h1>
-  <p><strong>简体中文</strong> | <a href="./README.en.md">English</a></p>
+  <p><strong>简体中文</strong> | <a href="./docs/README.en.md">English</a></p>
   <p><strong>把 AstrBot 和 NapCat，装进你的 Android 手机。</strong></p>
   <p>一个 APK · 本地运行 · 原生管理 · 内置 WebUI</p>
   <p>
@@ -21,7 +21,7 @@
     <a href="#开始使用">开始使用</a> ·
     <a href="./docs/使用指南.md">使用指南</a> ·
     <a href="./docs/构建指南.md">源码构建</a> ·
-    <a href="./CHANGELOG.md">更新记录</a>
+    <a href="./docs/CHANGELOG.md">更新记录</a>
   </p>
 </div>
 
@@ -33,32 +33,32 @@
 
 ## 界面预览
 
-<table align="center">
+<table width="100%" align="center">
   <tr>
     <td align="center" width="33%">
-      <img src="./docs/images/home.webp" alt="首页：双服务启停、应用内存与手机总内存" width="200" />
+      <img src="./docs/images/home.webp" alt="首页：双服务启停、应用内存与手机总内存" width="144" />
       <p align="center"><strong>首页 · 服务与资源</strong></p>
     </td>
     <td align="center" width="33%">
-      <img src="./docs/images/personas.webp" alt="人设：市场入口、手动添加与本地列表" width="200" />
+      <img src="./docs/images/personas.webp" alt="人设：市场入口、手动添加与本地列表" width="144" />
       <p align="center"><strong>人设 · 搜索与切换</strong></p>
     </td>
     <td align="center" width="33%">
-      <img src="./docs/images/settings.webp" alt="设置：扩展、备份、诊断与后台运行" width="200" />
+      <img src="./docs/images/settings.webp" alt="设置：扩展、备份、诊断与后台运行" width="144" />
       <p align="center"><strong>设置 · 运行与维护</strong></p>
     </td>
   </tr>
   <tr>
-    <td align="center" width="33%">
-      <img src="./docs/images/service-logs.webp" alt="服务详情中的实时日志页面" width="200" />
+    <td align="center" width="300">
+      <img src="./docs/images/service-logs.webp" alt="服务详情中的实时日志页面" width="144" />
       <p align="center"><strong>服务日志 · 实时跟随</strong></p>
     </td>
-    <td align="center" width="33%">
-      <img src="./docs/images/astrbot-webui.webp" alt="App 内置 WebView 中的 AstrBot 后台" width="200" />
+    <td align="center" width="300">
+      <img src="./docs/images/astrbot-webui.webp" alt="App 内置 WebView 中的 AstrBot 后台" width="144" />
       <p align="center"><strong>AstrBot · 内置后台</strong></p>
     </td>
-    <td align="center" width="33%">
-      <img src="./docs/images/napcat-webui.webp" alt="App 内置 WebView 中的 NapCat 后台" width="200" />
+    <td align="center" width="300">
+      <img src="./docs/images/napcat-webui.webp" alt="App 内置 WebView 中的 NapCat 后台" width="144" />
       <p align="center"><strong>NapCat · 内置后台</strong></p>
     </td>
   </tr>
@@ -123,13 +123,13 @@
 - [构建指南](docs/构建指南.md)：开发环境、运行资源和 APK 构建。
 - [更新与分发](docs/更新与分发.md)：应用签名、更新通道和 GitHub 发布。
 - [发行材料](docs/发行材料.md)：第三方许可、依赖清单和源码伴随包。
-- [更新记录](CHANGELOG.md) · [参与开发](CONTRIBUTING.md) · [提交规则](GIT_COMMIT_RULES.md)。
+- [更新记录](docs/CHANGELOG.md) · [参与开发](.github/CONTRIBUTING.md) · [提交规则](.github/GIT_COMMIT_RULES.md)。
 
 ## 开源协议与致谢
 
 本项目原创代码采用 [MIT License](LICENSE)，**Copyright © 2026 [JunWan666](https://github.com/JunWan666)**。使用或分发时请保留版权声明和许可文本。
 
-感谢 [AstrBot](https://github.com/AstrBotDevs/AstrBot)、[NapCatQQ](https://github.com/NapNeko/NapCatQQ)、[PRoot](https://github.com/proot-me/proot)、Ubuntu、Termux 及相关开源项目。第三方组件遵循各自的许可与分发条款，详见 [NOTICE](NOTICE) 和 [第三方声明](THIRD_PARTY_NOTICES.md)。
+感谢 [AstrBot](https://github.com/AstrBotDevs/AstrBot)、[NapCatQQ](https://github.com/NapNeko/NapCatQQ)、[PRoot](https://github.com/proot-me/proot)、Ubuntu、Termux 及相关开源项目。第三方组件遵循各自的许可与分发条款，详见 [NOTICE](docs/legal/NOTICE) 和 [第三方声明](docs/legal/THIRD_PARTY_NOTICES.md)。
 
 ## Star History
 

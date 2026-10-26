@@ -1,6 +1,6 @@
 # Third-party components
 
-The original Android manager code and documentation are copyright (c) 2026 JunWan666 and licensed under the [MIT License](LICENSE). Attribution is recorded in [NOTICE](NOTICE).
+The original Android manager code and documentation are copyright (c) 2026 JunWan666 and licensed under the [MIT License](../../LICENSE). Attribution is recorded in [NOTICE](NOTICE).
 
 This file describes the pinned complete ARM64 runtime, not just the Ubuntu bootstrap. The manager's MIT license does not replace third-party terms or grant permission to redistribute third-party software.
 
@@ -33,4 +33,4 @@ Run `:app:collectReleaseDependencyMetadata`, then `python tools/build_support/co
 - `python-source-packages.zip`: a separate companion with 148 exact PyPI sdists and 2 explicitly identified upstream tag/commit archives, original metadata and fixed source lock. Bind its external directory using `--python-source-directory` when collecting and verifying release materials; it is not embedded in the APK or copied into the main output directory.
 - `release-inventory.json` and `collection.json`: exact versions, SHA-256, file manifests, scope and unresolved delivery items. They contain no host cache paths.
 
-Python source archives are collected for all 150 pinned versions; complete corresponding source, wheel provenance, vendored/native/JavaScript dependency mapping, binary build provenance and applicable third-party grants require separate release review. The original manager is MIT licensed. Ubuntu source archives are collected; matching binary rebuilds have not been performed. Merely retaining URLs or source JARs does not complete those obligations. Rebuild the inventory for every runtime/dependency change. Collection, source companions and required release materials are described in the [distribution guide](docs/发行材料.md).
+Python source archives are collected for all 150 pinned versions; complete corresponding source, wheel provenance, vendored/native/JavaScript dependency mapping, binary build provenance and applicable third-party grants require separate release review. The original manager is MIT licensed. Ubuntu source archives are collected; matching binary rebuilds have not been performed. Merely retaining URLs or source JARs does not complete those obligations. Rebuild the inventory for every runtime/dependency change. Collection, source companions and required release materials are described in the [distribution guide](../发行材料.md).

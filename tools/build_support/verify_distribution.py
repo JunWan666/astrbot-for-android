@@ -62,8 +62,8 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
     assert "files-2.1" not in text and "gradle-cache" not in text
     with zipfile.ZipFile(directory / "third-party-notices.zip") as notices:
         assert json.loads(notices.read("release-inventory.json")) == inventory
-        for name in ("LICENSE", "NOTICE"):
-            assert notices.read("manager/" + name) == (root / name).read_bytes()
+        for name, source in (("LICENSE", "LICENSE"), ("NOTICE", "docs/legal/NOTICE")):
+            assert notices.read("manager/" + name) == (root / source).read_bytes()
         assert b"MIT License" in notices.read("manager/LICENSE")
         assert b"JunWan666" in notices.read("manager/LICENSE")
         assert not any(item["id"] == "manager-license" for item in inventory["openItems"])

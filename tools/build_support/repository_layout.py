@@ -1,6 +1,14 @@
 """Documentation included in the public repository and source distribution."""
 
 PUBLIC_DOCUMENTS = frozenset({
+    ".github/CONTRIBUTING.md",
+    ".github/GIT_COMMIT_RULES.md",
+    "docs/README.en.md",
+    "docs/CHANGELOG.md",
+    "docs/examples/local.properties.example",
+    "docs/legal/AUTHORS.md",
+    "docs/legal/NOTICE",
+    "docs/legal/THIRD_PARTY_NOTICES.md",
     "docs/使用指南.md",
     "docs/构建指南.md",
     "docs/更新与分发.md",

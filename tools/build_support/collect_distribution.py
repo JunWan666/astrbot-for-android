@@ -33,12 +33,12 @@ FIXED_RUNTIME = {
     "opt/qq/LICENSES.chromium.html", "opt/qq/resources/app/package.original.json",
 }
 SOURCE_ROOT_FILES = {
-    ".gitignore", ".gitattributes", "local.properties.example", ".github/workflows/ci.yml", ".github/CODEOWNERS",
+    ".gitignore", ".gitattributes", ".github/workflows/ci.yml", ".github/CODEOWNERS",
     ".github/workflows/renew-updates.yml", "runtime/update-public-key.der",
     "app/src/main/res/drawable-nodpi/logo_napcat.webp",
     "app/src/main/res/drawable-nodpi/app_logo.webp",
     *{f"app/src/main/res/mipmap-{density}/ic_launcher.png" for density in ("mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")},
-    "README.md", "README.en.md", "THIRD_PARTY_NOTICES.md", "LICENSE", "NOTICE", "AUTHORS.md", "CHANGELOG.md", "CONTRIBUTING.md", "GIT_COMMIT_RULES.md",
+    "README.md", "LICENSE",
     "build.gradle.kts", "settings.gradle.kts", "gradle.properties", "gradlew", "gradlew.bat", "build.bat",
 }
 SOURCE_EXTENSIONS = {
@@ -487,8 +487,8 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     if entry_count not in (image_manifest["entryCount"], image_manifest["entryCount"] - 1):
         raise ValueError("Runtime entry count differs")
     notices = {"runtime/" + path: data for path, data in files.items()}
-    for name in ("LICENSE", "NOTICE"):
-        notices["manager/" + name] = (root / name).read_bytes()
+    for name, source in (("LICENSE", "LICENSE"), ("NOTICE", "docs/legal/NOTICE")):
+        notices["manager/" + name] = (root / source).read_bytes()
     dpkg = system_packages(files, links)
     ubuntu_collection = ubuntu_source_collection(root, image_manifest["sha256"], dpkg, notices, cache_dir)
     python = python_packages(files)
@@ -569,7 +569,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     manager_readme = {"SOURCE-COLLECTION.txt": ("Allowlisted manager sources/build scripts/docs.\n"
         "Excludes binary runtime images, native prebuilts, device/cache data, keys and build outputs.\n"
         "Prepare pinned runtime/native inputs using README.md before building.\n"
-        "Original manager code is MIT licensed; see LICENSE and NOTICE. Upstream terms remain separate.\n"
+        "Original manager code is MIT licensed; see LICENSE and docs/legal/NOTICE. Upstream terms remain separate.\n"
         "Fixed ZIP timestamps and file digests enable comparing identical input collections.\n").encode()}
     destination.mkdir(parents=True, exist_ok=True)
     if ubuntu_collection:
