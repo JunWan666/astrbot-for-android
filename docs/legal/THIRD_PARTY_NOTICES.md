@@ -6,6 +6,8 @@ This file describes the pinned complete ARM64 runtime, not just the Ubuntu boots
 
 The service cards use the [AstrBot brand symbol](https://astrbot.app/assets/astrbot-logo-with-text.svg) and the [NapCat artwork supplied for this project](https://cdn.apifox.com/app/project-icon/custom/20241226/3c5b999f-935a-4116-9d68-e4ddbaa7ef3f.png). The original files are retained in `docs/images/`; source URLs, SHA-256 and Android resource transformations are recorded in `runtime/brand-assets.json`. Artwork and trademarks retain their respective owners' rights and are separate from the manager's MIT license.
 
+The README community buttons use the [QQ symbol from Simple Icons](https://simpleicons.org/?q=qq), distributed under [CC0-1.0](https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md). QQ is a trademark of Tencent.
+
 
 | Component | Pinned version / source | License evidence |
 | --- | --- | --- |

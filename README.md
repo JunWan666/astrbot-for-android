@@ -17,7 +17,7 @@
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
-    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="https://img.shields.io/badge/QQ%E4%BA%A4%E6%B5%81%E7%BE%A4-1132360631-12B7F5?style=flat-square&amp;logo=qq&amp;logoColor=white" alt="加入 QQ 交流群：1132360631" /></a>
+    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="./docs/images/qq-community.svg" alt="加入 QQ 交流群" width="220" /></a>
   </p>
   <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">下载 APK</a> ·

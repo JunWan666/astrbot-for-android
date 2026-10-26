@@ -17,7 +17,7 @@
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
-    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="https://img.shields.io/badge/QQ_Group-1132360631-12B7F5?style=flat-square&amp;logo=qq&amp;logoColor=white" alt="Join QQ group: 1132360631" /></a>
+    <a href="https://qm.qq.com/q/fS2CdoBQB2"><img src="./images/qq-community.en.svg" alt="Join the QQ community" width="220" /></a>
   </p>
   <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">Download APK</a> ·

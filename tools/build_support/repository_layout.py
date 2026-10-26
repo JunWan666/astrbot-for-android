@@ -16,6 +16,8 @@ PUBLIC_DOCUMENTS = frozenset({
     "docs/在线更新协议.md",
     "docs/更新包格式与恢复协议.md",
     "docs/images/logo.png",
+    "docs/images/qq-community.svg",
+    "docs/images/qq-community.en.svg",
     "docs/images/astrbot-logo-with-text.svg",
     "docs/images/napcat-logo.png",
     "docs/images/home.webp",
