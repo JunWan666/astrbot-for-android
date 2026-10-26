@@ -77,8 +77,9 @@ class BootstrapRuntime(private val context: Context) {
             val actual = digest.digest().joinToString("") { "%02x".format(it) }
             requireLocalized(actual == manifest.getString("sha256")) { AppText.get(R.string.ui_ubuntu_resource_integrity_check_failed) }
             requireLocalized(manifest.getLong("unpackedBytes") in 1..(12L * 1024 * 1024 * 1024)) { AppText.get(R.string.ui_resource_size_exceeds_the_supported_limit) }
-            val required = manifest.getLong("unpackedBytes") * 2 + 64L * 1024 * 1024
-            requireLocalized(context.filesDir.usableSpace >= required) { AppText.get(R.string.ui_insufficient_storage_at_least_mb_is_required, required / 1024 / 1024) }
+            RuntimeStorageAdvice.fromManifest(manifest, context.filesDir.usableSpace)?.takeIf { it.shouldWarn }?.let {
+                progress(it.message)
+            }
             DurableFiles.delete(staging, writableGuestDirectories = true)
             checkLocalized(staging.mkdirs()) { AppText.get(R.string.ui_cannot_create_runtime_staging_directory) }
             try {

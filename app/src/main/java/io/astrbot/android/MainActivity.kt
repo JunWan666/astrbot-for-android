@@ -117,6 +117,7 @@ class MainActivity : LocalizedActivity() {
         var napcatUpdateDialog by remember { mutableStateOf(false) }
         var showAutomaticUpdates by remember { mutableStateOf(false) }
         var showLanguage by remember { mutableStateOf(false) }
+        var storagePrompt by remember { mutableStateOf<Pair<RuntimeStorageAdvice, () -> Unit>?>(null) }
         val automaticSettingsFlow = remember { automaticUpdates.settings.observeEnabled() }
         val automaticEnabled by automaticSettingsFlow.collectAsStateWithLifecycle(false)
         var confirmLan by remember { mutableStateOf<Pair<ServiceId, Boolean>?>(null) }
@@ -155,8 +156,14 @@ class MainActivity : LocalizedActivity() {
             } else if (uri != null) Toast.makeText(this@MainActivity, AppText.get(R.string.ui_export_interrupted_export_the_logs_again), Toast.LENGTH_LONG).show()
         }
         fun command(operation: String, id: ServiceId? = null, backupId: String? = null, updateId: String? = null) {
-            if (Build.VERSION.SDK_INT >= 33 && operation != "stop") permission.launch(Manifest.permission.POST_NOTIFICATIONS)
-            RuntimeService.command(this@MainActivity, operation, id, backupId, updateId = updateId)
+            val send: () -> Unit = {
+                if (Build.VERSION.SDK_INT >= 33 && operation != "stop") permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                RuntimeService.command(this@MainActivity, operation, id, backupId, updateId = updateId)
+            }
+            if (operation in setOf("initialize", "start", "restart", "apply-runtime", "repair-runtime")) lifecycleScope.launch {
+                val advice = withContext(Dispatchers.IO) { RuntimeStorageAdvice.beforeOperation(this@MainActivity, operation) }
+                if (advice?.shouldWarn == true) storagePrompt = advice to send else send()
+            } else send()
         }
         fun openLogs(category: LogCategory) {
             logService = category
@@ -318,6 +325,10 @@ class MainActivity : LocalizedActivity() {
             showLanguage = false
             AppLanguage.set(this@MainActivity, language)
             if (Build.VERSION.SDK_INT < 33) recreate()
+        }
+        storagePrompt?.let { (advice, send) ->
+            RuntimeStorageDialog(advice, onContinue = { storagePrompt = null; send() },
+                onDismiss = { storagePrompt = null })
         }
         if (showAutomaticUpdates) AutomaticUpdateDialog(automaticEnabled, automaticUpdates.configured, onToggle = { enabled ->
             if (!enabled || automaticUpdates.configured) lifecycleScope.launch {

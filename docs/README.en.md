@@ -34,7 +34,7 @@ Built with Kotlin and Jetpack Compose, the app provides a native management inte
 
 ## Screenshots
 
-The current stable release is **v1.0.0**. The main branch and screenshots below include the language settings and cpolar extension being developed for a future release.
+The current stable release is **v1.0.0**. The main branch and screenshots below include the language settings, cpolar extension and storage warning changes being developed for a future release.
 
 <table width="100%" align="center">
   <tr>
@@ -103,6 +103,7 @@ The full APK includes the runtime environment, so initialization does not requir
 
 - Android 8.0 / API 26 or later, with an ARM64 processor. Root access is not required.
 - The full APK is approximately **720 MiB**. Allow additional storage for the extracted environment, QQ data and backups.
+- If free space is below the runtime preparation estimate, a warning offers **Continue anyway**. Running out of writable storage can still cause the operation to fail.
 - Resource usage varies with plugins, model calls and QQ activity. Home displays actual app memory usage; the app does not preallocate memory for a virtual machine.
 - Continuous operation requires appropriate background permissions on the device. The app currently does not start automatically at boot.
 

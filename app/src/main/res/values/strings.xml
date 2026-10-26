@@ -732,7 +732,7 @@
     <string name="ui_python_or_a_dependency_failed_to_load_check_runtime" formatted="false">"Python 或基础依赖加载失败，查看环境日志；未修改用户配置"</string>
     <string name="ui_installation_launch_files_and_maintenance_conditions_must_pass_first" formatted="false">"需先满足安装、启动文件与维护条件，本次未执行依赖加载"</string>
     <string name="ui_repair_staging_space" formatted="false">"修复暂存空间"</string>
-    <string name="ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot">"可用 %1$s MiB；环境准备至少预留 %2$s MiB，数据快照另行精确检查"</string>
+    <string name="ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot">"应用可用 %1$s MiB；准备环境建议预留 %2$s MiB。不足时会提醒，可选择继续；数据快照另行检查。"</string>
     <string name="ui_cannot_determine_the_full_resource_size_in_this_apk" formatted="false">"当前 APK 的完整资源大小无法识别"</string>
     <string name="ui_complete_the_pending_maintenance_operation_then_check_again" formatted="false">"先完成未结束的维护操作，再重新检查"</string>
     <string name="ui_install_an_apk_with_the_same_signing_certificate_to" formatted="false">"请覆盖安装同签名 APK，修复内置启动组件；不要卸载清除数据"</string>
@@ -1136,4 +1136,7 @@
     <string name="persona_invalid_prompt" formatted="false">"提示词需为 1–12000 个字符"</string>
     <string name="persona_invalid_intro" formatted="false">"简介最多 120 字，开场白最多 1000 字"</string>
     <string name="persona_initialize" formatted="false">"先启动一次 AstrBot，即可导入和切换人设"</string>
+    <string name="runtime_storage_warning_title">存储空间提醒</string>
+    <string name="runtime_storage_warning_message">当前应用可用 %1$d MiB，准备运行环境建议预留 %2$d MiB。\n\n这是保守预估，你可以选择仍然继续。空间耗尽可能导致本次操作失败，并影响手机或其他应用正常使用；建议先清理存储。</string>
+    <string name="runtime_storage_continue">仍然继续</string>
 </resources>

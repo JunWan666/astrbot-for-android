@@ -732,7 +732,7 @@
     <string name="ui_python_or_a_dependency_failed_to_load_check_runtime" formatted="false">"Python or a dependency failed to load. Check runtime logs. User configuration was not changed."</string>
     <string name="ui_installation_launch_files_and_maintenance_conditions_must_pass_first" formatted="false">"Installation, launch files and maintenance conditions must pass first. Dependency loading was skipped."</string>
     <string name="ui_repair_staging_space" formatted="false">"Repair staging space"</string>
-    <string name="ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot">"Available: %1$s MiB. Runtime preparation requires at least %2$s MiB; snapshot space is checked separately."</string>
+    <string name="ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot">"Available to the app: %1$s MiB. Runtime preparation recommends %2$s MiB. You can continue after the warning; snapshot space is checked separately."</string>
     <string name="ui_cannot_determine_the_full_resource_size_in_this_apk" formatted="false">"Cannot determine the full resource size in this APK"</string>
     <string name="ui_complete_the_pending_maintenance_operation_then_check_again" formatted="false">"Complete the pending maintenance operation, then check again"</string>
     <string name="ui_install_an_apk_with_the_same_signing_certificate_to" formatted="false">"Install an APK with the same signing certificate to repair the bundled launcher. Do not uninstall or clear data."</string>
@@ -1134,4 +1134,7 @@
     <string name="persona_invalid_prompt" formatted="false">"Prompt must contain 1–12,000 characters"</string>
     <string name="persona_invalid_intro" formatted="false">"Description: up to 120 characters. Greeting: up to 1,000 characters."</string>
     <string name="persona_initialize" formatted="false">"Start AstrBot once to import and switch personas"</string>
+    <string name="runtime_storage_warning_title">Storage space warning</string>
+    <string name="runtime_storage_warning_message">The app has %1$d MiB available. Preparing the runtime is recommended to have %2$d MiB free.\n\nThis is a conservative estimate. You can still continue. Running out of space may cause this operation to fail and affect your phone or other apps. Freeing up storage first is recommended.</string>
+    <string name="runtime_storage_continue">Continue anyway</string>
 </resources>

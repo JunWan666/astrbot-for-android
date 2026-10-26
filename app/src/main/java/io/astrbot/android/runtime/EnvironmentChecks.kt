@@ -101,12 +101,11 @@ internal class EnvironmentChecks(private val context: Context,
             versions == null -> AppText.get(R.string.ui_version_information_is_incomplete_export_diagnostics_first_the_runtime)
             !sameImage -> AppText.get(R.string.ui_the_installed_runtime_differs_from_the_bundled_resources_use)
             configurationFailed -> AppText.get(R.string.ui_resolve_dashboard_configuration_issues_first_redeploying_resources_does)
-            !enoughSpace -> AppText.get(R.string.ui_free_staging_space_first_data_snapshot_space_will_also)
             !damaged -> AppText.get(R.string.ui_no_resource_damage_was_identified_by_this_check_manage)
             else -> AppText.get(R.string.ui_the_same_version_bundled_resources_can_be_redeployed_the)
         }
         EnvironmentCheckReport(System.currentTimeMillis(), items,
-            pending.not() && nativeReady && installed && versions != null && sameImage && !configurationFailed && enoughSpace && damaged, reason)
+            pending.not() && nativeReady && installed && versions != null && sameImage && !configurationFailed && damaged, reason)
     }
 
     private fun readJson(read: () -> JSONObject): JSONObject? = runCatching(read).getOrNull()
