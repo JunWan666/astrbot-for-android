@@ -10,13 +10,14 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <img src="https://img.shields.io/badge/Version-1.0.0-3867FF?style=flat-square" alt="Version 1.0.0" />
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.0.0-3867FF?style=flat-square" alt="Version 1.0.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">Download APK</a> ·
     <a href="#screenshots">Screenshots</a> ·
     <a href="#getting-started">Getting started</a> ·
     <a href="./使用指南.md">User guide (Chinese)</a> ·
@@ -87,7 +88,7 @@ Home and Settings use fixed layouts, with pagination for small windows. Personas
 
 ## Getting started
 
-1. Install the full APK on an ARM64 Android device, open the app and initialize the environment.
+1. Download the full APK from [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest), install it on an ARM64 Android device, then open the app and initialize the environment.
 2. Tap **Start all (启动全部)** and wait for AstrBot and NapCat to become ready.
 3. Open the NapCat WebUI to sign in to QQ, then configure model providers, messaging platforms and plugins in the AstrBot WebUI.
 4. Follow **Settings → Background running (设置 → 后台运行)** to adjust device permissions, then configure personas, backups and SSH as needed.

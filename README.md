@@ -10,13 +10,14 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <img src="https://img.shields.io/badge/Version-1.0.0-3867FF?style=flat-square" alt="Version 1.0.0" />
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.0.0-3867FF?style=flat-square" alt="Version 1.0.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
     <a href="https://github.com/JunWan666"><img src="https://img.shields.io/badge/Author-JunWan666-111827?style=flat-square&amp;logo=github" alt="JunWan666" /></a>
   </p>
   <p>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">下载 APK</a> ·
     <a href="#界面预览">界面预览</a> ·
     <a href="#开始使用">开始使用</a> ·
     <a href="./docs/使用指南.md">使用指南</a> ·
@@ -85,7 +86,7 @@
 
 ## 开始使用
 
-1. 在 ARM64 Android 手机上安装完整 APK，打开 App 完成环境初始化。
+1. 从 [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest) 下载完整 APK，在 ARM64 Android 手机上安装，打开 App 完成环境初始化。
 2. 点击“启动全部”，等待 AstrBot 和 NapCat 就绪。
 3. 打开 NapCat 后台登录 QQ，在 AstrBot 后台配置模型、平台和插件。
 4. 按“设置 → 后台运行”的引导调整手机权限，再按需使用人设、备份和 SSH。
