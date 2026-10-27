@@ -2,6 +2,7 @@ package io.astrbot.android
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -57,6 +58,7 @@ class ExtensionsActivity : LocalizedActivity() {
         var detail by rememberSaveable { mutableStateOf(false) }
         var cpolarDetail by rememberSaveable { mutableStateOf(false) }
         val cpolar by CpolarStore.state.collectAsStateWithLifecycle()
+        val terminal by TerminalStore.state.collectAsStateWithLifecycle()
         var sshPage by rememberSaveable { mutableStateOf(SshPage.OVERVIEW) }
         val enabled = !manager.busy && !ssh.busy
         val status = when { ssh.paused -> AppText.get(R.string.ui_paused_for_maintenance); ssh.running -> AppText.get(R.string.ui_running); !ssh.configuration.installed -> AppText.get(R.string.ui_not_installed); else -> AppText.get(R.string.ui_stopped) }
@@ -76,11 +78,19 @@ class ExtensionsActivity : LocalizedActivity() {
                 else if (!detail) {
                     Text(AppText.get(R.string.ui_manage_optional_ubuntu_features), Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    ManagerSection(AppText.get(R.string.ui_available_extensions), padded = false) {
-                        ManagerSettingsRow(AppText.get(R.string.ui_ssh_terminal), R.drawable.ic_settings, AppText.get(R.string.ui_remote_ubuntu_access_included_with_the_app), value = status, divider = false) { detail = true }
-                        ManagerSettingsRow(AppText.get(R.string.cpolar_name), R.drawable.ic_link, AppText.get(R.string.cpolar_extension_subtitle),
-                            value = cpolarStatus(cpolar), divider = false) { cpolarDetail = true }
-                    }
+                    Text(AppText.get(R.string.ui_available_extensions), Modifier.padding(start = 4.dp, top = 4.dp),
+                        style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    FixedManagerMenu(listOf(
+                        ManagerMenuItem(AppText.get(R.string.terminal_name), R.drawable.ic_terminal, AppText.get(R.string.terminal_subtitle),
+                            badge = { Text(AppText.get(if (terminal.running) R.string.ui_running else R.string.terminal_built_in),
+                                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) {
+                            startActivity(Intent(this@ExtensionsActivity, TerminalActivity::class.java))
+                        },
+                        ManagerMenuItem(AppText.get(R.string.ui_ssh_terminal), R.drawable.ic_settings, AppText.get(R.string.ui_remote_ubuntu_access_included_with_the_app),
+                            badge = { Text(status, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) { detail = true },
+                        ManagerMenuItem(AppText.get(R.string.cpolar_name), R.drawable.ic_link, AppText.get(R.string.cpolar_extension_subtitle),
+                            badge = { Text(cpolarStatus(cpolar), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) { cpolarDetail = true }
+                    ), Modifier.weight(1f))
                     Text(AppText.get(R.string.ui_manage_runtime_extensions_here_manage_bot_plugins_in_the), Modifier.padding(horizontal = 4.dp),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {

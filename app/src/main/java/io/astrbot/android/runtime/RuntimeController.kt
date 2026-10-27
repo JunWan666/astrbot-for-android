@@ -123,6 +123,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     private val owner = Any().also { RuntimeStore.owner = it }
     private val runtime = BootstrapRuntime(context)
     private val ssh = SshEngine(context)
+    private val terminal = TerminalEngine(context, scope)
     private val sshRepository = SshRepository(context)
     private val cpolar = CpolarEngine(context, scope)
     private val cpolarRepository = CpolarRepository(context)
@@ -289,7 +290,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
 
     suspend fun execute(action: String, id: ServiceId?, backupId: String? = null, sourceUri: String? = null, updateId: String? = null,
                         backupLimitCount: Int = 0, backupLimitMiB: Int = 0,
-                        sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null) = commands.withLock {
+                        sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null,
+                        terminalSessionId: Long? = null) = commands.withLock {
         val diagnosticSnapshot = RuntimeStore.state.value
         var resumeSsh = false
         val readOnlyCheck = action in setOf("export-diagnostics", "check-environment")
@@ -314,6 +316,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             resumeSsh = action in setOf("backup", "backup-apk", "restore", "export-backup", "apply-backup", "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat") ||
                 backups.hasPendingRestore || updates.hasPendingUpdate || napcat.hasPendingUpdate || images.hasPendingUpdate
             if (resumeSsh) {
+                terminal.stop(if (TerminalStore.state.value.running) AppText.get(R.string.terminal_maintenance_closed) else null)
                 ssh.stop(paused = sshRepository.desired())
                 cpolar.stop(paused = cpolarRepository.desired())
             }
@@ -377,6 +380,15 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     cpolarRepository.uninstall()
                     cpolar.refresh()
                 }
+                "terminal-new" -> terminal.start(newSession = true)
+                "terminal-start" -> terminal.start(terminalSessionId ?: TerminalStore.state.value.selectedId)
+                "terminal-restart" -> {
+                    val target = terminalSessionId ?: TerminalStore.state.value.selectedId
+                    terminal.stopSession(target); terminal.start(target)
+                }
+                "terminal-close" -> terminal.stopSession(terminalSessionId, remove = true)
+                "terminal-stop" -> terminal.stopSession(terminalSessionId ?: TerminalStore.state.value.selectedId)
+                "terminal-stop-all" -> terminal.stop()
                 "ssh-start" -> {
                     sshRepository.ensureDefault()
                     ssh.start()
@@ -518,6 +530,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             event(AppText.get(R.string.ui_operation_failed_6846d, SecretRedactor.redact(message)))
             if (action.startsWith("ssh-")) SshStore.state.update { it.copy(error = message) }
             if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(error = message) }
+            if (action.startsWith("terminal-")) TerminalStore.state.update { it.copy(error = message) }
             updateState { it.copy(error = SecretRedactor.redact(message)) }
         } finally {
             withContext(NonCancellable) {
@@ -526,13 +539,6 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         SshStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.ui_maintenance_finished_but_ssh_could_not_restart_check_the)) }
                     }
                 }
-                if ((resumeSsh || action == "reconcile") && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && cpolarRepository.desired()) {
-                    runCatching { cpolar.start() }.onFailure {
-                        CpolarStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.cpolar_start_error)) }
-                    }
-                }
-                if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = false) }
-                if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = false) }
                 if (!readOnlyCheck) {
                     if (!backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate) retainLogs()
                     RuntimeStore.refreshInstallation(context)
@@ -929,6 +935,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     }
 
     suspend fun close() = commands.withLock {
+        terminal.close()
         cpolar.close()
         ssh.stop()
         supervisors.values.toList().reversed().forEach { it.close() }

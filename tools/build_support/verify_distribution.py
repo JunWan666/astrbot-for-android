@@ -66,6 +66,15 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
             assert notices.read("manager/" + name) == (root / source).read_bytes()
         assert b"MIT License" in notices.read("manager/LICENSE")
         assert b"JunWan666" in notices.read("manager/LICENSE")
+        terminal_renderer = json.loads((root / "runtime/terminal-assets.lock.json").read_text("utf-8"))
+        assert inventory["terminalRenderer"] == terminal_renderer
+        assert json.loads(notices.read("manager/terminal/terminal-assets.lock.json")) == terminal_renderer
+        for package in terminal_renderer["packages"]:
+            for entry in package["files"]:
+                data = (root / entry["path"]).read_bytes()
+                assert hashlib.sha256(data).hexdigest() == entry["sha256"]
+                if entry["path"].endswith("-LICENSE"):
+                    assert notices.read("manager/terminal/" + Path(entry["path"]).name) == data
         assert not any(item["id"] == "manager-license" for item in inventory["openItems"])
         names = set(notices.namelist())
         for path in names:

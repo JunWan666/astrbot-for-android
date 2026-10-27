@@ -37,13 +37,15 @@ SOURCE_ROOT_FILES = {
     ".github/workflows/renew-updates.yml", "runtime/update-public-key.der",
     "app/src/main/res/drawable-nodpi/logo_napcat.webp",
     "app/src/main/res/drawable-nodpi/app_logo.webp",
+    "app/src/main/assets/terminal/vendor/xterm-LICENSE",
+    "app/src/main/assets/terminal/vendor/addon-fit-LICENSE",
     *{f"app/src/main/res/mipmap-{density}/ic_launcher.png" for density in ("mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")},
     "README.md", "LICENSE",
     "build.gradle.kts", "settings.gradle.kts", "gradle.properties", "gradlew", "gradlew.bat", "build.bat",
 }
 SOURCE_EXTENSIONS = {
     ".kt", ".kts", ".java", ".xml", ".py", ".c", ".h", ".sh", ".js",
-    ".json", ".yaml", ".yml", ".txt", ".md", ".properties", ".ps1",
+    ".json", ".yaml", ".yml", ".txt", ".md", ".properties", ".ps1", ".html", ".css",
 }
 
 
@@ -489,6 +491,13 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     notices = {"runtime/" + path: data for path, data in files.items()}
     for name, source in (("LICENSE", "LICENSE"), ("NOTICE", "docs/legal/NOTICE")):
         notices["manager/" + name] = (root / source).read_bytes()
+    terminal_renderer = json.loads((root / "runtime/terminal-assets.lock.json").read_text("utf-8"))
+    for package in terminal_renderer["packages"]:
+        for entry in package["files"]:
+            verify(root / entry["path"], entry["sha256"])
+            if entry["path"].endswith("-LICENSE"):
+                notices["manager/terminal/" + Path(entry["path"]).name] = (root / entry["path"]).read_bytes()
+    notices["manager/terminal/terminal-assets.lock.json"] = json_bytes(terminal_renderer)
     dpkg = system_packages(files, links)
     ubuntu_collection = ubuntu_source_collection(root, image_manifest["sha256"], dpkg, notices, cache_dir)
     python = python_packages(files)
@@ -538,7 +547,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     inventory = {"schemaVersion": 1, "scope": "partial release evidence; not a complete SBOM or redistribution clearance",
                  "runtime": image_manifest, "runtimeEntriesScanned": entry_count, "native": native,
                  "ubuntuPackages": dpkg, "pythonPackages": python, "npmPackages": npm,
-                 "androidArtifacts": android, "originalSources": upstream,
+                 "androidArtifacts": android, "originalSources": upstream, "terminalRenderer": terminal_renderer,
                  "copyrightAliases": {"runtime/" + k: "runtime/" + v for k, v in sorted(links.items())},
                  "releaseReady": False, "openItems": gaps}
     if ubuntu_collection:

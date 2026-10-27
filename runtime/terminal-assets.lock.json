@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "description": "Unmodified offline terminal renderer; npm integrity and exact shipped files pinned.",
+  "packages": [
+    {
+      "name": "@xterm/xterm",
+      "version": "5.5.0",
+      "url": "https://registry.npmjs.org/@xterm/xterm/-/xterm-5.5.0.tgz",
+      "integrity": "sha512-hqJHYaQb5OptNunnyAnkHyM8aCjZ1MEIDTQu1iIbbTD/xops91NB5yq1ZK/dC2JDbVWtF23zUtl9JE2NqwT87A==",
+      "sha256": "bd954fa721872170188cc5d7e83e88db3c83c9a18a4e8d24c2783d26491f59d2",
+      "license": "MIT",
+      "files": [
+        {
+          "source": "package/lib/xterm.js",
+          "path": "app/src/main/assets/terminal/vendor/xterm.js",
+          "sha256": "1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495",
+          "bytes": 289441
+        },
+        {
+          "source": "package/css/xterm.css",
+          "path": "app/src/main/assets/terminal/vendor/xterm.css",
+          "sha256": "ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6",
+          "bytes": 5559
+        },
+        {
+          "source": "package/LICENSE",
+          "path": "app/src/main/assets/terminal/vendor/xterm-LICENSE",
+          "sha256": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd",
+          "bytes": 1261
+        }
+      ]
+    },
+    {
+      "name": "@xterm/addon-fit",
+      "version": "0.10.0",
+      "url": "https://registry.npmjs.org/@xterm/addon-fit/-/addon-fit-0.10.0.tgz",
+      "integrity": "sha512-UFYkDm4HUahf2lnEyHvio51TNGiLK66mqP2JoATy7hRZeXaGMRDr00JiSF7m63vR5WKATF605yEggJKsw0JpMQ==",
+      "sha256": "917ac44972453d5eed52edc1e50260c76398ce48cf2290c2e60671102bba0b33",
+      "license": "MIT",
+      "files": [
+        {
+          "source": "package/lib/addon-fit.js",
+          "path": "app/src/main/assets/terminal/vendor/addon-fit.js",
+          "sha256": "bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089",
+          "bytes": 1497
+        },
+        {
+          "source": "package/LICENSE",
+          "path": "app/src/main/assets/terminal/vendor/addon-fit-LICENSE",
+          "sha256": "e256f01188af527e4d06d21d06fbf785ae9c50d4b328bf03cbe0ba7f0aa4228f",
+          "bytes": 1103
+        }
+      ]
+    }
+  ]
+}

@@ -124,6 +124,18 @@ android {
     }
 }
 
+tasks.named("preBuild").configure {
+    doLast {
+        val lock = groovy.json.JsonSlurper().parse(rootProject.file("runtime/terminal-assets.lock.json")) as Map<*, *>
+        for (pkg in lock["packages"] as List<*>) for (entry in (pkg as Map<*, *>)["files"] as List<*>) {
+            val item = entry as Map<*, *>
+            val asset = rootProject.file(item["path"].toString())
+            val hash = MessageDigest.getInstance("SHA-256").digest(asset.readBytes()).joinToString("") { "%02x".format(it) }
+            check(hash == item["sha256"]) { "Terminal asset differs from pinned upstream file: ${item["path"]}" }
+        }
+    }
+}
+
 tasks.matching { it.name.startsWith("mergeBundled") && it.name.endsWith("Assets") }.configureEach {
     dependsOn(configurations.getByName("bundledReleaseRuntimeClasspath").buildDependencies)
     doFirst {

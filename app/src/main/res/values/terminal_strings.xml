@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_new">新建终端</string>
+    <string name="terminal_session_label">终端 %1$d</string>
+    <string name="terminal_close_label">关闭终端 %1$d</string>
+    <string name="terminal_running_count">%1$d 个终端后台运行</string>
+    <string name="terminal_end_all">结束全部终端</string>
+    <string name="terminal_no_sessions">点击右侧 + 新建终端</string>
+    <string name="terminal_session_limit">最多同时保留 %1$d 个终端，请先关闭不需要的会话。</string>
+    <string name="terminal_start_failed">终端启动失败，可重试或新建会话。</string>
+    <string name="terminal_copy_selection">复制</string>
+    <string name="terminal_select_all">全选</string>
+    <string name="terminal_scroll_latest">最新输出</string>
+</resources>

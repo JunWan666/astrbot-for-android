@@ -17,6 +17,9 @@ import io.astrbot.android.core.ServiceId
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -45,13 +48,20 @@ class RuntimeService : Service() {
             RuntimeStore.state.combine(NetworkConnectivity.observe(applicationContext)) { state, network -> state to network }
                 .combine(SshStore.state) { (state, network), ssh -> Triple(state, network, ssh) }
                 .combine(CpolarStore.state) { current, _ -> current }
+                .combine(TerminalStore.state) { current, _ -> current }
                 .combine(AppText.languageChanged) { current, _ -> current }
                 .collectLatest { (state, network, ssh) ->
                 val detail = if (state.busy) state.phase else state.services.values.joinToString(" · ") { "${it.id.label} ${it.localizedSummary()}" }
                 getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification("${network.title} · $detail" +
                     (if (ssh.running) AppText.get(R.string.ui_ssh_running) else "") +
                     (if (CpolarStore.state.value.running) " · cpolar" else "") +
+                    (if (TerminalStore.state.value.running) " · ${AppText.get(R.string.terminal_running_count, TerminalStore.state.value.runningCount)}" else "") +
                     (state.storageSpace.warning?.let { " · ${state.storageSpace.pressure.title}" } ?: "")))
+            }
+        }
+        scope.launch {
+            TerminalStore.state.map { it.running }.distinctUntilChanged().drop(1).collect { running ->
+                if (!running && operations.isEmpty() && !RuntimeStore.state.value.busy && idle()) stopSelf()
             }
         }
     }
@@ -74,10 +84,11 @@ class RuntimeService : Service() {
             previous.joinAll()
             controller.execute(action, id, intent?.getStringExtra("backupId"), intent?.getStringExtra("sourceUri"), intent?.getStringExtra("updateId"),
                 intent?.getIntExtra("backupLimitCount", 0) ?: 0, intent?.getIntExtra("backupLimitMiB", 0) ?: 0,
-                intent?.getIntExtra("sshPort", 8022) ?: 8022, intent?.getBooleanExtra("sshLan", false) ?: false, intent?.getStringExtra("sshPassword"))
+                intent?.getIntExtra("sshPort", 8022) ?: 8022, intent?.getBooleanExtra("sshLan", false) ?: false, intent?.getStringExtra("sshPassword"),
+                intent?.takeIf { it.hasExtra("terminalSessionId") }?.getLongExtra("terminalSessionId", -1))
             intent?.removeExtra("sshPassword")
             RuntimeStore.state.update { it.copy(completedOperation = requestId) }
-            if (RuntimeStore.state.value.services.values.none { it.desiredRunning } && !SshStore.state.value.running && !CpolarStore.state.value.running) stopSelf(startId)
+            if (idle()) stopSelf(startId)
         }
         operations.add(operation)
         operation.invokeOnCompletion { operations.remove(operation) }
@@ -86,6 +97,9 @@ class RuntimeService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun idle() = RuntimeStore.state.value.services.values.none { it.desiredRunning } &&
+        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running
 
     override fun onDestroy() {
         val closingOperations = operations.toList()
@@ -108,12 +122,15 @@ class RuntimeService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopCpolar = PendingIntent.getService(this, 3, Intent(this, RuntimeService::class.java).putExtra("operation", "cpolar-stop"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val stopTerminal = PendingIntent.getService(this, 4, Intent(this, RuntimeService::class.java).putExtra("operation", "terminal-stop-all"),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_notification)
             .setColor(Color.rgb(56, 103, 255))
             .setContentTitle(AppText.get(R.string.ui_astrbot_manager)).setContentText(detail).setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText(detail))
             .setOngoing(true).addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_bots), stop).build())
             .apply {
+                if (TerminalStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.terminal_end_all), stopTerminal).build())
                 if (SshStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_ssh), stopSsh).build())
                 if (CpolarStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.cpolar_stop), stopCpolar).build())
             }.build()
@@ -123,12 +140,14 @@ class RuntimeService : Service() {
         private const val CHANNEL = "local-runtime"
         private const val NOTIFICATION_ID = 2001
         fun command(context: Context, operation: String, id: ServiceId? = null, backupId: String? = null, sourceUri: String? = null, updateId: String? = null,
-                    backupLimitCount: Int = 0, backupLimitMiB: Int = 0, sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null): String {
+                    backupLimitCount: Int = 0, backupLimitMiB: Int = 0, sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null,
+                    terminalSessionId: Long? = null): String {
             val requestId = UUID.randomUUID().toString()
             context.startForegroundService(Intent(context, RuntimeService::class.java)
                 .putExtra("operation", operation).putExtra("serviceId", id?.name).putExtra("backupId", backupId).putExtra("sourceUri", sourceUri).putExtra("updateId", updateId).putExtra("requestId", requestId)
                 .putExtra("backupLimitCount", backupLimitCount).putExtra("backupLimitMiB", backupLimitMiB)
-                .putExtra("sshPort", sshPort).putExtra("sshLan", sshLan).putExtra("sshPassword", sshPassword))
+                .putExtra("sshPort", sshPort).putExtra("sshLan", sshLan).putExtra("sshPassword", sshPassword)
+                .apply { if (terminalSessionId != null) putExtra("terminalSessionId", terminalSessionId) })
             return requestId
         }
     }

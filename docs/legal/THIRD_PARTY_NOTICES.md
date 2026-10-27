@@ -4,6 +4,8 @@ The cpolar extension downloads the official Linux ARM64 client 3.3.12 only when 
 
 The original Android manager code and documentation are copyright (c) 2026 JunWan666 and licensed under the [MIT License](../../LICENSE). Attribution is recorded in [NOTICE](NOTICE).
 
+The offline Ubuntu terminal renderer bundles unmodified [xterm.js 5.5.0 and addon-fit 0.10.0](https://github.com/xtermjs/xterm.js), both under MIT. Exact npm tarball integrity values and shipped file hashes are pinned in `runtime/terminal-assets.lock.json`. The original copyright and license texts are retained alongside the assets in `app/src/main/assets/terminal/vendor/`, included in the manager source archive and the APK license collection. No CDN or remote terminal page is loaded.
+
 This file describes the pinned complete ARM64 runtime, not just the Ubuntu bootstrap. The manager's MIT license does not replace third-party terms or grant permission to redistribute third-party software.
 
 The service cards use the [AstrBot brand symbol](https://astrbot.app/assets/astrbot-logo-with-text.svg) and the [NapCat artwork supplied for this project](https://cdn.apifox.com/app/project-icon/custom/20241226/3c5b999f-935a-4116-9d68-e4ddbaa7ef3f.png). The original files are retained in `docs/images/`; source URLs, SHA-256 and Android resource transformations are recorded in `runtime/brand-assets.json`. Artwork and trademarks retain their respective owners' rights and are separate from the manager's MIT license.

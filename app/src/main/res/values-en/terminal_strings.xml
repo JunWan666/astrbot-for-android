@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="terminal_new">New terminal</string>
+    <string name="terminal_session_label">Terminal %1$d</string>
+    <string name="terminal_close_label">Close terminal %1$d</string>
+    <string name="terminal_running_count">%1$d terminals running</string>
+    <string name="terminal_end_all">End all terminals</string>
+    <string name="terminal_no_sessions">Tap + to open a terminal</string>
+    <string name="terminal_session_limit">Keep up to %1$d terminals. Close an unused session first.</string>
+    <string name="terminal_start_failed">Could not start the terminal. Retry or open another session.</string>
+    <string name="terminal_copy_selection">Copy</string>
+    <string name="terminal_select_all">Select all</string>
+    <string name="terminal_scroll_latest">Latest output</string>
+</resources>

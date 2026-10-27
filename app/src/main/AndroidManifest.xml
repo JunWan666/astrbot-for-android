@@ -27,6 +27,7 @@
         <activity android:name=".CpolarWebUiActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ThirdPartyNoticesActivity" android:exported="false" />
         <activity android:name=".ExtensionsActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".TerminalActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ManagerUpdateActivity" android:exported="false" />
         <activity android:name=".StorageUsageActivity" android:exported="false" />
         <provider android:name=".ManagerApkProvider"
