@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "ubuntuVersion": "24.04",
+  "architecture": "arm64",
+  "packages": ["xvfb", "xauth", "fluxbox", "feh", "x11vnc", "novnc", "websockify", "dbus-x11", "fonts-wqy-zenhei", "tmux", "x11-utils"],
+  "qq": {
+    "version": "3.2.32-52194",
+    "url": "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.33/release/3f89efc5/QQ_3.2.32_260812_arm64_01.deb",
+    "bytes": 205524324,
+    "sha256": "8796ccfd66acc025ef18db37185532d40bc8c58921e17da6d28c295acbcf8f92"
+  }
+}

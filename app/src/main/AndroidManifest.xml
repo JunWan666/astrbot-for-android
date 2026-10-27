@@ -25,6 +25,8 @@
         </service>
         <activity android:name=".WebUiActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".CpolarWebUiActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".DesktopWebUiActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".DesktopActivity" android:exported="false" />
         <activity android:name=".ThirdPartyNoticesActivity" android:exported="false" />
         <activity android:name=".ExtensionsActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".TerminalActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />

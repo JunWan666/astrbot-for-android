@@ -49,6 +49,7 @@ class RuntimeService : Service() {
                 .combine(SshStore.state) { (state, network), ssh -> Triple(state, network, ssh) }
                 .combine(CpolarStore.state) { current, _ -> current }
                 .combine(TerminalStore.state) { current, _ -> current }
+                .combine(DesktopStore.state) { current, _ -> current }
                 .combine(AppText.languageChanged) { current, _ -> current }
                 .collectLatest { (state, network, ssh) ->
                 val detail = if (state.busy) state.phase else state.services.values.joinToString(" · ") { "${it.id.label} ${it.localizedSummary()}" }
@@ -56,6 +57,7 @@ class RuntimeService : Service() {
                     (if (ssh.running) AppText.get(R.string.ui_ssh_running) else "") +
                     (if (CpolarStore.state.value.running) " · cpolar" else "") +
                     (if (TerminalStore.state.value.running) " · ${AppText.get(R.string.terminal_running_count, TerminalStore.state.value.runningCount)}" else "") +
+                    (if (DesktopStore.state.value.running) " · ${AppText.get(R.string.desktop_name)}" else "") +
                     (state.storageSpace.warning?.let { " · ${state.storageSpace.pressure.title}" } ?: "")))
             }
         }
@@ -99,7 +101,7 @@ class RuntimeService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun idle() = RuntimeStore.state.value.services.values.none { it.desiredRunning } &&
-        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running
+        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running && !DesktopStore.state.value.running
 
     override fun onDestroy() {
         val closingOperations = operations.toList()
@@ -124,12 +126,15 @@ class RuntimeService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopTerminal = PendingIntent.getService(this, 4, Intent(this, RuntimeService::class.java).putExtra("operation", "terminal-stop-all"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val stopDesktop = PendingIntent.getService(this, 5, Intent(this, RuntimeService::class.java).putExtra("operation", "desktop-stop"),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_notification)
             .setColor(Color.rgb(56, 103, 255))
             .setContentTitle(AppText.get(R.string.ui_astrbot_manager)).setContentText(detail).setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText(detail))
             .setOngoing(true).addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_bots), stop).build())
             .apply {
+                if (DesktopStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.desktop_stop), stopDesktop).build())
                 if (TerminalStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.terminal_end_all), stopTerminal).build())
                 if (SshStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_ssh), stopSsh).build())
                 if (CpolarStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.cpolar_stop), stopCpolar).build())

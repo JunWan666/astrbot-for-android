@@ -58,7 +58,7 @@ data class ManagerState(
 )
 
 enum class LogCategory(private val labelResource: Int) {
-    MANAGER(R.string.ui_manager_7ad33), RUNTIME(R.string.ui_runtime), ASTRBOT(R.string.component_astrbot), NAPCAT(R.string.component_napcat_qq), CPOLAR(R.string.cpolar_name)
+    MANAGER(R.string.ui_manager_7ad33), RUNTIME(R.string.ui_runtime), ASTRBOT(R.string.component_astrbot), NAPCAT(R.string.component_napcat_qq), CPOLAR(R.string.cpolar_name), DESKTOP(R.string.desktop_name)
 ;
     val label: String get() = AppText.get(labelResource)
 }
@@ -95,6 +95,10 @@ object RuntimeStore {
             ssh.ensureDefault()
             SshStore.state.update { state -> state.copy(configuration = ssh.configuration(), desired = ssh.desired()) }
         }.onFailure { SshStore.state.update { it.copy(error = AppText.get(R.string.ui_ssh_extension_settings_are_unavailable_configure_ssh_again_or)) } }
+        runCatching {
+            val desktop = DesktopRepository(context)
+            DesktopStore.state.update { it.copy(configuration = desktop.configuration(), desired = desktop.desired()) }
+        }.onFailure { DesktopStore.state.update { it.copy(error = AppText.get(R.string.desktop_operation_failed)) } }
         state.update { it.copy(environmentInstalled = installed, componentsReady = ready,
             services = it.services.mapValues { (id, status) -> if (owner == null) status.copy(history = histories.getValue(id)) else status },
             versions = inspection?.components.orEmpty(), versionNotice = inspection?.notice, versionsCheckedAtMillis = inspection?.checkedAtMillis,
@@ -127,6 +131,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     private val sshRepository = SshRepository(context)
     private val cpolar = CpolarEngine(context, scope)
     private val cpolarRepository = CpolarRepository(context)
+    private val desktop = DesktopEngine(context, scope)
+    private val desktopRepository = DesktopRepository(context)
     private val configuration = RuntimeConfiguration(context)
     private val activeConnections = ConcurrentHashMap<ServiceId, WebUiConnection>()
     private val commands get() = RuntimeStore.operationLock
@@ -151,6 +157,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     private val histories = ServiceHistoryRepository(context)
     private val supervisors = ServiceId.entries.associateWith { id ->
         ProcessSupervisor(id, scope, launcher = {
+            if (id == ServiceId.NAPCAT) {
+                checkLocalized(!DesktopStore.state.value.qqRunning) { AppText.get(R.string.desktop_qq_stop_first) }
+            }
             if (id == ServiceId.NAPCAT) NapCatCompatibility(context).prepare()
             val connection = configuration.read(id)
             connection.endpoint?.let { checkPortFree(it) }
@@ -294,10 +303,12 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         terminalSessionId: Long? = null) = commands.withLock {
         val diagnosticSnapshot = RuntimeStore.state.value
         var resumeSsh = false
+        var resumeBots = emptyList<ServiceId>()
         val readOnlyCheck = action in setOf("export-diagnostics", "check-environment")
         updateState { it.copy(busy = true, error = if (readOnlyCheck) diagnosticSnapshot.error else null, notice = null) }
         if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = true, error = null) }
         if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = true, error = null) }
+        if (action.startsWith("desktop-")) DesktopStore.state.update { it.copy(busy = true, error = null) }
         event(AppText.get(R.string.ui_start_1ae95, action, id?.label.orEmpty()))
         try {
             if (action == "check-environment") {
@@ -313,12 +324,17 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 updateState { it.copy(notice = AppText.get(R.string.ui_diagnostics_exported_review_log_contents_before_sharing)) }
                 return@withLock
             }
-            resumeSsh = action in setOf("backup", "backup-apk", "restore", "export-backup", "apply-backup", "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat") ||
+            resumeSsh = action in setOf("desktop-install", "backup", "backup-apk", "restore", "export-backup", "apply-backup", "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat") ||
                 backups.hasPendingRestore || updates.hasPendingUpdate || napcat.hasPendingUpdate || images.hasPendingUpdate
             if (resumeSsh) {
                 terminal.stop(if (TerminalStore.state.value.running) AppText.get(R.string.terminal_maintenance_closed) else null)
                 ssh.stop(paused = sshRepository.desired())
                 cpolar.stop(paused = cpolarRepository.desired())
+                desktop.stop(paused = desktopRepository.desired())
+            }
+            if (action == "desktop-install") {
+                resumeBots = ServiceId.entries.filter { supervisors.getValue(it).state.value.desiredRunning }
+                supervisors.values.toList().reversed().forEach { it.stop() }
             }
             if (backups.hasPendingRestore || updates.hasPendingUpdate || napcat.hasPendingUpdate || images.hasPendingUpdate) supervisors.values.toList().reversed().forEach { it.stop() }
             images.recover()?.let { result -> updateState { it.copy(notice = result) } }
@@ -380,6 +396,32 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     cpolarRepository.uninstall()
                     cpolar.refresh()
                 }
+                "desktop-install" -> desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                "desktop-start" -> { desktop.start(); desktopRepository.setDesired(true); desktop.refresh() }
+                "desktop-stop" -> {
+                    desktopRepository.setDesired(false); desktopRepository.setQqDesired(false)
+                    desktop.stop(); desktop.refresh()
+                }
+                "desktop-qq-install" -> desktopRepository.installQq { phase -> updateState { it.copy(phase = phase) } }
+                "desktop-qq-start" -> {
+                    checkLocalized(desktopRepository.configuration().qqInstalled) { AppText.get(R.string.desktop_qq_install_first) }
+                    val wanted = preferences.getBoolean("desired_NAPCAT", false)
+                    checkLocalized(preferences.edit().putBoolean("desired_NAPCAT", false).commit()) { AppText.get(R.string.ui_unable_to_save_stop_preferences) }
+                    supervisors.getValue(ServiceId.NAPCAT).stop()
+                    try { desktop.startQq() } catch (failure: Exception) {
+                        withContext(NonCancellable) {
+                            desktop.stopQq()
+                            if (wanted) {
+                                preferences.edit().putBoolean("desired_NAPCAT", true).commit()
+                                runCatching { supervisors.getValue(ServiceId.NAPCAT).start() }
+                            }
+                        }
+                        throw failure
+                    }
+                    desktopRepository.setDesired(true); desktopRepository.setQqDesired(true); desktop.refresh()
+                }
+                "desktop-qq-stop" -> { desktopRepository.setQqDesired(false); desktop.stopQq() }
+                "desktop-uninstall" -> { desktop.stop(); desktopRepository.uninstall(); desktop.refresh() }
                 "terminal-new" -> terminal.start(newSession = true)
                 "terminal-start" -> terminal.start(terminalSessionId ?: TerminalStore.state.value.selectedId)
                 "terminal-restart" -> {
@@ -418,6 +460,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_this_apk_contains_only_the_base_runtime_complete_resources) }
                     configuration.prepareDefaults()
                     val ids = id?.let { listOf(it) } ?: ServiceId.entries
+                    if (ServiceId.NAPCAT in ids) { desktopRepository.setQqDesired(false); desktop.stopQq() }
                     if (action == "restart") ids.reversed().forEach { supervisors.getValue(it).stop() }
                     for (serviceId in ids) {
                         checkLocalized(preferences.edit().putBoolean("desired_${serviceId.name}", true).commit()) { AppText.get(R.string.ui_unable_to_save_runtime_preferences_check_storage_space) }
@@ -506,6 +549,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 else -> error(AppText.get(R.string.ui_unknown_runtime_operation))
             }
         } catch (_: TimeoutCancellationException) {
+            if (action.startsWith("desktop-")) DesktopStore.state.update { it.copy(error = AppText.get(R.string.desktop_operation_failed)) }
             updateState { it.copy(error = if (action == "apply-backup")
                 AppText.get(R.string.ui_services_did_not_become_ready_after_import_recovery_of)
                 else if (action in setOf("apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat"))
@@ -513,7 +557,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 else AppText.get(R.string.ui_webui_readiness_timed_out_process_monitoring_continues_view_logs)) }
         } catch (failure: CancellationException) { throw failure }
         catch (failure: Exception) {
-            val message = if (action.startsWith("cpolar-")) failure.userFacingMessage() ?: AppText.get(R.string.cpolar_operation_error)
+            val message = if (action.startsWith("desktop-")) failure.userFacingMessage() ?: AppText.get(R.string.desktop_operation_failed)
+            else if (action.startsWith("cpolar-")) failure.userFacingMessage() ?: AppText.get(R.string.cpolar_operation_error)
             else if (action.startsWith("ssh-")) failure.userFacingMessage()
                 ?: AppText.get(R.string.ui_ssh_operation_failed_check_the_port_runtime_and_free)
             else if (action == "export-diagnostics") AppText.get(R.string.ui_diagnostic_export_failed_check_free_space_or_choose_another)
@@ -531,14 +576,32 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             if (action.startsWith("ssh-")) SshStore.state.update { it.copy(error = message) }
             if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(error = message) }
             if (action.startsWith("terminal-")) TerminalStore.state.update { it.copy(error = message) }
+            if (action.startsWith("desktop-")) DesktopStore.state.update { it.copy(error = SecretRedactor.redact(message)) }
             updateState { it.copy(error = SecretRedactor.redact(message)) }
         } finally {
             withContext(NonCancellable) {
+                for (serviceId in resumeBots) runCatching { supervisors.getValue(serviceId).start() }.onFailure {
+                    event(AppText.get(R.string.desktop_resume_failed, serviceId.label))
+                }
                 if (resumeSsh && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && sshRepository.desired()) {
                     runCatching { ssh.start() }.onFailure {
                         SshStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.ui_maintenance_finished_but_ssh_could_not_restart_check_the)) }
                     }
                 }
+                if ((resumeSsh || action == "reconcile") && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && cpolarRepository.desired()) {
+                    runCatching { cpolar.start() }.onFailure {
+                        CpolarStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.cpolar_start_error)) }
+                    }
+                }
+                if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = false) }
+                if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = false) }
+                if ((resumeSsh || action == "reconcile") && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && desktopRepository.desired()) {
+                    runCatching {
+                        desktop.start()
+                        if (desktopRepository.qqDesired() && !preferences.getBoolean("desired_NAPCAT", false)) desktop.startQq()
+                    }.onFailure { DesktopStore.state.update { state -> state.copy(paused = false, error = AppText.get(R.string.desktop_operation_failed)) } }
+                }
+                if (action.startsWith("desktop-")) { desktop.refresh(); DesktopStore.state.update { it.copy(busy = false) } }
                 if (!readOnlyCheck) {
                     if (!backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate) retainLogs()
                     RuntimeStore.refreshInstallation(context)
@@ -937,6 +1000,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     suspend fun close() = commands.withLock {
         terminal.close()
         cpolar.close()
+        desktop.close()
         ssh.stop()
         supervisors.values.toList().reversed().forEach { it.close() }
         client.connectionPool.evictAll()
