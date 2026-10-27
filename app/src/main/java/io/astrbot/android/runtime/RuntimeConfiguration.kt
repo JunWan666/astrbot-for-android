@@ -13,6 +13,7 @@ import io.astrbot.android.core.LocalEndpoint
 import io.astrbot.android.core.ServiceId
 import org.json.JSONObject
 import org.json.JSONArray
+import org.json.JSONTokener
 import java.io.File
 import java.security.SecureRandom
 
@@ -43,9 +44,76 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
     }
 
     private fun defaultNetwork() = JSONObject().put("websocketClients", JSONArray().put(JSONObject()
-        .put("name", "AstrBot").put("enable", true).put("url", "ws://localhost:6199/ws")
+        .put("name", "AstrBot").put("enable", true).put("url", "ws://127.0.0.1:6199/ws")
         .put("messagePostFormat", "array").put("reportSelfMessage", false).put("token", "")
         .put("reconnectInterval", 5000).put("heartInterval", 30000).put("debug", false)))
+
+    /** Called only before launching NapCat, after its previous process has stopped. */
+    fun prepareLocalOneBotCompatibility(): Int {
+        // Migrate only our original, enabled, empty-token pair. Custom endpoints stay intact.
+        val astrbot = localOneBotDocument(File(persistent, "astrbot/data/cmd_config.json")) ?: return 0
+        val platforms = astrbot.optJSONArray("platform") ?: return 0
+        if ((0 until platforms.length()).none { index ->
+            platforms.optJSONObject(index)?.let {
+                it.opt("type") == "aiocqhttp" && it.opt("id") == "napcat" && it.opt("enable") == true &&
+                    it.opt("ws_reverse_host") == "127.0.0.1" && it.opt("ws_reverse_port") == 6199 &&
+                    it.opt("ws_reverse_token") == ""
+            } == true
+        }) return 0
+        val originalClient = defaultNetwork().getJSONArray("websocketClients").getJSONObject(0)
+            .put("url", "ws://localhost:6199/ws")
+        var changed = 0
+        for (file in File(persistent, "napcat/config").listFiles().orEmpty().filter {
+            it.name == "onebot11.json" || it.name.matches(Regex("onebot11_[0-9]{5,20}\\.json"))
+        }) {
+            val document = localOneBotDocument(file) ?: continue
+            val clients = document.optJSONObject("network")?.optJSONArray("websocketClients") ?: continue
+            val matching = (0 until clients.length()).mapNotNull { clients.optJSONObject(it) }.filter { client ->
+                originalClient.keys().asSequence().all { key -> client.opt(key) == originalClient.get(key) }
+            }
+            if (matching.isEmpty()) continue
+            try {
+                val backup = File(persistent, "manager/onebot-ipv4-backup/${file.name}")
+                require(backup.canonicalFile.toPath().startsWith(persistent.canonicalFile.toPath()))
+                require(listOf(backup, File(backup.path + ".bak"), File(backup.path + ".new")).none {
+                    java.nio.file.Files.isSymbolicLink(it.toPath())
+                })
+                // Keep the first original for manual recovery; never replace it on later launches.
+                if (!backup.exists() && !File(backup.path + ".bak").exists()) {
+                    writeOneBotAtomic(backup, file.readBytes(), 384)
+                }
+                matching.forEach { it.put("url", "ws://127.0.0.1:6199/ws") }
+                writeOneBotAtomic(file, document.toString(2).toByteArray(Charsets.UTF_8), Os.stat(file.path).st_mode and 511)
+                changed += matching.size
+            } catch (_: Exception) {
+                throw LocalizedStateException(AppText.get(R.string.onebot_ipv4_compat_failed))
+            }
+        }
+        return changed
+    }
+
+    private fun localOneBotDocument(file: File): JSONObject? = runCatching {
+        require(file.canonicalFile.toPath().startsWith(persistent.canonicalFile.toPath()))
+        require(file.isFile && file.length() <= 8 * 1024 * 1024)
+        require(listOf(file, File(file.path + ".bak"), File(file.path + ".new")).none {
+            java.nio.file.Files.isSymbolicLink(it.toPath())
+        })
+        // Do not interfere with a pending upstream/manager write.
+        require(!File(file.path + ".bak").exists() && !File(file.path + ".new").exists())
+        val parser = JSONTokener(file.readText(Charsets.UTF_8).removePrefix("\uFEFF"))
+        val document = parser.nextValue() as JSONObject
+        require(parser.nextClean() == '\u0000')
+        document
+    }.getOrNull()
+
+    private fun writeOneBotAtomic(file: File, bytes: ByteArray, mode: Int) {
+        val atomic = AtomicFile(file)
+        val output = atomic.startWrite()
+        try { output.write(bytes); Os.fchmod(output.fd, mode); atomic.finishWrite(output) }
+        catch (failure: Throwable) { atomic.failWrite(output); throw failure }
+        check(file.readBytes().contentEquals(bytes))
+        DurableFiles.sync(file.parentFile!!)
+    }
 
     private fun seedEmptyOneBotOnce(astrbot: File) {
         val marker = File(persistent, "manager/onebot-defaults-v1.json")

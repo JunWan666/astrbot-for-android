@@ -1170,4 +1170,11 @@
     <string name="background_autostart_oppo">"设置 → 应用 → 应用管理 → 本应用，开启“允许自启动”和“允许关联启动”；也可在手机管家的启动管理中查找。\n\n完成后返回，勾选确认。"</string>
     <string name="background_autostart_samsung">"三星通常没有独立的自启动开关。请在“设备维护 → 电池 → 后台使用限制”中，将本应用加入“从不休眠的应用程序”。\n\n按本机可用选项检查后返回，勾选确认。"</string>
     <string name="background_autostart_generic">"设置 → 应用 → 本应用，或手机管家 → 启动管理，允许“自启动”和“关联启动”。系统未提供相关开关时，按本机可用选项检查。\n\n检查后返回，勾选确认。"</string>
+    <string name="napcat_startup_compat_title">"NapCat 反检测选项兼容性"</string>
+    <string name="napcat_startup_compat_corrected">"当前 NapCat / Linux QQ 组合在 Android PRoot 中开启反检测可能导致启动或登录后 Worker 崩溃。按上游建议关闭了 %1$s；O3 模式及其他设置保持原值。修改前配置已保留在 persistent/manager/napcat-startup-compat/napcat.before-compat.json。"</string>
+    <string name="napcat_startup_compat_failed">"无法检查或保存 NapCat 反检测兼容配置。为避免启动或登录后反复崩溃，修正前不会继续启动 NapCat；QQ 登录和业务配置不会重置。请检查 napcat.json 格式、文件权限及可用空间；当前组合应关闭 Hook、Window、Module、Process、Container、JS，O3 单独设置。"</string>
+    <string name="napcat_startup_compat_ok">"当前 NapCat 4.18.41 / Linux QQ 3.2.34-53644 未显式开启六项反检测；若以后启用，下次启动前会备份配置并自动关闭，避免启动或登录后崩溃。O3 模式及其他设置保持原值。"</string>
+    <string name="napcat_startup_compat_pending">"反检测已开启，当前环境已复现启动或登录后 Worker 崩溃。按上游建议，下次启动前会备份配置并关闭 Hook、Window、Module、Process、Container、JS；O3 模式、QQ 登录和网络配置保留，无需重装环境。"</string>
+    <string name="onebot_ipv4_compat_corrected">"已将原始默认 OneBot 连接切换为 ws://127.0.0.1:6199/ws，避免 localhost 解析到 IPv6 后无法连接。原配置保留在 persistent/manager/onebot-ipv4-backup/。"</string>
+    <string name="onebot_ipv4_compat_failed">"无法保存 OneBot 本机连接兼容配置。请检查可用空间和 NapCat 配置文件权限，再重新启动。原配置备份位于 persistent/manager/onebot-ipv4-backup/。"</string>
 </resources>

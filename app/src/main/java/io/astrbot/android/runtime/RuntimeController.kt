@@ -153,6 +153,19 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             if (id == ServiceId.NAPCAT) NapCatCompatibility(context).prepare()
             val connection = configuration.read(id)
             connection.endpoint?.let { checkPortFree(it) }
+            if (id == ServiceId.NAPCAT) {
+                if (configuration.prepareLocalOneBotCompatibility() > 0) {
+                    val message = AppText.get(R.string.onebot_ipv4_compat_corrected)
+                    RuntimeStore.log(context, id).append(message)
+                    event(message)
+                }
+                val corrected = NapCatStartupCompatibility(context).prepare()
+                if (corrected.isNotEmpty()) {
+                    val message = AppText.get(R.string.napcat_startup_compat_corrected, corrected.joinToString(", "))
+                    RuntimeStore.log(context, id).append(message)
+                    event(message)
+                }
+            }
             activeConnections[id] = connection
             updateState { it.copy(webUis = it.webUis + (id to connection)) }
             val launchNonce = if (id == ServiceId.ASTRBOT) oneBotObservation.prepareLaunch() else null

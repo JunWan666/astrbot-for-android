@@ -134,8 +134,17 @@ internal object OfficialNapCat {
 }
 
 internal object NapCatVersion {
-    fun read(program: File, source: String): String? {
-        val marker = runCatching { DurableFiles.read(File(program, OfficialNapCat.MARKER)) }.getOrNull()
+    fun read(program: File, source: String, recoverPendingWrite: Boolean = true): String? {
+        val marker = runCatching {
+            val file = File(program, OfficialNapCat.MARKER)
+            if (recoverPendingWrite) DurableFiles.read(file) else {
+                val selected = File(file.path + ".bak").takeIf { it.exists() } ?: file
+                if (!selected.exists()) null else {
+                    require(selected.isFile && selected.length() <= 64 * 1024 && !java.nio.file.Files.isSymbolicLink(selected.toPath()))
+                    JSONObject(selected.readText())
+                }
+            }
+        }.getOrNull()
         if (marker != null) {
             val version = marker.optString("version")
             if (version.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")) &&

@@ -75,6 +75,15 @@ internal class EnvironmentChecks(private val context: Context,
                 else -> AppText.get(R.string.ui_local_endpoint_configuration_is_recognized_login_models_qq_and)
             })
         }
+        try {
+            val compatibility = NapCatStartupCompatibility(context).inspect()
+            if (compatibility.affectedRuntime) item(AppText.get(R.string.napcat_startup_compat_title),
+                if (compatibility.optionsToDisable.isEmpty()) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.ATTENTION,
+                AppText.get(if (compatibility.optionsToDisable.isEmpty()) R.string.napcat_startup_compat_ok else R.string.napcat_startup_compat_pending))
+        } catch (_: Exception) {
+            item(AppText.get(R.string.napcat_startup_compat_title), EnvironmentCheckStatus.ATTENTION,
+                AppText.get(R.string.napcat_startup_compat_failed))
+        }
         var dependenciesReady = false
         if (installed && nativeReady && !pending && missing.isEmpty()) {
             dependenciesReady = try { pythonCheck(runtime) }
