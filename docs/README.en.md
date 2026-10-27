@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.0.0-3867FF?style=flat-square" alt="Version 1.0.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.1.0-3867FF?style=flat-square" alt="Version 1.1.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -34,7 +34,7 @@ Built with Kotlin and Jetpack Compose, the app provides a native management inte
 
 ## Screenshots
 
-The current stable release is **v1.0.0**. The main branch and screenshots below include the language settings, cpolar extension and storage warning changes being developed for a future release.
+**v1.1.0** interface previews: service management, personas, settings, live logs and both embedded WebUIs.
 
 <table width="100%" align="center">
   <tr>

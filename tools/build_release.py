@@ -181,12 +181,18 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     if not versions:
         raise ValueError("未找到稳定版 Android Build Tools，请安装 35.0.0 或更新版本")
     tools = max(versions, key=lambda p: tuple(map(int, p.name.split('.'))))
+    # Force verification of v1 as well: the default minSdk >= 24 skips it once v2 verifies.
+    # This affects signature verification only; the app still requires Android 8 (API 26).
     verify = subprocess.run([str(java_home / "bin" / ("java.exe" if os.name == "nt" else "java")), "-jar",
-        str(tools / "lib/apksigner.jar"), "verify", "--verbose", "--print-certs", str(apk)],
+        str(tools / "lib/apksigner.jar"), "verify", "--verbose", "--print-certs", "--min-sdk-version", "23", str(apk)],
         check=True, capture_output=True, text=True, encoding="utf8")
     signers = re.findall(r"Signer #\d+ certificate SHA-256 digest: ([a-fA-F0-9]+)", verify.stdout)
     if signers != [fingerprint]:
         raise ValueError("APK 签名与长期密钥不一致，已拒绝导出")
+    schemes = {scheme: bool(re.search(rf"Verified using {scheme} scheme [^\n]*: true", verify.stdout))
+               for scheme in ("v1", "v2", "v3")}
+    if not all(schemes.values()):
+        raise ValueError("APK 必须同时通过 v1、v2、v3 签名验证，兼容签名缺失，已拒绝导出")
     badging = subprocess.run([str(tools / ("aapt2.exe" if os.name == "nt" else "aapt2")), "dump", "badging", str(apk)],
                              check=True, capture_output=True, text=True, encoding="utf8").stdout
     expected = f"package: name='{PACKAGE}' versionCode='{item['versionCode']}' versionName='{item['versionName']}'"
@@ -206,7 +212,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     (output / "output-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf8")
     record = {"file": name, "packageName": PACKAGE, "versionName": version, "versionCode": item["versionCode"],
               "bytes": target.stat().st_size, "sha256": sha, "certificateSha256": fingerprint,
-              "signingVerified": True}
+              "signingVerified": True, "signatureSchemes": schemes}
     (output / "release.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf8")
     (output / "SHA256SUMS").write_text(f"{sha}  {name}\n", encoding="utf8")
     older = sorted(output.glob("AstrBot-for-Android-v*-arm64-v8a.apk"), key=lambda p: p.stat().st_mtime, reverse=True)

@@ -83,6 +83,11 @@ android {
             storePassword = releaseSigning.getProperty("storePassword")
             keyAlias = releaseSigning.getProperty("keyAlias")
             keyPassword = releaseSigning.getProperty("keyPassword")
+            // Some vendor installers still inspect META-INF even on Android 8+.
+            // Keep all standalone-APK signatures on the same long-term identity.
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
         }
         buildTypes.getByName("release").signingConfig = identity
     }

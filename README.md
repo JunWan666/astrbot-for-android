@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.0.0-3867FF?style=flat-square" alt="Version 1.0.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.1.0-3867FF?style=flat-square" alt="Version 1.1.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -34,7 +34,7 @@
 
 ## 界面预览
 
-当前正式版本为 **v1.0.0**。主分支和下方截图包含开发中的中英文界面、cpolar 扩展与存储提醒调整，相关功能将在后续版本发布。
+**v1.1.0** 界面预览，包含服务管理、人设库、设置、实时日志及两套内置后台。
 
 <table width="100%" align="center">
   <tr>
