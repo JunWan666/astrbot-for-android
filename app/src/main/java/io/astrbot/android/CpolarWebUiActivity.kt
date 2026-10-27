@@ -55,7 +55,7 @@ class CpolarWebUiActivity : LocalizedActivity() {
             setOnClickListener { action(this) }
             toolbar.addView(this, LinearLayout.LayoutParams(dp(48), dp(48)))
         }
-        icon(AppText.get(R.string.ui_back), R.drawable.ic_back) { onBackPressedDispatcher.onBackPressed() }
+        icon(AppText.get(R.string.ui_back), R.drawable.ic_back) { finish() }
         val heading = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         heading.addView(TextView(this).apply {
             text = "cpolar WebUI"; textSize = 16f; setTextColor(foreground)
@@ -142,7 +142,8 @@ class CpolarWebUiActivity : LocalizedActivity() {
         savedInstanceState?.getBundle("browser")?.let { loaded = webView.restoreState(it) != null }
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (recovery.visibility != View.VISIBLE && webView.canGoBack()) webView.goBack() else finish()
+                // Dashboard redirects can keep repopulating browser history. Back always returns to the manager.
+                finish()
             }
         })
         lifecycleScope.launch {
