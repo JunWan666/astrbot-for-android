@@ -6,18 +6,24 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -28,44 +34,78 @@ internal enum class BackgroundTopic(private val titleResource: Int) {
     AUTOSTART(R.string.ui_auto_start_permissions), TASKS(R.string.ui_lock_recent_task), HELP(R.string.ui_background_operation_guide)
 ;
     val title: String get() = AppText.get(titleResource)
+    val manual: Boolean get() = this == UNRESTRICTED || this == AUTOSTART || this == TASKS
 }
+
+internal data class BackgroundSettingStatus(val complete: Boolean, val manual: Boolean, val label: String, val detail: String)
 
 internal object BackgroundGuide {
     private const val CHANNEL = "local-runtime"
-    fun status(context: Context, topic: BackgroundTopic): String = when (topic) {
+    fun preferences(context: Context): SharedPreferences = context.getSharedPreferences("background-guide", Context.MODE_PRIVATE)
+
+    fun setConfirmed(context: Context, topic: BackgroundTopic, confirmed: Boolean) {
+        require(topic.manual) { "System permissions must be read from Android" }
+        preferences(context).edit().putBoolean(topic.name, confirmed).apply()
+    }
+
+    fun status(context: Context, topic: BackgroundTopic): BackgroundSettingStatus = when (topic) {
         BackgroundTopic.NOTIFICATIONS -> context.getSystemService(NotificationManager::class.java).let {
-            when {
-                !it.areNotificationsEnabled() -> AppText.get(R.string.ui_notifications_are_blocked_enable_them)
-                it.getNotificationChannel(CHANNEL)?.importance == NotificationManager.IMPORTANCE_NONE -> AppText.get(R.string.ui_app_notifications_are_allowed_but_the_service_notification_channel)
-                else -> AppText.get(R.string.ui_service_notifications_are_allowed)
-            }
+            val allowed = it.areNotificationsEnabled()
+            val channelBlocked = it.getNotificationChannel(CHANNEL)?.importance == NotificationManager.IMPORTANCE_NONE
+            BackgroundSettingStatus(allowed && !channelBlocked, false,
+                AppText.get(if (allowed && !channelBlocked) R.string.background_enabled else R.string.background_needs_setting),
+                AppText.get(when {
+                    !allowed -> R.string.ui_notifications_are_blocked_enable_them
+                    channelBlocked -> R.string.ui_app_notifications_are_allowed_but_the_service_notification_channel
+                    else -> R.string.ui_service_notifications_are_allowed
+                }))
         }
-        BackgroundTopic.BATTERY -> if (context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)) AppText.get(R.string.ui_exempt_from_system_battery_optimization) else AppText.get(R.string.ui_system_battery_optimization_still_applies)
-        BackgroundTopic.UNRESTRICTED -> AppText.get(R.string.ui_allow_background_activity_and_remove_app_battery_limits)
-        BackgroundTopic.AUTOSTART -> AppText.get(R.string.ui_check_manufacturer_permissions_in_system_settings)
-        BackgroundTopic.TASKS -> AppText.get(R.string.ui_keep_the_app_task_to_reduce_accidental_cleanup)
-        BackgroundTopic.HELP -> AppText.get(R.string.ui_view_setup_steps_and_limitations, Build.MANUFACTURER)
+        BackgroundTopic.BATTERY -> context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName).let { allowed ->
+            BackgroundSettingStatus(allowed, false,
+                AppText.get(if (allowed) R.string.background_allowed else R.string.background_needs_setting),
+                AppText.get(if (allowed) R.string.ui_exempt_from_system_battery_optimization else R.string.ui_system_battery_optimization_still_applies))
+        }
+        else -> {
+            require(topic.manual)
+            val confirmed = preferences(context).getBoolean(topic.name, false)
+            BackgroundSettingStatus(confirmed, true,
+                AppText.get(if (confirmed) R.string.background_confirmed else R.string.background_needs_confirmation),
+                AppText.get(if (confirmed) R.string.background_confirmation_record else R.string.background_manual_status_hint))
+        }
     }
 
     fun steps(topic: BackgroundTopic, manufacturer: String = Build.MANUFACTURER): String {
         val vendor = manufacturer.lowercase(java.util.Locale.ROOT)
-        val path = when {
-            "vivo" in vendor || "iqoo" in vendor -> AppText.get(R.string.ui_vivo_iqoo_settings_battery_background_power_consumption_management_find)
-            "xiaomi" in vendor || "redmi" in vendor || "poco" in vendor -> AppText.get(R.string.ui_xiaomi_redmi_settings_apps_manage_apps_this_app_enable)
-            "huawei" in vendor || "honor" in vendor -> AppText.get(R.string.ui_huawei_honor_settings_apps_app_launch_disable_automatic_management)
-            "oppo" in vendor || "realme" in vendor || "oneplus" in vendor -> AppText.get(R.string.ui_oppo_realme_oneplus_settings_apps_app_management_this_app)
-            "samsung" in vendor -> AppText.get(R.string.ui_samsung_settings_apps_this_app_battery_unrestricted_in_device)
-            else -> AppText.get(R.string.ui_settings_apps_this_app_battery_choose_unrestricted_or_allow)
+        val family = when {
+            "vivo" in vendor || "iqoo" in vendor -> "vivo"
+            "xiaomi" in vendor || "redmi" in vendor || "poco" in vendor -> "xiaomi"
+            "huawei" in vendor || "honor" in vendor -> "huawei"
+            "oppo" in vendor || "realme" in vendor || "oneplus" in vendor -> "oppo"
+            "samsung" in vendor -> "samsung"
+            else -> "generic"
         }
-        val introduction = when (topic) {
-            BackgroundTopic.NOTIFICATIONS -> AppText.get(R.string.ui_1_open_notification_settings_for_this_app_and_allow)
-            BackgroundTopic.BATTERY -> AppText.get(R.string.ui_1_use_the_button_below_to_request_exemption_from)
-            BackgroundTopic.UNRESTRICTED -> AppText.get(R.string.ui_1_open_manufacturer_background_battery_management_and_find_this)
-            BackgroundTopic.AUTOSTART -> AppText.get(R.string.ui_allowing_auto_start_and_secondary_launch_helps_the_system)
-            BackgroundTopic.TASKS -> AppText.get(R.string.ui_1_return_to_the_home_screen_then_open_recent)
-            BackgroundTopic.HELP -> AppText.get(R.string.ui_check_notifications_battery_optimization_background_battery_limits_auto)
-        }
-        return AppText.get(R.string.ui_n_nsetting_names_vary_by_system_version_auto_start, introduction, if (topic in setOf(BackgroundTopic.AUTOSTART, BackgroundTopic.UNRESTRICTED, BackgroundTopic.HELP)) path + "\n\n" else "")
+        return AppText.get(when (topic) {
+            BackgroundTopic.NOTIFICATIONS -> R.string.background_steps_notifications
+            BackgroundTopic.BATTERY -> R.string.background_steps_battery
+            BackgroundTopic.TASKS -> R.string.background_steps_tasks
+            BackgroundTopic.HELP -> R.string.background_help
+            BackgroundTopic.UNRESTRICTED -> when (family) {
+                "vivo" -> R.string.background_battery_vivo
+                "xiaomi" -> R.string.background_battery_xiaomi
+                "huawei" -> R.string.background_battery_huawei
+                "oppo" -> R.string.background_battery_oppo
+                "samsung" -> R.string.background_battery_samsung
+                else -> R.string.background_battery_generic
+            }
+            BackgroundTopic.AUTOSTART -> when (family) {
+                "vivo" -> R.string.background_autostart_vivo
+                "xiaomi" -> R.string.background_autostart_xiaomi
+                "huawei" -> R.string.background_autostart_huawei
+                "oppo" -> R.string.background_autostart_oppo
+                "samsung" -> R.string.background_autostart_samsung
+                else -> R.string.background_autostart_generic
+            }
+        })
     }
 
     fun appDetails(context: Context) = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))
@@ -86,7 +126,13 @@ internal object BackgroundGuide {
     fun intents(context: Context, topic: BackgroundTopic, manufacturer: String = Build.MANUFACTURER,
                 ignoringBattery: Boolean = context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)): List<Intent> {
         val detail = appDetails(context)
-        if (topic == BackgroundTopic.NOTIFICATIONS) return listOf(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName), detail)
+        if (topic == BackgroundTopic.NOTIFICATIONS) return buildList {
+            val manager = context.getSystemService(NotificationManager::class.java)
+            if (manager.areNotificationsEnabled() && manager.getNotificationChannel(CHANNEL)?.importance == NotificationManager.IMPORTANCE_NONE)
+                add(channelSettings(context))
+            add(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+            add(detail)
+        }
         if (topic == BackgroundTopic.BATTERY) return buildList {
             if (!ignoringBattery) add(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}")))
             add(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)); add(detail)
@@ -131,59 +177,122 @@ internal object BackgroundGuide {
     }
 }
 
-@Composable internal fun BackgroundGuideDialog(topic: BackgroundTopic, onDismiss: () -> Unit) {
+/** Refresh on return from Settings and whenever a manual confirmation changes. */
+@Composable private fun rememberBackgroundStatuses(): Map<BackgroundTopic, BackgroundSettingStatus> {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var revision by remember { mutableIntStateOf(0) }
-    var selected by rememberSaveable(topic) { mutableStateOf(topic) }
-    var feedback by rememberSaveable(selected) { mutableStateOf<String?>(null) }
-    DisposableEffect(owner) {
+    DisposableEffect(context, owner) {
+        val preferences = BackgroundGuide.preferences(context)
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> revision++ }
         val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) revision++ }
+        preferences.registerOnSharedPreferenceChangeListener(listener)
         owner.lifecycle.addObserver(observer)
-        onDispose { owner.lifecycle.removeObserver(observer) }
+        onDispose {
+            preferences.unregisterOnSharedPreferenceChangeListener(listener)
+            owner.lifecycle.removeObserver(observer)
+        }
     }
-    fun open(candidates: List<Intent>) {
-        val result = BackgroundGuide.open(context, candidates)
+    return remember(context, revision) {
+        BackgroundTopic.entries.filter { it != BackgroundTopic.HELP }.associateWith { BackgroundGuide.status(context, it) }
+    }
+}
+
+@Composable private fun BackgroundStatusBadge(status: BackgroundSettingStatus) {
+    val dark = isSystemInDarkTheme()
+    val color = when {
+        !status.complete -> if (dark) Color(0xFFF2C16C) else Color(0xFF98600D)
+        status.manual -> MaterialTheme.colorScheme.primary
+        else -> if (dark) Color(0xFF75D8AF) else Color(0xFF12835E)
+    }
+    Surface(shape = MaterialTheme.shapes.small, color = color.copy(alpha = .10f)) {
+        Text(status.label, Modifier.padding(horizontal = 8.dp, vertical = 4.dp).widthIn(max = 132.dp),
+            style = MaterialTheme.typography.labelMedium, color = color, maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+    }
+}
+
+@Composable internal fun BackgroundSettings(modifier: Modifier = Modifier, onAction: (SettingAction) -> Unit) {
+    val statuses = rememberBackgroundStatuses()
+    val automaticCount = statuses.values.count { !it.manual && it.complete }
+    val manualCount = statuses.values.count { it.manual && it.complete }
+    val items = listOf(
+        Triple(BackgroundTopic.NOTIFICATIONS, R.drawable.ic_info, SettingAction.NOTIFICATIONS),
+        Triple(BackgroundTopic.BATTERY, R.drawable.ic_battery, SettingAction.BATTERY),
+        Triple(BackgroundTopic.UNRESTRICTED, R.drawable.ic_battery, SettingAction.UNRESTRICTED),
+        Triple(BackgroundTopic.AUTOSTART, R.drawable.ic_settings, SettingAction.AUTOSTART),
+        Triple(BackgroundTopic.TASKS, R.drawable.ic_info, SettingAction.TASK_LOCK)
+    ).map { (topic, icon, action) ->
+        val status = statuses.getValue(topic)
+        ManagerMenuItem(topic.title, icon,
+            AppText.get(if (!topic.manual) R.string.background_auto_checked
+                else if (status.complete) R.string.background_manual_recorded else R.string.background_manual_todo),
+            badge = { BackgroundStatusBadge(status) }) { onAction(action) }
+    } + ManagerMenuItem(BackgroundTopic.HELP.title, R.drawable.ic_document,
+        AppText.get(R.string.ui_setup_recommendations_and_runtime_limitations)) { onAction(SettingAction.BACKGROUND_HELP) }
+    Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Surface(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = .45f), shape = MaterialTheme.shapes.medium) {
+            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(AppText.get(R.string.background_system_summary, automaticCount), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                    Text(AppText.get(R.string.background_manual_summary, manualCount), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                }
+                Text(AppText.get(R.string.background_summary_hint), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        FixedManagerMenu(items, Modifier.weight(1f))
+    }
+}
+
+@Composable internal fun BackgroundGuideDialog(topic: BackgroundTopic, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val statuses = rememberBackgroundStatuses()
+    val status = statuses[topic]
+    var feedback by rememberSaveable(topic) { mutableStateOf<String?>(null) }
+    fun openSettings() {
+        val result = BackgroundGuide.open(context, BackgroundGuide.intents(context, topic))
         feedback = when {
             result < 0 -> AppText.get(R.string.ui_this_shortcut_is_unavailable_follow_the_steps_above_to)
             result > 0 -> AppText.get(R.string.ui_opened_an_alternative_settings_page_follow_the_steps_above)
             else -> null
         }
     }
-    AlertDialog(onDismissRequest = onDismiss, title = { Text(selected.title) }, text = {
-        Column(Modifier.heightIn(max = 460.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(AppText.get(R.string.ui_device, Build.MANUFACTURER, Build.MODEL), style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(AppText.get(R.string.ui_app_to_configure, context.applicationInfo.loadLabel(context.packageManager)), style = MaterialTheme.typography.bodyMedium)
-            Text(remember(selected, revision) { BackgroundGuide.status(context, selected) }, color = MaterialTheme.colorScheme.primary)
-            Text(BackgroundGuide.steps(selected))
-            feedback?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
-            if (selected == BackgroundTopic.HELP) BackgroundTopic.entries.filter { it != BackgroundTopic.HELP }.forEach { item ->
-                OutlinedButton(onClick = { selected = item }, Modifier.fillMaxWidth()) { Text(item.title + " ›") }
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(topic.title) }, text = {
+        Column(Modifier.heightIn(max = 380.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            status?.let {
+                Surface(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium) {
+                    Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        BackgroundStatusBadge(it)
+                        Text(it.detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
             }
-            if (selected == BackgroundTopic.UNRESTRICTED)
-                OutlinedButton(onClick = { open(listOf(BackgroundGuide.appBattery(context), BackgroundGuide.appDetails(context))) }, Modifier.fillMaxWidth()) { Text(AppText.get(R.string.ui_open_app_battery_settings)) }
-            // Current vivo firmware redirects the channel action to the same app-wide page.
-            if (selected == BackgroundTopic.NOTIFICATIONS && !Build.MANUFACTURER.equals("vivo", true) &&
-                !Build.MANUFACTURER.equals("iqoo", true) && context.getSystemService(NotificationManager::class.java).getNotificationChannel("local-runtime") != null)
-                OutlinedButton(onClick = { open(listOf(BackgroundGuide.channelSettings(context), BackgroundGuide.appDetails(context))) }, Modifier.fillMaxWidth()) { Text(AppText.get(R.string.ui_open_runtime_notification_settings)) }
-            if (selected != BackgroundTopic.TASKS && selected != BackgroundTopic.HELP)
-                TextButton(onClick = { open(listOf(BackgroundGuide.appDetails(context))) }) { Text(AppText.get(R.string.ui_open_app_info_alternative)) }
-            if (topic == BackgroundTopic.HELP && selected != topic)
-                TextButton(onClick = { selected = topic }) { Text(AppText.get(R.string.ui_back_to_background_settings)) }
+            Text(AppText.get(R.string.ui_app_to_configure, context.applicationInfo.loadLabel(context.packageManager)),
+                style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(BackgroundGuide.steps(topic), style = MaterialTheme.typography.bodyMedium)
+            if (topic.manual) {
+                Row(Modifier.fillMaxWidth().toggleable(value = status!!.complete, role = Role.Checkbox,
+                    onValueChange = { BackgroundGuide.setConfirmed(context, topic, it) }).padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Checkbox(checked = status.complete, onCheckedChange = null)
+                    Text(AppText.get(R.string.background_confirm_checkbox), style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+            if (topic == BackgroundTopic.UNRESTRICTED || topic == BackgroundTopic.AUTOSTART)
+                Text(AppText.get(R.string.background_route_hint), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            feedback?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
         }
     }, confirmButton = {
-        TextButton(onClick = {
-            when (selected) {
-                BackgroundTopic.HELP -> onDismiss()
-                BackgroundTopic.TASKS -> {
-                    if (context is Activity) context.moveTaskToBack(true)
-                    feedback = AppText.get(R.string.ui_find_this_app_in_recent_apps_open_its_card)
-                }
-                else -> open(BackgroundGuide.intents(context, selected))
-            }
-        }) {
-            Text(remember(selected, revision) { BackgroundGuide.buttonLabel(context, selected) })
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            if (topic != BackgroundTopic.HELP) ManagerActionButton(
+                BackgroundGuide.buttonLabel(context, topic), onClick = {
+                    if (topic == BackgroundTopic.TASKS) {
+                        if (context is Activity) context.moveTaskToBack(true)
+                    } else openSettings()
+                }, modifier = Modifier.fillMaxWidth())
+            TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_close)) }
         }
-    }, dismissButton = { TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_close)) } })
+    })
 }

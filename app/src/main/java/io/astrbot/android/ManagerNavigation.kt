@@ -66,7 +66,7 @@ internal fun ManagerState.canStop(id: ServiceId? = null): Boolean = busy ||
 }
 
 internal data class ManagerMenuItem(val title: String, val icon: Int, val subtitle: String? = null,
-    val enabled: Boolean = true, val onClick: () -> Unit)
+    val enabled: Boolean = true, val badge: (@Composable () -> Unit)? = null, val onClick: () -> Unit)
 
 /** Fixed pages with a bounded number of rows. Small windows use pages instead of scrolling. */
 @Composable internal fun FixedManagerMenu(items: List<ManagerMenuItem>, modifier: Modifier = Modifier) {
@@ -95,6 +95,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
                                     item.subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 1,
                                         overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                                 }
+                                item.badge?.invoke()
                                 Icon(painterResource(R.drawable.ic_chevron), null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
@@ -237,6 +238,14 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
 @Composable internal fun FixedManagerSettings(route: SettingsRoute, state: ManagerState, onNavigate: (SettingsRoute) -> Unit,
     onAction: (SettingAction) -> Unit, onNotice: (String, String) -> Unit,
     automaticUpdateEnabled: Boolean = false, updateChannelConfigured: Boolean = BuildConfig.UPDATE_CATALOG_URL.isNotEmpty()) {
+    if (route == SettingsRoute.BACKGROUND) {
+        Column(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_settings_content) },
+            verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            ManagerStatusStrip(state, onNotice)
+            BackgroundSettings(Modifier.weight(1f), onAction)
+        }
+        return
+    }
     fun action(title: String, icon: Int, subtitle: String? = null, enabled: Boolean = true, action: SettingAction) =
         ManagerMenuItem(title, icon, subtitle, enabled) { onAction(action) }
     fun destination(title: String, icon: Int, subtitle: String, destination: SettingsRoute) =
@@ -287,13 +296,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
             action(AppText.get(R.string.ui_manager_logs), R.drawable.ic_logs, AppText.get(R.string.ui_service_controls_updates_and_backup_events), action = SettingAction.LOGS),
             action(AppText.get(R.string.ui_runtime_logs), R.drawable.ic_logs, AppText.get(R.string.ui_initialization_and_runtime_maintenance), action = SettingAction.RUNTIME_LOGS),
             action(AppText.get(R.string.ui_export_diagnostics), R.drawable.ic_export, AppText.get(R.string.ui_device_information_status_and_redacted_logs), !state.busy, SettingAction.DIAGNOSTICS))
-        SettingsRoute.BACKGROUND -> listOf(
-            action(AppText.get(R.string.ui_service_notifications), R.drawable.ic_info, AppText.get(R.string.ui_allow_status_notifications_and_notification_channels), action = SettingAction.NOTIFICATIONS),
-            action(AppText.get(R.string.ui_battery_optimization), R.drawable.ic_battery, AppText.get(R.string.ui_check_system_battery_optimization), action = SettingAction.BATTERY),
-            action(AppText.get(R.string.ui_background_battery_limits), R.drawable.ic_battery, AppText.get(R.string.ui_guidance_for_this_phone_s_system), action = SettingAction.UNRESTRICTED),
-            action(AppText.get(R.string.ui_auto_start_permissions), R.drawable.ic_settings, AppText.get(R.string.ui_manufacturer_permissions_and_manual_checks), action = SettingAction.AUTOSTART),
-            action(AppText.get(R.string.ui_lock_recent_task), R.drawable.ic_info, AppText.get(R.string.ui_reduce_accidental_task_cleanup), action = SettingAction.TASK_LOCK),
-            action(AppText.get(R.string.ui_background_operation_guide), R.drawable.ic_document, AppText.get(R.string.ui_setup_recommendations_and_runtime_limitations), action = SettingAction.BACKGROUND_HELP))
+        SettingsRoute.BACKGROUND -> emptyList() // Rendered above with live permission statuses.
         SettingsRoute.ABOUT -> listOf(
             action(AppText.get(R.string.ui_check_for_updates), R.drawable.ic_update, AppText.get(R.string.ui_app_apk_updates_and_installation), true, SettingAction.CHECK_APP_UPDATE),
             action(AppText.get(R.string.ui_app_and_component_versions), R.drawable.ic_info, BuildConfig.VERSION_NAME, action = SettingAction.VERSIONS),
