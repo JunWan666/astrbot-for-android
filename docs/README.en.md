@@ -78,7 +78,7 @@ The screenshots show the app in Simplified Chinese. English is also available in
 | Fixed zoom | Defaults to 75%, with 100% / 75% / 50% / 25% options; pinch zoom is disabled. |
 | Local connectivity | New installations prepare a OneBot connection to `ws://127.0.0.1:6199/ws` with an empty token, preserving custom connections. |
 | LAN access | Enable LAN access for each WebUI independently, copy its address, and retain WebUI authentication. |
-| Persona library | Includes 12 original presets; add, delete (including presets), search, filter by category and switch the default persona. Includes a link to an external persona marketplace. |
+| Persona library | Includes 4 presets adapted from community featured prompts, with attribution and adaptation notes. Add, delete (including presets), search, filter by category and switch the default persona. Includes a link to an external persona marketplace. |
 | Live logs | Follow the latest service output automatically, pause updates, copy logs or export them with sensitive data redacted. |
 | Resource overview | View memory usage for the app and managed processes, total device memory and the usage percentage. Storage usage is shown separately. |
 | Backup and restore | Create local snapshots and portable backups, roll back updates, and automatically remove old unprotected automatic snapshots. |

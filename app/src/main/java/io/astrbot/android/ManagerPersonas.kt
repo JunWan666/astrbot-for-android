@@ -21,6 +21,7 @@ import io.astrbot.android.core.ServiceId
 import io.astrbot.android.runtime.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 /** Only the card area scrolls; search, categories and the app navigation stay in place. */
@@ -39,6 +40,12 @@ import kotlinx.coroutines.withContext
     val scrollPosition = rememberPersonaScrollPosition()
     val scroll = scrollPosition.state
     val scope = rememberCoroutineScope()
+    // AstrBot creates its database on first start, after the initial installation scan.
+    LaunchedEffect(context, state.componentsReady, state.busy, state.services.getValue(ServiceId.ASTRBOT).canOpenWebUi) {
+        if (state.componentsReady && !state.busy) {
+            RuntimeStore.operationLock.withLock { RuntimeStore.refreshInstallation(context) }
+        }
+    }
     fun load() { scope.launch {
         loading = true
         val result = withContext(Dispatchers.IO) { runCatching { PersonaLibrary.read(context) } }
@@ -134,9 +141,11 @@ import kotlinx.coroutines.withContext
                     if (preset.intro.isNotBlank()) Text(preset.intro, style = MaterialTheme.typography.bodyMedium)
                     SelectionContainer(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Text(if (preset.id.startsWith("custom-")) AppText.get(R.string.persona_local_source) else preset.source, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(AppText.get(R.string.persona_segmented_reply_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            HorizontalDivider()
                             Text(preset.prompt, style = MaterialTheme.typography.bodyMedium)
                             if (preset.greeting.isNotBlank()) Text(AppText.get(R.string.ui_greeting_example, preset.greeting), style = MaterialTheme.typography.bodySmall)
-                            Text(if (preset.id.startsWith("custom-")) AppText.get(R.string.persona_local_source) else preset.source, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     installation.unavailable?.let { Text(it, style = MaterialTheme.typography.bodySmall) }

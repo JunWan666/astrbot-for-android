@@ -12,6 +12,16 @@ The service cards use the [AstrBot brand symbol](https://astrbot.app/assets/astr
 
 The README community buttons use the [QQ symbol from Simple Icons](https://simpleicons.org/?q=qq), distributed under [CC0-1.0](https://github.com/simple-icons/simple-icons/blob/develop/LICENSE.md). QQ is a trademark of Tencent.
 
+The offline persona catalog in `app/src/main/assets/personas/catalog.json` includes adaptations of featured public prompts from [玖帕喵](https://jiupamiao.asia/market), reviewed on 2026-10-27. The site's [User Agreement, section 4](https://jiupamiao.asia/disclaimer) permits other users to copy, modify and use public prompts for AI conversations under a worldwide, free, non-exclusive grant. The original prompts, fictional characters and brands retain their respective owners' rights; the manager's MIT license does not relicense them. Each preset includes a direct source link and an adaptation note, displayed in the app preview.
+
+| Bundled persona | Public source and contributor | Adaptation |
+| --- | --- | --- |
+| 吃白饭的大肥鱼 | [Featured prompt #746](https://jiupamiao.asia/market?id=746), posted by dipping5115 and marked as reposted; original author not identified in the post | Expanded the whale-girl, rice-loving, lazy-but-kind character cues into Chinese dialogue; omitted unconditional-obedience and child-coded tokens |
+| 月见八千代 | [Featured prompt #530](https://jiupamiao.asia/market?id=530), 糯米茨本喵; fan portrayal of the character from《超かぐや姫》 | Retained character background and voice; removed fixed user identity, stage directions and prompt-priority overrides; adjusted sentence boundaries |
+| DeepSeek娘 | [Featured prompt #726](https://jiupamiao.asia/market?id=726), misaka16180 | Adapted the character and conversational style; removed framework-specific plugins, assumed tool permissions and official-identity claims; identified it as an unofficial fan persona |
+| 小满·日常朋友 | [Featured template #755,《拟人模板Ⅲ（更新补全）》](https://jiupamiao.asia/market?id=755), 糯米茨本喵 | Filled the template with an original adult character, background and dialogue examples; removed unused options and added sentence-format guidance. This character is not a separate marketplace submission |
+
+Jailbreak prompts are excluded. The catalog adds short Chinese sentences and real newline conventions for AstrBot segmented replies; it does not change AstrBot settings or claim to enforce model behavior. Existing custom personas and imported database copies are preserved.
 
 | Component | Pinned version / source | License evidence |
 | --- | --- | --- |

@@ -1127,6 +1127,7 @@
     <string name="status_onebot_connecting" formatted="false">"OneBot 连接中"</string>
     <string name="status_onebot_unknown" formatted="false">"OneBot 状态待确认"</string>
     <string name="persona_local_source" formatted="false">"本地添加的人设"</string>
+    <string name="persona_segmented_reply_hint" formatted="false">"分段发送需在 AstrBot 后台开启；超过字数阈值的长回复会整条发送。"</string>
     <string name="persona_limit" formatted="false">"最多保存 200 个自建人设，请先删除不需要的人设"</string>
     <string name="persona_duplicate" formatted="false">"已有同名人设，请换一个名称"</string>
     <string name="persona_read_error" formatted="false">"本地人设库读取失败，原文件已保留，请重试"</string>
