@@ -42,3 +42,6 @@ Thumbs.db
 /app/src/debug/
 /core/src/test/
 docs/internal/
+
+# Logs exported from a phone belong in the private troubleshooting archive.
+/astrbot-napcat-*.log.txt
