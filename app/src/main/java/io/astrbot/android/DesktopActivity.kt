@@ -106,6 +106,7 @@ class DesktopActivity : LocalizedActivity() {
                             state.busy -> R.string.cpolar_working
                             state.paused -> R.string.ui_paused_for_maintenance
                             !state.configuration.installed -> R.string.ui_not_installed
+                            page == 1 && state.configuration.qqUpdateAvailable -> R.string.desktop_qq_update_available
                             page == 1 && !state.configuration.qqInstalled -> R.string.ui_not_installed
                             page == 1 && state.qqRunning -> R.string.ui_running
                             page == 1 -> R.string.ui_stopped
@@ -140,7 +141,12 @@ class DesktopActivity : LocalizedActivity() {
                         }
                         1 -> {
                             Text(AppText.get(R.string.desktop_qq_version, repository.qqVersion), style = MaterialTheme.typography.bodySmall)
-                            ManagerActionButton(AppText.get(if (!state.configuration.qqInstalled) R.string.desktop_qq_install else if (state.qqRunning) R.string.desktop_qq_stop else R.string.desktop_qq_start), {
+                            ManagerActionButton(AppText.get(when {
+                                state.qqRunning -> R.string.desktop_qq_stop
+                                state.configuration.qqUpdateAvailable -> R.string.desktop_qq_update
+                                !state.configuration.qqInstalled -> R.string.desktop_qq_install
+                                else -> R.string.desktop_qq_start
+                            }), {
                                 if (state.qqRunning) command("qq-stop") else confirmation = if (state.configuration.qqInstalled) "qq-start" else "qq-install"
                             }, Modifier.fillMaxWidth(), if (state.qqRunning) ActionTone.STOP else ActionTone.START, enabled && state.configuration.installed)
                             ManagerActionButton(AppText.get(R.string.desktop_open), {
@@ -177,7 +183,7 @@ class DesktopActivity : LocalizedActivity() {
             AlertDialog(onDismissRequest = { confirmation = null }, title = { Text(AppText.get(R.string.desktop_name)) },
                 text = { Text(AppText.get(when (action) {
                     "install" -> R.string.desktop_install_notice
-                    "qq-install" -> R.string.desktop_qq_install_notice
+                    "qq-install" -> if (state.configuration.qqUpdateAvailable) R.string.desktop_qq_update_notice else R.string.desktop_qq_install_notice
                     "qq-start" -> R.string.desktop_qq_start_notice
                     else -> R.string.desktop_uninstall_notice
                 })) }, confirmButton = { TextButton(onClick = { confirmation = null; command(action) }) { Text(AppText.get(R.string.cpolar_confirm)) } },

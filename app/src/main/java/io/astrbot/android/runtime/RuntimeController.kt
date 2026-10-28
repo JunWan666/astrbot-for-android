@@ -402,7 +402,12 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     desktopRepository.setDesired(false); desktopRepository.setQqDesired(false)
                     desktop.stop(); desktop.refresh()
                 }
-                "desktop-qq-install" -> desktopRepository.installQq { phase -> updateState { it.copy(phase = phase) } }
+                "desktop-qq-install" -> {
+                    desktop.stopQq()
+                    desktopRepository.setQqDesired(false)
+                    desktopRepository.installQq { phase -> updateState { it.copy(phase = phase) } }
+                    desktop.refresh()
+                }
                 "desktop-qq-start" -> {
                     checkLocalized(desktopRepository.configuration().qqInstalled) { AppText.get(R.string.desktop_qq_install_first) }
                     val wanted = preferences.getBoolean("desired_NAPCAT", false)

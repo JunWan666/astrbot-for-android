@@ -1,0 +1,84 @@
+#!/usr/bin/python3
+"""Launch a user-provided guest program with optional glibc compatibility."""
+import argparse
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+ROOT = Path('/manager/extensions/desktop')
+PROFILE = ROOT / 'compat-profile.json'
+
+
+def configure(arguments):
+    parser = argparse.ArgumentParser(description='Configure the optional desktop library initializer')
+    parser.add_argument('--library', required=True)
+    parser.add_argument('--symbol', required=True)
+    parser.add_argument('--wait-module', default='')
+    parser.add_argument('--delay-ms', type=int, default=5000)
+    args = parser.parse_args(arguments)
+    library = Path(args.library)
+    if not library.is_absolute() or not library.is_file():
+        parser.error('The library must be an existing absolute guest path')
+    if not args.symbol.isascii() or not args.symbol.replace('_', 'a').isalnum():
+        parser.error('The initializer must be a C symbol with no arguments returning int')
+    if not 0 <= args.delay_ms <= 300000:
+        parser.error('Delay must be between 0 and 300000 ms')
+    data = dict(library=str(library), symbol=args.symbol, waitModule=args.wait_module, delayMs=args.delay_ms)
+    if any('\x00' in str(value) or '\n' in str(value) for value in data.values()):
+        parser.error('Configuration values must be single lines')
+    fd, name = tempfile.mkstemp(prefix='.compat-profile-', dir=ROOT)
+    try:
+        with os.fdopen(fd, 'w') as stream:
+            json.dump(data, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(name, PROFILE)
+    finally:
+        Path(name).unlink(missing_ok=True)
+    print('Optional desktop startup profile saved. Programs and account files were not changed.')
+
+
+def main():
+    arguments = sys.argv[1:]
+    if arguments and arguments[0] == 'configure':
+        configure(arguments[1:])
+        return
+    if arguments == ['clear-profile']:
+        PROFILE.unlink(missing_ok=True)
+        print('Optional startup profile removed.')
+        return
+    use_profile = bool(arguments and arguments[0] == '--profile')
+    if use_profile:
+        arguments.pop(0)
+    if arguments and arguments[0] == '--':
+        arguments.pop(0)
+    if not arguments:
+        raise SystemExit('Usage: guest-compat [--profile] PROGRAM [ARG ...] | configure --help | clear-profile')
+    library = ROOT / 'libguest-compat.so'
+    if not library.is_file():
+        raise SystemExit('Install the Ubuntu desktop dependencies in the App first.')
+    env = dict(os.environ)
+    # These options belong to this invocation, never to an inherited profile.
+    for key in list(env):
+        if key.startswith('ASTRBOT_COMPAT_INIT_') or key in ('ASTRBOT_COMPAT_WAIT_MODULE', 'ASTRBOT_COMPAT_TARGET_NAME'):
+            env.pop(key)
+    env.update(ASTRBOT_COMPAT_MEMFD='1', ASTRBOT_COMPAT_PROC_LOCKS='1',
+               ASTRBOT_COMPAT_LOCK_HELPER=str(ROOT / 'proc_locks.py'))
+    existing = env.get('LD_PRELOAD', '').split()
+    env['LD_PRELOAD'] = ' '.join([str(library), *(item for item in existing if item != str(library))])
+    if use_profile and PROFILE.is_file():
+        if PROFILE.stat().st_size > 8192:
+            raise SystemExit('Invalid optional startup profile size.')
+        data = json.loads(PROFILE.read_text())
+        if not Path(data['library']).is_file():
+            raise SystemExit('The configured external library is missing. Restore it or run guest-compat clear-profile.')
+        env.update(ASTRBOT_COMPAT_INIT_LIBRARY=data['library'], ASTRBOT_COMPAT_INIT_SYMBOL=data['symbol'],
+                   ASTRBOT_COMPAT_WAIT_MODULE=data['waitModule'], ASTRBOT_COMPAT_INIT_DELAY_MS=str(data['delayMs']),
+                   ASTRBOT_COMPAT_TARGET_NAME=Path(arguments[0]).name)
+    os.execvpe(arguments[0], arguments, env)
+
+
+if __name__ == '__main__':
+    main()

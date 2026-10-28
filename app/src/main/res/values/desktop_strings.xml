@@ -37,6 +37,8 @@
     <string name="desktop_scope">App 已包含安装器和运行管理；首次安装时联网获取 Ubuntu 桌面组件。原版 QQ 可在下方单独安装。其他程序请按其官方教程手动部署，具体兼容性取决于该程序。</string>
     <string name="desktop_qq_version">当前提供的原版 QQ：%1$s</string>
     <string name="desktop_qq_install">安装原版 QQ</string>
+    <string name="desktop_qq_update">更新原版 QQ</string>
+    <string name="desktop_qq_update_available">原版 QQ 有可用更新</string>
     <string name="desktop_qq_start">启动原版 QQ</string>
     <string name="desktop_qq_stop">停止原版 QQ</string>
     <string name="desktop_qq_stop_first">请先停止独立原版 QQ，再启动 NapCat。</string>
@@ -47,8 +49,9 @@
     <string name="desktop_copy_password">复制密码</string>
     <string name="desktop_copy_environment">复制终端图形环境配置</string>
     <string name="desktop_cli_help">先在 App 启动桌面，再到终端粘贴并执行环境配置，即可启动其他图形程序。扩展安装完成后也提供 desktop-start 和 qq-desktop 命令；手动命令的生命周期由所在终端负责。</string>
-    <string name="desktop_install_notice">将联网安装轻量桌面、noVNC、字体及依赖，约增加 230 MiB（以实际依赖为准）。安装期间会暂时停止服务、SSH、cpolar 和终端会话；完成后恢复原来运行的服务，终端需重新打开。继续安装？</string>
-    <string name="desktop_qq_install_notice">从腾讯官方下载约 196 MiB 安装包，校验后解压；安装后约占用 640 MiB。不会修改 NapCat 的 QQ 文件。继续安装？</string>
+    <string name="desktop_install_notice">将联网安装轻量桌面、noVNC、字体、编译工具及 Python、curl；所需空间以实际依赖为准。安装期间会暂时停止服务、SSH、cpolar 和终端会话；完成后恢复原来运行的服务，终端需重新打开。继续安装？</string>
+    <string name="desktop_qq_install_notice">从腾讯官方下载约 198 MiB 安装包，校验后解压；安装后约占用 640 MiB。不会修改 NapCat 的 QQ 文件。继续安装？</string>
+    <string name="desktop_qq_update_notice">从腾讯官方下载约 198 MiB 安装包，校验并检查依赖后替换旧版 QQ 程序。更新前停止独立 QQ，保留登录数据；安装失败时恢复旧程序。继续更新？</string>
     <string name="desktop_qq_start_notice">将停止 NapCat 并启动独立原版 QQ，两边的登录数据都会保留。切回 NapCat 时可在首页重新启动。继续？</string>
     <string name="desktop_uninstall_notice">停止桌面与原版 QQ，删除独立 QQ 程序和扩展安装标记。保留 QQ 登录数据及 Ubuntu 共享依赖，避免影响手动安装的软件。继续卸载？</string>
 </resources>

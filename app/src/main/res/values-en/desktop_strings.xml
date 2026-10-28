@@ -37,6 +37,8 @@
     <string name="desktop_scope">The App includes installation and process management. Desktop components are downloaded on first installation. Install original QQ separately below. Deploy other programs manually using their official documentation; compatibility depends on each program.</string>
     <string name="desktop_qq_version">Original QQ version: %1$s</string>
     <string name="desktop_qq_install">Install original QQ</string>
+    <string name="desktop_qq_update">Update original QQ</string>
+    <string name="desktop_qq_update_available">Original QQ update available</string>
     <string name="desktop_qq_start">Start original QQ</string>
     <string name="desktop_qq_stop">Stop original QQ</string>
     <string name="desktop_qq_stop_first">Stop independent original QQ before starting NapCat.</string>
@@ -47,8 +49,9 @@
     <string name="desktop_copy_password">Copy password</string>
     <string name="desktop_copy_environment">Copy graphical terminal environment</string>
     <string name="desktop_cli_help">Start the desktop in the App, then paste and run the environment configuration in Terminal to launch graphical programs. Installation also provides desktop-start and qq-desktop; manually launched processes belong to their terminal session.</string>
-    <string name="desktop_install_notice">Download a lightweight desktop, noVNC, fonts and dependencies, adding about 230 MiB depending on installed packages. Services, SSH, cpolar and terminal sessions stop during installation. Previously running services restart afterwards; reopen Terminal manually. Continue?</string>
-    <string name="desktop_qq_install_notice">Download about 196 MiB from Tencent, verify and extract it. Installed size is about 640 MiB. NapCat files are preserved. Continue?</string>
+    <string name="desktop_install_notice">Download a lightweight desktop, noVNC, fonts, build tools, Python and curl. Space depends on installed packages. Services, SSH, cpolar and terminal sessions stop during installation. Previously running services restart afterwards; reopen Terminal manually. Continue?</string>
+    <string name="desktop_qq_install_notice">Download about 198 MiB from Tencent, verify and extract it. Installed size is about 640 MiB. NapCat files are preserved. Continue?</string>
+    <string name="desktop_qq_update_notice">Download about 198 MiB from Tencent, verify it and check dependencies before replacing QQ. Independent QQ stops before the update; login data is preserved. Installation failure restores the previous program. Update?</string>
     <string name="desktop_qq_start_notice">Stop NapCat and start independent original QQ? Both data directories are preserved. Restart NapCat from Home to switch back.</string>
     <string name="desktop_uninstall_notice">Stop desktop and QQ, remove independent QQ binaries and extension installation markers. QQ login data and shared Ubuntu dependencies are preserved. Uninstall?</string>
 </resources>

@@ -15,7 +15,7 @@ import java.io.File
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
 
-data class DesktopConfiguration(val installed: Boolean = false, val qqInstalled: Boolean = false)
+data class DesktopConfiguration(val installed: Boolean = false, val qqInstalled: Boolean = false, val qqUpdateAvailable: Boolean = false)
 
 /** Generic, optional Linux tools. No third-party bridge or installer is bundled or invoked. */
 class DesktopRepository(private val context: Context) {
@@ -25,16 +25,26 @@ class DesktopRepository(private val context: Context) {
     private val preferences = context.getSharedPreferences("manager", Context.MODE_PRIVATE)
     private val source by lazy { context.assets.open("runtime/desktop/sources.json").bufferedReader().use { JSONObject(it.readText()) } }
     val qqVersion: String get() = source.getJSONObject("qq").getString("version")
+    private val compatibilityDigest by lazy {
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
+        for (name in listOf("guest_compat.c", "proc_locks.py", "guest-compat"))
+            context.assets.open("runtime/desktop/$name").use { digest.update(it.readBytes()) }
+        digest.digest().joinToString("") { "%02x".format(it) }
+    }
 
     fun configuration(): DesktopConfiguration {
-        val installed = DurableFiles.read(marker)?.optInt("schemaVersion") == 1 &&
+        val desktopMarker = DurableFiles.read(marker)
+        val installed = desktopMarker?.optInt("schemaVersion") == 1 &&
+            desktopMarker.optString("compatibilitySHA256") == compatibilityDigest &&
+            File(directory, "libguest-compat.so").isFile &&
             !File(marker.path.removeSuffix(".json") + ".pending").exists() &&
-            listOf("Xvfb", "xauth", "fluxbox", "feh", "x11vnc", "websockify", "tmux", "xdpyinfo", "dbus-run-session").all {
+            listOf("Xvfb", "xauth", "fluxbox", "feh", "x11vnc", "websockify", "tmux", "xdpyinfo", "dbus-run-session", "gcc", "g++", "make", "python3", "curl").all {
                 File(runtime.rootfs, "usr/bin/$it").isFile
             } && File(runtime.rootfs, "usr/share/novnc/vnc.html").isFile
-        val qq = DurableFiles.read(File(directory, "qq.json"))?.optString("archiveSHA256") ==
-            source.getJSONObject("qq").getString("sha256") && File(directory, "qq/opt/QQ/qq").isFile
-        return DesktopConfiguration(installed, qq)
+        val qqMarker = DurableFiles.read(File(directory, "qq.json"))
+        val qqPresent = qqMarker?.optInt("schemaVersion") == 1 && File(directory, "qq/opt/QQ/qq").isFile
+        val qq = qqPresent && qqMarker?.optString("archiveSHA256") == source.getJSONObject("qq").getString("sha256")
+        return DesktopConfiguration(installed, qq, qqPresent && !qq)
     }
 
     fun desired() = preferences.getBoolean("desired_desktop", false)
@@ -44,7 +54,7 @@ class DesktopRepository(private val context: Context) {
 
     fun prepareAssets() {
         directory.mkdirs(); Os.chmod(directory.path, 448)
-        for (name in listOf("sources.json", "install.py", "desktop.sh", "qq.sh")) {
+        for (name in listOf("sources.json", "install.py", "desktop.sh", "qq.sh", "guest_compat.c", "proc_locks.py", "guest-compat")) {
             val contents = context.assets.open("runtime/desktop/$name").use { it.readBytes() }
             val target = File(directory, name)
             if (!target.isFile || !target.readBytes().contentEquals(contents)) {
@@ -63,7 +73,7 @@ class DesktopRepository(private val context: Context) {
         checkLocalized(runInstaller("dependencies", 1200) == 0 && configuration().installed) { AppText.get(R.string.desktop_install_failed) }
         prepareAccess()
         val commands = runtime.execute("/bin/bash", "-lc",
-            "ln -sfn '$GUEST/desktop.sh' /usr/local/bin/desktop-start; ln -sfn '$GUEST/qq.sh' /usr/local/bin/qq-desktop")
+            "ln -sfn '$GUEST/desktop.sh' /usr/local/bin/desktop-start; ln -sfn '$GUEST/qq.sh' /usr/local/bin/qq-desktop; ln -sfn '$GUEST/guest-compat' /usr/local/bin/guest-compat")
         checkLocalized(commands.exitCode == 0) { AppText.get(R.string.desktop_install_failed) }
     }
 
@@ -149,9 +159,9 @@ class DesktopRepository(private val context: Context) {
 
     fun uninstall() {
         setDesired(false); setQqDesired(false)
-        listOf("qq", "qq.installing", "qq.json", "download.deb").forEach { DurableFiles.delete(File(directory, it)) }
+        listOf("qq", "qq.installing", "qq.previous", "qq.json", "download.deb", "qq-runtime", "libguest-compat.so", "libguest-compat.so.new", "compat-profile.json").forEach { DurableFiles.delete(File(directory, it)) }
         DurableFiles.delete(marker)
-        for ((name, script) in listOf("desktop-start" to "desktop.sh", "qq-desktop" to "qq.sh")) {
+        for ((name, script) in listOf("desktop-start" to "desktop.sh", "qq-desktop" to "qq.sh", "guest-compat" to "guest-compat")) {
             val link = File(runtime.rootfs, "usr/local/bin/$name")
             if (runCatching { Os.readlink(link.path) }.getOrNull() == "$GUEST/$script") link.delete()
         }

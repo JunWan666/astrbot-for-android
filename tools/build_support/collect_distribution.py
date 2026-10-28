@@ -39,6 +39,7 @@ SOURCE_ROOT_FILES = {
     "app/src/main/res/drawable-nodpi/app_logo.webp",
     "app/src/main/assets/terminal/vendor/xterm-LICENSE",
     "app/src/main/assets/terminal/vendor/addon-fit-LICENSE",
+    "app/src/main/assets/runtime/desktop/guest-compat",
     *{f"app/src/main/res/mipmap-{density}/ic_launcher.png" for density in ("mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi")},
     "README.md", "LICENSE",
     "build.gradle.kts", "settings.gradle.kts", "gradle.properties", "gradlew", "gradlew.bat", "build.bat",
