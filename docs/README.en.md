@@ -83,8 +83,8 @@ The screenshots show the app in Simplified Chinese. English is also available in
 | Resource overview | View memory usage for the app and managed processes, total device memory and the usage percentage. Storage usage is shown separately. |
 | Backup and restore | Create local snapshots and portable backups, roll back updates, and automatically remove old unprotected automatic snapshots. |
 | SSH extension | Installed by default and started on demand, with configurable password, port and LAN access. |
-| Ubuntu terminal | Built-in local shell with multiple background sessions, touch selection, inertial scrolling and quick font controls. Does not require SSH. |
-| Ubuntu desktop | Optional lightweight desktop with an embedded noVNC viewer, independent original ARM64 QQ installation, terminal environment and service lifecycle management. Downloaded on demand. |
+| Ubuntu terminal | Built-in local shell with multiple sessions, smooth touch scrolling, arrow keys, paste and Enter. Text selection magnifier on Android 9 and later. |
+| Ubuntu desktop | Optional lightweight desktop and general build tools, with an embedded noVNC viewer. Install or update independent original ARM64 QQ while preserving login data. |
 | cpolar extension | Install on demand and sign in through the official embedded WebUI. Includes SSH, AstrBot and NapCat tunnel presets. |
 | App language | Choose system default, Simplified Chinese or English for the management interface, notifications and app messages. |
 | Background setup | Access notification, battery optimization, unrestricted background usage and auto-start settings, with guidance for locking the app in recent tasks. |

@@ -4,9 +4,10 @@
   const post = value => window.UbuntuTerminal.postMessage(JSON.stringify(value));
   const container = document.getElementById('terminal');
   const entries = new Map();
-  let current = null, active = true, fontSize = 14, selecting = false, range = null;
+  let current = null, active = true, fontSize = 10, selecting = false, range = null;
+  let magnifierFrame = 0, magnifierPoint = null, magnifierShown = false;
   let longPress = null, touchOrigin = null, dragging = null, ignoreClickUntil = 0;
-  let scrollTouch = null, inertia = 0, scrollPixels = 0;
+  let scrollTouch = null, inertia = 0, dragFrame = 0, scrollPixels = 0, scrollView = null;
   let labels = {latest:'Latest'}, reportedSelection = false, reportedSession = null;
   const latest = document.createElement('button');
   latest.type = 'button'; latest.className = 'scroll-latest';
@@ -20,49 +21,99 @@
       if (!range || !current) return;
       e.preventDefault(); e.stopPropagation();
       const cols = current.term.cols;
-      dragging = {anchor:edge === 'start' ? range.end.y * cols + range.end.x - 1 : range.start.y * cols + range.start.x};
+      const start = range.start.y * cols + range.start.x, end = range.end.y * cols + range.end.x - 1;
+      const index = edge === 'start' ? start : end;
+      const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
+      const point = {clientX:rect.left + (index % cols + 0.5) * rect.width / cols,
+        clientY:rect.top + (Math.floor(index / cols) - current.term.buffer.active.viewportY + 0.5) * rect.height / current.term.rows};
+      const touch = e.touches[0];
+      if (!touch) return;
+      dragging = {anchor:edge === 'start' ? end : start, dx:touch.clientX - point.clientX, dy:touch.clientY - point.clientY};
+      showMagnifier(point);
     }, {passive:false});
     element.addEventListener('touchmove', e => {
       if (!dragging || !e.touches[0]) return;
-      e.preventDefault(); e.stopPropagation(); extendSelection(e.touches[0], dragging.anchor);
+      e.preventDefault(); e.stopPropagation();
+      const point = {clientX:e.touches[0].clientX - dragging.dx, clientY:e.touches[0].clientY - dragging.dy};
+      extendSelection(point, dragging.anchor); showMagnifier(point);
     }, {passive:false});
-    element.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); dragging = null; }, {passive:false});
+    for (const type of ['touchend','touchcancel']) element.addEventListener(type, e => {
+      e.preventDefault(); e.stopPropagation(); dragging = null; hideMagnifier();
+    }, {passive:false});
     document.body.appendChild(element); return element;
   });
   function updateLabels() {
     latest.textContent = '↓ ' + labels.latest;
+  }
+  function showMagnifier(touch) {
+    if (!current || !selecting) return;
+    const point = position(touch), term = current.term;
+    const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
+    magnifierPoint = {type:'magnifier',id:current.id,show:true,
+      x:Math.max(0,Math.min(innerWidth,rect.left + (point.x + 0.5) * rect.width / term.cols)),
+      y:Math.max(0,Math.min(innerHeight,rect.top + (point.y - term.buffer.active.viewportY + 0.5) * rect.height / term.rows)),
+      width:innerWidth,height:innerHeight};
+    if (!magnifierFrame) magnifierFrame = requestAnimationFrame(() => {
+      magnifierFrame = 0;
+      if (magnifierPoint && selecting && active) { magnifierShown = true; post(magnifierPoint); }
+    });
+  }
+  function hideMagnifier() {
+    cancelAnimationFrame(magnifierFrame); magnifierFrame = 0; magnifierPoint = null;
+    if (magnifierShown) { magnifierShown = false; post({type:'magnifier',id:current?.id,show:false}); }
   }
   function updateLatest() {
     const buffer = current?.term.buffer.active;
     latest.style.display = !selecting && buffer && buffer.viewportY < buffer.baseY ? 'block' : 'none';
   }
   function stopScroll() {
-    cancelAnimationFrame(inertia); inertia = 0; scrollTouch = null; scrollPixels = 0;
+    cancelAnimationFrame(inertia); cancelAnimationFrame(dragFrame);
+    inertia = 0; dragFrame = 0; scrollTouch = null; scrollPixels = 0;
+    if (scrollView) {
+      scrollView.screen.style.transform = '';
+      scrollView.screen.style.willChange = '';
+      scrollView = null;
+    }
     if (current) {
       current.scrolling = false;
       if (current.pending && !selecting) { const batch = current.pending; current.pending = null; receive(batch); }
     }
     poll();
   }
+  function offsetScreen() {
+    if (scrollView) scrollView.screen.style.transform = `translate3d(0,${scrollView.rendered * scrollView.height - scrollView.position}px,0)`;
+  }
   function scrollBy(pixels) {
     if (!current) return false;
-    const term = current.term, rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
-    const height = rect.height / term.rows;
-    scrollPixels += pixels;
-    const lines = Math.trunc(scrollPixels / height);
-    if (!lines) return true;
-    scrollPixels -= lines * height;
-    const previous = term.buffer.active.viewportY;
-    term.scrollLines(lines); updateLatest();
-    return previous !== term.buffer.active.viewportY;
+    const term = current.term;
+    if (!scrollView) {
+      const screen = current.element.querySelector('.xterm-screen');
+      const height = screen.getBoundingClientRect().height / term.rows;
+      if (!height) return false;
+      // Measure once per gesture. Fractional rows move on the compositor while
+      // xterm redraws complete rows; no repeated layout read on the animation path.
+      scrollView = {screen,height,position:term.buffer.active.viewportY * height,rendered:term.buffer.active.viewportY};
+      screen.style.willChange = 'transform';
+    }
+    const previous = scrollView.position;
+    scrollView.position = Math.max(0, Math.min(term.buffer.active.baseY * scrollView.height, previous + pixels));
+    term.scrollToLine(Math.round(scrollView.position / scrollView.height));
+    offsetScreen(); updateLatest();
+    return previous !== scrollView.position;
+  }
+  function flushDrag() {
+    cancelAnimationFrame(dragFrame); dragFrame = 0;
+    if (scrollPixels) { const delta = scrollPixels; scrollPixels = 0; scrollBy(delta); }
   }
   function finishScroll(velocity) {
+    flushDrag();
     scrollTouch = null;
     let previous = performance.now();
     const frame = now => {
       const elapsed = Math.min(32, now - previous); previous = now;
-      const moved = scrollBy(velocity * elapsed);
-      velocity *= Math.exp(-elapsed / 180);
+      const decay = Math.exp(-elapsed / 325);
+      const moved = scrollBy(velocity * 325 * (1 - decay));
+      velocity *= decay;
       if (moved && Math.abs(velocity) > 0.025) inertia = requestAnimationFrame(frame);
       else stopScroll();
     };
@@ -78,7 +129,7 @@
       reportedSelection = selecting; reportedSession = current?.id;
       post({type:'selection',id:current?.id,selected:selecting});
     }
-    if (!selecting) { handles.forEach(h => h.style.display = 'none'); return; }
+    if (!selecting) { hideMagnifier(); handles.forEach(h => h.style.display = 'none'); return; }
     const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
     const width = rect.width / term.cols, height = rect.height / term.rows;
     [range.start, range.end].forEach((point,index) => {
@@ -91,6 +142,7 @@
   function clearSelection() {
     const entry = current;
     selecting = false; range = null; dragging = null;
+    hideMagnifier();
     entry?.term.clearSelection(); selectionUi();
     if (entry?.pending) { const batch = entry.pending; entry.pending = null; receive(batch); }
     poll();
@@ -121,7 +173,7 @@
     if (group === 0) first = last = point.x;
     term.select(first, point.y, last - first + 1);
     current.element.querySelector('textarea')?.blur();
-    selectionUi();
+    selectionUi(); showMagnifier(touch);
   }
   container.addEventListener('touchstart', e => {
     stopScroll();
@@ -139,7 +191,7 @@
     if (selecting) {
       e.preventDefault(); e.stopImmediatePropagation();
       const anchor = range.start.y * current.term.cols + range.start.x;
-      extendSelection(touch, anchor); return;
+      extendSelection(touch, anchor); showMagnifier(touch); return;
     }
     if (Math.hypot(touch.clientX - touchOrigin.clientX,touch.clientY - touchOrigin.clientY) > 8) {
       clearTimeout(longPress);
@@ -148,21 +200,23 @@
     if (scrollTouch?.moved) {
       e.preventDefault(); e.stopImmediatePropagation();
       const now = performance.now(), delta = scrollTouch.y - touch.clientY;
-      const velocity = Math.max(-3.2, Math.min(3.2,delta / Math.max(1,now - scrollTouch.time)));
+      const velocity = Math.max(-10, Math.min(10,delta / Math.max(1,now - scrollTouch.time)));
       scrollTouch.velocity = scrollTouch.velocity * 0.35 + velocity * 0.65;
       scrollTouch.y = touch.clientY; scrollTouch.time = now;
-      current.scrolling = true; scrollBy(delta);
+      current.scrolling = true;
+      scrollPixels += delta;
+      if (!dragFrame) dragFrame = requestAnimationFrame(flushDrag);
     }
   }, {capture:true,passive:false});
   container.addEventListener('touchend', e => {
-    clearTimeout(longPress); touchOrigin = null;
+    clearTimeout(longPress); touchOrigin = null; hideMagnifier();
     if (selecting) { e.preventDefault(); e.stopImmediatePropagation(); ignoreClickUntil = Date.now() + 600; }
     else if (scrollTouch?.moved) {
       e.preventDefault(); e.stopImmediatePropagation(); ignoreClickUntil = Date.now() + 400;
       finishScroll(performance.now() - scrollTouch.time < 100 ? scrollTouch.velocity : 0);
     } else stopScroll();
   }, {capture:true,passive:false});
-  container.addEventListener('touchcancel', () => { clearTimeout(longPress); touchOrigin = null; stopScroll(); });
+  container.addEventListener('touchcancel', () => { clearTimeout(longPress); touchOrigin = null; hideMagnifier(); stopScroll(); });
   container.addEventListener('click', e => {
     if (selecting || Date.now() < ignoreClickUntil) { e.preventDefault(); e.stopImmediatePropagation(); }
   }, true);
@@ -186,9 +240,14 @@
     });
     term.onSelectionChange(() => { if (entry === current) selectionUi(); });
     term.onScroll(() => { if (entry === current) { updateLatest(); if (selecting) selectionUi(); } });
+    term.onRender(() => {
+      if (entry === current && scrollView) { scrollView.rendered = term.buffer.active.viewportY; offsetScreen(); }
+    });
     entries.set(id,entry); return entry;
   }
   function resize() {
+    hideMagnifier();
+    stopScroll();
     container.style.width = Math.max(20,innerWidth - 12) + 'px';
     container.style.height = Math.max(20,innerHeight - 16) + 'px';
     if (!current) return;
@@ -246,12 +305,12 @@
     },
     labels(value) { labels = value; updateLabels(); },
     focus() { clearSelection(); if (current?.running) current.term.focus(); },
-    active(value) { active = value; if(value) poll(); },
+    active(value) { active = value; if(value) poll(); else hideMagnifier(); },
     paste(text) { if (current?.running) { clearSelection(); current.term.paste(text); current.term.focus(); } },
     ctrl(enabled) { if (current) { current.ctrl = enabled; current.term.focus(); } },
     key(data) { if (current?.running) { post({type:'input',id:current.id,data}); current.term.focus(); } },
     font(size) { fontSize = size; for (const entry of entries.values()) entry.term.options.fontSize = size; requestAnimationFrame(resize); }
   };
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); else hideMagnifier(); });
   updateLabels(); post({type:'ready'});
 })();

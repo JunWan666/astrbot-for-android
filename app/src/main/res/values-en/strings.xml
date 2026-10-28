@@ -1151,6 +1151,7 @@
     <string name="terminal_end_message">Closes this terminal and its processes. Other sessions keep running. Save any files you are editing first.</string>
     <string name="terminal_copy">Copy selection or terminal output</string>
     <string name="terminal_paste">Paste</string>
+    <string name="terminal_enter">Enter</string>
     <string name="terminal_clear">Clear screen and output history</string>
     <string name="terminal_font_larger">Increase font size</string>
     <string name="terminal_font_smaller">Decrease font size</string>

@@ -1153,6 +1153,7 @@
     <string name="terminal_end_message">将关闭此终端和由此会话启动的进程，其他终端继续运行。请先保存正在编辑的文件。</string>
     <string name="terminal_copy">复制选区或终端内容</string>
     <string name="terminal_paste">粘贴</string>
+    <string name="terminal_enter">回车</string>
     <string name="terminal_clear">清空屏幕与历史输出</string>
     <string name="terminal_font_larger">增大字号</string>
     <string name="terminal_font_smaller">缩小字号</string>

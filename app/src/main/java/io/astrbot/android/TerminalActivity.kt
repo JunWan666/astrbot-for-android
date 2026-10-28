@@ -7,8 +7,10 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.webkit.*
+import android.widget.Magnifier
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -52,14 +54,16 @@ class TerminalActivity : LocalizedActivity() {
     private var selectionMode by mutableStateOf(false)
     private var pageError by mutableStateOf<String?>(null)
     private var pendingPaste by mutableStateOf<Pair<Long, String>?>(null)
+    private var selectionMagnifier: Magnifier? = null
+    private var selectionTouchActive = false
     private val preferences by lazy { getSharedPreferences("terminal-ui", MODE_PRIVATE) }
-    private var fontSize by mutableIntStateOf(14)
+    private var fontSize by mutableIntStateOf(10)
     private val permission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        fontSize = preferences.getInt("fontSize", 14).coerceIn(10, 24)
+        fontSize = preferences.getInt("fontSize", 10).coerceIn(10, 24)
         setContent { ManagerTheme { TerminalScreen() } }
         lifecycleScope.launch {
             RuntimeStore.operationLock.withLock { RuntimeStore.refreshInstallation(this@TerminalActivity) }
@@ -156,15 +160,16 @@ class TerminalActivity : LocalizedActivity() {
                 verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Shortcut("Ctrl", control, keysEnabled, Modifier.weight(1f)) { control = !control; js("TerminalApp.ctrl($control)") }
-                    for ((label, value) in listOf("Esc" to "\u001b", "Tab" to "\t", "/" to "/", "-" to "-")) {
-                        Shortcut(label, false, keysEnabled, Modifier.weight(1f)) { js("TerminalApp.key(${JSONObject.quote(value)})") }
-                    }
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for ((label, value) in listOf("←" to "\u001b[D", "↓" to "\u001b[B", "↑" to "\u001b[A", "→" to "\u001b[C")) {
+                    for ((label, value) in listOf("Esc" to "\u001b", "↑" to "\u001b[A", "/" to "/")) {
                         Shortcut(label, false, keysEnabled, Modifier.weight(1f)) { js("TerminalApp.key(${JSONObject.quote(value)})") }
                     }
                     Shortcut(AppText.get(R.string.terminal_paste), false, keysEnabled, Modifier.weight(1f)) { paste() }
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for ((label, value) in listOf("Tab" to "\t", "←" to "\u001b[D", "↓" to "\u001b[B", "→" to "\u001b[C")) {
+                        Shortcut(label, false, keysEnabled, Modifier.weight(1f)) { js("TerminalApp.key(${JSONObject.quote(value)})") }
+                    }
+                    Shortcut(AppText.get(R.string.terminal_enter), false, keysEnabled, Modifier.weight(1f)) { js("TerminalApp.key(\"\\r\")") }
                 }
             }
         }
@@ -244,8 +249,10 @@ class TerminalActivity : LocalizedActivity() {
             "ctrlReleased" -> control = false
             "selection" -> if (message.optLong("id", -1) == TerminalStore.state.value.selectedId) {
                 selectionMode = message.optBoolean("selected")
+                if (!selectionMode) dismissMagnifier()
                 if (selectionMode) browser?.let { getSystemService(InputMethodManager::class.java).hideSoftInputFromWindow(it.windowToken, 0) }
             }
+            "magnifier" -> updateMagnifier(message)
             "copy" -> {
                 if (message.optLong("id", -1) != TerminalStore.state.value.selectedId) return
                 val text = message.optString("data").take(524288)
@@ -267,6 +274,36 @@ class TerminalActivity : LocalizedActivity() {
 
     private fun js(script: String) { if (ready) browser?.evaluateJavascript(script, null) }
     private fun setFont(value: Int) { fontSize = value.coerceIn(10, 24); preferences.edit().putInt("fontSize", fontSize).apply(); js("TerminalApp.font($fontSize)") }
+    private fun dismissMagnifier() {
+        if (Build.VERSION.SDK_INT >= 28) selectionMagnifier?.dismiss()
+        selectionMagnifier = null
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) selectionTouchActive = true
+        val released = event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL
+        if (released) selectionTouchActive = false
+        return try { super.dispatchTouchEvent(event) }
+        finally { if (released) dismissMagnifier() }
+    }
+
+    private fun updateMagnifier(message: JSONObject) {
+        if (!message.optBoolean("show")) { dismissMagnifier(); return }
+        if (Build.VERSION.SDK_INT < 28 || !selectionTouchActive || !selectionMode || !lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) ||
+            message.optLong("id", -1) != TerminalStore.state.value.selectedId) return
+        val view = browser ?: return
+        val x = message.optDouble("x"); val y = message.optDouble("y")
+        val width = message.optDouble("width"); val height = message.optDouble("height")
+        if (!x.isFinite() || !y.isFinite() || !width.isFinite() || !height.isFinite() ||
+            width <= 0 || height <= 0 || x !in 0.0..width || y !in 0.0..height || view.width <= 0 || view.height <= 0) return
+        val magnifier = selectionMagnifier ?: if (Build.VERSION.SDK_INT >= 29) {
+            val density = resources.displayMetrics.density
+            Magnifier.Builder(view).setSize((168 * density).toInt(), (56 * density).toInt())
+                .setInitialZoom(2f).setCornerRadius(10 * density).build()
+        } else Magnifier(view)
+        selectionMagnifier = magnifier
+        magnifier.show((x * view.width / width).toFloat(), (y * view.height / height).toFloat())
+    }
     private fun keyboard() {
         if (ready) browser?.let { view ->
             view.evaluateJavascript("TerminalApp.focus()") {
@@ -287,9 +324,10 @@ class TerminalActivity : LocalizedActivity() {
     }
 
     override fun onStart() { super.onStart(); browser?.onResume(); js("TerminalApp.active(true)") }
-    override fun onStop() { js("TerminalApp.active(false)"); browser?.onPause(); pendingPaste = null; super.onStop() }
+    override fun onStop() { selectionTouchActive = false; dismissMagnifier(); js("TerminalApp.active(false)"); browser?.onPause(); pendingPaste = null; super.onStop() }
 
     override fun onDestroy() {
+        dismissMagnifier()
         ready = false
         browser?.apply { stopLoading(); removeAllViews(); destroy() }
         browser = null
