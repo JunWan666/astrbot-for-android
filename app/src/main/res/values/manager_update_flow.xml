@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manager_update_found">发现新版本 %1$s</string>
+    <string name="manager_update_no_notes">此版本未提供更新说明。</string>
+    <string name="manager_update_download_install">下载并安装</string>
+    <string name="manager_update_resume_install">继续下载并安装</string>
+    <string name="manager_update_flow_notice">下载后自动校验并打开系统安装器。安装前会短暂停止服务并创建数据快照，再恢复原运行状态。系统仍会请你确认安装。</string>
+    <string name="manager_update_permission_notice">更新包已校验。请在系统设置中允许本应用安装 APK；授权并返回后将继续打开安装器。</string>
+    <string name="manager_update_permission_denied">尚未允许安装 APK，已保留下载。下次检查更新可继续安装。</string>
+    <string name="manager_update_installer_opened">已打开系统安装器。若取消，可再次检查更新并继续安装，无需重新下载。</string>
+    <string name="manager_update_latest">当前已是此设备适用的最新版本。</string>
+</resources>

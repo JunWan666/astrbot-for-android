@@ -87,8 +87,8 @@ The screenshots show the app in Simplified Chinese. English is also available in
 | Ubuntu desktop | Optional lightweight desktop and general build tools, with an embedded noVNC viewer. Install or update independent original ARM64 QQ while preserving login data. |
 | cpolar extension | Install on demand and sign in through the official embedded WebUI. Includes SSH, AstrBot and NapCat tunnel presets. |
 | App language | Choose system default, Simplified Chinese or English for the management interface, notifications and app messages. |
-| Background setup | Access notification, battery optimization, unrestricted background usage and auto-start settings, with guidance for locking the app in recent tasks. |
-| Updates | Check for app, AstrBot and NapCat updates independently; verify downloads and confirm installation. |
+| Background setup | Access notification, battery optimization, unrestricted background usage and auto-start settings, with guidance for locking the app in recent tasks and an option to hide its task cards. |
+| Updates | Check for app updates, review release notes, then download, verify and open the system installer. AstrBot and NapCat update independently. |
 
 Home and most settings use fixed layouts, with pagination for small windows. Background settings use one scrollable page; personas and logs also support scrolling. Opening a service switches the bottom navigation to that service's overview, connections, credentials and logs. Its credentials page can reset a forgotten WebUI password or access token.
 
@@ -125,7 +125,7 @@ The keystore and credentials stay in the Git-ignored `.local/signing/` directory
 
 ## Updates
 
-**Settings → About → Check for updates** manages app APK updates. AstrBot and NapCat have separate component update entries. Compatible component updates do not require reinstalling the app. Updates support signature verification, resumable downloads, snapshots before installation and rollback on failure. Installation requires user confirmation after the download completes.
+**Settings → About → Check for updates** manages app APK updates. A dialog shows release notes when an update is available. Downloading then verifies the APK and opens the system installer; if installation permission is missing, the app guides you to settings and continues when you return. A message confirms when the latest applicable version is installed. AstrBot and NapCat have separate component update entries. Signature verification, resumable downloads, snapshots before installation and component rollback are retained. Android asks you to confirm APK installation.
 
 The app uses this project's signed GitHub update channels by default: **Releases host app APKs and AstrBot packages, the `updates` branch hosts signed update manifests, and NapCat packages are downloaded directly from upstream official Shell releases**. Changes to Linux QQ, Python or underlying dependencies require a matching runtime environment upgrade. See [updates and distribution (Chinese)](更新与分发.md) for configuration details.
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="manager_update_found">New version %1$s available</string>
+    <string name="manager_update_no_notes">No release notes were provided.</string>
+    <string name="manager_update_download_install">Download and install</string>
+    <string name="manager_update_resume_install">Resume download and install</string>
+    <string name="manager_update_flow_notice">The download is verified automatically, then the system installer opens. Services briefly stop for a data snapshot and return to their previous state before installation. The system still asks you to confirm installation.</string>
+    <string name="manager_update_permission_notice">The update is verified. Allow this app to install APKs in system settings; installation continues when you grant access and return.</string>
+    <string name="manager_update_permission_denied">APK installation is not allowed yet. The download is kept; check for updates again to continue.</string>
+    <string name="manager_update_installer_opened">System installer opened. If you cancel, check for updates again to continue without downloading again.</string>
+    <string name="manager_update_latest">You already have the latest version available for this device.</string>
+</resources>

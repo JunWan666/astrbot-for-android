@@ -79,7 +79,7 @@ internal class ManagerApkRepository(private val context: Context,
         }
         val entry = verify(envelope, commitSequence = true)
         DurableFiles.write(catalog, JSONObject().put("source", source).put("envelope", envelope))
-        entry?.let(::status) ?: ManagerApkStatus(null, false, 0, AppText.get(R.string.ui_signed_catalog_checked_no_applicable_app_update_is_available))
+        entry?.let(::status) ?: ManagerApkStatus(null, false, 0, AppText.get(R.string.manager_update_latest))
     } }
 
     suspend fun download(id: String, progress: (String) -> Unit): ManagerApkStatus = gate.withLock { withContext(Dispatchers.IO) {
@@ -286,7 +286,15 @@ internal class ManagerApkRepository(private val context: Context,
         }
         error(AppText.get(R.string.ui_too_many_update_server_redirects))
     }
-    fun close() { if (providedClient == null && clientDelegate.isInitialized()) { client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown() } }
+    fun close() {
+        if (providedClient == null && clientDelegate.isInitialized()) {
+            // Closing a pooled TLS socket may write to the network. Activity teardown runs on main.
+            CoroutineScope(Dispatchers.IO).launch {
+                try { client.connectionPool.evictAll() }
+                finally { client.dispatcher.executorService.shutdown() }
+            }
+        }
+    }
     companion object {
         private val gate = Mutex()
         private const val MAX_CATALOG = 256 * 1024
