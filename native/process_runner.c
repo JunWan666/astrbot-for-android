@@ -1,15 +1,18 @@
 #define _GNU_SOURCE
+#include <dirent.h>
 #include <errno.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
 
-/* One launcher owns one session and adopts orphaned grandchildren. No global PID search. */
+/* One launcher owns one session and adopts orphaned grandchildren. */
 static volatile sig_atomic_t stop_signal = 0;
 static void request_stop(int signal_number) { stop_signal = signal_number; }
 
@@ -29,16 +32,48 @@ static int signal_adopted_children(int signal_number) {
     char path[128];
     snprintf(path, sizeof(path), "/proc/self/task/%d/children", getpid());
     FILE *children = fopen(path, "r");
-    if (children == NULL) return -1;
     int count = 0;
     long child;
-    while (fscanf(children, "%ld", &child) == 1) {
-        if (child > 1 && child != getpid()) {
+    if (children != NULL) {
+        while (fscanf(children, "%ld", &child) == 1) {
+            if (child > 1 && child != getpid()) {
+                kill((pid_t) child, signal_number);
+                count++;
+            }
+        }
+        fclose(children);
+        return count;
+    }
+
+    /* Some Android kernels omit the children file. Discover only our direct
+     * children through procfs instead. This single-threaded launcher does not
+     * reap during the scan: an owned child's PID cannot be recycled between
+     * checking its parent and signalling it, even if the child exits. */
+    DIR *processes = opendir("/proc");
+    if (processes == NULL) return -1;
+    struct dirent *entry;
+    while ((entry = readdir(processes)) != NULL) {
+        char *end;
+        errno = 0;
+        child = strtol(entry->d_name, &end, 10);
+        if (errno || end == entry->d_name || *end || child <= 1 || child > INT_MAX || child == getpid()) continue;
+        snprintf(path, sizeof(path), "/proc/%ld/stat", child);
+        FILE *stat = fopen(path, "r");
+        if (stat == NULL) continue;
+        char buffer[4096];
+        size_t length = fread(buffer, 1, sizeof(buffer) - 1, stat);
+        fclose(stat);
+        buffer[length] = '\0';
+        /* A comm value can contain spaces, parentheses, or newlines. */
+        char *comm_end = strrchr(buffer, ')');
+        char state;
+        long parent;
+        if (comm_end != NULL && sscanf(comm_end + 1, " %c %ld", &state, &parent) == 2 && parent == getpid()) {
             kill((pid_t) child, signal_number);
             count++;
         }
     }
-    fclose(children);
+    closedir(processes);
     return count;
 }
 
@@ -52,7 +87,11 @@ int main(int argc, char **argv) {
     sigaction(SIGINT, &action, NULL);
     sigaction(SIGHUP, &action, NULL);
     signal(SIGCHLD, SIG_DFL);
-    if (setsid() < 0 || prctl(PR_SET_CHILD_SUBREAPER, 1) < 0 || prctl(PR_SET_PDEATHSIG, SIGTERM) < 0) {
+    /* PDEATHSIG follows the thread that forked us, not the parent's entire
+     * process. Android may start this launcher on a coroutine worker which
+     * retires while the app is still running. Watch the parent process below
+     * instead, so retiring a worker cannot stop healthy guest sessions. */
+    if (setsid() < 0 || prctl(PR_SET_CHILD_SUBREAPER, 1) < 0 || prctl(PR_SET_PDEATHSIG, 0) < 0) {
         perror("process-runner: initialize"); return 70;
     }
     if (getppid() != original_parent) return 71;
@@ -78,6 +117,7 @@ int main(int argc, char **argv) {
     long long stop_started = 0;
     siginfo_t info = {0};
     while (1) {
+        if (getppid() != original_parent && !stop_signal) stop_signal = SIGTERM;
         if (waitid(P_PID, (id_t) child, &info, WEXITED | WNOHANG | WNOWAIT) == 0 && info.si_pid == child) break;
         if (stop_signal && stop_started == 0) {
             kill(-child, SIGTERM);
