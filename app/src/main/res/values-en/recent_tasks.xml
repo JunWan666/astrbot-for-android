@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="background_hide_recents">Hide from recent apps</string>
+    <string name="background_hide_recents_detail">Hide this app’s task card to reduce accidental dismissal. Open it from the launcher icon. Battery and child process restrictions still need their own settings.</string>
+    <string name="background_hide_recents_failed">The system could not update the task card. Reopen the app and try again.</string>
+</resources>

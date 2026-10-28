@@ -11,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.unit.dp
@@ -213,6 +216,8 @@ internal object BackgroundGuide {
 }
 
 @Composable internal fun BackgroundSettings(modifier: Modifier = Modifier, onAction: (SettingAction) -> Unit) {
+    val context = LocalContext.current
+    var hideRecents by remember { mutableStateOf(RecentTaskVisibility.hidden(context)) }
     val statuses = rememberBackgroundStatuses()
     val automaticCount = statuses.values.count { !it.manual && it.complete }
     val manualCount = statuses.values.count { it.manual && it.complete }
@@ -230,9 +235,9 @@ internal object BackgroundGuide {
             badge = { BackgroundStatusBadge(status) }) { onAction(action) }
     } + ManagerMenuItem(BackgroundTopic.HELP.title, R.drawable.ic_document,
         AppText.get(R.string.ui_setup_recommendations_and_runtime_limitations)) { onAction(SettingAction.BACKGROUND_HELP) }
-    Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Surface(color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = .45f), shape = MaterialTheme.shapes.medium) {
-            Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(AppText.get(R.string.background_system_summary, automaticCount), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                     Text(AppText.get(R.string.background_manual_summary, manualCount), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
@@ -241,7 +246,31 @@ internal object BackgroundGuide {
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        FixedManagerMenu(items, Modifier.weight(1f))
+        Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+            Row(Modifier.fillMaxWidth().toggleable(hideRecents, role = Role.Switch, onValueChange = { hidden ->
+                if (RecentTaskVisibility.setHidden(context, hidden)) hideRecents = hidden
+                else Toast.makeText(context, AppText.get(R.string.background_hide_recents_failed), Toast.LENGTH_LONG).show()
+            }).padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(AppText.get(R.string.background_hide_recents), style = MaterialTheme.typography.titleSmall)
+                    Text(AppText.get(R.string.background_hide_recents_detail), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = hideRecents, onCheckedChange = null)
+            }
+        }
+        items.forEach { item ->
+            Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+                Row(Modifier.fillMaxWidth().clickable(onClick = item.onClick).heightIn(min = 54.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    ManagerGlyph(item.icon, MaterialTheme.colorScheme.primary)
+                    Text(item.title, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                    item.badge?.invoke()
+                    Icon(painterResource(R.drawable.ic_chevron), null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        }
     }
 }
 

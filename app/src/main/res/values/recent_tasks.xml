@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="background_hide_recents">在最近任务中隐藏</string>
+    <string name="background_hide_recents_detail">隐藏本应用的任务卡片，减少误划关闭；仍可从桌面图标进入。此设置不代替系统的电池与子进程限制设置。</string>
+    <string name="background_hide_recents_failed">系统未能更新任务卡片显示，请重新打开应用后重试。</string>
+</resources>

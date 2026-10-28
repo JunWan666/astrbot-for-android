@@ -77,6 +77,7 @@ abstract class LocalizedActivity : ComponentActivity() {
     }
     override fun onResume() {
         super.onResume()
+        runCatching { RecentTaskVisibility.apply(this) }
         if (languageAtCreation != AppLanguage.selected(this)) recreate()
     }
 }
