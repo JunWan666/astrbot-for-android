@@ -50,8 +50,8 @@ class ResourceMonitor(private val context: Context) {
             val uid = runCatching { Os.stat(file.path).st_uid }.getOrNull()
             if (uid == null) { complete = false; continue }
             if (uid != Process.myUid()) continue
-            runCatching { ResourceMemoryPolicy.startTicks(pid, File(file, "stat").readText()) }
-                .onSuccess { processes[pid] = it }.onFailure { complete = false }
+            runCatching { ResourceMemoryPolicy.residentStartTicks(pid, File(file, "stat").readText()) }
+                .onSuccess { ticks -> if (ticks != null) processes[pid] = ticks }.onFailure { complete = false }
         }
         return Census(processes, complete)
     }

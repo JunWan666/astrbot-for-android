@@ -10,12 +10,23 @@ object ResourceMemoryPolicy {
     }
 
     fun startTicks(pid: Int, stat: String): Long {
+        return statFields(pid, stat)[19].toLong().also { require(it >= 0) }
+    }
+
+    /** Zombies have released their address space; no PSS file exists to sample. */
+    fun residentStartTicks(pid: Int, stat: String): Long? {
+        val fields = statFields(pid, stat)
+        val ticks = fields[19].toLong().also { require(it >= 0) }
+        return if (fields[0] in listOf("Z", "X", "x")) null else ticks
+    }
+
+    private fun statFields(pid: Int, stat: String): List<String> {
         require(stat.substringBefore(" (").toIntOrNull() == pid) { "Process identity mismatch" }
         val separator = stat.lastIndexOf(") ")
         require(separator > 0)
         val fields = stat.substring(separator + 2).trim().split(Regex("\\s+"))
         require(fields.size >= 20)
-        return fields[19].toLong().also { require(it >= 0) }
+        return fields
     }
 
     fun pssKiB(lines: Sequence<String>, single: Boolean): Long {
