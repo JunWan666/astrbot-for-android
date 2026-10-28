@@ -426,6 +426,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     desktopRepository.setDesired(true); desktopRepository.setQqDesired(true); desktop.refresh()
                 }
                 "desktop-qq-stop" -> { desktopRepository.setQqDesired(false); desktop.stopQq() }
+                "reset-webui-password" -> resetWebUiPassword(requireNotNull(id))
                 "desktop-uninstall" -> { desktop.stop(); desktopRepository.uninstall(); desktop.refresh() }
                 "terminal-new" -> terminal.start(newSession = true)
                 "terminal-start" -> terminal.start(terminalSessionId ?: TerminalStore.state.value.selectedId)
@@ -853,6 +854,30 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 updateState { it.copy(maintenance = MaintenanceState.IDLE) }
             }
         }
+    }
+
+    private suspend fun resetWebUiPassword(id: ServiceId) {
+        checkLocalized(RuntimeStore.state.value.componentsReady) { AppText.get(R.string.ui_initialize_the_complete_runtime_first) }
+        val supervisor = supervisors.getValue(id)
+        val wanted = supervisor.state.value.desiredRunning
+        updateState { it.copy(phase = AppText.get(R.string.credentials_resetting, id.label)) }
+        supervisor.setMaintenance(MaintenanceState.RESTORING)
+        var resetFailure: Throwable? = null
+        try {
+            supervisor.stop()
+            withContext(Dispatchers.IO) { WebUiCredentials.reset(File(context.filesDir, "persistent"), id) }
+        } catch (failure: Throwable) {
+            resetFailure = failure
+            throw failure
+        } finally {
+            withContext(NonCancellable) {
+                supervisor.setMaintenance(MaintenanceState.IDLE)
+                if (wanted) try { supervisor.start() } catch (failure: Throwable) {
+                    if (resetFailure != null) resetFailure.addSuppressed(failure) else throw failure
+                }
+            }
+        }
+        updateState { it.copy(notice = AppText.get(R.string.credentials_reset_done, id.label)) }
     }
 
     private suspend fun maintain(action: String, backupId: String?) {

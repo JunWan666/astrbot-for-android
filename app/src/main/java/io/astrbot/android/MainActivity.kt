@@ -464,11 +464,14 @@ class MainActivity : LocalizedActivity() {
     }
 
     @Composable private fun CredentialControls(id: ServiceId) {
+        val manager by RuntimeStore.state.collectAsStateWithLifecycle()
         val label = if (id == ServiceId.NAPCAT) AppText.get(R.string.ui_napcat_access_token) else AppText.get(R.string.ui_astrbot_initial_password)
         val owner = LocalLifecycleOwner.current
         var revealed by remember(id) { mutableStateOf<String?>(null) }
         var loading by remember(id) { mutableStateOf(false) }
         var request by remember(id) { mutableIntStateOf(0) }
+        var confirmReset by remember(id) { mutableStateOf(false) }
+        LaunchedEffect(manager.busy) { if (manager.busy) { request++; revealed = null; loading = false } }
         DisposableEffect(owner, id) {
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_STOP) { request++; revealed = null; loading = false }
@@ -495,12 +498,23 @@ class MainActivity : LocalizedActivity() {
             IconButton(onClick = {
                 if (revealed != null) { request++; revealed = null }
                 else readCredential { revealed = it }
-            }, enabled = !loading) {
+            }, enabled = !loading && !manager.busy) {
                 Icon(painterResource(if (revealed == null) R.drawable.ic_visibility else R.drawable.ic_visibility_off),
                     contentDescription = "${if (revealed == null) AppText.get(R.string.ui_show) else AppText.get(R.string.ui_hide)} $label")
             }
         }
-        ManagerActionButton(AppText.get(R.string.ui_copy_f4880, label), { readCredential { copy(label, it, sensitive = true) } }, tone = ActionTone.NEUTRAL, enabled = !loading)
+        ManagerActionButton(AppText.get(R.string.ui_copy_f4880, label), { readCredential { copy(label, it, sensitive = true) } }, tone = ActionTone.NEUTRAL, enabled = !loading && !manager.busy)
+        ManagerActionButton(AppText.get(if (id == ServiceId.NAPCAT) R.string.credentials_reset_token else R.string.credentials_reset_password), {
+            request++; revealed = null; confirmReset = true
+        }, tone = ActionTone.NEUTRAL, enabled = manager.componentsReady && !manager.busy && !loading)
+        if (confirmReset) AlertDialog(onDismissRequest = { confirmReset = false },
+            title = { Text(AppText.get(if (id == ServiceId.NAPCAT) R.string.credentials_reset_token else R.string.credentials_reset_password)) },
+            text = { Text(AppText.get(if (id == ServiceId.NAPCAT) R.string.credentials_reset_napcat_notice else R.string.credentials_reset_astrbot_notice)) },
+            confirmButton = { TextButton(onClick = {
+                confirmReset = false; request++; revealed = null
+                RuntimeService.command(this@MainActivity, "reset-webui-password", id)
+            }) { Text(AppText.get(R.string.credentials_reset_confirm)) } },
+            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(AppText.get(R.string.ui_cancel)) } })
     }
 
     private fun copy(label: String, value: String, sensitive: Boolean = false) {

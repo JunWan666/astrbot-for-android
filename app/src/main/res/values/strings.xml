@@ -376,7 +376,7 @@
     <string name="ui_total">"（共 %1$s 个）"</string>
     <string name="ui_view_logs" formatted="false">"查看日志"</string>
     <string name="ui_login_credentials">"%1$s 登录凭据"</string>
-    <string name="ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first" formatted="false">"初始用户名：astrbot。首次登录会自动预填初始凭据；修改用户名或密码后不再预填，请使用你设置的账号。"</string>
+    <string name="ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first" formatted="false">"默认初始用户名：astrbot。重置密码会保留当前用户名。首次登录或重置后自动预填生成的凭据；自行修改用户名或密码后，请使用你设置的账号。"</string>
     <string name="ui_the_login_page_prefills_the_current_access_token_select" formatted="false">"登录页会预填当前访问口令，点击登录即可。离开此页或进入后台后，显示的口令会自动隐藏。"</string>
     <string name="ui_loading_update_information" formatted="false">"正在读取更新信息"</string>
     <string name="ui_read_apk_update_information" formatted="false">"读取 APK 更新信息"</string>

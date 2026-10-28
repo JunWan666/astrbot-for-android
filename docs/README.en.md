@@ -90,7 +90,7 @@ The screenshots show the app in Simplified Chinese. English is also available in
 | Background setup | Access notification, battery optimization, unrestricted background usage and auto-start settings, with guidance for locking the app in recent tasks. |
 | Updates | Check for app, AstrBot and NapCat updates independently; verify downloads and confirm installation. |
 
-Home and Settings use fixed layouts, with pagination for small windows. Personas and logs support scrolling. Opening a service switches the bottom navigation to that service's overview, connections, credentials and logs.
+Home and most settings use fixed layouts, with pagination for small windows. Background settings use one scrollable page; personas and logs also support scrolling. Opening a service switches the bottom navigation to that service's overview, connections, credentials and logs. Its credentials page can reset a forgotten WebUI password or access token.
 
 ## Getting started
 

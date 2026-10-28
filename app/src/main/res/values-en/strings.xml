@@ -376,7 +376,7 @@
     <string name="ui_total">"(%1$s total)"</string>
     <string name="ui_view_logs" formatted="false">"View logs"</string>
     <string name="ui_login_credentials">"%1$s login credentials"</string>
-    <string name="ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first" formatted="false">"Initial username: astrbot. Initial credentials are prefilled on first login. After changing the username or password, use your own credentials; initial values will no longer be prefilled."</string>
+    <string name="ui_initial_username_astrbot_initial_credentials_are_prefilled_on_first" formatted="false">"Default initial username: astrbot. A password reset keeps your current username. Generated credentials are prefilled on first login or after a reset. After changing the username or password yourself, use your own credentials."</string>
     <string name="ui_the_login_page_prefills_the_current_access_token_select" formatted="false">"The login page prefills the current access token. Select Log in to continue. A revealed token is hidden automatically when you leave this page or background the app."</string>
     <string name="ui_loading_update_information" formatted="false">"Loading update information"</string>
     <string name="ui_read_apk_update_information" formatted="false">"Read APK update information"</string>

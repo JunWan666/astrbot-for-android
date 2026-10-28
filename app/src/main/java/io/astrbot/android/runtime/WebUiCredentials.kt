@@ -1,10 +1,13 @@
 package io.astrbot.android.runtime
 
 import android.content.Context
+import android.system.Os
+import android.util.AtomicFile
 import io.astrbot.android.core.ServiceId
 import org.json.JSONObject
 import java.io.File
 import java.security.MessageDigest
+import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
@@ -20,7 +23,9 @@ object WebUiCredentials {
         val file = File(persistent, "astrbot/data/cmd_config.json")
         require(file.isFile && file.length() <= 8 * 1024 * 1024)
         val dashboard = JSONObject(file.readText().removePrefix("\uFEFF")).getJSONObject("dashboard")
-        require(dashboard.optString("username") == "astrbot" && dashboard.optBoolean("password_change_required"))
+        val username = dashboard.optString("username")
+        val generatedUsername = File(persistent, "manager/astrbot-initial-username").takeIf { it.isFile && it.length() <= 4096 }?.readText() ?: "astrbot"
+        require(username.isNotBlank() && username == generatedUsername && dashboard.optBoolean("password_change_required"))
         val md5 = MessageDigest.getInstance("MD5").digest(password.toByteArray()).joinToString("") { "%02x".format(it) }
         require(dashboard.optString("password").equals(md5, ignoreCase = true))
         val pbkdf2 = dashboard.optString("pbkdf2_password")
@@ -35,7 +40,7 @@ object WebUiCredentials {
             val expected = parts[3].chunked(2).map { it.toInt(16).toByte() }.toByteArray()
             require(MessageDigest.isEqual(actual, expected))
         }
-        Login("astrbot", password, signature(dashboard))
+        Login(username, password, signature(dashboard))
     }.getOrNull()
 
     /** Cheap per-attempt revalidation also covers SPA setup/logout without a document reload. */
@@ -58,6 +63,58 @@ object WebUiCredentials {
     }
 
     fun read(context: Context, id: ServiceId): String? = read(File(context.filesDir, "persistent"), id)
+
+    /** Call only after stopping this service; business configuration and QQ sessions stay in place. */
+    internal fun reset(persistent: File, id: ServiceId) {
+        val file = File(persistent, if (id == ServiceId.NAPCAT) "napcat/config/webui.json" else "astrbot/data/cmd_config.json")
+        require(file.isFile && file.length() <= 8 * 1024 * 1024)
+        val config = JSONObject(file.readText().removePrefix("\uFEFF"))
+        val random = SecureRandom()
+        fun randomHex(bytes: Int) = ByteArray(bytes).also(random::nextBytes).joinToString("") { "%02x".format(it) }
+        val password = if (id == ServiceId.ASTRBOT) "Aa7!${randomHex(16)}" else randomHex(16)
+        if (id == ServiceId.NAPCAT) {
+            config.put("token", password)
+            DurableFiles.write(file, config)
+            Os.chmod(file.path, 384)
+            return
+        }
+        val dashboard = config.getJSONObject("dashboard")
+        require(dashboard.optString("username").isNotBlank())
+        val salt = ByteArray(16).also(random::nextBytes)
+        val rounds = 260_000
+        val spec = PBEKeySpec(password.toCharArray(), salt, rounds, 256)
+        val derived = try { SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded } finally { spec.clearPassword() }
+        fun ByteArray.hex() = joinToString("") { "%02x".format(it) }
+        dashboard.put("password", MessageDigest.getInstance("MD5").digest(password.toByteArray()).hex())
+            .put("pbkdf2_password", "pbkdf2_sha256\$$rounds\$${salt.hex()}\$${derived.hex()}")
+            .put("password_change_required", true).put("password_storage_upgraded", true)
+            .put("jwt_secret", randomHex(32))
+        val initial = File(persistent, "manager/astrbot-initial-password")
+        val username = File(persistent, "manager/astrbot-initial-username")
+        val old = initial.takeIf { it.isFile }?.readBytes()
+        val oldUsername = username.takeIf { it.isFile }?.readBytes()
+        try {
+            writeSecret(username, dashboard.getString("username").toByteArray())
+            writeSecret(initial, password.toByteArray())
+            DurableFiles.write(file, config)
+            Os.chmod(file.path, 384)
+        } catch (failure: Throwable) {
+            if (old == null) AtomicFile(initial).delete() else writeSecret(initial, old)
+            if (oldUsername == null) AtomicFile(username).delete() else writeSecret(username, oldUsername)
+            throw failure
+        }
+    }
+
+    private fun writeSecret(file: File, bytes: ByteArray) {
+        file.parentFile!!.mkdirs()
+        val atomic = AtomicFile(file)
+        val output = atomic.startWrite()
+        try { output.write(bytes); atomic.finishWrite(output) }
+        catch (failure: Throwable) { atomic.failWrite(output); throw failure }
+        Os.chmod(file.path, 384)
+        DurableFiles.sync(file.parentFile!!)
+    }
+
     private fun read(persistent: File, id: ServiceId): String? = runCatching {
         val file = File(persistent, if (id == ServiceId.NAPCAT) "napcat/config/webui.json" else "manager/astrbot-initial-password")
         require(file.isFile && file.length() <= if (id == ServiceId.NAPCAT) 8 * 1024 * 1024 else 4096)
