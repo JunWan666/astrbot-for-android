@@ -12,6 +12,7 @@ import secrets
 import shutil
 import subprocess
 import sys
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = "io.astrbot.android"
@@ -113,6 +114,33 @@ def run_logged(command: list[str], env: dict[str, str], log):
         raise ValueError("构建或检查失败，请查看上方输出和构建日志；未生成新的发行包")
 
 
+def verify_bundled_runtime(apk: Path) -> dict:
+    """Verify the final APK payload after Gradle has merged all runtime asset sources."""
+    base = "assets/bootstrap/arm64-v8a/"
+    manifest_name, image_name = base + "manifest.json", base + "ubuntu.tar.bin"
+    try:
+        with zipfile.ZipFile(apk) as archive:
+            names = archive.namelist()
+            if any(names.count(name) != 1 for name in (manifest_name, image_name)):
+                raise ValueError("APK 内置 Ubuntu 资源或清单缺失、重复，已拒绝导出")
+            manifest = json.loads(archive.read(manifest_name))
+            if (not isinstance(manifest, dict) or manifest.get("abi") != "arm64-v8a" or
+                    manifest.get("kind") != "complete"):
+                raise ValueError("APK 必须包含 ARM64 完整运行环境，已拒绝导出")
+            expected = manifest.get("sha256")
+            if not isinstance(expected, str) or not re.fullmatch(r"[a-f0-9]{64}", expected):
+                raise ValueError("APK 内置 Ubuntu 清单的 SHA-256 无效，已拒绝导出")
+            image = archive.getinfo(image_name)
+            with archive.open(image) as stream:
+                actual = hashlib.file_digest(stream, "sha256").hexdigest()
+            if image.file_size == 0 or actual != expected:
+                raise ValueError(f"APK 内置 Ubuntu 资源完整性校验失败：{image_name}，"
+                                 f"读取 {image.file_size} 字节，期望 SHA-256 {expected}，实际 {actual}；已拒绝导出")
+            return {"abi": manifest["abi"], "bytes": image.file_size, "sha256": actual}
+    except (zipfile.BadZipFile, json.JSONDecodeError, UnicodeDecodeError) as failure:
+        raise ValueError("无法读取 APK 内置 Ubuntu 资源或清单，已拒绝导出") from failure
+
+
 def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], work: Path, output: Path, config=None):
     config = config or {}
     say("[1/6] 检查签名身份与构建目录…")
@@ -168,7 +196,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
         run_logged(verify_sources, env, log)
         say("[4/6] 构建 ARM64 正式包并执行 lint 检查…")
         run_logged(command + common + [":app:assembleBundledRelease", ":app:lintBundledRelease"], env, log)
-    say("[5/6] 核对 APK 签名、包名、版本及文件摘要…")
+    say("[5/6] 核对 APK 签名、包名、版本、内置环境及文件摘要…")
     directory = work / "build/app/outputs/apk/bundled/release"
     metadata = json.loads((directory / "output-metadata.json").read_text("utf8"))
     if metadata.get("applicationId") != PACKAGE or len(metadata.get("elements", [])) != 1:
@@ -198,6 +226,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     expected = f"package: name='{PACKAGE}' versionCode='{item['versionCode']}' versionName='{item['versionName']}'"
     if expected not in badging or "native-code: 'arm64-v8a'" not in badging or "x86_64" in badging:
         raise ValueError("APK 包名、版本或架构与发行元数据不一致")
+    bundled_runtime = verify_bundled_runtime(apk)
     version = item["versionName"]
     if not re.fullmatch(r"[a-zA-Z0-9._+-]{1,100}", version):
         raise ValueError("版本号不能用于发行文件名")
@@ -212,7 +241,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     (output / "output-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf8")
     record = {"file": name, "packageName": PACKAGE, "versionName": version, "versionCode": item["versionCode"],
               "bytes": target.stat().st_size, "sha256": sha, "certificateSha256": fingerprint,
-              "signingVerified": True, "signatureSchemes": schemes}
+              "signingVerified": True, "signatureSchemes": schemes, "bundledRuntime": bundled_runtime}
     (output / "release.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf8")
     (output / "SHA256SUMS").write_text(f"{sha}  {name}\n", encoding="utf8")
     older = sorted(output.glob("AstrBot-for-Android-v*-arm64-v8a.apk"), key=lambda p: p.stat().st_mtime, reverse=True)

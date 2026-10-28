@@ -855,7 +855,7 @@
     <string name="ui_unrecognized_existing_runtime_initialization_stopped_data_is_preserved" formatted="false">"存在未识别环境，保留数据并停止初始化"</string>
     <string name="ui_bundled_runtime_architecture_mismatch" formatted="false">"内置环境架构不匹配"</string>
     <string name="ui_verifying_bundled_ubuntu_resources" formatted="false">"校验内置 Ubuntu 资源"</string>
-    <string name="ui_ubuntu_resource_integrity_check_failed" formatted="false">"Ubuntu 资源完整性校验失败"</string>
+    <string name="ui_ubuntu_resource_integrity_check_failed" formatted="false">"Ubuntu 资源完整性校验失败。请从官方 Releases 重新下载完整 APK，覆盖安装后重试；若仍失败，请导出诊断包。"</string>
     <string name="ui_resource_size_exceeds_the_supported_limit" formatted="false">"资源大小超出支持范围"</string>
     <string name="ui_insufficient_storage_at_least_mb_is_required">"存储空间不足，至少需要 %1$s MB"</string>
     <string name="ui_cannot_create_runtime_staging_directory" formatted="false">"无法创建环境准备目录"</string>

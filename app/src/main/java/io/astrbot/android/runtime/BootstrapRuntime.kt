@@ -65,6 +65,7 @@ class BootstrapRuntime(private val context: Context) {
             requireLocalized(manifest.getString("abi") == abi) { AppText.get(R.string.ui_bundled_runtime_architecture_mismatch) }
             progress(AppText.get(R.string.ui_verifying_bundled_ubuntu_resources))
             val digest = MessageDigest.getInstance("SHA-256")
+            var bytesRead = 0L
             context.assets.open("$assetBase/ubuntu.tar.bin").use { input ->
                 val buffer = ByteArray(128 * 1024)
                 while (true) {
@@ -72,10 +73,22 @@ class BootstrapRuntime(private val context: Context) {
                     val count = input.read(buffer)
                     if (count < 0) break
                     digest.update(buffer, 0, count)
+                    bytesRead += count
                 }
             }
             val actual = digest.digest().joinToString("") { "%02x".format(it) }
-            requireLocalized(actual == manifest.getString("sha256")) { AppText.get(R.string.ui_ubuntu_resource_integrity_check_failed) }
+            val expected = manifest.getString("sha256")
+            requireLocalized(actual == expected) {
+                // Keep checksum details in exported runtime logs, with a short recovery hint in the UI.
+                runCatching {
+                    RuntimeStore.log(context, LogCategory.RUNTIME).append(
+                        "${java.time.Instant.now()} Ubuntu asset integrity mismatch: " +
+                            "asset=$assetBase/ubuntu.tar.bin abi=$abi bytesRead=$bytesRead " +
+                            "expectedSha256=$expected actualSha256=$actual"
+                    )
+                }
+                AppText.get(R.string.ui_ubuntu_resource_integrity_check_failed)
+            }
             requireLocalized(manifest.getLong("unpackedBytes") in 1..(12L * 1024 * 1024 * 1024)) { AppText.get(R.string.ui_resource_size_exceeds_the_supported_limit) }
             RuntimeStorageAdvice.fromManifest(manifest, context.filesDir.usableSpace)?.takeIf { it.shouldWarn }?.let {
                 progress(it.message)

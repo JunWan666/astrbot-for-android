@@ -853,7 +853,7 @@
     <string name="ui_unrecognized_existing_runtime_initialization_stopped_data_is_preserved" formatted="false">"Unrecognized existing runtime. Initialization stopped; data is preserved."</string>
     <string name="ui_bundled_runtime_architecture_mismatch" formatted="false">"Bundled runtime architecture mismatch"</string>
     <string name="ui_verifying_bundled_ubuntu_resources" formatted="false">"Verifying bundled Ubuntu resources"</string>
-    <string name="ui_ubuntu_resource_integrity_check_failed" formatted="false">"Ubuntu resource integrity check failed"</string>
+    <string name="ui_ubuntu_resource_integrity_check_failed" formatted="false">"Ubuntu resource integrity check failed. Download the full APK again from the official Releases page, install it over the existing app, and retry. If it still fails, export diagnostics."</string>
     <string name="ui_resource_size_exceeds_the_supported_limit" formatted="false">"Resource size exceeds the supported limit"</string>
     <string name="ui_insufficient_storage_at_least_mb_is_required">"Insufficient storage. At least %1$s MB is required."</string>
     <string name="ui_cannot_create_runtime_staging_directory" formatted="false">"Cannot create runtime staging directory"</string>

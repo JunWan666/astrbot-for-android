@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.1.0-3867FF?style=flat-square" alt="Version 1.1.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.2.0-3867FF?style=flat-square" alt="Version 1.2.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -32,9 +32,11 @@
 
 Built with Kotlin and Jetpack Compose, the app provides a native management interface in Simplified Chinese and English and embeds the AstrBot and NapCat WebUIs in a WebView. Users can sign in to QQ, configure model providers and plugins, manage personas, enable LAN access, and use SSH and cpolar tunneling extensions directly from their phone.
 
+Current version: **1.2.0**. This update improves terminal scrolling, text selection and shortcut keys, adds an option to hide recent tasks and reset WebUI credentials, simplifies app updates, and improves Linux QQ and Ubuntu compatibility. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
+
 ## Screenshots
 
-**v1.1.0** interface previews: service management, personas, settings, live logs and both embedded WebUIs.
+These **v1.1.0** screenshots are basic interface examples showing service management, personas, settings, live logs and both embedded WebUIs. They have not yet been updated for 1.2.0.
 
 <table width="100%" align="center">
   <tr>

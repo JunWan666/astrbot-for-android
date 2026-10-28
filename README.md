@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.1.0-3867FF?style=flat-square" alt="Version 1.1.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.2.0-3867FF?style=flat-square" alt="Version 1.2.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -32,9 +32,11 @@
 
 应用采用 Kotlin 与 Jetpack Compose 构建原生管理界面，支持简体中文与英文，通过内置 WebView 访问 AstrBot 和 NapCat 的 WebUI，在手机端完成 QQ 登录、模型接入与插件配置，并提供人设管理、局域网访问、SSH 终端与 cpolar 内网穿透扩展。
 
+当前版本为 **1.2.0**。本轮改善终端滚动、选字和快捷键，增加最近任务隐藏与后台凭据重置，简化 App 更新流程，并完善 Linux QQ 与 Ubuntu 的运行兼容性。完整变化见[更新记录](docs/CHANGELOG.md)。
+
 ## 界面预览
 
-**v1.1.0** 界面预览，包含服务管理、人设库、设置、实时日志及两套内置后台。
+以下为 **v1.1.0** 的基础界面示例，包含服务管理、人设库、设置、实时日志及两套内置后台；截图尚未更新到 1.2.0。
 
 <table width="100%" align="center">
   <tr>
