@@ -110,6 +110,14 @@ Settings, extensions and permissions use section headings and grouped cards in a
 
 The Websites tab stores custom HTTP / HTTPS bookmarks, with the DeepSeek usage page provided by default. Website icons load automatically, with an initial as fallback. Pages open inside the app and remember zoom for each bookmark. Desktop and original QQ downloads display bytes, total size, percentage and speed, with pause, resume and stop during download. Partial files are kept for verified reuse; package installation runs to completion.
 
+## Architecture
+
+The native app provides the interface, foreground service and process management. AstrBot and NapCat run locally in PRoot Ubuntu; the default QQ message path uses OneBot to connect to AstrBot and the user's model provider. The terminal and extensions have separate controls, while Android device access is enabled and authorized by the user.
+
+<p align="center">
+  <a href="./images/architecture.en.webp"><img src="./images/architecture.en.webp" alt="Architecture: the native Android app manages services in PRoot Ubuntu, with the default QQ message path, optional extensions and device access" width="1000" /></a>
+</p>
+
 ## Getting started
 
 1. Download the full APK from [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest), install it on an ARM64 Android device, then open the app and initialize the environment.

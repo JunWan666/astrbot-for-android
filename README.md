@@ -106,6 +106,14 @@
 
 设置、扩展和权限采用分类标题与分组卡片，连续排列，小屏或大字号下可滚动。底部“网页”默认提供 DeepSeek 用量页，可自行增删网址。桌面与 QQ 下载显示大小、进度和速度，下载阶段可暂停、继续或停止。进入服务详情后，底部导航切换为该服务的概览、连接、凭据和日志，凭据页可重置忘记的后台密码或口令。
 
+## 项目架构
+
+原生 App 负责界面、前台服务和进程管理，AstrBot 与 NapCat 在本机 PRoot Ubuntu 中运行。默认 QQ 消息通过 OneBot 连接 AstrBot，再调用用户配置的模型；终端与扩展分别管理，设备访问由用户按需开启和授权。
+
+<p align="center">
+  <a href="./docs/images/architecture.webp"><img src="./docs/images/architecture.webp" alt="项目架构：Android 原生 App 管理 PRoot Ubuntu 中的服务，展示默认 QQ 消息链路、可选扩展与设备访问" width="1000" /></a>
+</p>
+
 ## 开始使用
 
 1. 从 [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest) 下载完整 APK，在 ARM64 Android 手机上安装，打开 App 完成环境初始化。
