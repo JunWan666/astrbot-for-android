@@ -10,6 +10,7 @@ PUBLIC_DOCUMENTS = frozenset({
     "docs/legal/NOTICE",
     "docs/legal/THIRD_PARTY_NOTICES.md",
     "docs/使用指南.md",
+    "docs/SnowLuma手动部署.md",
     "docs/构建指南.md",
     "docs/更新与分发.md",
     "docs/发行材料.md",

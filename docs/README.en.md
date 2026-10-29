@@ -21,6 +21,7 @@
     <a href="#screenshots">Screenshots</a> ·
     <a href="#architecture">Architecture</a> ·
     <a href="#getting-started">Getting started</a> ·
+    <a href="#optional-setup-snowluma">SnowLuma manual setup</a> ·
     <a href="./使用指南.md">User guide (Chinese)</a> ·
     <a href="#building-from-source">Build from source</a> ·
     <a href="./CHANGELOG.md">Changelog (Chinese)</a>
@@ -128,6 +129,12 @@ The full APK includes the runtime environment, so initialization does not requir
 
 Install cpolar separately in **Settings → Runtime extensions**; its client is not bundled in the APK. Sign in through its official WebUI to save the token automatically and manage the three default tunnels. Start each target service in the app before using its tunnel. Features depend on your cpolar account plan.
 
+## Optional setup: SnowLuma
+
+[SnowLuma](https://github.com/SnowLuma/SnowLuma) is another QQ interoperability project providing OneBot v11 interfaces. The [NapCat README](https://github.com/NapNeko/NapCatQQ#new-framework-) recommends it as an alternative to **NapCat Gui**. See our [manual phone setup and AstrBot connection guide (Chinese)](SnowLuma手动部署.md) for this optional approach.
+
+The guide uses the app's general Ubuntu, desktop, original QQ and terminal features. Users obtain the official full package and set it up themselves, keeping NapCat stopped while using this approach. The app's default setup remains NapCat. SnowLuma uses a **source-available non-commercial license**, with separate proprietary terms for native components; read its [LICENSE](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/LICENSE) and [EULA](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/EULA.md) first. This repository does not supply its programs or automated deployment scripts. The guide does not imply upstream endorsement or additional permission.
+
 ## Building from source
 
 Use JDK 17, Android SDK 35, the Android NDK and Python 3.11+. Compile the application sources with:
@@ -159,6 +166,7 @@ Join the QQ community to discuss app usage, AstrBot / NapCat configuration, pers
 The detailed guides and project policies below are currently available in Chinese.
 
 - [User guide](使用指南.md): WebUI configuration, personas, websites, permissions, device access, extensions, resources and backups.
+- [SnowLuma manual setup](SnowLuma手动部署.md): Official package setup on a phone, AstrBot connection, troubleshooting, sources and license references.
 - [Build guide](构建指南.md): Development tools, runtime assets and APK builds.
 - [Updates and distribution](更新与分发.md): App signing, update channels and GitHub publishing.
 - [Distribution materials](发行材料.md): Third-party licenses, dependency inventories and accompanying source archives.

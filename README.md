@@ -21,6 +21,7 @@
     <a href="#界面预览">界面预览</a> ·
     <a href="#项目架构">项目架构</a> ·
     <a href="#开始使用">开始使用</a> ·
+    <a href="#可选方案snowluma-手动部署">SnowLuma 手动部署</a> ·
     <a href="./docs/使用指南.md">使用指南</a> ·
     <a href="./docs/构建指南.md">源码构建</a> ·
     <a href="./docs/CHANGELOG.md">更新记录</a>
@@ -124,6 +125,12 @@
 
 cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打入 APK。登录官方 WebUI 后自动保存令牌，可管理三个默认隧道；隧道目标服务需在 App 中启动，服务能力以 cpolar 账号套餐为准。
 
+## 可选方案：SnowLuma 手动部署
+
+[SnowLuma](https://github.com/SnowLuma/SnowLuma) 是另一个提供 OneBot v11 接口的 QQ 互操作项目。[NapCat README](https://github.com/NapNeko/NapCatQQ#new-framework-) 推荐其作为 **NapCat Gui 替代品**；希望了解其他接入方式的用户，可以阅读本项目整理的[手机手动部署与 AstrBot 对接教程](docs/SnowLuma手动部署.md)。
+
+教程使用 App 的通用 Ubuntu、桌面、原版 QQ 和终端，由用户另行获取官方完整包、手动部署并连接 AstrBot。App 默认方案仍为 NapCat，使用本教程时保持 NapCat 停止。SnowLuma 采用**源码可见非商业许可**，原生组件另有专有条款；请先阅读官方 [LICENSE](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/LICENSE) 和 [EULA](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/EULA.md)。本仓库不附带其程序或自动部署脚本，教程不代表上游背书或额外授权。
+
 ## 源码构建
 
 使用 JDK 17、Android SDK 35、NDK 和 Python 3.11+。编译应用源码：
@@ -153,6 +160,7 @@ cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打�
 ## 文档
 
 - [使用指南](docs/使用指南.md)：后台配置、人设、网页、权限、设备访问、扩展、资源和备份。
+- [SnowLuma 手动部署](docs/SnowLuma手动部署.md)：官方原包的手机手动部署、AstrBot 对接、常见问题及来源许可。
 - [构建指南](docs/构建指南.md)：开发环境、运行资源和 APK 构建。
 - [更新与分发](docs/更新与分发.md)：应用签名、更新通道和 GitHub 发布。
 - [发行材料](docs/发行材料.md)：第三方许可、依赖清单和源码伴随包。
