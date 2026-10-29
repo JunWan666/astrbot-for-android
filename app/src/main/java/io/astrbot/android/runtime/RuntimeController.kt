@@ -28,7 +28,8 @@ import java.util.concurrent.ConcurrentHashMap
 data class ManagerState(
     val environmentInstalled: Boolean = false,
     val componentsReady: Boolean = false,
-    val busy: Boolean = false,
+    val executing: Boolean = false,
+    val pendingRequests: Set<String> = emptySet(),
     val phase: String = AppText.get(R.string.ui_checking_runtime),
     val error: String? = null,
     val services: Map<ServiceId, ServiceStatus> = ServiceId.entries.associateWith { ServiceStatus(it) },
@@ -55,10 +56,12 @@ data class ManagerState(
     val personas: PersonaInstallation = PersonaInstallation(),
     val environmentCheck: EnvironmentCheckReport? = null,
     val storageSpace: StorageSpaceReading = StorageSpaceReading(),
-)
+) {
+    val busy: Boolean get() = executing || pendingRequests.isNotEmpty()
+}
 
 enum class LogCategory(private val labelResource: Int) {
-    MANAGER(R.string.ui_manager_7ad33), RUNTIME(R.string.ui_runtime), ASTRBOT(R.string.component_astrbot), NAPCAT(R.string.component_napcat_qq), CPOLAR(R.string.cpolar_name), DESKTOP(R.string.desktop_name)
+    MANAGER(R.string.ui_manager_7ad33), RUNTIME(R.string.ui_runtime), ASTRBOT(R.string.component_astrbot), NAPCAT(R.string.component_napcat_qq), CPOLAR(R.string.cpolar_name), DESKTOP(R.string.desktop_name), HARNESS(R.string.harness_name)
 ;
     val label: String get() = AppText.get(labelResource)
 }
@@ -68,6 +71,13 @@ object RuntimeStore {
     @Volatile internal var owner: Any? = null
     internal val operationLock = Mutex()
     private val logs = ConcurrentHashMap<String, RotatingLog>()
+    fun beginRequest(requestId: String = java.util.UUID.randomUUID().toString()): String {
+        state.update { it.copy(pendingRequests = it.pendingRequests + requestId) }
+        return requestId
+    }
+    fun endRequest(requestId: String) {
+        state.update { it.copy(pendingRequests = it.pendingRequests - requestId) }
+    }
     suspend fun refreshInstallation(context: Context) = withContext(Dispatchers.IO) {
         val root = File(context.filesDir, "runtime-data/ubuntu")
         val installed = File(root, ".astrbot-bootstrap.json").isFile
@@ -99,6 +109,7 @@ object RuntimeStore {
             val desktop = DesktopRepository(context)
             DesktopStore.state.update { it.copy(configuration = desktop.configuration(), desired = desktop.desired()) }
         }.onFailure { DesktopStore.state.update { it.copy(error = AppText.get(R.string.desktop_operation_failed)) } }
+        runCatching { HarnessRepository(context).refresh() }.onFailure { HarnessStore.state.update { it.copy(error = AppText.get(R.string.harness_failed)) } }
         state.update { it.copy(environmentInstalled = installed, componentsReady = ready,
             services = it.services.mapValues { (id, status) -> if (owner == null) status.copy(history = histories.getValue(id)) else status },
             versions = inspection?.components.orEmpty(), versionNotice = inspection?.notice, versionsCheckedAtMillis = inspection?.checkedAtMillis,
@@ -131,6 +142,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     private val sshRepository = SshRepository(context)
     private val cpolar = CpolarEngine(context, scope)
     private val cpolarRepository = CpolarRepository(context)
+    private val harness = HarnessEngine(context,scope)
+    private val harnessRepository = HarnessRepository(context)
     private val desktop = DesktopEngine(context, scope)
     private val desktopRepository = DesktopRepository(context)
     private val configuration = RuntimeConfiguration(context)
@@ -305,9 +318,10 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         var resumeSsh = false
         var resumeBots = emptyList<ServiceId>()
         val readOnlyCheck = action in setOf("export-diagnostics", "check-environment")
-        updateState { it.copy(busy = true, error = if (readOnlyCheck) diagnosticSnapshot.error else null, notice = null) }
+        updateState { it.copy(executing = true, error = if (readOnlyCheck) diagnosticSnapshot.error else null, notice = null) }
         if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = true, error = null) }
         if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = true, error = null) }
+        if (action.startsWith("harness-")) HarnessStore.state.update { it.copy(busy = true,error = null,downloaded = 0,total = 0, installation = null) }
         if (action.startsWith("desktop-")) DesktopStore.state.update { it.copy(busy = true, error = null) }
         event(AppText.get(R.string.ui_start_1ae95, action, id?.label.orEmpty()))
         try {
@@ -330,6 +344,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 terminal.stop(if (TerminalStore.state.value.running) AppText.get(R.string.terminal_maintenance_closed) else null)
                 ssh.stop(paused = sshRepository.desired())
                 cpolar.stop(paused = cpolarRepository.desired())
+                harness.stop()
                 desktop.stop(paused = desktopRepository.desired())
             }
             if (action == "desktop-install") {
@@ -375,6 +390,25 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         CpolarStore.state.update { state -> state.copy(error = AppText.get(R.string.cpolar_start_error)) }
                     }
                 }
+                "harness-install" -> {
+                    harness.stop()
+                    harnessRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                    updateState { it.copy(phase = AppText.get(R.string.harness_starting)) }
+                    harness.start(); harnessRepository.setDesired(true); harnessRepository.refresh()
+                }
+                "harness-start" -> {
+                    updateState { it.copy(phase = AppText.get(R.string.harness_starting)) }
+                    harness.start(); harnessRepository.setDesired(true); harnessRepository.refresh()
+                }
+                "harness-stop" -> { harnessRepository.setDesired(false); harness.stop(); harnessRepository.refresh() }
+                "harness-uninstall" -> { harness.stop(); harnessRepository.uninstall() }
+                "harness-lan-enable", "harness-lan-disable" -> {
+                    val lan = action == "harness-lan-enable"
+                    checkLocalized(!lan || LanAccess.addresses(context).isNotEmpty()) { AppText.get(R.string.harness_no_lan) }
+                    val resume = HarnessStore.state.value.active
+                    harness.stop(); harnessRepository.setLan(lan)
+                    if (resume) harness.start()
+                }
                 "cpolar-install" -> {
                     cpolarRepository.install { phase -> updateState { it.copy(phase = phase) } }
                     cpolar.start()
@@ -408,8 +442,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     desktop.stopQq()
                     desktopRepository.setQqDesired(false)
                     DesktopInstallStore.install(context,"qq") {
-                    desktopRepository.installQq { phase -> updateState { it.copy(phase = phase) } }
-                }
+                        desktopRepository.installQq { phase -> updateState { it.copy(phase = phase) } }
+                    }
                     desktop.refresh()
                 }
                 "desktop-qq-start" -> {
@@ -476,8 +510,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                         checkLocalized(preferences.edit().putBoolean("desired_${serviceId.name}", true).commit()) { AppText.get(R.string.ui_unable_to_save_runtime_preferences_check_storage_space) }
                         updateState { it.copy(phase = AppText.get(R.string.ui_starting_d784e, serviceId.label)) }
                         supervisors.getValue(serviceId).start()
-                        // A full start waits for the actual local interface before the next service.
-                        if (id == null && activeConnections[serviceId]?.let { it.enabled && it.endpoint != null } == true) waitForInterface(serviceId)
+                        // Keep the operation active until each requested local interface is ready.
+                        if (activeConnections[serviceId]?.let { it.enabled && it.endpoint != null } == true) waitForInterface(serviceId)
                     }
                 }
                 "stop" -> (id?.let { listOf(it) } ?: ServiceId.entries.reversed()).forEach { serviceId ->
@@ -571,6 +605,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         catch (failure: Exception) {
             val message = if (action.startsWith("desktop-")) failure.userFacingMessage() ?: AppText.get(R.string.desktop_operation_failed)
             else if (action.startsWith("cpolar-")) failure.userFacingMessage() ?: AppText.get(R.string.cpolar_operation_error)
+            else if (action.startsWith("harness-")) failure.userFacingMessage() ?: AppText.get(R.string.harness_failed)
             else if (action.startsWith("ssh-")) failure.userFacingMessage()
                 ?: AppText.get(R.string.ui_ssh_operation_failed_check_the_port_runtime_and_free)
             else if (action == "export-diagnostics") AppText.get(R.string.ui_diagnostic_export_failed_check_free_space_or_choose_another)
@@ -587,6 +622,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             event(AppText.get(R.string.ui_operation_failed_6846d, SecretRedactor.redact(message)))
             if (action.startsWith("ssh-")) SshStore.state.update { it.copy(error = message) }
             if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(error = message) }
+            if (action.startsWith("harness-")) HarnessStore.state.update { it.copy(error = message) }
             if (action.startsWith("terminal-")) TerminalStore.state.update { it.copy(error = message) }
             if (action.startsWith("desktop-")) DesktopStore.state.update { it.copy(error = SecretRedactor.redact(message)) }
             updateState { it.copy(error = SecretRedactor.redact(message)) }
@@ -607,6 +643,10 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 }
                 if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = false) }
                 if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = false) }
+                if ((resumeSsh || action == "reconcile") && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && harnessRepository.desired()) {
+                    runCatching { harness.start() }.onFailure { HarnessStore.state.update { it.copy(error = AppText.get(R.string.harness_failed)) } }
+                }
+                if (action.startsWith("harness-")) { harnessRepository.refresh(); HarnessStore.state.update { it.copy(busy = false) } }
                 if ((resumeSsh || action == "reconcile") && !backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate && desktopRepository.desired()) {
                     runCatching {
                         desktop.start()
@@ -618,7 +658,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     if (!backups.hasPendingRestore && !updates.hasPendingUpdate && !napcat.hasPendingUpdate && !images.hasPendingUpdate) retainLogs()
                     RuntimeStore.refreshInstallation(context)
                 }
-                updateState { it.copy(busy = false, phase = if (readOnlyCheck) diagnosticSnapshot.phase else it.phase) }
+                updateState { it.copy(executing = false, phase = if (readOnlyCheck) diagnosticSnapshot.phase else it.phase) }
                 event(AppText.get(R.string.ui_finished_072d2, action))
             }
         }
@@ -1036,6 +1076,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     suspend fun close() = commands.withLock {
         terminal.close()
         cpolar.close()
+        harness.close()
         desktop.close()
         ssh.stop()
         supervisors.values.toList().reversed().forEach { it.close() }

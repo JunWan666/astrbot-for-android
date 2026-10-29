@@ -92,6 +92,14 @@ class ManagerUpdateActivity : LocalizedActivity() {
                         Text("${candidate.bytes / 1024 / 1024} MiB")
                         Text(candidate.notes.ifBlank { AppText.get(R.string.manager_update_no_notes) })
                         Text(AppText.get(R.string.manager_update_flow_notice), style = MaterialTheme.typography.bodySmall)
+                        ManagerActionButton(AppText.get(R.string.manager_update_browser), {
+                            review = false
+                            runOperation(AppText.get(R.string.manager_update_browser)) {
+                                val url = repository.browserDownloadUrl(candidate.id)
+                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE))
+                                information = AppText.get(R.string.manager_update_browser_notice)
+                            }
+                        }, Modifier.fillMaxWidth(), ActionTone.NEUTRAL, !busy)
                     }
                 }, confirmButton = { TextButton(onClick = {
                     review = false

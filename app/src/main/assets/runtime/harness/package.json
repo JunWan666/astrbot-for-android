@@ -1,0 +1,1 @@
+{"name": "astrbot-optional-harness", "private": true, "version": "1.0.0", "dependencies": {"@deepseek-ai/dsh": "0.2.1-rc.2"}}

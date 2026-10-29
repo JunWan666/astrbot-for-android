@@ -8,6 +8,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+    <queries>
+        <package android:name="moe.shizuku.privileged.api" />
+    </queries>
     <application
         android:name=".ManagerApplication"
         android:allowBackup="false"
@@ -32,6 +36,21 @@
         <activity android:name=".TerminalActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ManagerUpdateActivity" android:exported="false" />
         <activity android:name=".StorageUsageActivity" android:exported="false" />
+        <activity android:name=".DebugAccessActivity" android:exported="false" />
+        <activity android:name=".DeviceAccessActivity" android:exported="false" />
+        <service android:name=".device.DeviceBridgeService" android:exported="false" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-enabled private Android device bridge for local terminal tools, with screen and input toggles and an explicit stop action" />
+        </service>
+        <service android:name=".device.DeviceAccessibility" android:exported="true" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:label="@string/device_accessibility_title">
+            <intent-filter><action android:name="android.accessibilityservice.AccessibilityService" /></intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/device_accessibility" />
+        </service>
+        <activity android:name=".WebsiteBrowserActivity" android:exported="false" />
+        <activity android:name=".HarnessActivity" android:exported="false" />
+        <provider android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku" android:exported="true"
+            android:multiprocess="false" android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
         <provider android:name=".ManagerApkProvider"
             android:authorities="${applicationId}.manager-apk" android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/manager_apk_paths" />

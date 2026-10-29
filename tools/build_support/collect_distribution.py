@@ -45,7 +45,7 @@ SOURCE_ROOT_FILES = {
     "build.gradle.kts", "settings.gradle.kts", "gradle.properties", "gradlew", "gradlew.bat", "build.bat",
 }
 SOURCE_EXTENSIONS = {
-    ".kt", ".kts", ".java", ".xml", ".py", ".c", ".h", ".sh", ".js",
+    ".kt", ".kts", ".java", ".aidl", ".xml", ".py", ".c", ".h", ".sh", ".js",
     ".json", ".yaml", ".yml", ".txt", ".md", ".properties", ".ps1", ".html", ".css",
 }
 
@@ -499,6 +499,13 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
             if entry["path"].endswith("-LICENSE"):
                 notices["manager/terminal/" + Path(entry["path"]).name] = (root / entry["path"]).read_bytes()
     notices["manager/terminal/terminal-assets.lock.json"] = json_bytes(terminal_renderer)
+    shizuku = json.loads((root / "runtime/shizuku-api.lock.json").read_text("utf-8"))
+    verify(root / shizuku["license"]["path"], shizuku["license"]["sha256"])
+    notices["manager/shizuku-api/LICENSE.txt"] = (root / shizuku["license"]["path"]).read_bytes()
+    notices["manager/shizuku-api/shizuku-api.lock.json"] = json_bytes(shizuku)
+    for component in ("shizuku-manager", "deepseek-harness"):
+        notices[f"manager/{component}/LICENSE.txt"] = (root / f"runtime/{component}-LICENSE.txt").read_bytes()
+        notices[f"manager/{component}/sources.json"] = (root / f"runtime/{component}.lock.json").read_bytes()
     dpkg = system_packages(files, links)
     ubuntu_collection = ubuntu_source_collection(root, image_manifest["sha256"], dpkg, notices, cache_dir)
     python = python_packages(files)
@@ -526,7 +533,8 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
                      **project_lock["astrbot"]["source"], "filename": astrbot.name, "bytes": astrbot.stat().st_size})
     archive_notices(astrbot, "sources/astrbot", notices)
     native = {}
-    for abi in ("arm64-v8a", "x86_64"):
+    # The complete APK and image above ship only this ABI.
+    for abi in (image_manifest['abi'],):
         hashes = json.loads((root / f"runtime/native-{abi}.json").read_text("utf-8"))
         native[abi] = []
         for filename, expected in sorted(hashes.items()):

@@ -75,6 +75,8 @@ class MainActivity : LocalizedActivity() {
             val wanted = getSharedPreferences("manager", MODE_PRIVATE).let { preferences ->
                 ServiceId.entries.any { preferences.getBoolean("desired_${it.name}", false) } ||
                     preferences.getBoolean("desired_cpolar", false) ||
+                    preferences.getBoolean("desired_harness", false) ||
+                    preferences.getBoolean("desired_desktop", false) ||
                     preferences.getBoolean(SshRepository.DESIRED, false) && preferences.getBoolean(SshRepository.INSTALLED, true)
             }
             if ((interrupted || wanted) && RuntimeStore.owner == null) RuntimeService.command(this@MainActivity, "reconcile")
@@ -160,9 +162,18 @@ class MainActivity : LocalizedActivity() {
                 if (Build.VERSION.SDK_INT >= 33 && operation != "stop") permission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 RuntimeService.command(this@MainActivity, operation, id, backupId, updateId = updateId)
             }
-            if (operation in setOf("initialize", "start", "restart", "apply-runtime", "repair-runtime")) lifecycleScope.launch {
-                val advice = withContext(Dispatchers.IO) { RuntimeStorageAdvice.beforeOperation(this@MainActivity, operation) }
-                if (advice?.shouldWarn == true) storagePrompt = advice to send else send()
+            if (operation in setOf("initialize", "start", "restart", "apply-runtime", "repair-runtime")) {
+                if (RuntimeStore.state.value.busy || storagePrompt != null) return
+                val preparation = RuntimeStore.beginRequest()
+                lifecycleScope.launch {
+                    try {
+                        val advice = withContext(Dispatchers.IO) { RuntimeStorageAdvice.beforeOperation(this@MainActivity, operation) }
+                        if (advice?.shouldWarn == true) storagePrompt = advice to send else send()
+                    } catch (failure: CancellationException) { throw failure }
+                    catch (failure: Exception) {
+                        RuntimeStore.state.update { it.copy(error = failure.localizedMessage ?: AppText.get(R.string.ui_operation_failed)) }
+                    } finally { RuntimeStore.endRequest(preparation) }
+                }
             } else send()
         }
         fun openLogs(category: LogCategory) {
@@ -218,6 +229,7 @@ class MainActivity : LocalizedActivity() {
                 SettingAction.DIAGNOSTICS -> confirmDiagnostics = true
                 SettingAction.ENVIRONMENT_CHECK -> { showEnvironmentCheck = true; command("check-environment") }
                 SettingAction.EXTENSIONS -> startActivity(Intent(this@MainActivity, ExtensionsActivity::class.java))
+                SettingAction.PERMISSIONS -> startActivity(Intent(this@MainActivity, DebugAccessActivity::class.java))
                 SettingAction.APP_SETTINGS -> startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")))
                 SettingAction.BATTERY -> backgroundGuide = BackgroundTopic.BATTERY
                 SettingAction.NOTIFICATIONS -> backgroundGuide = BackgroundTopic.NOTIFICATIONS
@@ -313,6 +325,8 @@ class MainActivity : LocalizedActivity() {
                             onBackend = { startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", ServiceId.ASTRBOT.name)) })
                     }
                 }
+                ManagerPage.WEBSITES -> WebsiteBookmarksScreen(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
+                    .padding(horizontal = 16.dp).padding(bottom = 12.dp))
                 ManagerPage.SETTINGS -> Box(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
                     .padding(horizontal = 16.dp).padding(bottom = 12.dp)) {
                     FixedManagerSettings(settingsRoute, state, onNavigate = { settingsRoute = it },

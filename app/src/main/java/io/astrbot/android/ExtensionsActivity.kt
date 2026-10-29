@@ -78,9 +78,7 @@ class ExtensionsActivity : LocalizedActivity() {
                 else if (!detail) {
                     Text(AppText.get(R.string.ui_manage_optional_ubuntu_features), Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(AppText.get(R.string.ui_available_extensions), Modifier.padding(start = 4.dp, top = 4.dp),
-                        style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    FixedManagerMenu(listOf(
+                    val extensionItems = listOf(
                         ManagerMenuItem(AppText.get(R.string.terminal_name), R.drawable.ic_terminal, AppText.get(R.string.terminal_subtitle),
                             badge = { Text(AppText.get(if (terminal.running) R.string.ui_running else R.string.terminal_built_in),
                                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) {
@@ -91,8 +89,16 @@ class ExtensionsActivity : LocalizedActivity() {
                         },
                         ManagerMenuItem(AppText.get(R.string.ui_ssh_terminal), R.drawable.ic_settings, AppText.get(R.string.ui_remote_ubuntu_access_included_with_the_app),
                             badge = { Text(status, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) { detail = true },
+                        ManagerMenuItem(AppText.get(R.string.harness_name), R.drawable.ic_link, AppText.get(R.string.harness_subtitle)) {
+                            startActivity(Intent(this@ExtensionsActivity,HarnessActivity::class.java))
+                        },
                         ManagerMenuItem(AppText.get(R.string.cpolar_name), R.drawable.ic_link, AppText.get(R.string.cpolar_extension_subtitle),
                             badge = { Text(cpolarStatus(cpolar), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) { cpolarDetail = true }
+                    )
+                    GroupedManagerMenu(listOf(
+                        AppText.get(R.string.group_terminal_desktop) to listOf(extensionItems[0], extensionItems[1]),
+                        AppText.get(R.string.group_remote) to listOf(extensionItems[2], extensionItems[4]),
+                        AppText.get(R.string.group_ai) to listOf(extensionItems[3])
                     ), Modifier.weight(1f))
                     Text(AppText.get(R.string.ui_manage_runtime_extensions_here_manage_bot_plugins_in_the), Modifier.padding(horizontal = 4.dp),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

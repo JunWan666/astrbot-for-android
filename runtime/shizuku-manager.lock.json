@@ -1,0 +1,13 @@
+{
+  "project": "https://github.com/RikkaApps/Shizuku",
+  "version": "13.6.0.r1086.2650830c",
+  "versionCode": 1086,
+  "packageName": "moe.shizuku.privileged.api",
+  "url": "https://github.com/RikkaApps/Shizuku/releases/download/v13.6.0/shizuku-v13.6.0.r1086.2650830c-release.apk",
+  "bytes": 2571773,
+  "sha256": "6e273ab0e991c4e79bc8b1bbb9b9dd739ccac1a8712a541a214078886b7b790f",
+  "certificateSha256": "268b5590e868fb08bae7e0ac413564cd1ff88f5ccff74af9dbd0dc918e30db30",
+  "license": "Apache-2.0",
+  "licenseFile": "runtime/shizuku-manager-LICENSE.txt",
+  "licenseSha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+}

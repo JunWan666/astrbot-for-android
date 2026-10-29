@@ -3,6 +3,8 @@ package io.astrbot.android
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -37,7 +39,7 @@ internal enum class SettingAction { VERSIONS, CHECK_UPDATE, CHECK_APP_UPDATE, IM
     CHECK_NAPCAT, ONLINE_NAPCAT, APPLY_NAPCAT, ROLLBACK_NAPCAT,
     APPLY_RUNTIME, ROLLBACK_RUNTIME, CREATE_BACKUP, BACKUPS, BACKUP_LIMITS, EXPORT_PORTABLE, IMPORT_PORTABLE,
     PORTABLE_SCOPE, DISCARD_PORTABLE, LOGS, RUNTIME_LOGS, DIAGNOSTICS, EXTENSIONS, APP_SETTINGS, BATTERY, LICENSES,
-    NOTIFICATIONS, UNRESTRICTED, AUTOSTART, TASK_LOCK, BACKGROUND_HELP, AUTOMATIC_UPDATES, ENVIRONMENT_CHECK, STORAGE_USAGE, DATA_RETENTION, LANGUAGE }
+    NOTIFICATIONS, UNRESTRICTED, AUTOSTART, TASK_LOCK, BACKGROUND_HELP, AUTOMATIC_UPDATES, ENVIRONMENT_CHECK, STORAGE_USAGE, DATA_RETENTION, LANGUAGE, PERMISSIONS }
 internal enum class ActionTone { PRIMARY, START, STOP, RESTART, NEUTRAL }
 
 internal fun ManagerState.canStop(id: ServiceId? = null): Boolean = busy ||
@@ -67,6 +69,30 @@ internal fun ManagerState.canStop(id: ServiceId? = null): Boolean = busy ||
 
 internal data class ManagerMenuItem(val title: String, val icon: Int, val subtitle: String? = null,
     val enabled: Boolean = true, val badge: (@Composable () -> Unit)? = null, val onClick: () -> Unit)
+
+/** A continuous menu: section labels sit outside a shared card, with dividers inside. */
+@Composable internal fun GroupedManagerMenu(groups: List<Pair<String, List<ManagerMenuItem>>>, modifier: Modifier = Modifier) {
+    Column(modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        groups.forEach { (title, items) ->
+            ManagerSection(title, padded = false) {
+                items.forEachIndexed { index, item ->
+                    Row(Modifier.fillMaxWidth().clickable(enabled = item.enabled, onClick = item.onClick)
+                        .padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ManagerGlyph(item.icon, if (item.enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(item.title, style = MaterialTheme.typography.bodyMedium)
+                            item.subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                        }
+                        item.badge?.invoke()
+                        Icon(painterResource(R.drawable.ic_chevron), null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (index < items.lastIndex) HorizontalDivider(Modifier.padding(start = 60.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                }
+            }
+        }
+    }
+}
 
 /** Fixed pages with a bounded number of rows. Small windows use pages instead of scrolling. */
 @Composable internal fun FixedManagerMenu(items: List<ManagerMenuItem>, modifier: Modifier = Modifier) {
@@ -182,7 +208,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
 
 @Composable private fun CompactOverview(state: ManagerState, network: NetworkSnapshot, onCommand: (String) -> Unit,
     onNotice: (String, String) -> Unit) {
-    val running = state.services.values.count { it.process == ProcessState.RUNNING }
+    val running = state.services.values.count { it.ready }
     Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Color(0xFF386BF6), Color(0xFF5686FF))),
         MaterialTheme.shapes.large).padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -216,7 +242,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
                     Text(status.localizedSummary(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
-                ManagerProcessBadge(status.process)
+                ManagerProcessBadge(status.displayedProcess)
             }
             if (spacious) Text(if (!ready) AppText.get(R.string.ui_initialize_the_runtime_to_use_the_webui) else if (id == ServiceId.ASTRBOT) AppText.get(R.string.ui_manage_models_platforms_and_plugins_in_the_webui)
                 else AppText.get(R.string.ui_onebot_to_astrbot) + when (status.oneBot) {
@@ -257,6 +283,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
             destination(AppText.get(R.string.ui_backup_and_restore), R.drawable.ic_backup, AppText.get(R.string.ui_local_snapshots_portable_backups_and_limits), SettingsRoute.BACKUPS),
             destination(AppText.get(R.string.ui_logs_and_diagnostics), R.drawable.ic_logs, AppText.get(R.string.ui_runtime_logs_and_diagnostic_exports), SettingsRoute.DIAGNOSTICS),
             destination(AppText.get(R.string.ui_background_operation), R.drawable.ic_battery, AppText.get(R.string.ui_permissions_auto_start_and_battery_management), SettingsRoute.BACKGROUND),
+            action(AppText.get(R.string.permissions_title), R.drawable.ic_settings, AppText.get(R.string.permissions_subtitle), action = SettingAction.PERMISSIONS),
             action(AppText.get(R.string.language_title), R.drawable.ic_settings, AppText.get(R.string.language_subtitle), action = SettingAction.LANGUAGE),
             destination(AppText.get(R.string.ui_about), R.drawable.ic_info, AppText.get(R.string.ui_updates_app_version_and_licenses), SettingsRoute.ABOUT))
         SettingsRoute.PROGRAMS -> listOf(
@@ -307,7 +334,12 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
     }
     Column(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_settings_content) }, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         ManagerStatusStrip(state, onNotice)
-        FixedManagerMenu(items, Modifier.weight(1f))
+        val groups = if (route == SettingsRoute.ROOT) listOf(
+            AppText.get(R.string.group_runtime) to listOf(items[0], items[3], items[4]),
+            AppText.get(R.string.group_data) to listOf(items[1], items[2]),
+            AppText.get(R.string.group_general) to listOf(items[5], items[6]))
+        else listOf(route.title to items)
+        GroupedManagerMenu(groups, Modifier.weight(1f))
         if (route == SettingsRoute.ROOT || route == SettingsRoute.ABOUT) Text("${ProjectIdentity.AUTHOR} · v${BuildConfig.VERSION_NAME}", Modifier.fillMaxWidth(),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center, style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)

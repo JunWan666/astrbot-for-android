@@ -82,6 +82,12 @@ internal class ManagerApkRepository(private val context: Context,
         entry?.let(::status) ?: ManagerApkStatus(null, false, 0, AppText.get(R.string.manager_update_latest))
     } }
 
+    suspend fun browserDownloadUrl(id: String): String = gate.withLock { withContext(Dispatchers.IO) {
+        val entry = requireNotNullLocalized(savedCandidate()) { AppText.get(R.string.ui_check_for_manager_updates_again_first) }
+        requireLocalized(entry.info.id == id) { AppText.get(R.string.ui_version_information_has_changed_review_it_again) }
+        entry.url.toString()
+    } }
+
     suspend fun download(id: String, progress: (String) -> Unit): ManagerApkStatus = gate.withLock { withContext(Dispatchers.IO) {
         val entry = requireNotNullLocalized(savedCandidate()) { AppText.get(R.string.ui_check_for_manager_updates_again_first) }
         requireLocalized(entry.info.id == id) { AppText.get(R.string.ui_version_information_has_changed_review_it_again) }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="websites_title">Websites</string>
+    <string name="websites_intro">Add your favorite URLs and open them in the app. Each bookmark remembers its page zoom.</string>
+    <string name="websites_add">Add website</string>
+    <string name="websites_empty">No bookmarks yet. Add one above.</string>
+    <string name="websites_edit">Edit</string>
+    <string name="websites_delete">Delete website</string>
+    <string name="websites_name">Name</string>
+    <string name="websites_address">URL (HTTP / HTTPS)</string>
+    <string name="websites_save">Save</string>
+    <string name="websites_invalid">Enter a name and a valid HTTP / HTTPS URL without embedded credentials.</string>
+    <string name="websites_save_failed">Could not save. Check available storage and retry.</string>
+    <string name="websites_load_failed">Could not load the page. Check the network or URL, then refresh.</string>
+    <string name="websites_only_http">The embedded browser supports HTTP / HTTPS pages only.</string>
+</resources>

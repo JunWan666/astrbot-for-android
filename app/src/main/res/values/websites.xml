@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="websites_title">网页</string>
+    <string name="websites_intro">添加常用网址，直接在应用内打开。每个地址可独立保存页面缩放比例。</string>
+    <string name="websites_add">添加网址</string>
+    <string name="websites_empty">还没有常用网址，点击上方添加。</string>
+    <string name="websites_edit">编辑</string>
+    <string name="websites_delete">删除网址</string>
+    <string name="websites_name">名称</string>
+    <string name="websites_address">网址（HTTP / HTTPS）</string>
+    <string name="websites_save">保存</string>
+    <string name="websites_invalid">请填写名称和有效的 HTTP / HTTPS 网址；网址不能包含账号密码。</string>
+    <string name="websites_save_failed">未能保存，请检查可用存储后重试。</string>
+    <string name="websites_load_failed">页面未能加载，请检查网络或地址后点击刷新。</string>
+    <string name="websites_only_http">仅支持在内置浏览器访问 HTTP / HTTPS 网页。</string>
+</resources>

@@ -1,7 +1,5 @@
 package io.astrbot.android.runtime
 
-import io.astrbot.android.checkLocalized
-
 import io.astrbot.android.localizedSummary
 import io.astrbot.android.AppText
 import io.astrbot.android.R
@@ -32,6 +30,7 @@ class RuntimeService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        lifecycleEvent("created")
         getSystemService(NotificationManager::class.java).createNotificationChannel(
             NotificationChannel(CHANNEL, AppText.get(R.string.ui_local_services), NotificationManager.IMPORTANCE_LOW))
         startForeground(NOTIFICATION_ID, notification(AppText.get(R.string.ui_preparing_runtime_tasks)))
@@ -50,12 +49,14 @@ class RuntimeService : Service() {
                 .combine(CpolarStore.state) { current, _ -> current }
                 .combine(TerminalStore.state) { current, _ -> current }
                 .combine(DesktopStore.state) { current, _ -> current }
+                .combine(HarnessStore.state) { current, _ -> current }
                 .combine(AppText.languageChanged) { current, _ -> current }
                 .collectLatest { (state, network, ssh) ->
                 val detail = if (state.busy) state.phase else state.services.values.joinToString(" · ") { "${it.id.label} ${it.localizedSummary()}" }
                 getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification("${network.title} · $detail" +
                     (if (ssh.running) AppText.get(R.string.ui_ssh_running) else "") +
                     (if (CpolarStore.state.value.running) " · cpolar" else "") +
+                    (if (HarnessStore.state.value.active) " · DeepSeek Harness" else "") +
                     (if (TerminalStore.state.value.running) " · ${AppText.get(R.string.terminal_running_count, TerminalStore.state.value.runningCount)}" else "") +
                     (if (DesktopStore.state.value.running) " · ${AppText.get(R.string.desktop_name)}" else "") +
                     (state.storageSpace.warning?.let { " · ${state.storageSpace.pressure.title}" } ?: "")))
@@ -71,12 +72,17 @@ class RuntimeService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.getStringExtra("operation") ?: "reconcile"
         val id = intent?.getStringExtra("serviceId")?.let { raw -> ServiceId.entries.firstOrNull { it.name == raw } }
-        val requestId = intent?.getStringExtra("requestId")
+        val requestId = RuntimeStore.beginRequest(intent?.getStringExtra("requestId") ?: UUID.randomUUID().toString())
         if (action == "stop") {
             // Persist a user's stop before cancelling queued work or recovering maintenance.
             val edit = getSharedPreferences("manager", Context.MODE_PRIVATE).edit()
             (id?.let { listOf(it) } ?: ServiceId.entries).forEach { edit.putBoolean("desired_${it.name}", false) }
-            checkLocalized(edit.commit()) { AppText.get(R.string.ui_unable_to_save_stop_preferences) }
+            if (!edit.commit()) {
+                RuntimeStore.state.update { it.copy(error = AppText.get(R.string.ui_unable_to_save_stop_preferences)) }
+                RuntimeStore.endRequest(requestId)
+                if (operations.isEmpty() && idle()) stopSelf(startId)
+                return START_STICKY
+            }
         }
         val previous = if (action == "stop") operations.toList() else emptyList()
         previous.forEach { it.cancel() }
@@ -90,10 +96,14 @@ class RuntimeService : Service() {
                 intent?.takeIf { it.hasExtra("terminalSessionId") }?.getLongExtra("terminalSessionId", -1))
             intent?.removeExtra("sshPassword")
             RuntimeStore.state.update { it.copy(completedOperation = requestId) }
-            if (idle()) stopSelf(startId)
+            if (idle() && RuntimeStore.state.value.pendingRequests.size <= 1) stopSelf(startId)
         }
         operations.add(operation)
-        operation.invokeOnCompletion { operations.remove(operation) }
+        operation.invokeOnCompletion {
+            operations.remove(operation)
+            intent?.removeExtra("sshPassword")
+            RuntimeStore.endRequest(requestId)
+        }
         operation.start()
         return START_STICKY
     }
@@ -101,9 +111,10 @@ class RuntimeService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun idle() = RuntimeStore.state.value.services.values.none { it.desiredRunning } &&
-        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running && !DesktopStore.state.value.running
+        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running && !DesktopStore.state.value.running && !HarnessStore.state.value.active
 
     override fun onDestroy() {
+        lifecycleEvent("destroyed")
         val closingOperations = operations.toList()
         closingOperations.forEach { it.cancel() }
         scope.launch {
@@ -114,6 +125,11 @@ class RuntimeService : Service() {
             }
         }
         super.onDestroy()
+    }
+
+    private fun lifecycleEvent(event: String) {
+        runCatching { RuntimeStore.log(this, LogCategory.MANAGER).append(
+            "${java.time.Instant.now()} runtime-service $event appPid=${android.os.Process.myPid()}") }
     }
 
     private fun notification(detail: String): Notification {
@@ -147,12 +163,13 @@ class RuntimeService : Service() {
         fun command(context: Context, operation: String, id: ServiceId? = null, backupId: String? = null, sourceUri: String? = null, updateId: String? = null,
                     backupLimitCount: Int = 0, backupLimitMiB: Int = 0, sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null,
                     terminalSessionId: Long? = null): String {
-            val requestId = UUID.randomUUID().toString()
-            context.startForegroundService(Intent(context, RuntimeService::class.java)
+            val requestId = RuntimeStore.beginRequest()
+            try { context.startForegroundService(Intent(context, RuntimeService::class.java)
                 .putExtra("operation", operation).putExtra("serviceId", id?.name).putExtra("backupId", backupId).putExtra("sourceUri", sourceUri).putExtra("updateId", updateId).putExtra("requestId", requestId)
                 .putExtra("backupLimitCount", backupLimitCount).putExtra("backupLimitMiB", backupLimitMiB)
                 .putExtra("sshPort", sshPort).putExtra("sshLan", sshLan).putExtra("sshPassword", sshPassword)
-                .apply { if (terminalSessionId != null) putExtra("terminalSessionId", terminalSessionId) })
+                .apply { if (terminalSessionId != null) putExtra("terminalSessionId", terminalSessionId) }) }
+            catch (failure: Exception) { RuntimeStore.endRequest(requestId); throw failure }
             return requestId
         }
     }

@@ -183,6 +183,8 @@ class BootstrapRuntime(private val context: Context) {
         val sharedMemory = File(context.cacheDir, "guest-shm").apply { mkdirs() }
         val persistent = File(context.filesDir, "persistent").apply { mkdirs() }
         val manager = File(context.filesDir, "manager").apply { mkdirs() }
+        io.astrbot.android.device.DeviceBridge.prepareGuest(context)
+        val sharedFiles = File(context.getExternalFilesDir(null) ?: context.filesDir, "shared").apply { mkdirs() }
         // procfs reports Android host paths even inside PRoot. Keep our own
         // mapped files readable by those paths as well as their guest paths.
         // Include both spellings: /data/user/0 can resolve to /data/data.
@@ -195,11 +197,11 @@ class BootstrapRuntime(private val context: Context) {
             File(nativeDir, "libproot.so").path,
             "--kill-on-exit", "--link2symlink", "-0", "-r", guestRoot.path,
             "-b", "/dev", "-b", "/proc", "-b", "/sys", "-b", "${sharedMemory.path}:/dev/shm",
-            "-b", "${persistent.path}:/persistent", "-b", "${manager.path}:/manager",
+            "-b", "${persistent.path}:/persistent", "-b", "${manager.path}:/manager", "-b", "${sharedFiles.path}:/android-share",
         ) + hostPathBindings + listOf(
             "-w", "/root",
             "/usr/bin/env", "-i", "HOME=/root", "USER=root", "TMPDIR=/tmp",
-            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "PATH=/manager/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "ANDROID_SHARED_DIR=/android-share",
             "LANG=C.UTF-8", "TERM=xterm-256color", "SHELL=/bin/bash",
         ) + command).apply {
             directory(context.filesDir)

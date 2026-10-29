@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permissions_title">权限</string>
+    <string name="permissions_subtitle">管理调试授权与系统能力，查看实际连接和生效状态。</string>
+    <string name="debug_install_bundled">安装 Shizuku（离线）</string>
+    <string name="debug_installer_failed">安装包校验或提取失败，请重试或从官网下载。</string>
+    <string name="debug_official_site">Shizuku 官网与帮助</string>
+    <string name="debug_server_identity">服务版本：%1$d · UID：%2$d</string>
+    <string name="debug_bind_timeout">已授权，但调试服务未能连接。请打开 Shizuku 确认正在运行，再返回重新检测；部分系统还需允许 Shizuku 在后台运行。</string>
+    <string name="debug_write_refused">系统拒绝了修改，尚未设置成功。可复制检测信息查看原因。</string>
+    <string name="debug_write_not_retained">命令已执行，但重新读取的配置与目标不一致，尚未确认设置成功。</string>
+    <string name="debug_default_restored">已删除自定义配置并重新确认。有效上限由系统决定。</string>
+    <string name="debug_effective_confirmed">设置成功，已确认当前有效上限为 256。</string>
+    <string name="debug_saved_unconfirmed">配置已保存为 256，但尚不能确认实际生效。请重新检测；部分系统不公开有效值或会覆盖配置。</string>
+    <string name="debug_rom_not_exposed">该系统未公开可识别的有效上限。上方配置值仅表示保存的设置，不代表已生效。</string>
+    <string name="debug_monitor_disabled">系统当前关闭了派生子进程监控，显示的数量上限可能不会用于清理判断。</string>
+    <string name="debug_copy_diagnostic">复制检测信息</string>
+    <string name="websites_open">打开网页</string>
+    <string name="websites_delete_short">删除</string>
+    <string name="manager_update_browser">使用外部浏览器下载</string>
+    <string name="manager_update_browser_notice">已交给外部浏览器。下载后请自行打开 APK 安装；浏览器下载不经过本应用的自动校验和安装前快照流程。</string>
+    <string name="harness_name">DeepSeek Harness</string>
+    <string name="harness_space">安装扩展需至少 1.5 GiB 可用空间，请先清理存储。</string>
+    <string name="harness_subtitle">按需安装的 AI 工作台，内置网页访问</string>
+    <string name="harness_intro">DeepSeek 官方开发预览版。首次安装联网准备独立的 Node.js 和程序；安装完成后可在内置页面配置模型、选择工作目录并使用。默认不安装，不预填 API Key。</string>
+    <string name="harness_install">安装扩展</string>
+    <string name="harness_downloading">正在下载并校验运行环境</string>
+    <string name="harness_preparing">正在安装 DeepSeek Harness 依赖</string>
+    <string name="harness_starting">等待 DeepSeek Harness 后台就绪</string>
+    <string name="harness_open">打开工作台</string>
+    <string name="harness_failed">操作未完成，请查看扩展日志后重试。</string>
+    <string name="harness_port_busy">本机 3080 端口已被占用，请关闭占用程序后重试。</string>
+    <string name="harness_uninstall_notice">停止工作台并删除程序及专用 Node.js。保留工作目录与模型配置，之后重新安装可以继续使用。</string>
+    <string name="harness_remove">卸载扩展</string>
+    <string name="harness_workspace">工作目录：/manager/extensions/harness/workspace；配置在独立 home 目录。普通机器人备份不包含此扩展的数据。</string>
+</resources>

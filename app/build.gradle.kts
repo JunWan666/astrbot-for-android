@@ -65,7 +65,7 @@ android {
         buildConfigField("String", "MANAGER_CATALOG_URL", "\"${managerCatalogUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         ndk { abiFilters += if (bundledRuntime) listOf("arm64-v8a") else listOf("arm64-v8a", "x86_64") }
     }
-    buildFeatures { compose = true; buildConfig = true }
+    buildFeatures { compose = true; buildConfig = true; aidl = true }
     bundle.language.enableSplit = false
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -119,6 +119,9 @@ android {
     sourceSets.getByName("bundled").assets.srcDir(runtimeAssets)
     sourceSets.getByName("bundled").assets.srcDir(distributionAssets)
     bootstrapAssets?.let { sourceSets.getByName("main").assets.srcDir(it) }
+    (providers.gradleProperty("optionalAssetsDir").orNull ?: localInputs.getProperty("optionalAssetsDir"))?.let {
+        sourceSets.getByName("main").assets.srcDir(file(it))
+    }
     nativeLibs?.let { sourceSets.getByName("main").jniLibs.setSrcDirs(listOf(it)) }
     // An explicit development build may trust a local HTTPS fixture. Release never includes it.
     providers.gradleProperty("onlineVerificationResources").orNull?.let {
@@ -138,6 +141,16 @@ tasks.named("preBuild").configure {
             val hash = MessageDigest.getInstance("SHA-256").digest(asset.readBytes()).joinToString("") { "%02x".format(it) }
             check(hash == item["sha256"]) { "Terminal asset differs from pinned upstream file: ${item["path"]}" }
         }
+        val parser = groovy.json.JsonSlurper()
+        val harness = parser.parse(rootProject.file("runtime/deepseek-harness.lock.json")) as Map<*, *>
+        val harnessAssets = rootProject.file("app/src/main/assets/runtime/harness")
+        check(parser.parse(harnessAssets.resolve("sources.json")) == harness) { "Harness asset sources differ from the distribution lock" }
+        val packageLock = harnessAssets.resolve("package-lock.json")
+        val packageHash = MessageDigest.getInstance("SHA-256").digest(packageLock.readBytes()).joinToString("") { "%02x".format(it) }
+        check(packageHash == harness["packageLockSha256"]) { "Harness npm lock digest mismatch" }
+        val packages = (parser.parse(packageLock) as Map<*, *>)["packages"] as Map<*, *>
+        val official = packages["node_modules/${harness["package"]}"] as Map<*, *>
+        check(official["version"] == harness["version"] && official["integrity"] == harness["packageIntegrity"]) { "Harness package identity mismatch" }
     }
 }
 
@@ -225,6 +238,8 @@ dependencies {
     implementation("org.apache.commons:commons-compress:1.27.1")
     implementation("org.apache.sshd:sshd-core:2.20.0")
     implementation("org.slf4j:slf4j-nop:2.0.17")
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")

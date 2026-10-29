@@ -1,0 +1,14 @@
+{
+  "project": "https://github.com/deepseek-ai/deepseek-harness",
+  "version": "0.2.1-rc.2",
+  "package": "@deepseek-ai/dsh",
+  "packageIntegrity": "sha512-tvY+yhfKRifthbqPe/OK0AYxM5ZkvqfYq/jMYgJcEUxiRRL1Vwra3Ti5TB6AXgSWQdiPHYh/Vp6SJa9yHwMNuw==",
+  "packageLockSha256": "a269fd9359ec8e138fc3faeae3dae4c0705b02531e76f461ed53c252be36aae5",
+  "node": {
+    "version": "24.22.2",
+    "url": "https://nodejs.org/dist/v24.22.2/node-v24.22.2-linux-arm64.tar.xz",
+    "bytes": 30968168,
+    "directory": "node-v24.22.2-linux-arm64",
+    "sha256": "eb187837a2230d4047161ac0be008584e16b46f726e9c9490ee35dc6b17d9ba8"
+  }
+}

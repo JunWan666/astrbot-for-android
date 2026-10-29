@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permissions_title">Permissions</string>
+    <string name="permissions_subtitle">Manage debugging access and inspect actual connection and system settings.</string>
+    <string name="debug_install_bundled">Install Shizuku offline</string>
+    <string name="debug_installer_failed">Could not extract or verify the installer. Retry or download it from the official site.</string>
+    <string name="debug_official_site">Shizuku website and help</string>
+    <string name="debug_server_identity">Server version: %1$d · UID: %2$d</string>
+    <string name="debug_bind_timeout">Permission is granted, but the debugging service did not connect. Open Shizuku, confirm it is running, and retry. Some devices also require background access for Shizuku.</string>
+    <string name="debug_write_refused">The system refused the change. Copy the diagnostic details for the reason.</string>
+    <string name="debug_write_not_retained">The command completed, but the saved setting does not match the request. Success is unconfirmed.</string>
+    <string name="debug_default_restored">The custom setting was removed and checked. The system decides the effective limit.</string>
+    <string name="debug_effective_confirmed">Success: the effective limit is confirmed as 256.</string>
+    <string name="debug_saved_unconfirmed">256 was saved, but the effective limit is unconfirmed. Refresh to check. Some systems hide or override this setting.</string>
+    <string name="debug_rom_not_exposed">This system does not expose a recognized effective limit. A saved setting alone does not confirm it took effect.</string>
+    <string name="debug_monitor_disabled">The system has disabled phantom process monitoring. The displayed limit may not be used to trim processes.</string>
+    <string name="debug_copy_diagnostic">Copy diagnostic details</string>
+    <string name="websites_open">Open page</string>
+    <string name="websites_delete_short">Delete</string>
+    <string name="manager_update_browser">Download in external browser</string>
+    <string name="manager_update_browser_notice">The download was handed to your browser. Open the APK yourself afterward. Browser downloads do not use the automatic verification and pre-install snapshot flow in this app.</string>
+    <string name="harness_name">DeepSeek Harness</string>
+    <string name="harness_space">At least 1.5 GiB of free storage is required to install this extension.</string>
+    <string name="harness_subtitle">Optional AI workspace with an embedded Web UI</string>
+    <string name="harness_intro">Official DeepSeek developer preview. Installation downloads a separate Node.js runtime and application. Configure models and select a workspace in the embedded page. Not installed by default; no API key is prefilled.</string>
+    <string name="harness_install">Install extension</string>
+    <string name="harness_downloading">Downloading and verifying runtime</string>
+    <string name="harness_preparing">Installing DeepSeek Harness dependencies</string>
+    <string name="harness_starting">Waiting for DeepSeek Harness to become ready</string>
+    <string name="harness_open">Open workspace</string>
+    <string name="harness_failed">Operation incomplete. Check the extension log and retry.</string>
+    <string name="harness_port_busy">Local port 3080 is occupied. Stop the conflicting program and retry.</string>
+    <string name="harness_uninstall_notice">Stop the workspace and remove its application and dedicated Node.js runtime. Keep workspace files and model configuration for reinstallation.</string>
+    <string name="harness_remove">Uninstall extension</string>
+    <string name="harness_workspace">Workspace: /manager/extensions/harness/workspace. Configuration uses a separate home directory. Regular bot backups do not include this extension.</string>
+</resources>

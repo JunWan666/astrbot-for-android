@@ -43,6 +43,10 @@ data class ServiceStatus(
     val processGeneration: Long = 0,
     val history: ServiceHistory = ServiceHistory(),
 ) {
+    val ready: Boolean get() = process == ProcessState.RUNNING &&
+        health in setOf(HealthState.AVAILABLE, HealthState.RECHECKING, HealthState.DISABLED)
+    val displayedProcess: ProcessState get() = if (process == ProcessState.RUNNING &&
+        health in setOf(HealthState.UNKNOWN, HealthState.WAITING)) ProcessState.STARTING else process
     // A recent failed probe should not unload a working page. RECHECKING is shown
     // explicitly, while readiness/maintenance still requires a fresh AVAILABLE probe.
     val canOpenWebUi: Boolean get() = process == ProcessState.RUNNING && (health == HealthState.AVAILABLE || health == HealthState.RECHECKING)

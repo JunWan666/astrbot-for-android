@@ -39,6 +39,7 @@ import java.util.Date
 internal enum class ManagerPage(private val labelResource: Int, val icon: Int) {
     HOME(R.string.ui_home, R.drawable.ic_home),
     PERSONAS(R.string.ui_personas, R.drawable.ic_persona),
+    WEBSITES(R.string.websites_title, R.drawable.ic_link),
     SETTINGS(R.string.ui_settings, R.drawable.ic_settings),
 ;
     val label: String get() = AppText.get(labelResource)
@@ -87,7 +88,7 @@ internal enum class ManagerPage(private val labelResource: Int, val icon: Int) {
             if (page == ManagerPage.HOME && title == null) Text(AppText.get(R.string.ui_manager), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (state.busy) {
-            Text(state.phase, Modifier.padding(top = 6.dp), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(if (state.executing) state.phase else AppText.get(R.string.ui_preparing_runtime_tasks), Modifier.padding(top = 6.dp), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
             LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 6.dp))
         }
     }
@@ -198,7 +199,7 @@ internal enum class ManagerPage(private val labelResource: Int, val icon: Int) {
 }
 
 @Composable internal fun ManagerOverview(state: ManagerState, network: NetworkSnapshot, onCommand: (String) -> Unit) {
-    val running = state.services.values.count { it.process == ProcessState.RUNNING }
+    val running = state.services.values.count { it.ready }
     Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(Color(0xFF386BF6), Color(0xFF5686FF))),
         RoundedCornerShape(16.dp)).padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
