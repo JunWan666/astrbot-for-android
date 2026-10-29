@@ -5,6 +5,9 @@ export DISPLAY=:20
 export XAUTHORITY="$desktop_root/Xauthority"
 test -s "$desktop_root/vnc.passwd"
 test -s "$XAUTHORITY"
+if test -n "${ASTRBOT_DESKTOP_SESSION:-}"; then
+    python3 "$desktop_root/processes.py" register desktop --session "$ASTRBOT_DESKTOP_SESSION" --leader "$$"
+fi
 mkdir -p "$desktop_root/logs" "$desktop_root/desktop-home/.fluxbox"
 if ! test -f "$desktop_root/desktop-home/.fluxbox/init"; then
     printf '%s\n' 'session.screen0.rootCommand: /bin/true' 'session.screen0.workspaces: 1' > "$desktop_root/desktop-home/.fluxbox/init"

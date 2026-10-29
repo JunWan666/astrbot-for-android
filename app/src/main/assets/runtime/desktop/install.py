@@ -6,6 +6,10 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import shlex
+import time
+import urllib.request
+import urllib.error
 
 ROOT = Path('/manager/extensions/desktop')
 MARKER = Path('/var/lib/astrbot-manager/desktop.json')
@@ -13,6 +17,144 @@ PENDING = MARKER.with_suffix('.pending')
 SOURCES = json.loads((ROOT / 'sources.json').read_text())
 TOOLS = ['Xvfb', 'xauth', 'fluxbox', 'feh', 'x11vnc', 'websockify', 'tmux', 'xdpyinfo', 'dbus-run-session', 'gcc', 'g++', 'make', 'python3', 'curl']
 COMPATIBILITY_FILES = ['guest_compat.c', 'proc_locks.py', 'guest-compat']
+
+
+class DownloadStopped(Exception):
+    pass
+
+
+def transfer_state(stage, downloaded=None, total=None, speed=0):
+    value = dict(stage=stage, speed=speed)
+    if downloaded is not None:
+        value['downloaded'] = downloaded
+    if total is not None:
+        value['total'] = total
+    print('ASTRBOT_TRANSFER ' + json.dumps(value), flush=True)
+
+
+def control():
+    try:
+        value = json.loads((ROOT / 'download-control.json').read_text())
+    except FileNotFoundError:
+        value = {}
+    if value.get('stopped'):
+        raise DownloadStopped()
+    return value.get('paused', False)
+
+
+def metadata_update(options, environment):
+    transfer_state('PREPARING')
+    process = subprocess.Popen(['apt-get', *options, 'update'], env=environment)
+    try:
+        while process.poll() is None:
+            control()
+            time.sleep(0.2)
+        assert process.returncode == 0, 'Package metadata download failed'
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+
+
+def download_packages(options, environment):
+    output = subprocess.check_output(['apt-get', *options, '--print-uris', 'install', '-y',
+        '--no-install-recommends', *SOURCES['packages']], env=environment, text=True)
+    packages = []
+    cache = Path('/var/cache/apt/archives')
+    partial = cache / 'partial'
+    partial.mkdir(parents=True, exist_ok=True)
+    for line in output.splitlines():
+        if not line.startswith(("'http://", "'https://")):
+            continue
+        fields = shlex.split(line)
+        if len(fields) != 4 or not fields[0].startswith(('http://', 'https://')):
+            continue
+        url, name, size, expected = fields
+        assert Path(name).name == name and name.endswith('.deb'), 'Invalid package filename'
+        algorithm, digest = expected.split(':', 1)
+        algorithm = {'MD5Sum': 'md5'}.get(algorithm, algorithm.lower())
+        assert algorithm in ('sha256', 'sha512', 'sha1', 'md5'), 'Unsupported package checksum'
+        packages.append((url, name, int(size), algorithm, digest.lower()))
+
+    def verified(path, size, algorithm, expected):
+        if not path.is_file() or path.stat().st_size != size:
+            return False
+        with path.open('rb') as stream:
+            return hashlib.file_digest(stream, algorithm).hexdigest() == expected
+
+    total = sum(package[2] for package in packages)
+    completed = 0
+    started = time.monotonic()
+    previous = 0
+    received = 0
+    current_speed = 0
+
+    def publish_download(downloaded):
+        nonlocal started, previous, current_speed
+        now = time.monotonic()
+        if now - started >= 0.25:
+            current_speed = max(0, int((received - previous) / (now - started)))
+            started, previous = now, received
+        transfer_state('DOWNLOADING', downloaded, total, current_speed)
+
+    for url, name, size, algorithm, expected in packages:
+        target = cache / name
+        temporary = partial / name
+        if verified(target, size, algorithm, expected):
+            completed += size
+            publish_download(completed)
+            continue
+        if temporary.exists() and temporary.stat().st_size > size:
+            temporary.unlink()
+        while not temporary.exists() or temporary.stat().st_size < size:
+            while control():
+                transfer_state('PAUSED', completed + (temporary.stat().st_size if temporary.exists() else 0), total)
+                time.sleep(0.2)
+                started = time.monotonic()
+                previous = received
+                current_speed = 0
+            offset = temporary.stat().st_size if temporary.exists() else 0
+            publish_download(completed + offset)
+            request = urllib.request.Request(url, headers={'Range': f'bytes={offset}-'} if offset else {})
+            try:
+                with urllib.request.urlopen(request, timeout=15) as response:
+                    if response.status == 206:
+                        assert response.headers.get('Content-Range', '').startswith(f'bytes {offset}-'), 'Invalid package range'
+                    else:
+                        assert response.status == 200
+                        if offset:
+                            temporary.unlink(missing_ok=True)
+                            offset = 0
+                    with temporary.open('ab') as stream:
+                        while not control():
+                            block = response.read(65536)
+                            if not block:
+                                break
+                            assert offset + len(block) <= size, 'Package exceeds expected size'
+                            stream.write(block)
+                            offset += len(block)
+                            received += len(block)
+                            now = time.monotonic()
+                            if now - started >= 0.25 or offset == size:
+                                publish_download(completed + offset)
+                if offset < size and not control():
+                    raise RuntimeError('Package download was interrupted; retry to resume')
+            except (OSError, urllib.error.URLError):
+                if not control():
+                    raise
+        if not verified(temporary, size, algorithm, expected):
+            temporary.unlink(missing_ok=True)
+            raise RuntimeError('Package checksum mismatch; retry to download again')
+        os.replace(temporary, target)
+        completed += size
+    while control():
+        transfer_state('PAUSED', completed, total)
+        time.sleep(0.2)
+    transfer_state('INSTALLING', completed, total)
 
 
 def run(*args, **kwargs):
@@ -123,10 +265,12 @@ def main():
         environment = dict(os.environ, DEBIAN_FRONTEND='noninteractive')
         options = ['-o', 'Acquire::ForceIPv4=true', '-o', 'Acquire::http::Timeout=25', '-o', 'Acquire::Retries=2']
         if PENDING.is_file():
+            transfer_state('INSTALLING')
             run('dpkg', '--configure', '-a', env=environment)
         atomic_json(PENDING, {'schemaVersion': 1})
-        run('apt-get', *options, 'update', env=environment)
-        run('apt-get', *options, 'install', '-y', '--no-install-recommends', *SOURCES['packages'], env=environment)
+        metadata_update(options, environment)
+        download_packages(options, environment)
+        run('apt-get', *options, 'install', '-y', '--no-download', '--no-install-recommends', *SOURCES['packages'], env=environment)
         assert all(shutil.which(tool) for tool in TOOLS)
         assert Path('/usr/share/novnc/vnc.html').is_file()
         install_compatibility()
@@ -141,4 +285,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except DownloadStopped:
+        transfer_state('STOPPED')
+        raise SystemExit(130)

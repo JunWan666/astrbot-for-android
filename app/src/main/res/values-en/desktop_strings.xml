@@ -17,6 +17,8 @@
     <string name="desktop_qq_failed">QQ installation did not complete. Check desktop logs and retry.</string>
     <string name="desktop_unavailable">Desktop is not ready. Refresh later or check desktop logs.</string>
     <string name="desktop_exited">Desktop exited. Check logs before restarting.</string>
+    <string name="desktop_exited_code">The desktop exited (%1$d). Remaining owned processes were cleaned up; you can start it again. For repeated exits, check Android background limits and desktop logs.</string>
+    <string name="desktop_process_recovery_failed">Remaining desktop or QQ processes could not be cleaned up. Check the desktop logs and retry.</string>
     <string name="desktop_qq_install_first">Install the independent original Linux QQ first.</string>
     <string name="desktop_qq_exited">Original QQ exited. Check logs or start it again.</string>
     <string name="desktop_operation_failed">Desktop operation failed. Check logs, connection and free storage.</string>

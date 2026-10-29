@@ -396,7 +396,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     cpolarRepository.uninstall()
                     cpolar.refresh()
                 }
-                "desktop-install" -> desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                "desktop-install" -> DesktopInstallStore.install(context,"desktop") {
+                    desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                }
                 "desktop-start" -> { desktop.start(); desktopRepository.setDesired(true); desktop.refresh() }
                 "desktop-stop" -> {
                     desktopRepository.setDesired(false); desktopRepository.setQqDesired(false)
@@ -405,7 +407,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 "desktop-qq-install" -> {
                     desktop.stopQq()
                     desktopRepository.setQqDesired(false)
+                    DesktopInstallStore.install(context,"qq") {
                     desktopRepository.installQq { phase -> updateState { it.copy(phase = phase) } }
+                }
                     desktop.refresh()
                 }
                 "desktop-qq-start" -> {
@@ -561,6 +565,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 else if (action in setOf("apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat"))
                 AppText.get(R.string.ui_the_new_version_did_not_become_ready_recovery_of)
                 else AppText.get(R.string.ui_webui_readiness_timed_out_process_monitoring_continues_view_logs)) }
+        } catch (failure: DesktopInstallStopped) {
+            updateState { it.copy(notice = AppText.get(R.string.desktop_transfer_stopped), phase = AppText.get(R.string.desktop_transfer_stopped)) }
         } catch (failure: CancellationException) { throw failure }
         catch (failure: Exception) {
             val message = if (action.startsWith("desktop-")) failure.userFacingMessage() ?: AppText.get(R.string.desktop_operation_failed)

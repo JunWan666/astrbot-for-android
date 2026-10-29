@@ -9,7 +9,6 @@ import io.astrbot.android.checkLocalized
 import io.astrbot.android.core.SecretRedactor
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.json.JSONObject
 import java.io.File
 import java.security.SecureRandom
@@ -54,7 +53,7 @@ class DesktopRepository(private val context: Context) {
 
     fun prepareAssets() {
         directory.mkdirs(); Os.chmod(directory.path, 448)
-        for (name in listOf("sources.json", "install.py", "desktop.sh", "qq.sh", "guest_compat.c", "proc_locks.py", "guest-compat")) {
+        for (name in listOf("sources.json", "install.py", "desktop.sh", "qq.sh", "processes.py", "guest_compat.c", "proc_locks.py", "guest-compat")) {
             val contents = context.assets.open("runtime/desktop/$name").use { it.readBytes() }
             val target = File(directory, name)
             if (!target.isFile || !target.readBytes().contentEquals(contents)) {
@@ -62,6 +61,18 @@ class DesktopRepository(private val context: Context) {
                 staged.writeBytes(contents); Os.chmod(staged.path, 448); Os.rename(staged.path, target.path)
             }
         }
+    }
+
+    suspend fun recoverProcesses(role: String, session: String? = null) {
+        require(role == "desktop" || role == "qq")
+        if (!File(runtime.rootfs, "usr/bin/python3").isFile ||
+            !File(directory, "processes").isDirectory && !File(directory, "logs").isDirectory) return
+        prepareAssets()
+        val command = listOf("/usr/bin/python3", "$GUEST/processes.py", "cleanup", role) +
+            (session?.let { listOf("--session", it) } ?: emptyList())
+        val result = runtime.execute(*command.toTypedArray(), timeoutSeconds = 20)
+        RuntimeStore.log(context, LogCategory.DESKTOP).append(SecretRedactor.redact(result.output.trim()).take(4096))
+        checkLocalized(result.exitCode == 0) { AppText.get(R.string.desktop_process_recovery_failed) }
     }
 
     suspend fun install(progress: (String) -> Unit) = withContext(Dispatchers.IO) {
@@ -105,32 +116,25 @@ class DesktopRepository(private val context: Context) {
         prepareAssets()
         val spec = source.getJSONObject("qq")
         val archive = File(directory, "download.deb")
+        val resume = File(directory,"download-source.json")
+        if (DurableFiles.read(resume)?.optString("sha256") != spec.getString("sha256") || archive.length() > spec.getLong("bytes")) archive.delete()
+        DurableFiles.write(resume,JSONObject().put("sha256",spec.getString("sha256")))
         val client = OkHttpClient.Builder().connectTimeout(20, TimeUnit.SECONDS).readTimeout(45, TimeUnit.SECONDS)
             .callTimeout(15, TimeUnit.MINUTES).followRedirects(false).build()
         try {
             progress(AppText.get(R.string.desktop_qq_downloading))
-            client.newCall(Request.Builder().url(spec.getString("url")).build()).execute().use { response ->
-                checkLocalized(response.isSuccessful) { AppText.get(R.string.desktop_download_failed) }
-                requireNotNull(response.body).byteStream().use { input -> archive.outputStream().use { output ->
-                    val buffer = ByteArray(65536); var count = 0L; var reported = -1L
-                    while (true) {
-                        currentCoroutineContext().ensureActive()
-                        val size = input.read(buffer); if (size < 0) break
-                        count += size
-                        checkLocalized(count <= spec.getLong("bytes")) { AppText.get(R.string.desktop_integrity_failed) }
-                        output.write(buffer, 0, size)
-                        val step = count / (16 * 1024 * 1024)
-                        if (step != reported) { reported = step; progress(AppText.get(R.string.desktop_qq_download_progress, count / (1024 * 1024))) }
-                    }
-                } }
-            }
-            checkLocalized(archive.length() == spec.getLong("bytes") && CpolarRepository.digest(archive) == spec.getString("sha256")) {
+            DesktopDownload.download(client,spec.getString("url"),archive,spec.getLong("bytes"))
+            DesktopInstallStore.phase(DesktopInstallStage.VERIFYING)
+            val verified = archive.length() == spec.getLong("bytes") && CpolarRepository.digest(archive) == spec.getString("sha256")
+            if (!verified) archive.delete()
+            checkLocalized(verified) {
                 AppText.get(R.string.desktop_integrity_failed)
             }
+            DesktopInstallStore.phase(DesktopInstallStage.INSTALLING)
             progress(AppText.get(R.string.desktop_qq_unpacking))
             checkLocalized(runInstaller("qq", 180) == 0 && configuration().qqInstalled) { AppText.get(R.string.desktop_qq_failed) }
+            archive.delete(); DurableFiles.removeRecord(resume)
         } finally {
-            archive.delete()
             client.dispatcher.executorService.shutdown(); client.connectionPool.evictAll()
         }
     }
@@ -139,12 +143,23 @@ class DesktopRepository(private val context: Context) {
         val process = runtime.processBuilder("/usr/bin/python3", "$GUEST/install.py", mode).start()
         val output = launch(Dispatchers.IO) {
             runCatching { process.inputStream.bufferedReader().useLines { lines -> lines.forEach {
-                RuntimeStore.log(context, LogCategory.DESKTOP).append(SecretRedactor.redact(it))
+                if (it.startsWith("ASTRBOT_TRANSFER ")) runCatching {
+                    DesktopInstallStore.guestProgress(JSONObject(it.removePrefix("ASTRBOT_TRANSFER ")))
+                } else RuntimeStore.log(context, LogCategory.DESKTOP).append(SecretRedactor.redact(it))
             } } }
         }
         try {
-            withTimeout(seconds * 1000) { while (process.isAlive) delay(250) }
+            var remaining = seconds * 1000
+            var previous = android.os.SystemClock.elapsedRealtime()
+            while (process.isAlive) {
+                delay(250)
+                val now = android.os.SystemClock.elapsedRealtime()
+                if (DesktopInstallStore.state.value.stage != DesktopInstallStage.PAUSED) remaining -= now - previous
+                previous = now
+                checkLocalized(remaining > 0) { AppText.get(R.string.desktop_install_failed) }
+            }
             output.join()
+            if (process.exitValue() == 130) throw DesktopInstallStopped()
             process.exitValue()
         } finally {
             withContext(NonCancellable + Dispatchers.IO) {
@@ -159,7 +174,7 @@ class DesktopRepository(private val context: Context) {
 
     fun uninstall() {
         setDesired(false); setQqDesired(false)
-        listOf("qq", "qq.installing", "qq.previous", "qq.json", "download.deb", "qq-runtime", "libguest-compat.so", "libguest-compat.so.new", "compat-profile.json").forEach { DurableFiles.delete(File(directory, it)) }
+        listOf("qq", "qq.installing", "qq.previous", "qq.json", "download.deb", "download-source.json", "download-control.json", "qq-runtime", "libguest-compat.so", "libguest-compat.so.new", "compat-profile.json").forEach { DurableFiles.delete(File(directory, it)) }
         DurableFiles.delete(marker)
         for ((name, script) in listOf("desktop-start" to "desktop.sh", "qq-desktop" to "qq.sh", "guest-compat" to "guest-compat")) {
             val link = File(runtime.rootfs, "usr/local/bin/$name")

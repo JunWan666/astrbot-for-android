@@ -3,6 +3,9 @@ set -eu
 desktop_root=/manager/extensions/desktop
 qq_binary="$desktop_root/qq/opt/QQ/qq"
 test -x "$qq_binary"
+if test -n "${ASTRBOT_DESKTOP_SESSION:-}"; then
+    python3 "$desktop_root/processes.py" register qq --session "$ASTRBOT_DESKTOP_SESSION" --leader "$$"
+fi
 mkdir -p "$desktop_root/qq-home/.config" "$desktop_root/qq-home/.local/share" "$desktop_root/qq-home/.cache" "$desktop_root/qq-runtime"
 # PRoot's guest UID can differ from the UID exposed by procfs. Give desktop
 # clients an explicit standard directory for their per-user IPC sockets.

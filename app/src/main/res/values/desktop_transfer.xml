@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="desktop_transfer_preparing">正在准备软件包列表，总大小待计算…</string>
+    <string name="desktop_transfer_downloading">正在下载</string>
+    <string name="desktop_transfer_paused">下载已暂停</string>
+    <string name="desktop_transfer_verifying">正在校验下载文件…</string>
+    <string name="desktop_transfer_installing">正在应用安装，请等待当前阶段完成。</string>
+    <string name="desktop_transfer_stopped">下载已停止，已下载的部分保留，可重试继续。</string>
+    <string name="desktop_transfer_failed">安装未完成。可重试，校验通过的缓存将继续使用。</string>
+    <string name="desktop_transfer_finished">安装已完成</string>
+    <string name="desktop_transfer_stopping">正在停止下载…</string>
+    <string name="desktop_transfer_values">%1$s / %2$s · %3$d%%</string>
+    <string name="desktop_transfer_speed">当前速度：%1$s/s</string>
+    <string name="desktop_transfer_pause">暂停下载</string>
+    <string name="desktop_transfer_resume">继续下载</string>
+    <string name="desktop_transfer_stop">停止下载</string>
+    <string name="desktop_transfer_retry">重试 / 继续安装</string>
+    <string name="desktop_transfer_control_failed">未能保存下载操作，请重试。</string>
+</resources>

@@ -11,6 +11,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,6 +43,7 @@ class DesktopActivity : LocalizedActivity() {
     @Composable private fun DesktopScreen() {
         val state by DesktopStore.state.collectAsStateWithLifecycle()
         val manager by RuntimeStore.state.collectAsStateWithLifecycle()
+        val transfer by DesktopInstallStore.state.collectAsStateWithLifecycle()
         var page by rememberSaveable { mutableIntStateOf(0) }
         var confirmation by remember { mutableStateOf<String?>(null) }
         var password by remember { mutableStateOf<String?>(null) }
@@ -95,12 +98,26 @@ class DesktopActivity : LocalizedActivity() {
                 }
             }
         }) { padding ->
-            Column(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).padding(horizontal = 16.dp),
+            Column(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).padding(horizontal = 16.dp)
+                .then(if (page != 3) Modifier.verticalScroll(rememberScrollState()) else Modifier),
                 verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (page == 3) ManagerLogViewer(logs, paused, { paused = !paused }, {
                     copy(AppText.get(R.string.desktop_name), logs)
                 }, { export.launch("ubuntu-desktop.log") }, Modifier.weight(1f))
                 else {
+                    if (transfer.kind != null && (transfer.active || transfer.stage in setOf(DesktopInstallStage.STOPPED,DesktopInstallStage.FAILED))) {
+                        DesktopDownloadPanel(transfer, canRetry = enabled,
+                            onControl = { action -> scope.launch(Dispatchers.IO) {
+                                runCatching { when (action) {
+                                    "pause" -> DesktopInstallStore.pause()
+                                    "resume" -> DesktopInstallStore.resume()
+                                    else -> DesktopInstallStore.stop()
+                                } }.onFailure { withContext(Dispatchers.Main) {
+                                    Toast.makeText(this@DesktopActivity,AppText.get(R.string.desktop_transfer_control_failed),Toast.LENGTH_LONG).show()
+                                } }
+                            } },
+                            onRetry = { command(if (transfer.kind == "qq") "qq-install" else "install") })
+                    }
                     ManagerSection(AppText.get(if (page == 1) R.string.desktop_qq_name else R.string.desktop_name)) {
                         Text(AppText.get(when {
                             state.busy -> R.string.cpolar_working

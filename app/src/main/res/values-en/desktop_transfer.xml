@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="desktop_transfer_preparing">Preparing package lists; total size is being calculated…</string>
+    <string name="desktop_transfer_downloading">Downloading</string>
+    <string name="desktop_transfer_paused">Download paused</string>
+    <string name="desktop_transfer_verifying">Verifying downloaded files…</string>
+    <string name="desktop_transfer_installing">Applying installation. Wait for this stage to finish.</string>
+    <string name="desktop_transfer_stopped">Download stopped. Partial files are kept for retry.</string>
+    <string name="desktop_transfer_failed">Installation incomplete. Retry to reuse verified cached files.</string>
+    <string name="desktop_transfer_finished">Installation complete</string>
+    <string name="desktop_transfer_stopping">Stopping download…</string>
+    <string name="desktop_transfer_values">%1$s / %2$s · %3$d%%</string>
+    <string name="desktop_transfer_speed">Current speed: %1$s/s</string>
+    <string name="desktop_transfer_pause">Pause download</string>
+    <string name="desktop_transfer_resume">Resume download</string>
+    <string name="desktop_transfer_stop">Stop download</string>
+    <string name="desktop_transfer_retry">Retry / continue installation</string>
+    <string name="desktop_transfer_control_failed">Could not save the download action. Retry.</string>
+</resources>
