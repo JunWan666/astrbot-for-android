@@ -23,7 +23,9 @@ PUBLIC_DOCUMENTS = frozenset({
     "docs/images/home.webp",
     "docs/images/personas.webp",
     "docs/images/settings.webp",
-    "docs/images/service-logs.webp",
+    "docs/images/websites.webp",
+    "docs/images/extensions.webp",
+    "docs/images/permissions.webp",
     "docs/images/astrbot-webui.webp",
     "docs/images/napcat-webui.webp",
 })

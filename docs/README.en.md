@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.2.0-3867FF?style=flat-square" alt="Version 1.2.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.3.0-3867FF?style=flat-square" alt="Version 1.3.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -19,6 +19,7 @@
   <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">Download APK</a> ·
     <a href="#screenshots">Screenshots</a> ·
+    <a href="#architecture">Architecture</a> ·
     <a href="#getting-started">Getting started</a> ·
     <a href="./使用指南.md">User guide (Chinese)</a> ·
     <a href="#building-from-source">Build from source</a> ·
@@ -32,38 +33,46 @@
 
 Built with Kotlin and Jetpack Compose, the app provides a native management interface in Simplified Chinese and English and embeds the AstrBot and NapCat WebUIs in a WebView. Users can sign in to QQ, configure model providers and plugins, manage personas, enable LAN access, and use SSH and cpolar tunneling extensions directly from their phone.
 
-Current version: **1.2.0**. This update improves terminal scrolling, text selection and shortcut keys, adds an option to hide recent tasks and reset WebUI credentials, simplifies app updates, and improves Linux QQ and Ubuntu compatibility. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
+Current version: **1.3.0**. This update adds website bookmarks, Shizuku permission management, Android device access for terminal tools and an optional DeepSeek Harness extension. It also groups settings and improves service readiness, download progress, terminal selection and process management. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
 
 ## Screenshots
 
-These **v1.1.0** screenshots are basic interface examples showing service management, personas, settings, live logs and both embedded WebUIs. They have not yet been updated for 1.2.0.
+Captured from **v1.3.0** on an Android phone. The eight screens show service management, personas, website bookmarks, grouped settings, extensions, permissions and both embedded WebUIs.
 
 <table width="100%" align="center">
   <tr>
-    <td align="center" width="33%">
-      <img src="./images/home.webp" alt="Home: service controls, app memory and total device memory" width="144" />
+    <td align="center" width="25%">
+      <img src="./images/home.webp" alt="Home: service status, controls and resource usage" width="150" />
       <p align="center"><strong>Home · Services &amp; resources</strong></p>
     </td>
-    <td align="center" width="33%">
-      <img src="./images/personas.webp" alt="Personas: marketplace link, custom personas and local library" width="144" />
+    <td align="center" width="25%">
+      <img src="./images/personas.webp" alt="Personas: marketplace, search and local presets" width="150" />
       <p align="center"><strong>Personas · Search &amp; switch</strong></p>
     </td>
-    <td align="center" width="33%">
-      <img src="./images/settings.webp" alt="Settings: extensions, backups, diagnostics and background operation" width="144" />
-      <p align="center"><strong>Settings · App management</strong></p>
+    <td align="center" width="25%">
+      <img src="./images/websites.webp" alt="Websites: saved addresses, site icons and built-in browsing" width="150" />
+      <p align="center"><strong>Websites · Quick access</strong></p>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/settings.webp" alt="Settings: runtime, permissions, maintenance and general options" width="150" />
+      <p align="center"><strong>Settings · Grouped menus</strong></p>
     </td>
   </tr>
   <tr>
-    <td align="center" width="300">
-      <img src="./images/service-logs.webp" alt="Live log viewer in the service details screen" width="144" />
-      <p align="center"><strong>Service logs · Live output</strong></p>
+    <td align="center" width="25%">
+      <img src="./images/extensions.webp" alt="Extensions: terminal, desktop, remote access and AI workspace" width="150" />
+      <p align="center"><strong>Extensions · On demand</strong></p>
     </td>
-    <td align="center" width="300">
-      <img src="./images/astrbot-webui.webp" alt="AstrBot WebUI in the built-in WebView" width="144" />
+    <td align="center" width="25%">
+      <img src="./images/permissions.webp" alt="Permissions: Shizuku, child process statistics and idle exemption" width="150" />
+      <p align="center"><strong>Permissions · Live status</strong></p>
+    </td>
+    <td align="center" width="25%">
+      <img src="./images/astrbot-webui.webp" alt="AstrBot dashboard inside the app" width="150" />
       <p align="center"><strong>AstrBot · Built-in WebUI</strong></p>
     </td>
-    <td align="center" width="300">
-      <img src="./images/napcat-webui.webp" alt="NapCat WebUI in the built-in WebView" width="144" />
+    <td align="center" width="25%">
+      <img src="./images/napcat-webui.webp" alt="NapCat dashboard inside the app" width="150" />
       <p align="center"><strong>NapCat · Built-in WebUI</strong></p>
     </td>
   </tr>
@@ -88,18 +97,24 @@ The screenshots show the app in Simplified Chinese. English is also available in
 | Ubuntu terminal | Built-in local shell with multiple sessions, smooth touch scrolling, arrow keys, paste and Enter. Text selection magnifier on Android 9 and later. |
 | Ubuntu desktop | Optional lightweight desktop and general build tools, with an embedded noVNC viewer. Install or update independent original ARM64 QQ while preserving login data. |
 | cpolar extension | Install on demand and sign in through the official embedded WebUI. Includes SSH, AstrBot and NapCat tunnel presets. |
+| DeepSeek Harness | Optional independent Node.js runtime and official AI workspace, with staged installation progress and optional LAN access. |
+| Website bookmarks | Save HTTP / HTTPS addresses, load website icons automatically and open pages inside the app with per-site zoom settings. |
+| Permission management | Install the official Shizuku APK offline, inspect tracked child processes and their effective limit, and optionally exempt this app from Android idle restrictions. |
+| Android device access | Disabled by default; separately allow screen reading and input for local terminal tools, with device state queries and shared file exchange. |
 | App language | Choose system default, Simplified Chinese or English for the management interface, notifications and app messages. |
 | Background setup | Access notification, battery optimization, unrestricted background usage and auto-start settings, with guidance for locking the app in recent tasks and an option to hide its task cards. |
-| Updates | Check for app updates, review release notes, then download, verify and open the system installer. AstrBot and NapCat update independently. |
+| Updates | Review release notes and choose in-app download with verification and installation, or download in an external browser. AstrBot and NapCat update independently. |
 
-Home and most settings use fixed layouts, with pagination for small windows. Background settings use one scrollable page; personas and logs also support scrolling. Opening a service switches the bottom navigation to that service's overview, connections, credentials and logs. Its credentials page can reset a forgotten WebUI password or access token.
+Settings, extensions and permissions use section headings and grouped cards in a continuous menu, with scrolling on small screens or at larger font sizes. Opening a service switches the bottom navigation to that service's overview, connections, credentials and logs. Its credentials page can reset a forgotten WebUI password or access token.
+
+The Websites tab stores custom HTTP / HTTPS bookmarks, with the DeepSeek usage page provided by default. Website icons load automatically, with an initial as fallback. Pages open inside the app and remember zoom for each bookmark. Desktop and original QQ downloads display bytes, total size, percentage and speed, with pause, resume and stop during download. Partial files are kept for verified reuse; package installation runs to completion.
 
 ## Getting started
 
 1. Download the full APK from [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest), install it on an ARM64 Android device, then open the app and initialize the environment.
 2. Tap **Start all** and wait for AstrBot and NapCat to become ready.
 3. Open the NapCat WebUI to sign in to QQ, then configure model providers, messaging platforms and plugins in the AstrBot WebUI.
-4. Follow **Settings → Background running** to adjust device permissions, then configure personas, backups, SSH and cpolar as needed.
+4. Follow **Settings → Background running** to adjust device permissions, then configure personas, backups, SSH and cpolar as needed. **Settings → Permissions** provides an official offline Shizuku installer. On Android 12 and later, it separately displays tracked child process counts for this app and the device, plus the effective limit, which you can adjust if needed. Unavailable counts are never reported as zero. Start and authorize Shizuku after installation.
 
 The full APK includes the runtime environment, so initialization does not require a separate Ubuntu download or dependency installation. QQ sign-in, model API calls and online updates require network access. Enter account credentials and API keys directly in the relevant WebUI. See the [user guide (Chinese)](使用指南.md) for more details.
 
@@ -127,7 +142,7 @@ The keystore and credentials stay in the Git-ignored `.local/signing/` directory
 
 ## Updates
 
-**Settings → About → Check for updates** manages app APK updates. A dialog shows release notes when an update is available. Downloading then verifies the APK and opens the system installer; if installation permission is missing, the app guides you to settings and continues when you return. A message confirms when the latest applicable version is installed. AstrBot and NapCat have separate component update entries. Signature verification, resumable downloads, snapshots before installation and component rollback are retained. Android asks you to confirm APK installation.
+**Settings → About → Check for updates** manages app APK updates. A dialog shows release notes and offers an in-app download or an external browser. The in-app download verifies the APK and opens the system installer; if installation permission is missing, the app guides you to settings and continues when you return. A message confirms when the latest applicable version is installed. AstrBot and NapCat have separate component update entries. The in-app flow retains signature verification, resumable downloads, snapshots before installation and component rollback. Android asks you to confirm APK installation.
 
 The app uses this project's signed GitHub update channels by default: **Releases host app APKs and AstrBot packages, the `updates` branch hosts signed update manifests, and NapCat packages are downloaded directly from upstream official Shell releases**. Changes to Linux QQ, Python or underlying dependencies require a matching runtime environment upgrade. See [updates and distribution (Chinese)](更新与分发.md) for configuration details.
 
@@ -143,7 +158,7 @@ Join the QQ community to discuss app usage, AstrBot / NapCat configuration, pers
 
 The detailed guides and project policies below are currently available in Chinese.
 
-- [User guide](使用指南.md): WebUI configuration, personas, language, SSH, cpolar, resources and backups.
+- [User guide](使用指南.md): WebUI configuration, personas, websites, permissions, device access, extensions, resources and backups.
 - [Build guide](构建指南.md): Development tools, runtime assets and APK builds.
 - [Updates and distribution](更新与分发.md): App signing, update channels and GitHub publishing.
 - [Distribution materials](发行材料.md): Third-party licenses, dependency inventories and accompanying source archives.

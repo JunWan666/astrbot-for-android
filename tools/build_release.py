@@ -160,14 +160,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
         "/' + (path == ':' ? 'root' : path.substring(1).replace(':', '/')))) }\n", encoding="utf8")
     log_path = work / "build-release.log"
     with log_path.open("w", encoding="utf8") as log:
-        say("[2/6] 收集正式包的实际发行依赖…")
-        wrapper = ROOT / ("gradlew.bat" if os.name == "nt" else "gradlew")
-        command = ([os.environ.get("COMSPEC", "cmd.exe"), "/d", "/c", str(wrapper)] if os.name == "nt"
-                   else ["bash", str(wrapper)])
-        common = ["--project-cache-dir", str(work / "gradle"), "-I", str(init), "-PbundledRuntime=true",
-                  "-Pkotlin.incremental=false", f"-PreleaseSigningProperties={properties}", "--console", "plain"]
-        run_logged(command + common + [":app:collectReleaseDependencyMetadata"], env, log)
-        say("[3/6] 生成并校验随包许可材料…")
+        say("[2/6] 编译进程托管程序并收集正式包的实际发行依赖…")
         inputs = {}
         local = ROOT / "local.properties"
         if local.is_file():
@@ -177,6 +170,23 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
                     inputs[key.strip()] = value.strip()
         def input_path(name, default):
             return (ROOT / inputs.get(name, default)).resolve()
+        native_output = work / 'native-libs'
+        run_logged([sys.executable, '-B', '-X', 'utf8', 'tools/build_support/build_native.py',
+                    '--sdk', str(sdk), '--input-dir', str(input_path('nativeLibsDir', 'app/src/main/jniLibs')),
+                    '--output-dir', str(native_output)], env, log)
+        native_record = json.loads((native_output / 'native-build.json').read_text('utf-8'))
+        optional_output = work / 'optional-assets'
+        run_logged([sys.executable, '-B', '-X', 'utf8', 'tools/build_support/prepare_optional_assets.py',
+                    '--output-dir', str(optional_output)], env, log)
+        wrapper = ROOT / ("gradlew.bat" if os.name == "nt" else "gradlew")
+        command = ([os.environ.get("COMSPEC", "cmd.exe"), "/d", "/c", str(wrapper)] if os.name == "nt"
+                   else ["bash", str(wrapper)])
+        common = ["--project-cache-dir", str(work / "gradle"), "-I", str(init), "-PbundledRuntime=true",
+                  f"-PnativeLibsDir={native_output}",
+                  f"-PoptionalAssetsDir={optional_output}",
+                  "-Pkotlin.incremental=false", f"-PreleaseSigningProperties={properties}", "--console", "plain"]
+        run_logged(command + common + [":app:collectReleaseDependencyMetadata"], env, log)
+        say("[3/6] 生成并校验随包许可材料…")
         distribution = Path(config.get("distributionDirectory", ROOT / ".cache/distribution/release")).resolve()
         apk_assets = input_path("distributionAssetsDir", "runtime/distribution-assets")
         private_path(distribution / "collection.json")
@@ -184,7 +194,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
         collect = [sys.executable, "-B", "-X", "utf8", "tools/build_support/collect_distribution.py",
             "--runtime-dir", str(input_path("runtimeAssetsDir", "runtime/apk-assets") / "bootstrap/arm64-v8a"),
             "--cache-dir", str(Path(config.get("sourceCacheDirectory", ROOT / ".cache")).resolve()),
-            "--native-dir", str(input_path("nativeLibsDir", "app/src/main/jniLibs")),
+            "--native-dir", str(native_output),
             "--android-metadata", str(work / "build/app/distribution/android-dependencies"),
             "--output", str(distribution), "--apk-assets", str(apk_assets)]
         if config.get("pythonSourceDirectory"):
@@ -227,6 +237,14 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     if expected not in badging or "native-code: 'arm64-v8a'" not in badging or "x86_64" in badging:
         raise ValueError("APK 包名、版本或架构与发行元数据不一致")
     bundled_runtime = verify_bundled_runtime(apk)
+    with zipfile.ZipFile(apk) as archive:
+        optional = json.loads((ROOT / 'runtime/shizuku-manager.lock.json').read_text('utf-8'))
+        if hashlib.sha256(archive.read('assets/optional/shizuku.apk')).hexdigest() != optional['sha256']:
+            raise ValueError('Bundled Shizuku installer differs from pinned original')
+        for program in native_record['programs']:
+            if (hashlib.sha256((ROOT / program['source']).read_bytes()).hexdigest() != program['sourceSha256'] or
+                    hashlib.sha256(archive.read(program['file'])).hexdigest() != program['sha256']):
+                raise ValueError("APK 进程托管程序与本次源码编译结果不一致，已拒绝导出")
     version = item["versionName"]
     if not re.fullmatch(r"[a-zA-Z0-9._+-]{1,100}", version):
         raise ValueError("版本号不能用于发行文件名")
@@ -241,7 +259,8 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     (output / "output-metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf8")
     record = {"file": name, "packageName": PACKAGE, "versionName": version, "versionCode": item["versionCode"],
               "bytes": target.stat().st_size, "sha256": sha, "certificateSha256": fingerprint,
-              "signingVerified": True, "signatureSchemes": schemes, "bundledRuntime": bundled_runtime}
+              "signingVerified": True, "signatureSchemes": schemes, "bundledRuntime": bundled_runtime,
+              "nativeBuild": native_record}
     (output / "release.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf8")
     (output / "SHA256SUMS").write_text(f"{sha}  {name}\n", encoding="utf8")
     older = sorted(output.glob("AstrBot-for-Android-v*-arm64-v8a.apk"), key=lambda p: p.stat().st_mtime, reverse=True)

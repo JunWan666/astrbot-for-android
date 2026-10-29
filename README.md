@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.2.0-3867FF?style=flat-square" alt="Version 1.2.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.3.0-3867FF?style=flat-square" alt="Version 1.3.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -19,6 +19,7 @@
   <p>
     <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest">下载 APK</a> ·
     <a href="#界面预览">界面预览</a> ·
+    <a href="#项目架构">项目架构</a> ·
     <a href="#开始使用">开始使用</a> ·
     <a href="./docs/使用指南.md">使用指南</a> ·
     <a href="./docs/构建指南.md">源码构建</a> ·
@@ -32,38 +33,46 @@
 
 应用采用 Kotlin 与 Jetpack Compose 构建原生管理界面，支持简体中文与英文，通过内置 WebView 访问 AstrBot 和 NapCat 的 WebUI，在手机端完成 QQ 登录、模型接入与插件配置，并提供人设管理、局域网访问、SSH 终端与 cpolar 内网穿透扩展。
 
-当前版本为 **1.2.0**。本轮改善终端滚动、选字和快捷键，增加最近任务隐藏与后台凭据重置，简化 App 更新流程，并完善 Linux QQ 与 Ubuntu 的运行兼容性。完整变化见[更新记录](docs/CHANGELOG.md)。
+当前版本为 **1.3.0**。本轮新增常用网页导航、Shizuku 权限管理、终端设备访问与 DeepSeek Harness 可选扩展，整理设置分类，并改善服务就绪状态、下载进度、终端选字和进程管理。完整变化见[更新记录](docs/CHANGELOG.md)。
 
 ## 界面预览
 
-以下为 **v1.1.0** 的基础界面示例，包含服务管理、人设库、设置、实时日志及两套内置后台；截图尚未更新到 1.2.0。
+以下八张图片均为 **v1.3.0** 手机实机截图，展示服务管理、人设、常用网页、分类设置、扩展、权限及两套内置后台。
 
 <table width="100%" align="center">
   <tr>
-    <td align="center" width="33%">
-      <img src="./docs/images/home.webp" alt="首页：双服务启停、应用内存与手机总内存" width="144" />
+    <td align="center" width="25%">
+      <img src="./docs/images/home.webp" alt="首页：服务状态、启停与资源占用" width="150" />
       <p align="center"><strong>首页 · 服务与资源</strong></p>
     </td>
-    <td align="center" width="33%">
-      <img src="./docs/images/personas.webp" alt="人设：市场入口、手动添加与本地列表" width="144" />
+    <td align="center" width="25%">
+      <img src="./docs/images/personas.webp" alt="人设：社区市场、搜索与本地预设" width="150" />
       <p align="center"><strong>人设 · 搜索与切换</strong></p>
     </td>
-    <td align="center" width="33%">
-      <img src="./docs/images/settings.webp" alt="设置：扩展、备份、诊断与后台运行" width="144" />
-      <p align="center"><strong>设置 · 运行与维护</strong></p>
+    <td align="center" width="25%">
+      <img src="./docs/images/websites.webp" alt="网页：带网站图标的常用地址与内置访问入口" width="150" />
+      <p align="center"><strong>网页 · 常用地址</strong></p>
+    </td>
+    <td align="center" width="25%">
+      <img src="./docs/images/settings.webp" alt="设置：运行与权限、数据与维护、通用分类" width="150" />
+      <p align="center"><strong>设置 · 分类管理</strong></p>
     </td>
   </tr>
   <tr>
-    <td align="center" width="300">
-      <img src="./docs/images/service-logs.webp" alt="服务详情中的实时日志页面" width="144" />
-      <p align="center"><strong>服务日志 · 实时跟随</strong></p>
+    <td align="center" width="25%">
+      <img src="./docs/images/extensions.webp" alt="扩展：终端与桌面、远程连接和 AI 工作台" width="150" />
+      <p align="center"><strong>扩展 · 按需安装</strong></p>
     </td>
-    <td align="center" width="300">
-      <img src="./docs/images/astrbot-webui.webp" alt="App 内置 WebView 中的 AstrBot 后台" width="144" />
+    <td align="center" width="25%">
+      <img src="./docs/images/permissions.webp" alt="权限：Shizuku 授权、后台子进程统计和息屏白名单" width="150" />
+      <p align="center"><strong>权限 · 状态与统计</strong></p>
+    </td>
+    <td align="center" width="25%">
+      <img src="./docs/images/astrbot-webui.webp" alt="应用内的 AstrBot 管理后台" width="150" />
       <p align="center"><strong>AstrBot · 内置后台</strong></p>
     </td>
-    <td align="center" width="300">
-      <img src="./docs/images/napcat-webui.webp" alt="App 内置 WebView 中的 NapCat 后台" width="144" />
+    <td align="center" width="25%">
+      <img src="./docs/images/napcat-webui.webp" alt="应用内的 NapCat 管理后台" width="150" />
       <p align="center"><strong>NapCat · 内置后台</strong></p>
     </td>
   </tr>
@@ -86,18 +95,22 @@
 | Ubuntu 终端 | 内置本机交互终端，支持多会话、平滑触摸滚动、方向键与粘贴回车；Android 9 及以上支持选字放大镜 |
 | Ubuntu 桌面 | 按需安装轻量桌面与通用编译工具，内嵌 noVNC，可独立安装或更新原版 ARM64 QQ，保留登录数据 |
 | cpolar 扩展 | 按需安装，内嵌官方 WebUI 登录与隧道管理，默认提供 SSH、AstrBot、NapCat 三个隧道 |
+| DeepSeek Harness | 按需准备独立 Node.js 与官方工作台，显示分阶段安装进度，可选局域网访问，自行配置模型 |
+| 常用网页 | 自定义 HTTP / HTTPS 网址，自动获取图标，在应用内访问并保存各页面缩放比例 |
+| 权限管理 | 提供官方 Shizuku 离线安装入口，检查后台子进程数量与有效上限，按需设置本应用的息屏省电白名单 |
+| Android 设备访问 | 默认关闭，分别授权终端工具读屏、点击和输入；支持设备状态查询与共享目录文件交换 |
 | 中英文界面 | 支持跟随系统、简体中文与 English，覆盖管理界面、通知与操作提示 |
 | 后台引导 | 提供通知、电池优化、后台无限制、自启动权限及任务锁定入口，可选择在最近任务中隐藏 |
-| 更新管理 | App 更新统一为检查、查看说明、下载校验后进入系统安装；AstrBot、NapCat 独立更新 |
+| 更新管理 | App 检查新版后可选择内置下载校验安装，或交给外部浏览器下载；AstrBot、NapCat 独立更新 |
 
-首页和多数设置采用固定布局，小窗口分页；后台运行设置集中在可滚动的单页，人设与日志区域支持滚动。进入服务详情后，底部导航切换为该服务的概览、连接、凭据和日志，凭据页可重置忘记的后台密码或口令。
+设置、扩展和权限采用分类标题与分组卡片，连续排列，小屏或大字号下可滚动。底部“网页”默认提供 DeepSeek 用量页，可自行增删网址。桌面与 QQ 下载显示大小、进度和速度，下载阶段可暂停、继续或停止。进入服务详情后，底部导航切换为该服务的概览、连接、凭据和日志，凭据页可重置忘记的后台密码或口令。
 
 ## 开始使用
 
 1. 从 [Releases](https://github.com/JunWan666/astrbot-for-android/releases/latest) 下载完整 APK，在 ARM64 Android 手机上安装，打开 App 完成环境初始化。
 2. 点击“启动全部”，等待 AstrBot 和 NapCat 就绪。
 3. 打开 NapCat 后台登录 QQ，在 AstrBot 后台配置模型、平台和插件。
-4. 按“设置 → 后台运行”的引导调整手机权限，再按需使用人设、备份、SSH 和 cpolar。
+4. 按“设置 → 后台运行”的引导调整手机权限，再按需使用人设、备份、SSH 和 cpolar。“设置 → 权限”提供 Shizuku 的官方离线安装包及授权入口，Android 12 及以上可分别查看本应用、全机已跟踪的后台子进程数量及有效上限，并按需调整上限；安装后仍需启动和授权 Shizuku。系统未公开的数量不会显示为 0。
 
 完整包内置运行环境，初始化无需另外下载 Ubuntu 或安装项目依赖。QQ 登录、模型调用和在线更新需要网络，账号与 API Key 直接在对应 WebUI 中配置。更多操作见[使用指南](docs/使用指南.md)。
 
@@ -125,7 +138,7 @@ cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打�
 
 ## 更新
 
-“设置 → 关于 → 检查更新”管理 App 安装包：发现新版后弹窗显示说明，点击下载后自动校验，再进入系统安装器；缺少安装权限时引导授权，返回后继续。当前已是适用的最新版本时会明确提示。AstrBot 与 NapCat 各有独立的程序更新入口。更新保留签名校验、断点续传、安装前快照和组件失败回退，APK 安装由系统确认。
+“设置 → 关于 → 检查更新”管理 App 安装包：发现新版后弹窗显示说明，可选择“下载并安装”或使用外部浏览器下载。内置下载完成后自动校验，再进入系统安装器；缺少安装权限时引导授权，返回后继续。当前已是适用的最新版本时会明确提示。AstrBot 与 NapCat 各有独立的程序更新入口。内置流程保留签名校验、断点续传、安装前快照和组件失败回退，APK 安装由系统确认。
 
 默认接入本项目的 GitHub 签名更新通道：**Releases 存放安装包和 AstrBot 程序包，`updates` 分支托管签名目录，NapCat 直接下载上游官方 Shell 包**。只有 QQ、Python 或底层依赖变化时，才需要匹配的运行环境升级。配置方式见[更新与分发](docs/更新与分发.md)。
 
@@ -139,7 +152,7 @@ cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打�
 
 ## 文档
 
-- [使用指南](docs/使用指南.md)：后台配置、人设、语言、SSH、cpolar、资源和备份。
+- [使用指南](docs/使用指南.md)：后台配置、人设、网页、权限、设备访问、扩展、资源和备份。
 - [构建指南](docs/构建指南.md)：开发环境、运行资源和 APK 构建。
 - [更新与分发](docs/更新与分发.md)：应用签名、更新通道和 GitHub 发布。
 - [发行材料](docs/发行材料.md)：第三方许可、依赖清单和源码伴随包。
