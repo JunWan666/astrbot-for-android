@@ -1,6 +1,8 @@
 package io.astrbot.android.runtime
 
 import android.content.Context
+import android.os.PowerManager
+import android.os.SystemClock
 import android.util.Base64
 import io.astrbot.android.AppText
 import io.astrbot.android.R
@@ -92,9 +94,11 @@ object TerminalStore {
 
 /** The foreground service owns all PTY/PRoot trees; changing tabs or destroying the Activity stops none. */
 class TerminalEngine(context: Context, private val scope: CoroutineScope) {
+    private val app = context.applicationContext
     private val runtime = BootstrapRuntime(context.applicationContext)
     private data class Frame(val type: Int, val bytes: ByteArray)
     private class Session(val id: Long, val process: Process) {
+        val started = SystemClock.elapsedRealtime()
         val frames = Channel<Frame>(32)
         var writer: Job? = null
         var reader: Job? = null
@@ -118,6 +122,7 @@ class TerminalEngine(context: Context, private val scope: CoroutineScope) {
             TerminalStore.update(target) { TerminalSessionState(target, running = true) }
             TerminalStore.state.update { it.copy(error = null) }
         }
+        lifecycleEvent("started", current)
         current.writer = scope.launch(Dispatchers.IO) {
             try {
                 val stream = DataOutputStream(current.process.outputStream)
@@ -146,10 +151,24 @@ class TerminalEngine(context: Context, private val scope: CoroutineScope) {
                 }
                 val code = current.process.waitFor()
                 synchronized(gate) {
-                    if (sessions[target] === current) TerminalStore.update(target) { it.copy(running = false, exitCode = code) }
+                    if (sessions[target] === current) {
+                        lifecycleEvent("exited code=$code", current)
+                        TerminalStore.update(target) { it.copy(running = false, exitCode = code) }
+                    }
                 }
             } catch (_: java.io.IOException) { /* explicit stop closes the owned stream */ }
             finally { current.frames.close() }
+        }
+    }
+
+    /** Lifecycle metadata only: never capture commands, output, or the guest environment. */
+    private fun lifecycleEvent(event: String, session: Session) {
+        runCatching {
+            val power = app.getSystemService(PowerManager::class.java)
+            RuntimeStore.log(app, LogCategory.MANAGER).append("${java.time.Instant.now()} terminal id=${session.id} $event " +
+                "appPid=${android.os.Process.myPid()} ageMs=${SystemClock.elapsedRealtime() - session.started} " +
+                "interactive=${power.isInteractive} idle=${power.isDeviceIdleMode} powerSave=${power.isPowerSaveMode} " +
+                "batteryExempt=${power.isIgnoringBatteryOptimizations(app.packageName)}")
         }
     }
 
@@ -167,6 +186,7 @@ class TerminalEngine(context: Context, private val scope: CoroutineScope) {
     }
 
     private suspend fun dispose(current: Session) = withContext(Dispatchers.IO) {
+        lifecycleEvent("stop-requested", current)
         current.frames.close()
         current.process.destroy()
         if (!current.process.waitFor(8, TimeUnit.SECONDS)) { current.process.destroyForcibly(); current.process.waitFor(3, TimeUnit.SECONDS) }

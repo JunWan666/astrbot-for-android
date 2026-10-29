@@ -6,7 +6,7 @@
   const entries = new Map();
   let current = null, active = true, fontSize = 10, selecting = false, range = null;
   let magnifierFrame = 0, magnifierPoint = null, magnifierShown = false;
-  let longPress = null, touchOrigin = null, dragging = null, ignoreClickUntil = 0;
+  let longPress = null, touchOrigin = null, dragging = null, wordDrag = null, ignoreClickUntil = 0;
   let scrollTouch = null, inertia = 0, dragFrame = 0, scrollPixels = 0, scrollView = null;
   let labels = {latest:'Latest'}, reportedSelection = false, reportedSession = null;
   const latest = document.createElement('button');
@@ -21,41 +21,51 @@
       if (!range || !current) return;
       e.preventDefault(); e.stopPropagation();
       const cols = current.term.cols;
-      const start = range.start.y * cols + range.start.x, end = range.end.y * cols + range.end.x - 1;
-      const index = edge === 'start' ? start : end;
+      const start = range.start.y * cols + range.start.x, end = range.end.y * cols + range.end.x;
+      const boundary = edge === 'start' ? range.start : range.end;
       const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
-      const point = {clientX:rect.left + (index % cols + 0.5) * rect.width / cols,
-        clientY:rect.top + (Math.floor(index / cols) - current.term.buffer.active.viewportY + 0.5) * rect.height / current.term.rows};
+      const point = {clientX:rect.left + boundary.x * rect.width / cols,
+        clientY:rect.top + (boundary.y - current.term.buffer.active.viewportY + 0.5) * rect.height / current.term.rows};
       const touch = e.touches[0];
       if (!touch) return;
-      dragging = {anchor:edge === 'start' ? end : start, dx:touch.clientX - point.clientX, dy:touch.clientY - point.clientY};
-      showMagnifier(point);
+      dragging = {anchor:edge === 'start' ? end : start, edge,
+        dx:touch.clientX - point.clientX, dy:touch.clientY - point.clientY};
+      showMagnifier(boundary);
     }, {passive:false});
     element.addEventListener('touchmove', e => {
       if (!dragging || !e.touches[0]) return;
       e.preventDefault(); e.stopPropagation();
       const point = {clientX:e.touches[0].clientX - dragging.dx, clientY:e.touches[0].clientY - dragging.dy};
-      extendSelection(point, dragging.anchor); showMagnifier(point);
+      extendSelection(point, dragging);
     }, {passive:false});
     for (const type of ['touchend','touchcancel']) element.addEventListener(type, e => {
-      e.preventDefault(); e.stopPropagation(); dragging = null; hideMagnifier();
+      e.preventDefault(); e.stopPropagation();
+      if (type === 'touchend' && dragging && e.changedTouches?.[0]) {
+        const touch = e.changedTouches[0];
+        extendSelection({clientX:touch.clientX - dragging.dx,clientY:touch.clientY - dragging.dy},dragging);
+      }
+      dragging = null; hideMagnifier();
     }, {passive:false});
     document.body.appendChild(element); return element;
   });
   function updateLabels() {
     latest.textContent = '↓ ' + labels.latest;
   }
-  function showMagnifier(touch) {
+  function showMagnifier(point) {
     if (!current || !selecting) return;
-    const point = position(touch), term = current.term;
+    const term = current.term;
     const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
     magnifierPoint = {type:'magnifier',id:current.id,show:true,
-      x:Math.max(0,Math.min(innerWidth,rect.left + (point.x + 0.5) * rect.width / term.cols)),
+      x:Math.max(0,Math.min(innerWidth,rect.left + point.x * rect.width / term.cols)),
       y:Math.max(0,Math.min(innerHeight,rect.top + (point.y - term.buffer.active.viewportY + 0.5) * rect.height / term.rows)),
       width:innerWidth,height:innerHeight};
     if (!magnifierFrame) magnifierFrame = requestAnimationFrame(() => {
-      magnifierFrame = 0;
-      if (magnifierPoint && selecting && active) { magnifierShown = true; post(magnifierPoint); }
+      // xterm paints its selection on the next frame. Sampling during that
+      // same frame can magnify the previous highlight while copy uses the new range.
+      magnifierFrame = requestAnimationFrame(() => {
+        magnifierFrame = 0;
+        if (magnifierPoint && selecting && active) { magnifierShown = true; post(magnifierPoint); }
+      });
     });
   }
   function hideMagnifier() {
@@ -129,7 +139,10 @@
       reportedSelection = selecting; reportedSession = current?.id;
       post({type:'selection',id:current?.id,selected:selecting});
     }
-    if (!selecting) { hideMagnifier(); handles.forEach(h => h.style.display = 'none'); return; }
+    if (!selecting) {
+      hideMagnifier(); handles.forEach(h => h.style.display = 'none');
+      post({type:'selection-handles',id:current?.id,width:innerWidth,height:innerHeight,rects:[]}); return;
+    }
     const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
     const width = rect.width / term.cols, height = rect.height / term.rows;
     [range.start, range.end].forEach((point,index) => {
@@ -138,10 +151,16 @@
       handle.style.left = Math.max(12, Math.min(innerWidth - 12, rect.left + point.x * width)) + 'px';
       handle.style.top = (rect.top + (row + 1) * height) + 'px';
     });
+    // Only the handle hit areas opt out of Android's edge-back gesture.
+    // A handle at column zero otherwise gets ACTION_CANCEL as the user drags right.
+    post({type:'selection-handles',id:current.id,width:innerWidth,height:innerHeight,
+      rects:handles.filter(h => h.style.display !== 'none').map(h => {
+        const r=h.getBoundingClientRect(); return [r.left,r.top,r.right,r.bottom];
+      })});
   }
   function clearSelection() {
     const entry = current;
-    selecting = false; range = null; dragging = null;
+    selecting = false; range = null; dragging = null; wordDrag = null;
     hideMagnifier();
     entry?.term.clearSelection(); selectionUi();
     if (entry?.pending) { const batch = entry.pending; entry.pending = null; receive(batch); }
@@ -154,26 +173,49 @@
     const y = Math.max(0, Math.min(term.rows - 1, Math.floor((touch.clientY - rect.top) / (rect.height / term.rows))));
     return {x, y:term.buffer.active.viewportY + y};
   }
-  function extendSelection(touch, anchor) {
+  function cellStart(index) {
+    const term = current.term, x = index % term.cols, y = Math.floor(index / term.cols);
+    return x > 0 && term.buffer.active.getLine(y)?.getCell(x)?.getWidth() === 0 ? index - 1 : index;
+  }
+  function cellEnd(index) {
+    const start = cellStart(index), term = current.term;
+    return start + Math.max(1, term.buffer.active.getLine(Math.floor(start / term.cols))?.getCell(start % term.cols)?.getWidth() || 1);
+  }
+  function extendSelection(touch, drag) {
     if (!current) return;
-    const term = current.term, point = position(touch), end = point.y * term.cols + point.x;
-    const start = Math.min(anchor,end), last = Math.max(anchor,end);
-    term.select(start % term.cols, Math.floor(start / term.cols), last - start + 1);
+    const term = current.term, point = position(touch);
+    const rect = current.element.querySelector('.xterm-screen').getBoundingClientRect();
+    const column = Math.max(0, Math.min(term.cols, Math.round((touch.clientX - rect.left) / (rect.width / term.cols))));
+    let boundary = point.y * term.cols + column;
+    const anchor = drag.anchor;
+    const before = boundary < anchor || boundary === anchor && drag.edge === 'start';
+    // A boundary inside a double-width glyph must include or exclude the whole glyph.
+    if (column < term.cols && cellStart(boundary) !== boundary) boundary = before ? cellStart(boundary) : cellEnd(boundary);
+    if (boundary === anchor) boundary = before ? cellStart(Math.max(0, anchor - 1)) : cellEnd(anchor);
+    const start = Math.min(anchor,boundary), end = Math.max(anchor,boundary);
+    if (end <= start) return;
+    drag.edge = boundary < anchor ? 'start' : 'end';
+    term.select(start % term.cols, Math.floor(start / term.cols), end - start);
     selectionUi();
+    if (range) showMagnifier(drag.edge === 'start' ? range.start : range.end);
   }
   function selectWord(touch) {
     if (!current) return;
     const term = current.term, point = position(touch), line = term.buffer.active.getLine(point.y);
-    const chars = x => line?.getCell(x)?.getChars() || ' ';
+    const chars = x => line?.getCell(cellStart(point.y * term.cols + x) % term.cols)?.getChars() || ' ';
     const category = text => /\s/.test(text) ? 0 : /[\w:/?&=.%@~+\-#]/u.test(text) ? 1 : 2;
     const group = category(chars(point.x));
     let first = point.x, last = point.x;
     while (first > 0 && category(chars(first - 1)) === group) first--;
     while (last + 1 < term.cols && category(chars(last + 1)) === group) last++;
     if (group === 0) first = last = point.x;
-    term.select(first, point.y, last - first + 1);
+    first = cellStart(point.y * term.cols + first) % term.cols;
+    const end = cellEnd(point.y * term.cols + last);
+    term.select(first, point.y, end - (point.y * term.cols + first));
     current.element.querySelector('textarea')?.blur();
-    selectionUi(); showMagnifier(touch);
+    selectionUi();
+    wordDrag = {anchor:point.y * term.cols + first, edge:'end'};
+    if (range) showMagnifier(range.end);
   }
   container.addEventListener('touchstart', e => {
     stopScroll();
@@ -190,8 +232,8 @@
     if (!touch || !touchOrigin) return;
     if (selecting) {
       e.preventDefault(); e.stopImmediatePropagation();
-      const anchor = range.start.y * current.term.cols + range.start.x;
-      extendSelection(touch, anchor); showMagnifier(touch); return;
+      if (wordDrag) extendSelection(touch, wordDrag);
+      return;
     }
     if (Math.hypot(touch.clientX - touchOrigin.clientX,touch.clientY - touchOrigin.clientY) > 8) {
       clearTimeout(longPress);

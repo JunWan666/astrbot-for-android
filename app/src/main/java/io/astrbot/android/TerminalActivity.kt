@@ -150,7 +150,13 @@ class TerminalActivity : LocalizedActivity() {
             if (!manager.environmentInstalled) {
                 Text(AppText.get(R.string.terminal_initialize_first), Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
             }
-            val message = pageError ?: session.error ?: current?.error ?: current?.exitCode?.let { AppText.get(R.string.terminal_exited, it) }
+            val message = pageError ?: session.error ?: current?.error ?: current?.exitCode?.let {
+                when (it) {
+                    137 -> AppText.get(R.string.terminal_exited_killed)
+                    143 -> AppText.get(R.string.terminal_exited_terminated)
+                    else -> AppText.get(R.string.terminal_exited, it)
+                }
+            }
             if (message != null) Text(message, Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             if (manager.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -253,6 +259,7 @@ class TerminalActivity : LocalizedActivity() {
                 if (selectionMode) browser?.let { getSystemService(InputMethodManager::class.java).hideSoftInputFromWindow(it.windowToken, 0) }
             }
             "magnifier" -> updateMagnifier(message)
+            "selection-handles" -> updateHandleGestures(message)
             "copy" -> {
                 if (message.optLong("id", -1) != TerminalStore.state.value.selectedId) return
                 val text = message.optString("data").take(524288)
@@ -275,8 +282,28 @@ class TerminalActivity : LocalizedActivity() {
     private fun js(script: String) { if (ready) browser?.evaluateJavascript(script, null) }
     private fun setFont(value: Int) { fontSize = value.coerceIn(10, 24); preferences.edit().putInt("fontSize", fontSize).apply(); js("TerminalApp.font($fontSize)") }
     private fun dismissMagnifier() {
+        magnifierRevision++
         if (Build.VERSION.SDK_INT >= 28) selectionMagnifier?.dismiss()
         selectionMagnifier = null
+    }
+
+    private var magnifierRevision = 0L
+
+    private fun updateHandleGestures(message: JSONObject) {
+        if (Build.VERSION.SDK_INT < 29 || message.optLong("id", -1) != TerminalStore.state.value.selectedId) return
+        val view = browser ?: return
+        val width = message.optDouble("width"); val height = message.optDouble("height")
+        if (!width.isFinite() || !height.isFinite() || width <= 0 || height <= 0) return
+        val rectangles = message.optJSONArray("rects") ?: return
+        view.systemGestureExclusionRects = (0 until minOf(2, rectangles.length())).mapNotNull { index ->
+            val item = rectangles.optJSONArray(index) ?: return@mapNotNull null
+            val values = (0..3).map { item.optDouble(it) }
+            if (values.any { !it.isFinite() }) return@mapNotNull null
+            android.graphics.Rect((values[0] * view.width / width).toInt().coerceIn(0, view.width),
+                (values[1] * view.height / height).toInt().coerceIn(0, view.height),
+                (values[2] * view.width / width).toInt().coerceIn(0, view.width),
+                (values[3] * view.height / height).toInt().coerceIn(0, view.height)).takeUnless { it.isEmpty }
+        }
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -302,7 +329,21 @@ class TerminalActivity : LocalizedActivity() {
                 .setInitialZoom(2f).setCornerRadius(10 * density).build()
         } else Magnifier(view)
         selectionMagnifier = magnifier
-        magnifier.show((x * view.width / width).toFloat(), (y * view.height / height).toFloat())
+        val revision = ++magnifierRevision
+        // Wait for the WebView selection frame; JS geometry can otherwise be
+        // newer than the surface copied by Android's native magnifier.
+        view.postVisualStateCallback(revision, object : WebView.VisualStateCallback() {
+            override fun onComplete(requestId: Long) {
+                if (requestId != magnifierRevision || !selectionTouchActive || selectionMagnifier !== magnifier) return
+                view.postOnAnimation {
+                    if (requestId != magnifierRevision || !selectionTouchActive || selectionMagnifier !== magnifier) return@postOnAnimation
+                    magnifier.show((x * view.width / width).toFloat(), (y * view.height / height).toFloat())
+                    view.postOnAnimation {
+                        if (requestId == magnifierRevision && selectionTouchActive && selectionMagnifier === magnifier) magnifier.update()
+                    }
+                }
+            }
+        })
     }
     private fun keyboard() {
         if (ready) browser?.let { view ->
@@ -324,7 +365,11 @@ class TerminalActivity : LocalizedActivity() {
     }
 
     override fun onStart() { super.onStart(); browser?.onResume(); js("TerminalApp.active(true)") }
-    override fun onStop() { selectionTouchActive = false; dismissMagnifier(); js("TerminalApp.active(false)"); browser?.onPause(); pendingPaste = null; super.onStop() }
+    override fun onStop() {
+        selectionTouchActive = false; dismissMagnifier()
+        if (Build.VERSION.SDK_INT >= 29) browser?.systemGestureExclusionRects = emptyList()
+        js("TerminalApp.active(false)"); browser?.onPause(); pendingPaste = null; super.onStop()
+    }
 
     override fun onDestroy() {
         dismissMagnifier()

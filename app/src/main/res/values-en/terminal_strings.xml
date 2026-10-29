@@ -11,4 +11,6 @@
     <string name="terminal_copy_selection">Copy</string>
     <string name="terminal_select_all">Select all</string>
     <string name="terminal_scroll_latest">Latest output</string>
+    <string name="terminal_exited_killed">The shell was killed (137). Check background permissions and system logs. If they show Trimming phantom processes, adjust Android child process limits before restarting the session.</string>
+    <string name="terminal_exited_terminated">Shell exited (143, usually SIGTERM). Check the session exit record in Logs and diagnostics, then review the battery exemption and child process limit in Settings → Permissions. The exit code alone does not identify who stopped the process.</string>
 </resources>
