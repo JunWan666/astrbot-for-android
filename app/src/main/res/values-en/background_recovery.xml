@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="background_assistance_group">Runtime assistance</string>
+    <string name="background_assistance_summary">Accessibility helper · Restore after reboot</string>
+    <string name="background_hide_recents_short">Reduce accidental dismissal · Details</string>
+    <string name="background_system_group">System background settings</string>
+    <string name="background_assist_title">Accessibility background assistance</string>
+    <string name="background_assist_description">Enable in system settings to support this App’s background operation with a system-bound service and a transparent window that cannot receive touches. Does not read the screen, text or notifications, tap, enter text or enable terminal device access. Can be disabled at any time. An independent App toggle controls service recovery after reboot; system auto-start and background permissions are still needed.</string>
+    <string name="background_assist_off">Off · optional background support</string>
+    <string name="background_assist_waiting">Enabled in system · waiting for connection</string>
+    <string name="background_assist_connected">Connected · background assistance active</string>
+    <string name="background_assist_partial">Connected · transparent helper window unavailable</string>
+    <string name="background_assist_detail">A system-bound service and transparent helper window support background operation without reading or controlling the screen.</string>
+    <string name="background_assist_settings">Open system accessibility settings</string>
+    <string name="background_restore_title">Restore services after reboot</string>
+    <string name="background_restore_detail">Off by default. After first unlock, an App update or helper reconnection, attempt to restore previously enabled services.</string>
+    <string name="background_restore_scope">Restores saved running preferences for AstrBot, NapCat, SSH, cpolar, Harness, the desktop and standalone QQ. Terminal commands, manually deployed programs and device-control permissions require a manual restart.</string>
+    <string name="background_restore_limit">Accessibility assistance does not remove background child-process limits. Open the App manually after a force stop.</string>
+    <string name="background_restore_requested">Last recovery request: %1$s · passed to the runtime service; check Home for results</string>
+    <string name="background_restore_blocked">Last recovery request: %1$s · blocked by the system; open the App to check</string>
+    <string name="background_restore_save_failed">Could not save the setting. Check free space and retry.</string>
+</resources>

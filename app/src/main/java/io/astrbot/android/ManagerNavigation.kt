@@ -27,10 +27,10 @@ import kotlin.math.floor
 
 internal enum class SettingsRoute(private val titleResource: Int) {
     ROOT(R.string.ui_settings), PROGRAMS(R.string.ui_astrbot_updates), NAPCAT(R.string.ui_napcat_updates), ENVIRONMENT(R.string.ui_runtime_upgrades),
-    BACKUPS(R.string.ui_backup_and_restore), PORTABLE(R.string.ui_portable_backups), DIAGNOSTICS(R.string.ui_logs_and_diagnostics), BACKGROUND(R.string.ui_background_operation), ABOUT(R.string.ui_about);
+    BACKUPS(R.string.ui_backup_and_restore), PORTABLE(R.string.ui_portable_backups), DIAGNOSTICS(R.string.ui_logs_and_diagnostics), BACKGROUND(R.string.ui_background_operation), BACKGROUND_ASSISTANCE(R.string.background_assistance_group), ABOUT(R.string.ui_about);
     val title: String get() = AppText.get(titleResource)
 
-    val parent get() = when (this) { PROGRAMS, NAPCAT, ENVIRONMENT -> ABOUT; PORTABLE -> BACKUPS; else -> ROOT }
+    val parent get() = when (this) { PROGRAMS, NAPCAT, ENVIRONMENT -> ABOUT; PORTABLE -> BACKUPS; BACKGROUND_ASSISTANCE -> BACKGROUND; else -> ROOT }
 }
 internal enum class ServiceRoute(private val titleResource: Int) { STATUS(R.string.ui_overview), CONNECTION(R.string.ui_connection_eebb5), CREDENTIALS(R.string.ui_credentials), LOGS(R.string.ui_logs_894b8), LAN(R.string.ui_connection_eebb5) ;
     val title: String get() = AppText.get(titleResource)
@@ -264,11 +264,13 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
 @Composable internal fun FixedManagerSettings(route: SettingsRoute, state: ManagerState, onNavigate: (SettingsRoute) -> Unit,
     onAction: (SettingAction) -> Unit, onNotice: (String, String) -> Unit,
     automaticUpdateEnabled: Boolean = false, updateChannelConfigured: Boolean = BuildConfig.UPDATE_CATALOG_URL.isNotEmpty()) {
-    if (route == SettingsRoute.BACKGROUND) {
+    if (route == SettingsRoute.BACKGROUND || route == SettingsRoute.BACKGROUND_ASSISTANCE) {
         Column(Modifier.fillMaxSize().semantics { contentDescription = AppText.get(R.string.ui_settings_content) },
             verticalArrangement = Arrangement.spacedBy(10.dp)) {
             ManagerStatusStrip(state, onNotice)
-            BackgroundSettings(Modifier.weight(1f), onAction)
+            if (route == SettingsRoute.BACKGROUND) BackgroundSettings(Modifier.weight(1f), onAction,
+                onAssistance = { onNavigate(SettingsRoute.BACKGROUND_ASSISTANCE) })
+            else Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) { BackgroundAssistance() }
         }
         return
     }
@@ -323,7 +325,7 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
             action(AppText.get(R.string.ui_manager_logs), R.drawable.ic_logs, AppText.get(R.string.ui_service_controls_updates_and_backup_events), action = SettingAction.LOGS),
             action(AppText.get(R.string.ui_runtime_logs), R.drawable.ic_logs, AppText.get(R.string.ui_initialization_and_runtime_maintenance), action = SettingAction.RUNTIME_LOGS),
             action(AppText.get(R.string.ui_export_diagnostics), R.drawable.ic_export, AppText.get(R.string.ui_device_information_status_and_redacted_logs), !state.busy, SettingAction.DIAGNOSTICS))
-        SettingsRoute.BACKGROUND -> emptyList() // Rendered above with live permission statuses.
+        SettingsRoute.BACKGROUND, SettingsRoute.BACKGROUND_ASSISTANCE -> emptyList() // Rendered above with live permission statuses.
         SettingsRoute.ABOUT -> listOf(
             action(AppText.get(R.string.ui_check_for_updates), R.drawable.ic_update, AppText.get(R.string.ui_app_apk_updates_and_installation), true, SettingAction.CHECK_APP_UPDATE),
             action(AppText.get(R.string.ui_app_and_component_versions), R.drawable.ic_info, BuildConfig.VERSION_NAME, action = SettingAction.VERSIONS),

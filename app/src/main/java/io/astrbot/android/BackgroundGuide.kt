@@ -215,9 +215,10 @@ internal object BackgroundGuide {
     }
 }
 
-@Composable internal fun BackgroundSettings(modifier: Modifier = Modifier, onAction: (SettingAction) -> Unit) {
+@Composable internal fun BackgroundSettings(modifier: Modifier = Modifier, onAction: (SettingAction) -> Unit, onAssistance: () -> Unit) {
     val context = LocalContext.current
     var hideRecents by remember { mutableStateOf(RecentTaskVisibility.hidden(context)) }
+    var hideExplanation by remember { mutableStateOf(false) }
     val statuses = rememberBackgroundStatuses()
     val automaticCount = statuses.values.count { !it.manual && it.complete }
     val manualCount = statuses.values.count { it.manual && it.complete }
@@ -242,8 +243,6 @@ internal object BackgroundGuide {
                     Text(AppText.get(R.string.background_system_summary, automaticCount), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                     Text(AppText.get(R.string.background_manual_summary, manualCount), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                 }
-                Text(AppText.get(R.string.background_summary_hint), style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
@@ -253,25 +252,46 @@ internal object BackgroundGuide {
             }).padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(AppText.get(R.string.background_hide_recents), style = MaterialTheme.typography.titleSmall)
-                    Text(AppText.get(R.string.background_hide_recents_detail), style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(AppText.get(R.string.background_hide_recents_short), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable { hideExplanation = true })
                 }
                 Switch(checked = hideRecents, onCheckedChange = null)
             }
         }
-        items.forEach { item ->
-            Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
-                Row(Modifier.fillMaxWidth().clickable(onClick = item.onClick).heightIn(min = 54.dp)
-                    .padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    ManagerGlyph(item.icon, MaterialTheme.colorScheme.primary)
-                    Text(item.title, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
-                    item.badge?.invoke()
-                    Icon(painterResource(R.drawable.ic_chevron), null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+            Row(Modifier.fillMaxWidth().clickable(onClick = onAssistance).padding(horizontal = 12.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ManagerGlyph(R.drawable.ic_settings, MaterialTheme.colorScheme.primary)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(AppText.get(R.string.background_assistance_group), style = MaterialTheme.typography.bodyMedium)
+                    Text(AppText.get(R.string.background_assistance_summary), style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Icon(painterResource(R.drawable.ic_chevron), null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Text(AppText.get(R.string.background_system_group), Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+            Column {
+                items.forEachIndexed { index, item ->
+                    Row(Modifier.fillMaxWidth().clickable(onClick = item.onClick).heightIn(min = 48.dp)
+                        .padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ManagerGlyph(item.icon, MaterialTheme.colorScheme.primary)
+                        Text(item.title, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                        item.badge?.invoke()
+                        Icon(painterResource(R.drawable.ic_chevron), null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (index != items.lastIndex) HorizontalDivider(Modifier.padding(start = 54.dp), color = MaterialTheme.colorScheme.outlineVariant)
                 }
             }
         }
     }
+    if (hideExplanation) AlertDialog(onDismissRequest = { hideExplanation = false },
+        title = { Text(AppText.get(R.string.background_hide_recents)) },
+        text = { Text(AppText.get(R.string.background_hide_recents_detail)) },
+        confirmButton = { TextButton(onClick = { hideExplanation = false }) { Text(AppText.get(R.string.ui_close)) } })
 }
 
 @Composable internal fun BackgroundGuideDialog(topic: BackgroundTopic, onDismiss: () -> Unit) {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="background_assistance_group">运行辅助</string>
+    <string name="background_assistance_summary">无障碍后台辅助 · 开机恢复服务</string>
+    <string name="background_hide_recents_short">减少误划关闭 · 查看说明</string>
+    <string name="background_system_group">系统后台设置</string>
+    <string name="background_assist_title">无障碍后台辅助</string>
+    <string name="background_assist_description">由你在系统中开启，以系统绑定的服务及不接收触摸的透明小窗口辅助本 App 后台运行。不读取屏幕、文字或通知，不点击、不输入，也不会启用终端设备访问。可以随时关闭。是否开机恢复服务由 App 中的独立开关控制；仍需允许系统自启动和后台运行。</string>
+    <string name="background_assist_off">未开启 · 可选增强后台运行</string>
+    <string name="background_assist_waiting">系统已开启 · 等待连接</string>
+    <string name="background_assist_connected">已连接 · 后台辅助已生效</string>
+    <string name="background_assist_partial">已连接 · 透明辅助窗口未启用</string>
+    <string name="background_assist_detail">系统绑定服务与透明小窗口辅助驻留，不读取屏幕或执行操作。</string>
+    <string name="background_assist_settings">打开系统无障碍设置</string>
+    <string name="background_restore_title">开机恢复服务</string>
+    <string name="background_restore_detail">默认关闭。首次解锁、应用更新或辅助重新连接后，尝试恢复上次开启的服务。</string>
+    <string name="background_restore_scope">恢复 AstrBot、NapCat、SSH、cpolar、Harness、桌面及原版 QQ 的已保存启停设置。终端命令、手动部署程序和设备控制授权需重新开启。</string>
+    <string name="background_restore_limit">无障碍辅助不能解除后台子进程限制；强行停止 App 后需手动打开。</string>
+    <string name="background_restore_requested">最近恢复请求：%1$s · 已交给运行服务，结果见首页</string>
+    <string name="background_restore_blocked">最近恢复请求：%1$s · 系统未允许，请打开 App 后检查</string>
+    <string name="background_restore_save_failed">设置未能保存，请检查存储空间后重试。</string>
+</resources>

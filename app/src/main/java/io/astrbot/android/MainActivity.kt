@@ -72,13 +72,7 @@ class MainActivity : LocalizedActivity() {
         lifecycleScope.launch {
             RuntimeStore.operationLock.withLock { RuntimeStore.refreshInstallation(this@MainActivity) }
             val interrupted = withContext(Dispatchers.IO) { BackupRepository(filesDir).let { it.hasPendingRestore || it.hasPendingCleanup } || UpdateRepository(this@MainActivity).hasPendingUpdate || UpdateRepository(this@MainActivity, "napcat").hasPendingUpdate || RuntimeImageRepository(this@MainActivity).hasPendingUpdate || PortableBackupRepository(this@MainActivity).hasInterruptedWork || PersonaRepository(this@MainActivity).hasPendingChange }
-            val wanted = getSharedPreferences("manager", MODE_PRIVATE).let { preferences ->
-                ServiceId.entries.any { preferences.getBoolean("desired_${it.name}", false) } ||
-                    preferences.getBoolean("desired_cpolar", false) ||
-                    preferences.getBoolean("desired_harness", false) ||
-                    preferences.getBoolean("desired_desktop", false) ||
-                    preferences.getBoolean(SshRepository.DESIRED, false) && preferences.getBoolean(SshRepository.INSTALLED, true)
-            }
+            val wanted = BackgroundRecovery.hasDesiredServices(this@MainActivity)
             if ((interrupted || wanted) && RuntimeStore.owner == null) RuntimeService.command(this@MainActivity, "reconcile")
         }
     }

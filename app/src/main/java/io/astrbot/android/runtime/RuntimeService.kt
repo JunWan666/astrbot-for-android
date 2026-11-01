@@ -43,6 +43,7 @@ class RuntimeService : Service() {
             }
         }
         controller = RuntimeController(this, scope)
+        BackgroundRecovery.runtimeCreated()
         scope.launch {
             RuntimeStore.state.combine(NetworkConnectivity.observe(applicationContext)) { state, network -> state to network }
                 .combine(SshStore.state) { (state, network), ssh -> Triple(state, network, ssh) }
