@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.3.0-3867FF?style=flat-square" alt="Version 1.3.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.4.0-3867FF?style=flat-square" alt="Version 1.4.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -34,11 +34,11 @@
 
 Built with Kotlin and Jetpack Compose, the app provides a native management interface in Simplified Chinese and English and embeds the AstrBot and NapCat WebUIs in a WebView. Users can sign in to QQ, configure model providers and plugins, manage personas, enable LAN access, and use SSH and cpolar tunneling extensions directly from their phone.
 
-Current version: **1.3.0**. This update adds website bookmarks, Shizuku permission management, Android device access for terminal tools and an optional DeepSeek Harness extension. It also groups settings and improves service readiness, download progress, terminal selection and process management. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
+Current version: **1.4.0**. This update brings Linux QQ and offline desktop dependencies together, adds optional background assistance, and improves AstrBot instance handling, external app navigation from the embedded WebView, and bookmark layout. The manual SnowLuma setup and lifecycle controls are preview features whose applicable license scope remains unconfirmed; its program is not bundled. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
 
 ## Screenshots
 
-Captured from **v1.3.0** on an Android phone. The eight screens show service management, personas, website bookmarks, grouped settings, extensions, permissions and both embedded WebUIs.
+The eight screenshots were captured on an Android phone and show service management, personas, website bookmarks, grouped settings, extensions, permissions and both embedded WebUIs.
 
 <table width="100%" align="center">
   <tr>
@@ -96,7 +96,7 @@ The screenshots show the app in Simplified Chinese. English is also available in
 | Backup and restore | Create local snapshots and portable backups, roll back updates, and automatically remove old unprotected automatic snapshots. |
 | SSH extension | Installed by default and started on demand, with configurable password, port and LAN access. |
 | Ubuntu terminal | Built-in local shell with multiple sessions, smooth touch scrolling, arrow keys, paste and Enter. Text selection magnifier on Android 9 and later. |
-| Ubuntu desktop | Optional lightweight desktop and general build tools, with an embedded noVNC viewer. Install or update independent original ARM64 QQ while preserving login data. |
+| Linux QQ | Bundled lightweight desktop and general tools, with optional original ARM64 QQ installation. Opening QQ prepares the desktop automatically; use the embedded viewer or opt-in LAN access to the same session. |
 | cpolar extension | Install on demand and sign in through the official embedded WebUI. Includes SSH, AstrBot and NapCat tunnel presets. |
 | DeepSeek Harness | Optional independent Node.js runtime and official AI workspace, with staged installation progress and optional LAN access. |
 | Website bookmarks | Save HTTP / HTTPS addresses, load website icons automatically and open pages inside the app with per-site zoom settings. |
@@ -108,7 +108,7 @@ The screenshots show the app in Simplified Chinese. English is also available in
 
 Settings, extensions and permissions use section headings and grouped cards in a continuous menu, with scrolling on small screens or at larger font sizes. Opening a service switches the bottom navigation to that service's overview, connections, credentials and logs. Its credentials page can reset a forgotten WebUI password or access token.
 
-The Websites tab stores custom HTTP / HTTPS bookmarks, with the DeepSeek usage page provided by default. Website icons load automatically, with an initial as fallback. Pages open inside the app and remember zoom for each bookmark. Desktop and original QQ downloads display bytes, total size, percentage and speed, with pause, resume and stop during download. Partial files are kept for verified reuse; package installation runs to completion.
+The Websites tab stores custom HTTP / HTTPS bookmarks, with the DeepSeek homepage provided by default. Website icons load automatically, with an initial as fallback. Each card has Open, Edit and Delete buttons. Pages open inside the app and remember zoom for each bookmark. Original QQ downloads display bytes, total size, percentage and speed, with pause, resume and stop during download. Partial files are kept for verified reuse; package installation runs to completion. Desktop dependencies are prepared offline from the full APK. Optional LAN access shares the same desktop session as the phone.
 
 ## Architecture
 
@@ -130,10 +130,10 @@ The full APK includes the runtime environment, so initialization does not requir
 ### Device and storage requirements
 
 - Android 8.0 / API 26 or later, with an ARM64 processor. Root access is not required.
-- The full APK is approximately **720 MiB**. Allow additional storage for the extracted environment, QQ data and backups.
+- The full APK is approximately **850 MiB**, including the base environment and offline desktop packages. Allow additional storage for the extracted environment, QQ data and backups.
 - If free space is below the runtime preparation estimate, a warning offers **Continue anyway**. Running out of writable storage can still cause the operation to fail.
 - Resource usage varies with plugins, model calls and QQ activity. Home displays actual app memory usage; the app does not preallocate memory for a virtual machine.
-- Continuous operation requires appropriate background permissions on the device. The app currently does not start automatically at boot.
+- Continuous operation requires appropriate background permissions on the device. Accessibility assistance and service recovery after reboot are optional and disabled by default; see the [background operation guide (Chinese)](使用指南.md#后台运行).
 
 Install cpolar separately in **Settings → Runtime extensions**; its client is not bundled in the APK. Sign in through its official WebUI to save the token automatically and manage the three default tunnels. Start each target service in the app before using its tunnel. Features depend on your cpolar account plan.
 
@@ -141,7 +141,7 @@ Install cpolar separately in **Settings → Runtime extensions**; its client is 
 
 [SnowLuma](https://github.com/SnowLuma/SnowLuma) is another QQ interoperability project providing OneBot v11 interfaces. The [NapCat README](https://github.com/NapNeko/NapCatQQ#new-framework-) recommends it as an alternative to **NapCat Gui**. See our [manual phone setup and AstrBot connection guide (Chinese)](SnowLuma手动部署.md) for this optional approach.
 
-The guide uses the app's general Ubuntu, desktop, original QQ and terminal features. Users obtain the official full package and set it up themselves, keeping NapCat stopped while using this approach. The app's default setup remains NapCat. SnowLuma uses a **source-available non-commercial license**, with separate proprietary terms for native components; read its [LICENSE](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/LICENSE) and [EULA](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/EULA.md) first. This repository does not supply its programs or automated deployment scripts. The guide does not imply upstream endorsement or additional permission.
+The guide uses the app's general Ubuntu, desktop, original QQ and terminal features. Users obtain the official full package and set it up themselves, keeping NapCat stopped while using this approach. The app's default setup remains NapCat. SnowLuma uses a **source-available non-commercial license**, with separate proprietary terms for native components; read its [LICENSE](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/LICENSE) and [EULA](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/EULA.md) first. This repository does not supply its programs; users copy and execute the example commands themselves. Dedicated controls remain subject to license review. The guide does not imply upstream endorsement or additional permission.
 
 ## Building from source
 

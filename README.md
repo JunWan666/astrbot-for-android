@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.3.0-3867FF?style=flat-square" alt="Version 1.3.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.4.0-3867FF?style=flat-square" alt="Version 1.4.0" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -34,11 +34,11 @@
 
 应用采用 Kotlin 与 Jetpack Compose 构建原生管理界面，支持简体中文与英文，通过内置 WebView 访问 AstrBot 和 NapCat 的 WebUI，在手机端完成 QQ 登录、模型接入与插件配置，并提供人设管理、局域网访问、SSH 终端与 cpolar 内网穿透扩展。
 
-当前版本为 **1.3.0**。本轮新增常用网页导航、Shizuku 权限管理、终端设备访问与 DeepSeek Harness 可选扩展，整理设置分类，并改善服务就绪状态、下载进度、终端选字和进程管理。完整变化见[更新记录](docs/CHANGELOG.md)。
+当前版本为 **1.4.0**。本轮整合 Linux QQ 与离线桌面依赖，新增可选的后台运行辅助，改善 AstrBot 重复实例处理、内置 WebView 的外部应用跳转与常用网址布局。SnowLuma 手动部署及运行管理为预览功能，适用许可范围仍需确认，不附带其程序。完整变化见[更新记录](docs/CHANGELOG.md)。
 
 ## 界面预览
 
-以下八张图片均为 **v1.3.0** 手机实机截图，展示服务管理、人设、常用网页、分类设置、扩展、权限及两套内置后台。
+以下八张手机实机截图展示服务管理、人设、常用网页、分类设置、扩展、权限及两套内置后台。
 
 <table width="100%" align="center">
   <tr>
@@ -94,7 +94,7 @@
 | 备份与恢复 | 支持本机快照、便携备份和更新回退，自动清理未受保护的旧自动快照 |
 | SSH 扩展 | 默认安装、按需启动，支持修改密码、端口和局域网访问设置 |
 | Ubuntu 终端 | 内置本机交互终端，支持多会话、平滑触摸滚动、方向键与粘贴回车；Android 9 及以上支持选字放大镜 |
-| Ubuntu 桌面 | 按需安装轻量桌面与通用编译工具，内嵌 noVNC，可独立安装或更新原版 ARM64 QQ，保留登录数据 |
+| Linux QQ | 预置轻量桌面与通用工具，原版 ARM64 QQ 按需安装；打开时自动准备桌面，支持内嵌操作及可选的局域网访问 |
 | cpolar 扩展 | 按需安装，内嵌官方 WebUI 登录与隧道管理，默认提供 SSH、AstrBot、NapCat 三个隧道 |
 | DeepSeek Harness | 按需准备独立 Node.js 与官方工作台，显示分阶段安装进度，可选局域网访问，自行配置模型 |
 | 常用网页 | 自定义 HTTP / HTTPS 网址，自动获取图标，在应用内访问并保存各页面缩放比例 |
@@ -104,7 +104,7 @@
 | 后台引导 | 提供通知、电池优化、后台无限制、自启动权限及任务锁定入口，可选择在最近任务中隐藏 |
 | 更新管理 | App 检查新版后可选择内置下载校验安装，或交给外部浏览器下载；AstrBot、NapCat 独立更新 |
 
-设置、扩展和权限采用分类标题与分组卡片，连续排列，小屏或大字号下可滚动。底部“网页”默认提供 DeepSeek 用量页，可自行增删网址。桌面与 QQ 下载显示大小、进度和速度，下载阶段可暂停、继续或停止。进入服务详情后，底部导航切换为该服务的概览、连接、凭据和日志，凭据页可重置忘记的后台密码或口令。
+设置、扩展和权限采用分类标题与分组卡片，连续排列，小屏或大字号下可滚动。底部“网页”默认提供 DeepSeek 官网首页，可自行增删网址。QQ 下载显示大小、进度和速度，下载阶段可暂停、继续或停止。Linux QQ 的桌面随环境离线准备，局域网访问默认关闭，与手机共用同一个桌面会话。进入服务详情后，底部导航切换为该服务的概览、连接、凭据和日志，凭据页可重置忘记的后台密码或口令。
 
 ## 项目架构
 
@@ -126,10 +126,10 @@
 ### 设备与空间
 
 - Android 8.0 / API 26 及以上，ARM64 架构，无需手机 Root。
-- 完整 APK 约 **720 MiB**，安装后还需为运行环境、QQ 数据和备份预留空间。
+- 完整 APK 约 **850 MiB**，包含基础环境和桌面离线依赖；安装后还需为运行环境、QQ 数据和备份预留空间。
 - 环境准备空间不足时显示预估提醒，可选择“仍然继续”；实际可写空间耗尽仍会导致操作失败。
 - 运行占用随插件、模型调用及 QQ 状态变化；首页显示实际应用内存，不预分配虚拟机内存。
-- 持续运行需要按手机系统设置后台权限，应用目前不提供开机自动启动。
+- 持续运行需要按手机系统设置后台权限。可选开启无障碍后台辅助及默认关闭的开机恢复服务，详见[后台运行](docs/使用指南.md#后台运行)。
 
 cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打入 APK。登录官方 WebUI 后自动保存令牌，可管理三个默认隧道；隧道目标服务需在 App 中启动，服务能力以 cpolar 账号套餐为准。
 
@@ -137,7 +137,7 @@ cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打�
 
 [SnowLuma](https://github.com/SnowLuma/SnowLuma) 是另一个提供 OneBot v11 接口的 QQ 互操作项目。[NapCat README](https://github.com/NapNeko/NapCatQQ#new-framework-) 推荐其作为 **NapCat Gui 替代品**；希望了解其他接入方式的用户，可以阅读本项目整理的[手机手动部署与 AstrBot 对接教程](docs/SnowLuma手动部署.md)。
 
-教程使用 App 的通用 Ubuntu、桌面、原版 QQ 和终端，由用户另行获取官方完整包、手动部署并连接 AstrBot。App 默认方案仍为 NapCat，使用本教程时保持 NapCat 停止。SnowLuma 采用**源码可见非商业许可**，原生组件另有专有条款；请先阅读官方 [LICENSE](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/LICENSE) 和 [EULA](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/EULA.md)。本仓库不附带其程序或自动部署脚本，教程不代表上游背书或额外授权。
+教程使用 App 的通用 Ubuntu、桌面、原版 QQ 和终端，由用户另行获取官方完整包、手动部署并连接 AstrBot。App 默认方案仍为 NapCat，使用本教程时保持 NapCat 停止。SnowLuma 采用**源码可见非商业许可**，原生组件另有专有条款；请先阅读官方 [LICENSE](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/LICENSE) 和 [EULA](https://github.com/SnowLuma/SnowLuma/blob/v2.2.1/EULA.md)。本仓库不附带其程序，示例命令需用户自行复制执行；专用入口仍待许可审核，教程不代表上游背书或额外授权。
 
 ## 源码构建
 

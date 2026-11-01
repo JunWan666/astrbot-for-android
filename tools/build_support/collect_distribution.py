@@ -474,7 +474,8 @@ def retain_source_archive(source: Path, destination: Path, record: dict) -> None
 
 
 def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, python_source_directory: Path | None = None,
-            cache_dir: Path | None = None, native_dir: Path | None = None) -> dict:
+            cache_dir: Path | None = None, native_dir: Path | None = None,
+            desktop_materials_directory: Path | None = None) -> dict:
     cache_dir = cache_dir if cache_dir is not None else root / ".cache"
     native_dir = native_dir if native_dir is not None else root / "app/src/main/jniLibs"
     image = image_dir / "ubuntu.tar.bin"
@@ -506,6 +507,20 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     for component in ("shizuku-manager", "deepseek-harness"):
         notices[f"manager/{component}/LICENSE.txt"] = (root / f"runtime/{component}-LICENSE.txt").read_bytes()
         notices[f"manager/{component}/sources.json"] = (root / f"runtime/{component}.lock.json").read_bytes()
+    # Offline desktop packages are outside the base image and need their own evidence.
+    from collect_desktop_materials import load_materials
+    desktop_directory = desktop_materials_directory or cache_dir / "distribution/desktop"
+    desktop_lock, desktop_materials = load_materials(root, desktop_directory)
+    if desktop_lock["baseRuntimeSha256"] != image_manifest["sha256"]:
+        raise ValueError("Desktop materials belong to another base runtime")
+    add_bytes(notices, "manager/desktop/desktop-packages.lock.json", json_bytes(desktop_lock))
+    add_bytes(notices, "manager/desktop/materials.json", json_bytes(desktop_materials))
+    with zipfile.ZipFile(desktop_directory / desktop_materials["notices"]["file"]) as archive:
+        for name in archive.namelist():
+            if name != "COLLECTION-MANIFEST.json":
+                add_bytes(notices, "desktop/" + name, archive.read(name))
+    desktop_packages = [{**p, "copyright": "desktop/" + p["copyright"]} for p in desktop_materials["packages"]]
+    desktop_collection = desktop_materials["sourceCollection"]
     dpkg = system_packages(files, links)
     ubuntu_collection = ubuntu_source_collection(root, image_manifest["sha256"], dpkg, notices, cache_dir)
     python = python_packages(files)
@@ -547,6 +562,8 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
         {"id": "linux-qq-redistribution", "status": "unconfirmed", "detail": "Electron/Chromium notices do not grant redistribution rights to Linux QQ itself."},
         {"id": "napcat-permission", "status": "requires-review", "detail": "Exact 4.18.41 Limited Redistribution License retained; noncommercial and modified-source restrictions apply. No broader permission inferred."},
         {"id": "ubuntu-corresponding-source", "status": "source-archives-collected; binary-build-provenance-unverified" if ubuntu_collection else "not-collected", "detail": "Exact source packages, Debian build/patch archives and signed archive metadata are in ubuntu-source-packages.zip; no binary rebuild claimed." if ubuntu_collection else "Installed binary/source package versions and copyright aliases recorded. Exact Ubuntu source archives and build recipes are not included."},
+        {"id": "desktop-corresponding-source", "status": "source-archives-collected; binary-build-provenance-unverified", "detail": "Offline desktop package notices and exact source versions are recorded separately from the base image. ubuntu-desktop-source-packages.zip is an external release companion; no binary rebuild claimed."},
+        {"id": "snowluma-integration-permission", "status": "requires-written-confirmation", "detail": "No SnowLuma program is bundled. Dedicated preparation commands and lifecycle controls require review against SnowLuma LICENSE 4(b) and EULA 5.4; absence of bundled binaries does not establish authorization."},
         {"id": "python-corresponding-source", "status": "source-archives-collected; wheel-native-build-provenance-unverified" if python_collection else "not-collected-in-this-inventory", "detail": "Exact PyPI sdists and separately identified upstream source archives are in the external python-source-packages.zip; wheel provenance, native/vendored dependencies and binary rebuilds remain unverified." if python_collection else "150 pinned distributions; pass --python-source-directory to bind a verified separate source companion. This inventory contains no Python source archive evidence."},
         {"id": "bundled-js-and-native", "status": "incomplete", "detail": "npm inventory covers external package.json files only. Bundled/minified JS, static/native binaries, fonts and QQ internals need separate dependency/source mapping."},
         {"id": "android-source-completeness", "status": "unverified", "detail": "Resolved source jars retained where available; source jars alone are not proof of complete corresponding source or build reproducibility."},
@@ -556,6 +573,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     inventory = {"schemaVersion": 1, "scope": "partial release evidence; not a complete SBOM or redistribution clearance",
                  "runtime": image_manifest, "runtimeEntriesScanned": entry_count, "native": native,
                  "ubuntuPackages": dpkg, "pythonPackages": python, "npmPackages": npm,
+                 "desktopPackages": desktop_packages, "desktopSourceCollection": desktop_collection,
                  "androidArtifacts": android, "originalSources": upstream, "terminalRenderer": terminal_renderer,
                  "copyrightAliases": {"runtime/" + k: "runtime/" + v for k, v in sorted(links.items())},
                  "releaseReady": False, "openItems": gaps}
@@ -565,6 +583,8 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
         inventory["pythonSourceCollection"] = python_collection
     summary = {"ubuntuBinaryPackages": len(dpkg),
                "ubuntuSourceVersions": len({(p['sourceName'], p['sourceVersion']) for p in dpkg}),
+               "desktopBinaryPackages": len(desktop_packages),
+               "desktopSourceVersions": len({(p['sourcePackage'], p['sourceVersion']) for p in desktop_packages}),
                "ubuntuMissingCopyright": [p["name"] for p in dpkg if p["copyright"] is None],
                "pythonDistributions": len(python), "npmExternalPackages": len(npm),
                "androidExternalArtifacts": sum(a["origin"].startswith("resolved-") for a in android),
@@ -581,6 +601,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
         "This ZIP does not include Ubuntu/Python sources or complete bundled dependency mapping.\n"
         "When available, Ubuntu source packages are a separate ubuntu-source-packages.zip; see inventory.\n"
         "Python source companions are separate external outputs; their directory must be supplied for verification.\n"
+        "Offline desktop sources are in the separate ubuntu-desktop-source-packages.zip companion.\n"
         "The manager source is in manager-source.zip, under MIT; copyright 2026 JunWan666.\n"
         "Refer to release-inventory.json; this archive is not complete corresponding source.\n").encode()
     manager_files = {p.relative_to(root).as_posix(): p for p in manager_source_paths(root)}
@@ -604,8 +625,8 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
         collection_outputs = outputs + ([{key: ubuntu_collection[key] for key in ("file", "sha256", "bytes", "entries")}] if ubuntu_collection else [])
         result = {"schemaVersion": 1, "runtimeSha256": image_manifest["sha256"], "releaseReady": False,
                   "summary": summary, "outputs": collection_outputs}
-        if python_collection:
-            result["externalOutputs"] = [{key: python_collection[key] for key in ("file", "sha256", "bytes", "entries")}]
+        external = ([python_collection] if python_collection else []) + [desktop_collection]
+        result["externalOutputs"] = [{key: item[key] for key in ("file", "sha256", "bytes", "entries")} for item in external]
         (stage / "collection.json").write_bytes(json_bytes(result))
         for item in outputs:
             (stage / item["file"]).replace(destination / item["file"])
@@ -646,8 +667,9 @@ def main() -> None:
     parser.add_argument("--python-source-directory", type=Path, help="Bind a verified external Python source companion without copying it into APK assets or this directory")
     parser.add_argument("--cache-dir", type=Path, help="Read collected build inputs from an external .cache directory")
     parser.add_argument("--native-dir", type=Path, help="Read prepared JNI inputs from an external jniLibs directory")
+    parser.add_argument("--desktop-materials-directory", type=Path, help="Verified desktop notices and the separate exact-source companion")
     args = parser.parse_args()
-    result = collect(ROOT, args.runtime_dir, args.android_metadata, args.output, args.python_source_directory, args.cache_dir, args.native_dir)
+    result = collect(ROOT, args.runtime_dir, args.android_metadata, args.output, args.python_source_directory, args.cache_dir, args.native_dir, args.desktop_materials_directory)
     if args.apk_assets:
         prepare_apk_assets(args.output, args.apk_assets)
     print(json.dumps(result, ensure_ascii=False, indent=2))

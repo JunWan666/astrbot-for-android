@@ -8,8 +8,10 @@ Windows 双击根目录 `build.bat`，或执行 `python3 -B tools/build_release.
 | --- | --- |
 | `build_release.py` | 构建 ARM64 Release、使用长期签名、执行 lint 并校验 APK |
 | `build_support/build_native.py` | 从当前源码编译管理器原生运行器，保留准备好的 PRoot 依赖 |
-| `build_support/prepare_optional_assets.py` | 准备并校验供用户选择安装的官方 Shizuku 安装包与许可 |
+| `build_support/prepare_optional_assets.py` | 准备官方 Shizuku 安装包、许可及桌面离线依赖 |
+| `build_support/prepare_desktop_assets.py` | 按版本锁下载并校验 Ubuntu ARM64 桌面离线依赖 |
 | `build_support/collect_distribution.py` | 按实际发行依赖生成随包许可和源码清单 |
+| `build_support/collect_desktop_materials.py` | 从锁定桌面包收集原始版权文本，绑定准确版本的 Ubuntu 源码伴随包 |
 | `build_support/collect_python_sources.py` | 校验发行材料中的 Python 源码伴随包 |
 | `build_support/verify_distribution.py` | 校验发行归档、文件摘要及来源关系 |
 | `build_support/repository_layout.py` | 限定源码包允许包含的公开文档与图片 |

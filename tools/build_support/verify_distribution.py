@@ -9,7 +9,8 @@ import zipfile
 from collect_distribution import ROOT, clean_path, digest, manager_source_paths, selected_runtime
 
 
-def verify_collection(directory: Path, root: Path = ROOT, python_source_directory: Path | None = None) -> dict:
+def verify_collection(directory: Path, root: Path = ROOT, python_source_directory: Path | None = None,
+                      desktop_materials_directory: Path | None = None) -> dict:
     collection = json.loads((directory / "collection.json").read_text("utf-8"))
     verified_files = 0
     for record in collection["outputs"]:
@@ -36,7 +37,9 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
                 verified_files += 1
     inventory = json.loads((directory / "release-inventory.json").read_text("utf-8"))
     python_record = inventory.get("pythonSourceCollection")
-    expected_external = [{key: python_record[key] for key in ("file", "sha256", "bytes", "entries")}] if python_record else []
+    desktop_record = inventory.get("desktopSourceCollection")
+    external = ([python_record] if python_record else []) + ([desktop_record] if desktop_record else [])
+    expected_external = [{key: item[key] for key in ("file", "sha256", "bytes", "entries")} for item in external]
     if collection.get("externalOutputs", []) != expected_external:
         raise ValueError("External source outputs differ from release inventory")
     if python_record:
@@ -55,6 +58,20 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
         verified_files += python_record["entries"] - 1
     elif python_source_directory is not None:
         raise ValueError("The release inventory does not bind an external Python source archive")
+    desktop_materials = None
+    if desktop_record:
+        if desktop_materials_directory is None:
+            raise ValueError("Supply --desktop-materials-directory to verify the offline desktop sources and notices")
+        from collect_desktop_materials import load_materials
+        desktop_lock, desktop_materials = load_materials(root, desktop_materials_directory)
+        if desktop_materials['sourceCollection'] != desktop_record or desktop_lock['baseRuntimeSha256'] != inventory['runtime']['sha256']:
+            raise ValueError('External desktop evidence differs from release inventory')
+        expected = [{**p, 'copyright': 'desktop/' + p['copyright']} for p in desktop_materials['packages']]
+        if inventory['desktopPackages'] != expected:
+            raise ValueError('Desktop package inventory differs from original metadata')
+        verified_files += desktop_record['entries'] - 1
+    elif 'desktopPackages' in inventory or desktop_materials_directory is not None:
+        raise ValueError('Desktop source archive is not bound to this release inventory')
     assert collection["runtimeSha256"] == inventory["runtime"]["sha256"]
     assert inventory["releaseReady"] is False and inventory["openItems"]
     text = json.dumps(inventory)
@@ -82,6 +99,15 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
                 assert selected_runtime(path.removeprefix("runtime/")), path
         for package in inventory["ubuntuPackages"]:
             assert package["copyright"] in names, package["name"]
+        if desktop_materials:
+            assert json.loads(notices.read('manager/desktop/materials.json')) == desktop_materials
+            assert json.loads(notices.read('manager/desktop/desktop-packages.lock.json')) == desktop_lock
+            with zipfile.ZipFile(desktop_materials_directory / desktop_materials['notices']['file']) as original:
+                for name in original.namelist():
+                    if name != 'COLLECTION-MANIFEST.json':
+                        assert notices.read('desktop/' + name) == original.read(name)
+            for package in inventory['desktopPackages']:
+                assert package['copyright'] in names, package['name']
         for package in inventory["pythonPackages"] + inventory["npmPackages"]:
             assert package["metadata"] in names
             assert set(package["notices"]).issubset(names)
@@ -125,8 +151,10 @@ if __name__ == "__main__":
     parser.add_argument("--directory", type=Path, default=ROOT / ".cache/distribution/release")
     parser.add_argument("--evidence", type=Path)
     parser.add_argument("--python-source-directory", type=Path)
+    parser.add_argument("--desktop-materials-directory", type=Path)
     args = parser.parse_args()
-    result = verify_collection(args.directory, python_source_directory=args.python_source_directory)
+    result = verify_collection(args.directory, python_source_directory=args.python_source_directory,
+                               desktop_materials_directory=args.desktop_materials_directory)
     text = json.dumps(result, indent=2) + "\n"
     if args.evidence:
         args.evidence.write_text(text, encoding="utf-8")

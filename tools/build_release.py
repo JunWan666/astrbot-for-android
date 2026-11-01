@@ -199,10 +199,13 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
             "--output", str(distribution), "--apk-assets", str(apk_assets)]
         if config.get("pythonSourceDirectory"):
             collect += ["--python-source-directory", str(Path(config["pythonSourceDirectory"]).resolve())]
+        desktop_materials = Path(config.get('desktopMaterialsDirectory', Path(config.get('sourceCacheDirectory', ROOT / '.cache')) / 'distribution/desktop')).resolve()
+        collect += ['--desktop-materials-directory', str(desktop_materials)]
         run_logged(collect, env, log)
         verify_sources = [sys.executable, "-B", "-X", "utf8", "tools/build_support/verify_distribution.py", "--directory", str(distribution)]
         if config.get("pythonSourceDirectory"):
             verify_sources += ["--python-source-directory", str(Path(config["pythonSourceDirectory"]).resolve())]
+        verify_sources += ['--desktop-materials-directory', str(desktop_materials)]
         run_logged(verify_sources, env, log)
         say("[4/6] 构建 ARM64 正式包并执行 lint 检查…")
         run_logged(command + common + [":app:assembleBundledRelease", ":app:lintBundledRelease"], env, log)
