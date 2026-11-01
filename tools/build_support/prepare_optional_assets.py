@@ -1,10 +1,11 @@
-"""Prepare the unmodified, pinned Shizuku installer for explicit user installation."""
+"""Prepare pinned Shizuku and offline Ubuntu desktop assets for the full APK."""
 import argparse
 import hashlib
 import json
 from pathlib import Path
 import shutil
 import urllib.request
+from prepare_desktop_assets import prepare as prepare_desktop
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -37,6 +38,7 @@ def prepare(output: Path):
             partial.unlink(missing_ok=True)
     shutil.copyfile(ROOT / 'runtime/shizuku-manager.lock.json', directory / 'shizuku.json')
     shutil.copyfile(ROOT / lock['licenseFile'], directory / 'shizuku-LICENSE.txt')
+    prepare_desktop(output)
     return lock
 
 

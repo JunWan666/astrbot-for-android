@@ -55,7 +55,7 @@
     <string name="ui_1_open_notification_settings_for_this_app_and_allow" formatted="false">"1. 打开本应用通知设置，允许发送通知。\n2. 向下查看通知类别，保持“本地服务运行”开启。部分系统把类别设置合并在应用通知页中。\n3. 服务启动后检查通知栏，可查看状态和停止服务。"</string>
     <string name="ui_1_use_the_button_below_to_request_exemption_from" formatted="false">"1. 点击下方按钮，直接申请本应用不受系统电池优化限制。\n2. 在系统确认窗口选择“允许”。若已经允许，将打开优化列表，可切换“所有应用”查看。\n3. 返回后本页自动刷新系统状态。厂商后台耗电还需单独设置。"</string>
     <string name="ui_1_open_manufacturer_background_battery_management_and_find_this" formatted="false">"1. 打开厂商后台耗电管理，找到本应用。\n2. 选择“允许后台高耗电 / 无限制 / 不限制”，或允许后台活动。\n3. 也可打开“本应用电池设置”，检查单应用限制。"</string>
-    <string name="ui_allowing_auto_start_and_secondary_launch_helps_the_system" formatted="false">"允许本应用自启动、关联启动，有助于系统在后台恢复应用。该授权不等于本应用已经设置开机运行；设备重启后请解锁并打开应用确认服务。"</string>
+    <string name="ui_allowing_auto_start_and_secondary_launch_helps_the_system" formatted="false">"允许本应用自启动、关联启动，有助于系统在后台恢复应用。若要开机恢复服务，还需开启 App 中的“开机恢复服务”，并在重启后首次解锁；可另行开启无障碍后台辅助。"</string>
     <string name="ui_1_return_to_the_home_screen_then_open_recent" formatted="false">"1. 点击下方按钮返回桌面，再使用最近任务键或手势打开任务列表。\n2. 找到本应用卡片，通过长按、菜单或下拉卡片选择“锁定”。\n3. 以后清理任务时保留此卡片。\n\n系统没有通用的直接锁定接口，需在任务列表中操作。"</string>
     <string name="ui_check_notifications_battery_optimization_background_battery_limits_auto" formatted="false">"推荐依次检查通知、电池优化、后台耗电、自启动与最近任务锁定。运行时保持服务通知，不要在系统应用详情中强行停止。"</string>
     <string name="ui_n_nsetting_names_vary_by_system_version_auto_start">"%1$s\n\n%2$s设置名称随系统版本不同。自启动、后台耗电和任务锁定通常没有公开查询接口，请在系统页面确认；它们不能保证系统强行停止后自动恢复。"</string>
@@ -1180,12 +1180,11 @@
     <string name="background_manual_todo">"设置完成后，请手动确认"</string>
     <string name="background_system_summary">"系统检查 %1$d/2"</string>
     <string name="background_manual_summary">"手动确认 %1$d/3"</string>
-    <string name="background_summary_hint">"通知、电池优化自动检查；其余三项按实际设置手动确认。"</string>
     <string name="background_confirm_checkbox">"我已按说明检查并完成设置"</string>
     <string name="background_steps_notifications">"1. 点击下方按钮，开启本应用的“允许通知”。\n2. 若有通知类别，保持“本地服务运行”开启。\n\n返回应用后，状态会自动更新。"</string>
     <string name="background_steps_battery">"1. 点击下方按钮，在系统提示中选择“允许”。\n2. 若打开了优化列表，切换到“所有应用”，找到本应用并选择“不优化”。\n\n返回应用后，状态会自动更新。厂商后台耗电限制需另行设置。"</string>
     <string name="background_steps_tasks">"1. 点击下方按钮返回桌面，打开最近任务列表。\n2. 找到本应用卡片，通过长按、卡片菜单或下拉卡片选择“锁定”。\n3. 返回应用，勾选完成确认。\n\n系统没有通用的直接锁定接口，需在任务列表中操作。"</string>
-    <string name="background_help">"推荐依次完成列表中的五项设置。\n\n“已开启 / 已允许”来自系统查询；“已手动确认”只记录你的确认，可以取消。点击设置按钮不会自动标为完成。\n\n自启动权限不等于已实现开机运行。设备重启后，请解锁并打开应用确认服务；系统强行停止应用后，需要手动打开。后台设置无法保证服务永不被系统终止。"</string>
+    <string name="background_help">"推荐依次完成系统后台设置。\n\n“已开启 / 已允许”来自系统查询；“已手动确认”只记录你的确认，可以取消。点击设置按钮不会自动标为完成。\n\n“无障碍后台辅助”与“开机恢复服务”均可选，互不依赖。开启开机恢复后，重启并首次解锁时会尝试恢复此前开启的服务；终端命令和手动部署程序仍需手动启动。系统强行停止应用后，需要手动打开。后台设置无法保证服务永不被系统终止，也不能解除后台子进程限制。"</string>
     <string name="background_route_hint">"系统版本不同，入口名称可能不同。无法直达时会自动尝试备用入口；若打开应用信息，请按上方路径继续设置。"</string>
     <string name="background_battery_vivo">"设置 → 电池 → 后台耗电管理 → 本应用，选择“允许后台高耗电”。\n\n完成后返回，勾选确认。"</string>
     <string name="background_battery_xiaomi">"设置 → 应用设置 → 应用管理 → 本应用 → 省电策略，选择“无限制”。\n\n完成后返回，勾选确认。"</string>

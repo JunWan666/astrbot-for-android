@@ -50,10 +50,16 @@ class DesktopRepository(private val context: Context) {
     fun qqDesired() = preferences.getBoolean("desired_desktop_qq", false)
     fun setDesired(value: Boolean) { check(preferences.edit().putBoolean("desired_desktop", value).commit()) }
     fun setQqDesired(value: Boolean) { check(preferences.edit().putBoolean("desired_desktop_qq", value).commit()) }
+    fun lanEnabled() = preferences.getBoolean("desktop_lan", false)
+    fun lanPort() = preferences.getInt("desktop_lan_port", 6082)
+    fun saveLan(enabled: Boolean, port: Int) {
+        require(port in 1024..65535 && port !in listOf(5920, 6081))
+        check(preferences.edit().putBoolean("desktop_lan", enabled).putInt("desktop_lan_port", port).commit())
+    }
 
     fun prepareAssets() {
         directory.mkdirs(); Os.chmod(directory.path, 448)
-        for (name in listOf("sources.json", "install.py", "desktop.sh", "qq.sh", "processes.py", "guest_compat.c", "proc_locks.py", "guest-compat")) {
+        for (name in listOf("sources.json", "install.py", "desktop.sh", "qq.sh", "lan.sh", "processes.py", "guest_compat.c", "proc_locks.py", "guest-compat")) {
             val contents = context.assets.open("runtime/desktop/$name").use { it.readBytes() }
             val target = File(directory, name)
             if (!target.isFile || !target.readBytes().contentEquals(contents)) {
@@ -64,7 +70,7 @@ class DesktopRepository(private val context: Context) {
     }
 
     suspend fun recoverProcesses(role: String, session: String? = null) {
-        require(role == "desktop" || role == "qq")
+        require(role in listOf("desktop", "qq", "lan"))
         if (!File(runtime.rootfs, "usr/bin/python3").isFile ||
             !File(directory, "processes").isDirectory && !File(directory, "logs").isDirectory) return
         prepareAssets()
@@ -78,15 +84,44 @@ class DesktopRepository(private val context: Context) {
     suspend fun install(progress: (String) -> Unit) = withContext(Dispatchers.IO) {
         checkLocalized(runtime.abi == "arm64-v8a") { AppText.get(R.string.desktop_arm64) }
         checkLocalized(File(runtime.rootfs, ".astrbot-bootstrap.json").isFile) { AppText.get(R.string.cpolar_initialize_first) }
-        checkLocalized(StatFs(context.filesDir.path).availableBytes >= 384L * 1024 * 1024) { AppText.get(R.string.desktop_space) }
+        checkLocalized(StatFs(context.filesDir.path).availableBytes >= 1024L * 1024 * 1024) { AppText.get(R.string.desktop_space) }
         prepareAssets()
-        progress(AppText.get(R.string.desktop_installing))
+        progress(AppText.get(R.string.qq_preparing_bundled))
+        if (DesktopInstallStore.state.value.let { it.active && it.kind == "desktop" }) DesktopInstallStore.phase(DesktopInstallStage.INSTALLING)
+        prepareBundledPackages()
         checkLocalized(runInstaller("dependencies", 1200) == 0 && configuration().installed) { AppText.get(R.string.desktop_install_failed) }
+        DurableFiles.delete(File(directory, "bundled-packages"))
         prepareAccess()
         val commands = runtime.execute("/bin/bash", "-lc",
             "ln -sfn '$GUEST/desktop.sh' /usr/local/bin/desktop-start; ln -sfn '$GUEST/qq.sh' /usr/local/bin/qq-desktop; ln -sfn '$GUEST/guest-compat' /usr/local/bin/guest-compat")
         checkLocalized(commands.exitCode == 0) { AppText.get(R.string.desktop_install_failed) }
     }
+
+    private suspend fun prepareBundledPackages() {
+        val base = "desktop-packages/$abiName"
+        val bundle = runCatching { context.assets.open("$base/manifest.json").bufferedReader().use { JSONObject(it.readText()) } }
+            .getOrElse { throw io.astrbot.android.LocalizedStateException(AppText.get(R.string.qq_bundle_missing), it) }
+        checkLocalized(bundle.getString("architecture") == "arm64" && bundle.getInt("schemaVersion") == 1) { AppText.get(R.string.qq_bundle_missing) }
+        val packages = bundle.getJSONArray("packages")
+        val targetDirectory = File(directory, "bundled-packages").apply { mkdirs() }
+        for (index in 0 until packages.length()) {
+            currentCoroutineContext().ensureActive()
+            val item = packages.getJSONObject(index)
+            val name = item.getString("file")
+            checkLocalized(name.matches(Regex("[A-Za-z0-9.+_~:%-]+\\.deb"))) { AppText.get(R.string.qq_bundle_missing) }
+            val target = File(targetDirectory, name)
+            if (target.length() == item.getLong("bytes") && CpolarRepository.digest(target) == item.getString("sha256")) continue
+            val staged = File(targetDirectory, "$name.part")
+            try {
+                context.assets.open("$base/$name").use { input -> staged.outputStream().use { input.copyTo(it) } }
+                checkLocalized(staged.length() == item.getLong("bytes") && CpolarRepository.digest(staged) == item.getString("sha256")) { AppText.get(R.string.qq_bundle_missing) }
+                Os.rename(staged.path, target.path)
+            } finally { staged.delete() }
+        }
+        DurableFiles.write(File(targetDirectory, "manifest.json"), bundle)
+    }
+
+    private val abiName get() = runtime.abi
 
     suspend fun prepareAccess() = withContext(Dispatchers.IO) {
         prepareAssets()
@@ -180,6 +215,12 @@ class DesktopRepository(private val context: Context) {
             val link = File(runtime.rootfs, "usr/local/bin/$name")
             if (runCatching { Os.readlink(link.path) }.getOrNull() == "$GUEST/$script") link.delete()
         }
+    }
+
+    fun uninstallQq() {
+        setQqDesired(false)
+        listOf("qq", "qq.installing", "qq.previous", "qq.json", "download.deb", "download-source.json", "download-control.json", "qq-runtime")
+            .forEach { DurableFiles.delete(File(directory, it)) }
     }
 
     fun diagnosticTail(): String = buildString {

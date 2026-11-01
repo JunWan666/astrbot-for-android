@@ -21,6 +21,8 @@ data class DesktopState(
     val configuration: DesktopConfiguration = DesktopConfiguration(), val running: Boolean = false,
     val qqRunning: Boolean = false, val webUiReady: Boolean = false, val desired: Boolean = false,
     val busy: Boolean = false, val paused: Boolean = false, val error: String? = null,
+    val qqStarting: Boolean = false, val lanEnabled: Boolean = false, val lanPort: Int = 6082,
+    val lanReady: Boolean = false,
 )
 object DesktopStore { val state = MutableStateFlow(DesktopState()) }
 
@@ -38,8 +40,12 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
     private var qqOutput: Job? = null
     private var monitor: Job? = null
     private var qqMonitor: Job? = null
+    private var lan: Owned? = null
+    private var lanOutput: Job? = null
+    private var lanMonitor: Job? = null
 
-    fun refresh() { DesktopStore.state.update { it.copy(configuration = repository.configuration(), desired = repository.desired()) } }
+    fun refresh() { DesktopStore.state.update { it.copy(configuration = repository.configuration(), desired = repository.desired(),
+        lanEnabled = repository.lanEnabled(), lanPort = repository.lanPort()) } }
 
     private fun drain(owned: Process, tag: String) = scope.launch(Dispatchers.IO) {
         runCatching { owned.inputStream.bufferedReader().useLines { lines -> lines.forEach {
@@ -47,10 +53,10 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
         } } }
     }
 
-    private fun launch(role: String, script: String): Owned {
+    private fun launch(role: String, script: String, vararg arguments: String): Owned {
         val session = UUID.randomUUID().toString().replace("-", "")
         return Owned(runtime.processBuilder("/usr/bin/env", "ASTRBOT_DESKTOP_OWNER=${DesktopRepository.GUEST}",
-            "ASTRBOT_DESKTOP_ROLE=$role", "ASTRBOT_DESKTOP_SESSION=$session", "/bin/bash", script).start(), session)
+            "ASTRBOT_DESKTOP_ROLE=$role", "ASTRBOT_DESKTOP_SESSION=$session", "/bin/bash", script, *arguments).start(), session)
     }
 
     suspend fun start() = withContext(Dispatchers.IO) { lifecycle.withLock { startLocked() } }
@@ -83,7 +89,7 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
                     RuntimeStore.log(context, LogCategory.DESKTOP).append("[desktop] launcher exited: $code")
                     val previousOutput = output; output = null
                     val error = try {
-                        try { stopQqLocked() } finally { finish("desktop", owned, previousOutput) }
+                        try { stopLanLocked(); stopQqLocked() } finally { finish("desktop", owned, previousOutput) }
                         AppText.get(R.string.desktop_exited_code, code)
                     } catch (failure: CancellationException) { throw failure }
                     catch (_: Exception) { AppText.get(R.string.desktop_process_recovery_failed) }
@@ -92,9 +98,18 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
             }
         }
         refresh()
+        if (repository.lanEnabled()) try { startLanLocked() }
+        catch (failure: CancellationException) { throw failure }
+        catch (_: Exception) { DesktopStore.state.update { it.copy(lanReady = false, error = AppText.get(R.string.qq_lan_unavailable)) } }
     }
 
-    suspend fun startQq() = withContext(Dispatchers.IO) { lifecycle.withLock { startQqLocked() } }
+    suspend fun startQq() = withContext(Dispatchers.IO) { lifecycle.withLock {
+        if (qq?.process?.isAlive == true && DesktopStore.state.value.qqRunning) return@withLock
+        DesktopStore.state.update { it.copy(qqStarting = true, error = null) }
+        try { startQqLocked() }
+        catch (failure: Exception) { withContext(NonCancellable) { stopQqLocked() }; throw failure }
+        finally { DesktopStore.state.update { it.copy(qqStarting = false) } }
+    } }
 
     private suspend fun startQqLocked() {
         if (qq?.process?.isAlive == true) return
@@ -106,8 +121,18 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
         } }
         val owned = launch("qq", "${DesktopRepository.GUEST}/qq.sh")
         qq = owned
-        DesktopStore.state.update { it.copy(qqRunning = true, error = null) }
         qqOutput = drain(owned.process, "QQ")
+        // A live launcher alone does not mean the application has opened a window.
+        withTimeoutOrNull(60_000) {
+            while (owned.process.isAlive) {
+                val windows = runtime.execute("/usr/bin/env", "DISPLAY=:20", "XAUTHORITY=${DesktopRepository.GUEST}/Xauthority",
+                    "/usr/bin/xwininfo", "-root", "-tree", timeoutSeconds = 5)
+                if (windows.exitCode == 0 && windows.output.contains("\"qq\"", ignoreCase = true)) return@withTimeoutOrNull true
+                delay(500)
+            }
+            false
+        }.also { ready -> checkLocalized(ready == true && owned.process.isAlive) { AppText.get(R.string.qq_window_timeout) } }
+        DesktopStore.state.update { it.copy(qqRunning = true, error = null) }
         qqMonitor = scope.launch(Dispatchers.IO) {
             while (isActive && qq === owned && owned.process.isAlive) delay(1500)
             lifecycle.withLock {
@@ -152,13 +177,75 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
         finally { DesktopStore.state.update { it.copy(qqRunning = false) } }
     }
 
+    suspend fun saveLan(enabled: Boolean, port: Int) = withContext(Dispatchers.IO) { lifecycle.withLock {
+        require(port in 1024..65535 && port !in listOf(5920, 6081))
+        val oldEnabled = repository.lanEnabled()
+        val oldPort = repository.lanPort()
+        if (enabled && (lan == null || port != oldPort)) checkLocalized(runCatching {
+            ServerSocket(port).use { true }
+        }.getOrDefault(false)) { AppText.get(R.string.ui_local_port_is_in_use_stop_the_service_using, port) }
+        stopLanLocked()
+        repository.saveLan(enabled, port)
+        try {
+            if (enabled) { startLocked(); startLanLocked(); repository.setDesired(true) }
+        } catch (failure: Exception) {
+            withContext(NonCancellable) {
+                stopLanLocked(); repository.saveLan(oldEnabled, oldPort)
+                if (oldEnabled && process?.process?.isAlive == true) runCatching { startLanLocked() }
+            }
+            throw failure
+        } finally { refresh() }
+    } }
+
+    private suspend fun startLanLocked() {
+        if (lan?.process?.isAlive == true) return
+        stopLanLocked()
+        val port = repository.lanPort()
+        checkLocalized(runCatching { ServerSocket(port).use { true } }.getOrDefault(false)) {
+            AppText.get(R.string.ui_local_port_is_in_use_stop_the_service_using, port)
+        }
+        val owned = launch("lan", "${DesktopRepository.GUEST}/lan.sh", port.toString())
+        lan = owned
+        lanOutput = drain(owned.process, "LAN")
+        val ready = withTimeoutOrNull(15_000) {
+            while (owned.process.isAlive) {
+                val responds = runCatching { client.newCall(Request.Builder().url("http://127.0.0.1:$port/vnc.html").build())
+                    .execute().use { it.isSuccessful && it.peekBody(65536).string().contains("noVNC") } }.getOrDefault(false)
+                if (responds) return@withTimeoutOrNull true
+                delay(250)
+            }
+            false
+        }
+        if (ready != true) { stopLanLocked(); throw io.astrbot.android.LocalizedStateException(AppText.get(R.string.qq_lan_unavailable)) }
+        DesktopStore.state.update { it.copy(lanReady = true) }
+        lanMonitor = scope.launch(Dispatchers.IO) {
+            while (isActive && lan === owned && owned.process.isAlive) delay(1500)
+            lifecycle.withLock {
+                if (lan === owned) {
+                    lan = null; lanMonitor = null
+                    val previousOutput = lanOutput; lanOutput = null
+                    runCatching { finish("lan", owned, previousOutput) }
+                    DesktopStore.state.update { it.copy(lanReady = false, error = AppText.get(R.string.qq_lan_unavailable)) }
+                }
+            }
+        }
+    }
+
+    private suspend fun stopLanLocked() {
+        val owned = lan; lan = null
+        lanMonitor?.cancelAndJoin(); lanMonitor = null
+        val previousOutput = lanOutput; lanOutput = null
+        try { finish("lan", owned, previousOutput) }
+        finally { DesktopStore.state.update { it.copy(lanReady = false) } }
+    }
+
     suspend fun stop(paused: Boolean = false): Unit = withContext(NonCancellable + Dispatchers.IO) { lifecycle.withLock { stopLocked(paused) } }
 
     private suspend fun stopLocked(paused: Boolean = false) {
         val owned = process; process = null
         monitor?.cancelAndJoin(); monitor = null
         val previousOutput = output; output = null
-        try { stopQqLocked() }
+        try { try { stopLanLocked() } finally { stopQqLocked() } }
         finally {
             try { finish("desktop", owned, previousOutput) }
             finally { DesktopStore.state.update { it.copy(running = false, webUiReady = false, paused = paused) } }

@@ -84,7 +84,7 @@ class ExtensionsActivity : LocalizedActivity() {
                                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }) {
                             startActivity(Intent(this@ExtensionsActivity, TerminalActivity::class.java))
                         },
-                        ManagerMenuItem(AppText.get(R.string.desktop_name), R.drawable.ic_terminal, AppText.get(R.string.desktop_subtitle)) {
+                        ManagerMenuItem(AppText.get(R.string.qq_title), R.drawable.ic_link, AppText.get(R.string.qq_extension_subtitle)) {
                             startActivity(Intent(this@ExtensionsActivity, DesktopActivity::class.java))
                         },
                         ManagerMenuItem(AppText.get(R.string.ui_ssh_terminal), R.drawable.ic_settings, AppText.get(R.string.ui_remote_ubuntu_access_included_with_the_app),

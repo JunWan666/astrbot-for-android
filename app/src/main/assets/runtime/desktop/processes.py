@@ -209,7 +209,7 @@ def cleanup(role, session=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('register', 'cleanup'))
-    parser.add_argument('role', choices=('desktop', 'qq'))
+    parser.add_argument('role', choices=('desktop', 'qq', 'lan'))
     parser.add_argument('--session', type=valid_session)
     parser.add_argument('--leader', type=int)
     args = parser.parse_args()

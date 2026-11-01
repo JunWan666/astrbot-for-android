@@ -151,6 +151,27 @@ tasks.named("preBuild").configure {
         val packages = (parser.parse(packageLock) as Map<*, *>)["packages"] as Map<*, *>
         val official = packages["node_modules/${harness["package"]}"] as Map<*, *>
         check(official["version"] == harness["version"] && official["integrity"] == harness["packageIntegrity"]) { "Harness package identity mismatch" }
+        if (bundledRuntime) {
+            val desktopLock = parser.parse(rootProject.file("runtime/desktop-packages.lock.json")) as Map<*, *>
+            val desktopBase = parser.parse(runtimeAssets.resolve("bootstrap/arm64-v8a/manifest.json")) as Map<*, *>
+            check(desktopLock["baseRuntimeSha256"] == desktopBase["sha256"]) { "Desktop package closure must match the bundled base image" }
+            val optionalPath = providers.gradleProperty("optionalAssetsDir").orNull ?: localInputs.getProperty("optionalAssetsDir")
+            check(optionalPath != null) { "Prepare bundled desktop assets with prepare_optional_assets.py" }
+            val desktopAssets = file(optionalPath).resolve("desktop-packages/arm64-v8a")
+            check(desktopAssets.resolve("manifest.json").isFile && parser.parse(desktopAssets.resolve("manifest.json")) == desktopLock) { "Bundled desktop manifest differs from its source lock" }
+            for (entry in desktopLock["packages"] as List<*>) {
+                val item = entry as Map<*, *>
+                val asset = desktopAssets.resolve(item["file"].toString())
+                check(asset.isFile && asset.length() == (item["bytes"] as Number).toLong()) { "Missing bundled desktop package: ${asset.name}" }
+                val hash = asset.inputStream().use { input ->
+                    val digest = MessageDigest.getInstance("SHA-256")
+                    val buffer = ByteArray(131072)
+                    while (true) { val count = input.read(buffer); if (count < 0) break; digest.update(buffer, 0, count) }
+                    digest.digest().joinToString("") { "%02x".format(it) }
+                }
+                check(hash == item["sha256"]) { "Bundled desktop package checksum mismatch: ${asset.name}" }
+            }
+        }
     }
 }
 

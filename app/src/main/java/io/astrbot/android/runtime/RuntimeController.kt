@@ -6,6 +6,7 @@ import io.astrbot.android.LocalizedStateException
 import io.astrbot.android.userFacingMessage
 
 import io.astrbot.android.AppText
+import io.astrbot.android.BuildConfig
 import io.astrbot.android.R
 
 import android.content.Context
@@ -107,7 +108,8 @@ object RuntimeStore {
         }.onFailure { SshStore.state.update { it.copy(error = AppText.get(R.string.ui_ssh_extension_settings_are_unavailable_configure_ssh_again_or)) } }
         runCatching {
             val desktop = DesktopRepository(context)
-            DesktopStore.state.update { it.copy(configuration = desktop.configuration(), desired = desktop.desired()) }
+            DesktopStore.state.update { it.copy(configuration = desktop.configuration(), desired = desktop.desired(),
+                lanEnabled = desktop.lanEnabled(), lanPort = desktop.lanPort()) }
         }.onFailure { DesktopStore.state.update { it.copy(error = AppText.get(R.string.desktop_operation_failed)) } }
         runCatching { HarnessRepository(context).refresh() }.onFailure { HarnessStore.state.update { it.copy(error = AppText.get(R.string.harness_failed)) } }
         state.update { it.copy(environmentInstalled = installed, componentsReady = ready,
@@ -318,11 +320,13 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     suspend fun execute(action: String, id: ServiceId?, backupId: String? = null, sourceUri: String? = null, updateId: String? = null,
                         backupLimitCount: Int = 0, backupLimitMiB: Int = 0,
                         sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null,
-                        terminalSessionId: Long? = null) = commands.withLock {
+                        terminalSessionId: Long? = null, desktopLan: Boolean = false, desktopLanPort: Int = 6082) = commands.withLock {
         val diagnosticSnapshot = RuntimeStore.state.value
         var resumeSsh = false
         var resumeBots = emptyList<ServiceId>()
         val readOnlyCheck = action in setOf("export-diagnostics", "check-environment")
+        val prepareDesktop = action == "desktop-install" || action in setOf("initialize", "desktop-start", "desktop-open", "desktop-qq-start", "desktop-qq-open", "desktop-qq-install", "desktop-lan-save") &&
+            !desktopRepository.configuration().installed
         updateState { it.copy(executing = true, error = if (readOnlyCheck) diagnosticSnapshot.error else null, notice = null) }
         if (action.startsWith("ssh-")) SshStore.state.update { it.copy(busy = true, error = null) }
         if (action.startsWith("cpolar-")) CpolarStore.state.update { it.copy(busy = true, error = null) }
@@ -343,7 +347,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 updateState { it.copy(notice = AppText.get(R.string.ui_diagnostics_exported_review_log_contents_before_sharing)) }
                 return@withLock
             }
-            resumeSsh = action in setOf("desktop-install", "backup", "backup-apk", "restore", "export-backup", "apply-backup", "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat") ||
+            resumeSsh = prepareDesktop || action in setOf("backup", "backup-apk", "restore", "export-backup", "apply-backup", "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "apply-napcat", "rollback-napcat") ||
                 backups.hasPendingRestore || updates.hasPendingUpdate || napcat.hasPendingUpdate || images.hasPendingUpdate
             if (resumeSsh) {
                 terminal.stop(if (TerminalStore.state.value.running) AppText.get(R.string.terminal_maintenance_closed) else null)
@@ -352,7 +356,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 harness.stop()
                 desktop.stop(paused = desktopRepository.desired())
             }
-            if (action == "desktop-install") {
+            if (prepareDesktop) {
                 resumeBots = ServiceId.entries.filter { supervisors.getValue(it).state.value.desiredRunning }
                 supervisors.values.toList().reversed().forEach { it.stop() }
             }
@@ -366,6 +370,13 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                 supervisors.getValue(ServiceId.ASTRBOT).stop()
                 withContext(Dispatchers.IO) { personas.recover() }
                 updateState { it.copy(notice = AppText.get(R.string.ui_restored_persona_settings_from_before_the_interruption)) }
+            }
+            if (prepareDesktop && action != "initialize") {
+                install()
+                if (action == "desktop-install" || !desktopRepository.configuration().installed) DesktopInstallStore.install(context, "desktop") {
+                    desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                }
+                desktop.refresh()
             }
             when (action) {
                 "reconcile" -> {
@@ -435,10 +446,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     cpolarRepository.uninstall()
                     cpolar.refresh()
                 }
-                "desktop-install" -> DesktopInstallStore.install(context,"desktop") {
-                    desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
-                }
-                "desktop-start" -> { desktop.start(); desktopRepository.setDesired(true); desktop.refresh() }
+                "desktop-install" -> Unit // Prepared above while other services are paused.
+                "desktop-start", "desktop-open" -> { desktop.start(); desktopRepository.setDesired(true); desktop.refresh() }
+                "desktop-lan-save" -> desktop.saveLan(desktopLan, desktopLanPort)
                 "desktop-stop" -> {
                     desktopRepository.setDesired(false); desktopRepository.setQqDesired(false)
                     desktop.stop(); desktop.refresh()
@@ -451,7 +461,8 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     }
                     desktop.refresh()
                 }
-                "desktop-qq-start" -> {
+                "desktop-qq-start", "desktop-qq-open" -> {
+                    updateState { it.copy(phase = AppText.get(R.string.qq_starting)) }
                     checkLocalized(desktopRepository.configuration().qqInstalled) { AppText.get(R.string.desktop_qq_install_first) }
                     val wanted = preferences.getBoolean("desired_NAPCAT", false)
                     checkLocalized(preferences.edit().putBoolean("desired_NAPCAT", false).commit()) { AppText.get(R.string.ui_unable_to_save_stop_preferences) }
@@ -469,6 +480,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     desktopRepository.setDesired(true); desktopRepository.setQqDesired(true); desktop.refresh()
                 }
                 "desktop-qq-stop" -> { desktopRepository.setQqDesired(false); desktop.stopQq() }
+                "desktop-qq-uninstall" -> { desktop.stopQq(); desktopRepository.uninstallQq(); desktop.refresh() }
                 "reset-webui-password" -> resetWebUiPassword(requireNotNull(id))
                 "desktop-uninstall" -> { desktop.stop(); desktopRepository.uninstall(); desktop.refresh() }
                 "terminal-new" -> terminal.start(newSession = true)
@@ -502,7 +514,13 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     if (wanted) ssh.start()
                     updateState { it.copy(notice = AppText.get(R.string.ui_ssh_settings_saved) + if (wanted) AppText.get(R.string.ui_existing_sessions_disconnected_connect_again) else AppText.get(R.string.ui_applies_when_the_service_starts)) }
                 }
-                "initialize" -> install()
+                "initialize" -> {
+                    install()
+                    if (BuildConfig.BUNDLED_RUNTIME && !desktopRepository.configuration().installed && runtime.abi == "arm64-v8a") {
+                        desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
+                        desktop.refresh()
+                    }
+                }
                 "persona-add", "persona-apply", "persona-undo" -> changePersona(action, updateId)
                 "start", "restart" -> {
                     install()
@@ -1029,9 +1047,15 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     }
 
     private suspend fun install() {
+        val fresh = !File(runtime.rootfs, ".astrbot-bootstrap.json").isFile
         runtime.install { phase ->
             RuntimeStore.log(context, LogCategory.RUNTIME).append("${java.time.Instant.now()} $phase")
             updateState { it.copy(phase = phase) }
+        }
+        if (fresh && BuildConfig.BUNDLED_RUNTIME && runtime.abi == "arm64-v8a" &&
+            !desktopRepository.configuration().installed) {
+            desktopRepository.install { phase -> updateState { it.copy(phase = phase) } }
+            desktop.refresh()
         }
         RuntimeStore.refreshInstallation(context)
     }
