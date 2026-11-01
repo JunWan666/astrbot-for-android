@@ -60,6 +60,7 @@
         </service>
         <activity android:name=".WebsiteBrowserActivity" android:exported="false" />
         <activity android:name=".HarnessActivity" android:exported="false" />
+        <activity android:name=".SnowLumaActivity" android:exported="false" />
         <provider android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku" android:exported="true"
             android:multiprocess="false" android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
