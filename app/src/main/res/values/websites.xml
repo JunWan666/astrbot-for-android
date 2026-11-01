@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="websites_title">网页</string>
+    <string name="websites_heading">常用网址，快捷访问</string>
     <string name="websites_intro">添加常用网址，直接在应用内打开。每个地址可独立保存页面缩放比例。</string>
     <string name="websites_add">添加网址</string>
+    <string name="websites_collection">我的收藏</string>
+    <string name="websites_count">%1$d 个网址</string>
     <string name="websites_empty">还没有常用网址，点击上方添加。</string>
     <string name="websites_edit">编辑</string>
     <string name="websites_delete">删除网址</string>
@@ -12,5 +15,13 @@
     <string name="websites_invalid">请填写名称和有效的 HTTP / HTTPS 网址；网址不能包含账号密码。</string>
     <string name="websites_save_failed">未能保存，请检查可用存储后重试。</string>
     <string name="websites_load_failed">页面未能加载，请检查网络或地址后点击刷新。</string>
-    <string name="websites_only_http">仅支持在内置浏览器访问 HTTP / HTTPS 网页。</string>
+    <string name="websites_external_browser">在外部浏览器打开</string>
+    <string name="websites_wechat">微信</string>
+    <string name="websites_alipay">支付宝</string>
+    <string name="websites_app_missing">未找到可用的%1$s，请先安装；也可从右上角菜单在外部浏览器打开。</string>
+    <string name="websites_app_failed">系统未允许打开%1$s，可从右上角菜单尝试外部浏览器。</string>
+    <string name="websites_link_unsupported">暂不支持此链接，可从右上角菜单尝试外部浏览器。</string>
+    <string name="websites_tap_to_open">请点击网页中的按钮打开对应 App。</string>
+    <string name="websites_opening_window">正在打开新页面…</string>
+    <string name="websites_browser_missing">未能打开外部浏览器，请检查手机是否已安装可用浏览器。</string>
 </resources>

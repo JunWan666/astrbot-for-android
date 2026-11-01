@@ -29,14 +29,15 @@ internal class WebsiteBookmarks(context: Context) {
     private val preferences = context.getSharedPreferences("website-bookmarks", Context.MODE_PRIVATE)
     fun read(): List<WebsiteBookmark> {
         val saved = preferences.getString("items", null)
-            ?: return listOf(WebsiteBookmark("deepseek", "DeepSeek", "https://platform.deepseek.com/usage"))
+            ?: return listOf(WebsiteBookmark("deepseek", "DeepSeek", DEEPSEEK_HOME))
         return runCatching {
             val rows = JSONArray(saved)
             (0 until rows.length()).map { index -> rows.getJSONObject(index).let {
                 val url = it.getString("url")
                 WebsiteBookmark(it.getString("id"), it.getString("title"), normalize(
-                    if (it.getString("id") == "deepseek" && url == "https://chat.deepseek.com/")
-                        "https://platform.deepseek.com/usage" else url))
+                    if (it.getString("id") == "deepseek" && it.getString("title") == "DeepSeek" &&
+                        url in setOf("https://chat.deepseek.com/", "https://platform.deepseek.com/usage"))
+                        DEEPSEEK_HOME else url))
             } }
         }.getOrDefault(emptyList())
     }
@@ -46,6 +47,8 @@ internal class WebsiteBookmarks(context: Context) {
         check(preferences.edit().putString("items", data.toString()).commit())
     }
     companion object {
+        private const val DEEPSEEK_HOME = "https://www.deepseek.com/"
+
         fun normalize(input: String): String {
             val value = input.trim().let { if ("://" in it) it else "https://$it" }
             require(value.length in 1..4096 && value.none { it.isISOControl() })
@@ -69,18 +72,25 @@ internal class WebsiteBookmarks(context: Context) {
     fun edit(item: WebsiteBookmark?) {
         editingId = item?.id ?: ""; title = item?.title.orEmpty(); url = item?.url.orEmpty(); error = null
     }
-    Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(AppText.get(R.string.websites_intro), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall,
+    Column(modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(AppText.get(R.string.websites_heading), style = MaterialTheme.typography.titleMedium)
+            Text(AppText.get(R.string.websites_intro), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-            ManagerActionButton(AppText.get(R.string.websites_add), { edit(null) }, enabled = rows.size < 100)
         }
-        if (rows.isEmpty()) Text(AppText.get(R.string.websites_empty))
-        LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 12.dp)) {
+        ManagerActionButton(AppText.get(R.string.websites_add), { edit(null) }, Modifier.fillMaxWidth(), enabled = rows.size < 100)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(AppText.get(R.string.websites_collection), Modifier.weight(1f), style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(AppText.get(R.string.websites_count, rows.size), style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (rows.isEmpty()) Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Text(AppText.get(R.string.websites_empty), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        } else LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 12.dp)) {
             items(rows, key = { it.id }) { item ->
                 Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerLow) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(Modifier.fillMaxWidth().clickable {
                             context.startActivity(Intent(context, WebsiteBrowserActivity::class.java).putExtra("bookmarkId", item.id))
                         }, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -91,12 +101,14 @@ internal class WebsiteBookmarks(context: Context) {
                                     maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                         }
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                             ManagerActionButton(AppText.get(R.string.websites_open), {
                                 context.startActivity(Intent(context, WebsiteBrowserActivity::class.java).putExtra("bookmarkId", item.id))
                             }, Modifier.weight(1.4f))
-                            ManagerActionButton(AppText.get(R.string.websites_edit), { edit(item) }, Modifier.weight(.8f), ActionTone.NEUTRAL)
-                            ManagerActionButton(AppText.get(R.string.websites_delete_short), { deleting = item }, Modifier.weight(.8f), ActionTone.STOP)
+                            ManagerActionButton(AppText.get(R.string.websites_edit), { edit(item) },
+                                Modifier.weight(1f), ActionTone.NEUTRAL)
+                            ManagerActionButton(AppText.get(R.string.websites_delete_short), { deleting = item },
+                                Modifier.weight(1f), ActionTone.STOP)
                         }
                     }
                 }

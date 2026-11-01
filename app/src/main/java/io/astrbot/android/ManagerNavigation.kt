@@ -40,7 +40,7 @@ internal enum class SettingAction { VERSIONS, CHECK_UPDATE, CHECK_APP_UPDATE, IM
     APPLY_RUNTIME, ROLLBACK_RUNTIME, CREATE_BACKUP, BACKUPS, BACKUP_LIMITS, EXPORT_PORTABLE, IMPORT_PORTABLE,
     PORTABLE_SCOPE, DISCARD_PORTABLE, LOGS, RUNTIME_LOGS, DIAGNOSTICS, EXTENSIONS, APP_SETTINGS, BATTERY, LICENSES,
     NOTIFICATIONS, UNRESTRICTED, AUTOSTART, TASK_LOCK, BACKGROUND_HELP, AUTOMATIC_UPDATES, ENVIRONMENT_CHECK, STORAGE_USAGE, DATA_RETENTION, LANGUAGE, PERMISSIONS }
-internal enum class ActionTone { PRIMARY, START, STOP, RESTART, NEUTRAL }
+internal enum class ActionTone { PRIMARY, ACCENT, START, STOP, RESTART, NEUTRAL }
 
 internal fun ManagerState.canStop(id: ServiceId? = null): Boolean = busy ||
     (id?.let { listOf(services.getValue(it)) } ?: services.values).any { it.desiredRunning || it.process != ProcessState.STOPPED }
@@ -49,13 +49,15 @@ internal fun ManagerState.canStop(id: ServiceId? = null): Boolean = busy ||
     tone: ActionTone = ActionTone.PRIMARY, enabled: Boolean = true, description: String = label) {
     val dark = isSystemInDarkTheme()
     val accent = when (tone) {
-        ActionTone.START -> if (dark) Color(0xFF75D8AF) else Color(0xFF12835E)
+        ActionTone.START, ActionTone.ACCENT -> if (dark) Color(0xFF75D8AF) else Color(0xFF12835E)
         ActionTone.STOP -> if (dark) Color(0xFFFFABA4) else Color(0xFFC64242)
         ActionTone.RESTART -> if (dark) Color(0xFFF2C16C) else Color(0xFFA76A0E)
         else -> MaterialTheme.colorScheme.primary
     }
     val colors = when (tone) {
         ActionTone.PRIMARY -> ButtonDefaults.buttonColors()
+        ActionTone.ACCENT -> ButtonDefaults.buttonColors(containerColor = accent,
+            contentColor = if (dark) Color(0xFF063B2C) else Color.White)
         ActionTone.NEUTRAL -> ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceContainer,
             contentColor = MaterialTheme.colorScheme.onSurface)
         else -> ButtonDefaults.buttonColors(containerColor = accent.copy(alpha = if (dark) .18f else .10f)

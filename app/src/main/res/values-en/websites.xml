@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="websites_title">Websites</string>
+    <string name="websites_heading">Your favorite sites, a tap away</string>
     <string name="websites_intro">Add your favorite URLs and open them in the app. Each bookmark remembers its page zoom.</string>
     <string name="websites_add">Add website</string>
+    <string name="websites_collection">My bookmarks</string>
+    <string name="websites_count">Saved: %1$d</string>
     <string name="websites_empty">No bookmarks yet. Add one above.</string>
     <string name="websites_edit">Edit</string>
     <string name="websites_delete">Delete website</string>
@@ -12,5 +15,13 @@
     <string name="websites_invalid">Enter a name and a valid HTTP / HTTPS URL without embedded credentials.</string>
     <string name="websites_save_failed">Could not save. Check available storage and retry.</string>
     <string name="websites_load_failed">Could not load the page. Check the network or URL, then refresh.</string>
-    <string name="websites_only_http">The embedded browser supports HTTP / HTTPS pages only.</string>
+    <string name="websites_external_browser">Open in external browser</string>
+    <string name="websites_wechat">WeChat</string>
+    <string name="websites_alipay">Alipay</string>
+    <string name="websites_app_missing">No available %1$s app found. Install it first, or open this page in an external browser from the top-right menu.</string>
+    <string name="websites_app_failed">The system did not allow opening %1$s. Try an external browser from the top-right menu.</string>
+    <string name="websites_link_unsupported">This link is not supported. Try an external browser from the top-right menu.</string>
+    <string name="websites_tap_to_open">Tap the button on the page to open the app.</string>
+    <string name="websites_opening_window">Opening a new page…</string>
+    <string name="websites_browser_missing">Could not open an external browser. Check that a browser is installed.</string>
 </resources>

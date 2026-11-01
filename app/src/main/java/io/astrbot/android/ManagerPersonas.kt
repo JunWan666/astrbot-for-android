@@ -78,7 +78,7 @@ import kotlinx.coroutines.withContext
             if (showDefault) Text(AppText.get(R.string.ui_default, installation.currentId?.removePrefix("安卓预设·") ?: AppText.get(R.string.ui_not_loaded_yet)), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ManagerActionButton(AppText.get(R.string.ui_marketplace), { onExternal(PersonaLibrary.MARKET_URL) }, Modifier.weight(1f), ActionTone.NEUTRAL,
+                ManagerActionButton(AppText.get(R.string.ui_marketplace), { onExternal(PersonaLibrary.MARKET_URL) }, Modifier.weight(1f), ActionTone.ACCENT,
                     description = AppText.get(R.string.ui_open_external_persona_marketplace))
                 ManagerActionButton(AppText.get(R.string.ui_add_persona), { actionError = null; showAdd = true }, Modifier.weight(1f),
                     enabled = !loading && !saving && libraryError == null)
