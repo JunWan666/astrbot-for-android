@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="astrbot_instance_recovered">已清理确认无响应的旧 AstrBot 实例，端口已释放，继续启动。</string>
+    <string name="astrbot_instance_healthy">检测到本环境的 AstrBot 已在其他会话运行且后台有响应，未重复启动。请在原会话停止后，再由 App 启动管理。</string>
+    <string name="astrbot_instance_starting">另一个 AstrBot 实例仍在启动，请稍后重试；若在终端手动启动，请先在原会话停止。</string>
+    <string name="astrbot_instance_unknown_port">AstrBot 后台端口仍被其他或无法确认身份的程序占用，未结束该进程。请停止占用程序，或在 AstrBot 配置中更换端口后重试。</string>
+    <string name="astrbot_instance_cleanup_failed">旧 AstrBot 实例尚未退出，已暂停本次启动。请查看服务日志后重试。</string>
+    <string name="astrbot_instance_busy">无法确认现有 AstrBot 实例或启动锁状态，已暂停重复启动。请查看服务日志，并停止原会话中的 AstrBot 后重试。</string>
+</resources>

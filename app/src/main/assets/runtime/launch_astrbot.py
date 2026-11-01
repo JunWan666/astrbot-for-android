@@ -8,6 +8,14 @@ import runpy
 import sys
 import uuid
 
+from astrbot_instance import AstrBotInstance, InstanceBlocked, configured_endpoint
+
+try:
+    instance_lock = AstrBotInstance().acquire(configured_endpoint())
+except (InstanceBlocked, OSError):
+    print("AstrBot instance guard: startup blocked; check the existing instance and dashboard port.", flush=True)
+    sys.exit(73)
+
 sys.path.insert(0, "/opt/astrbot")
 nonce = os.environ["ASTRBOT_MANAGER_OBSERVATION_NONCE"]
 target = Path("/manager/astrbot-startup.json")

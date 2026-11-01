@@ -175,7 +175,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             }
             if (id == ServiceId.NAPCAT) NapCatCompatibility(context).prepare()
             val connection = configuration.read(id)
-            connection.endpoint?.let { checkPortFree(it) }
+            if (id != ServiceId.ASTRBOT) connection.endpoint?.let { checkPortFree(it) }
             if (id == ServiceId.NAPCAT) {
                 if (configuration.prepareLocalOneBotCompatibility() > 0) {
                     val message = AppText.get(R.string.onebot_ipv4_compat_corrected)
@@ -192,11 +192,16 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             activeConnections[id] = connection
             updateState { it.copy(webUis = it.webUis + (id to connection)) }
             val launchNonce = if (id == ServiceId.ASTRBOT) oneBotObservation.prepareLaunch() else null
-            if (launchNonce != null) astrbotStartup.prepare(launchNonce)
+            if (launchNonce != null) {
+                astrbotStartup.prepare(launchNonce)
+                astrbotStartup.checkInstance(runtime)
+            }
             runtime.processBuilder("/bin/sh", "-lc", launchCommand(id, launchNonce)).start()
         }, onLog = { RuntimeStore.log(context, id).append(it) }, expectedRestart = { exitCode ->
             id == ServiceId.ASTRBOT && astrbotStartup.consumeRestartRequest(exitCode)
-        }, initialHistory = histories.read(id))
+        }, initialHistory = histories.read(id), terminalFailure = { exitCode ->
+            if (id == ServiceId.ASTRBOT && exitCode == 73) AppText.get(R.string.astrbot_instance_busy) else null
+        })
     }
 
     init {
@@ -375,7 +380,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                                 // The native owner cleans descendants on parent death. Allow that bounded
                                 // cleanup to finish; never kill an unknown process occupying this port.
                                 val endpoint = configuration.read(serviceId).endpoint
-                                if (endpoint != null) withTimeout(15_000) {
+                                if (endpoint != null && serviceId != ServiceId.ASTRBOT) withTimeout(15_000) {
                                     while (runCatching { checkPortFree(endpoint) }.isFailure) delay(250)
                                 }
                                 supervisors.getValue(serviceId).start()
@@ -1048,6 +1053,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
 
     private fun launchCommand(id: ServiceId, nonce: String? = null) = when (id) {
         ServiceId.ASTRBOT -> "cd /opt/astrbot; export HOME=/persistent/home ASTRBOT_ROOT=/persistent/astrbot; " +
+            "export ASTRBOT_MANAGER_OWNED_SERVICE=1; " +
             "export ASTRBOT_MANAGER_OBSERVATION_NONCE=${requireNotNull(nonce)}; " +
             "if test -f /persistent/manager/astrbot-initial-password; then " +
             "export ASTRBOT_DASHBOARD_INITIAL_PASSWORD=\"\$(cat /persistent/manager/astrbot-initial-password)\"; fi; " +

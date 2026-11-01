@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="astrbot_instance_recovered">Retired a verified unresponsive AstrBot instance. Its port is free; continuing startup.</string>
+    <string name="astrbot_instance_healthy">AstrBot from this installation is responding in another session. No duplicate was started. Stop it there before managing it from the App.</string>
+    <string name="astrbot_instance_starting">Another AstrBot instance is starting. Try again later, or stop the manual instance in its original terminal.</string>
+    <string name="astrbot_instance_unknown_port">The dashboard port is still occupied by another or unidentified program. It was left running. Stop it or change the AstrBot dashboard port and try again.</string>
+    <string name="astrbot_instance_cleanup_failed">The old AstrBot instance has not exited. Startup was paused. Check service logs and try again.</string>
+    <string name="astrbot_instance_busy">The existing AstrBot instance or startup lock could not be verified. Duplicate startup was paused. Check service logs and stop AstrBot in its original session before retrying.</string>
+</resources>

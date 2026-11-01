@@ -18,6 +18,7 @@ class ProcessSupervisor(
     private val expectedRestart: (Int) -> Boolean = { false },
     initialHistory: ServiceHistory = ServiceHistory(),
     private val wallClockMillis: () -> Long = System::currentTimeMillis,
+    private val terminalFailure: (Int) -> String? = { null },
 ) {
     private sealed interface Event {
         data class Start(val reply: CompletableDeferred<Unit>, val manual: Boolean = true) : Event
@@ -129,10 +130,15 @@ class ProcessSupervisor(
             scope.launch { delay(500); events.trySend(Event.Retry(event.generation)) }
             return
         }
-        history.processFailed("进程意外退出，代码 ${event.exitCode}", wallClockMillis())
+        val blocked = terminalFailure(event.exitCode)
+        history.processFailed(blocked ?: "进程意外退出，代码 ${event.exitCode}", wallClockMillis())
         mutableState.value = mutableState.value.copy(process = ProcessState.CRASHED,
             health = HealthState.UNKNOWN, qq = QqState.UNKNOWN, oneBot = OneBotState.UNKNOWN,
-            checkedAtMillis = null, detail = "进程退出，代码 ${event.exitCode}", history = history.history)
+            checkedAtMillis = null, detail = blocked ?: "进程退出，代码 ${event.exitCode}", history = history.history)
+        if (blocked != null) {
+            onLog("${id.label} $blocked")
+            return
+        }
         when (val decision = restartPolicy.onUnexpectedExit(monotonicMillis(), true, maintenance)) {
             RestartDecision.Suppressed -> Unit
             RestartDecision.Exhausted -> {
