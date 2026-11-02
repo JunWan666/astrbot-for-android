@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.4.0-3867FF?style=flat-square" alt="Version 1.4.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.4.1-3867FF?style=flat-square" alt="Version 1.4.1" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -34,7 +34,7 @@
 
 应用采用 Kotlin 与 Jetpack Compose 构建原生管理界面，支持简体中文与英文，通过内置 WebView 访问 AstrBot 和 NapCat 的 WebUI，在手机端完成 QQ 登录、模型接入与插件配置，并提供人设管理、局域网访问、SSH 终端与 cpolar 内网穿透扩展。
 
-当前版本为 **1.4.0**。本轮整合 Linux QQ 与离线桌面依赖，新增可选的后台运行辅助，改善 AstrBot 重复实例处理、内置 WebView 的外部应用跳转与常用网址布局。SnowLuma 手动部署及运行管理为预览功能，适用许可范围仍需确认，不附带其程序。完整变化见[更新记录](docs/CHANGELOG.md)。
+当前版本为 **1.4.1**。本轮通过构建时预配置桌面依赖，缩短全新安装后的初始化等待，完善离线修复进度和 Linux QQ 启动衔接；完整 APK 比 1.4.0 增加约 **175 MiB**，现约 **1 GiB**。SnowLuma 手动部署及运行管理仍为预览功能，适用许可范围仍需确认，不附带其程序。完整变化见[更新记录](docs/CHANGELOG.md)。
 
 ## 界面预览
 
@@ -43,37 +43,37 @@
 <table width="100%" align="center">
   <tr>
     <td align="center" width="25%">
-      <img src="./docs/images/home.webp" alt="首页：服务状态、启停与资源占用" width="150" />
+      <img src="./docs/images/home.webp" alt="首页：服务状态、启停与资源占用" width="240" />
       <p align="center"><strong>首页 · 服务与资源</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./docs/images/personas.webp" alt="人设：社区市场、搜索与本地预设" width="150" />
+      <img src="./docs/images/personas.webp" alt="人设：社区市场、搜索与本地预设" width="240" />
       <p align="center"><strong>人设 · 搜索与切换</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./docs/images/websites.webp" alt="网页：带网站图标的常用地址与内置访问入口" width="150" />
+      <img src="./docs/images/websites.webp" alt="网页：带网站图标的常用地址与内置访问入口" width="240" />
       <p align="center"><strong>网页 · 常用地址</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./docs/images/settings.webp" alt="设置：运行与权限、数据与维护、通用分类" width="150" />
+      <img src="./docs/images/settings.webp" alt="设置：运行与权限、数据与维护、通用分类" width="240" />
       <p align="center"><strong>设置 · 分类管理</strong></p>
     </td>
   </tr>
   <tr>
     <td align="center" width="25%">
-      <img src="./docs/images/extensions.webp" alt="扩展：终端与桌面、远程连接和 AI 工作台" width="150" />
+      <img src="./docs/images/extensions.webp" alt="扩展：终端与桌面、远程连接和 AI 工作台" width="240" />
       <p align="center"><strong>扩展 · 按需安装</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./docs/images/permissions.webp" alt="权限：Shizuku 授权、后台子进程统计和息屏白名单" width="150" />
+      <img src="./docs/images/permissions.webp" alt="权限：Shizuku 授权、后台子进程统计和息屏白名单" width="240" />
       <p align="center"><strong>权限 · 状态与统计</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./docs/images/astrbot-webui.webp" alt="应用内的 AstrBot 管理后台" width="150" />
+      <img src="./docs/images/astrbot-webui.webp" alt="应用内的 AstrBot 管理后台" width="240" />
       <p align="center"><strong>AstrBot · 内置后台</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./docs/images/napcat-webui.webp" alt="应用内的 NapCat 管理后台" width="150" />
+      <img src="./docs/images/napcat-webui.webp" alt="应用内的 NapCat 管理后台" width="240" />
       <p align="center"><strong>NapCat · 内置后台</strong></p>
     </td>
   </tr>
@@ -126,7 +126,7 @@
 ### 设备与空间
 
 - Android 8.0 / API 26 及以上，ARM64 架构，无需手机 Root。
-- 完整 APK 约 **850 MiB**，包含基础环境和桌面离线依赖；安装后还需为运行环境、QQ 数据和备份预留空间。
+- 完整 APK 约 **1022 MiB（1 GiB）**，比 1.4.0 增加约 **175 MiB**。新增预配置桌面资源用于加快全新初始化，同时保留原始离线依赖供已有环境修复；安装后还需为运行环境、QQ 数据和备份预留空间。
 - 环境准备空间不足时显示预估提醒，可选择“仍然继续”；实际可写空间耗尽仍会导致操作失败。
 - 运行占用随插件、模型调用及 QQ 状态变化；首页显示实际应用内存，不预分配虚拟机内存。
 - 持续运行需要按手机系统设置后台权限。可选开启无障碍后台辅助及默认关闭的开机恢复服务，详见[后台运行](docs/使用指南.md#后台运行)。

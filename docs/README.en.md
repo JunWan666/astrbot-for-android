@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.4.0-3867FF?style=flat-square" alt="Version 1.4.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.4.1-3867FF?style=flat-square" alt="Version 1.4.1" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -34,7 +34,7 @@
 
 Built with Kotlin and Jetpack Compose, the app provides a native management interface in Simplified Chinese and English and embeds the AstrBot and NapCat WebUIs in a WebView. Users can sign in to QQ, configure model providers and plugins, manage personas, enable LAN access, and use SSH and cpolar tunneling extensions directly from their phone.
 
-Current version: **1.4.0**. This update brings Linux QQ and offline desktop dependencies together, adds optional background assistance, and improves AstrBot instance handling, external app navigation from the embedded WebView, and bookmark layout. The manual SnowLuma setup and lifecycle controls are preview features whose applicable license scope remains unconfirmed; its program is not bundled. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
+Current version: **1.4.1**. Desktop dependencies are now configured at build time to reduce first-time initialization, with clearer offline repair progress and improved Linux QQ startup handling. The full APK is about **175 MiB** larger than 1.4.0, bringing it to approximately **1 GiB**. The manual SnowLuma setup and lifecycle controls remain preview features whose applicable license scope is unconfirmed; its program is not bundled. See the [changelog (Chinese)](CHANGELOG.md) for the full list of changes.
 
 ## Screenshots
 
@@ -43,37 +43,37 @@ The eight screenshots were captured on an Android phone and show service managem
 <table width="100%" align="center">
   <tr>
     <td align="center" width="25%">
-      <img src="./images/home.webp" alt="Home: service status, controls and resource usage" width="150" />
+      <img src="./images/home.webp" alt="Home: service status, controls and resource usage" width="240" />
       <p align="center"><strong>Home · Services &amp; resources</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./images/personas.webp" alt="Personas: marketplace, search and local presets" width="150" />
+      <img src="./images/personas.webp" alt="Personas: marketplace, search and local presets" width="240" />
       <p align="center"><strong>Personas · Search &amp; switch</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./images/websites.webp" alt="Websites: saved addresses, site icons and built-in browsing" width="150" />
+      <img src="./images/websites.webp" alt="Websites: saved addresses, site icons and built-in browsing" width="240" />
       <p align="center"><strong>Websites · Quick access</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./images/settings.webp" alt="Settings: runtime, permissions, maintenance and general options" width="150" />
+      <img src="./images/settings.webp" alt="Settings: runtime, permissions, maintenance and general options" width="240" />
       <p align="center"><strong>Settings · Grouped menus</strong></p>
     </td>
   </tr>
   <tr>
     <td align="center" width="25%">
-      <img src="./images/extensions.webp" alt="Extensions: terminal, desktop, remote access and AI workspace" width="150" />
+      <img src="./images/extensions.webp" alt="Extensions: terminal, desktop, remote access and AI workspace" width="240" />
       <p align="center"><strong>Extensions · On demand</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./images/permissions.webp" alt="Permissions: Shizuku, child process statistics and idle exemption" width="150" />
+      <img src="./images/permissions.webp" alt="Permissions: Shizuku, child process statistics and idle exemption" width="240" />
       <p align="center"><strong>Permissions · Live status</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./images/astrbot-webui.webp" alt="AstrBot dashboard inside the app" width="150" />
+      <img src="./images/astrbot-webui.webp" alt="AstrBot dashboard inside the app" width="240" />
       <p align="center"><strong>AstrBot · Built-in WebUI</strong></p>
     </td>
     <td align="center" width="25%">
-      <img src="./images/napcat-webui.webp" alt="NapCat dashboard inside the app" width="150" />
+      <img src="./images/napcat-webui.webp" alt="NapCat dashboard inside the app" width="240" />
       <p align="center"><strong>NapCat · Built-in WebUI</strong></p>
     </td>
   </tr>
@@ -130,7 +130,7 @@ The full APK includes the runtime environment, so initialization does not requir
 ### Device and storage requirements
 
 - Android 8.0 / API 26 or later, with an ARM64 processor. Root access is not required.
-- The full APK is approximately **850 MiB**, including the base environment and offline desktop packages. Allow additional storage for the extracted environment, QQ data and backups.
+- The full APK is approximately **1022 MiB (1 GiB)**, about **175 MiB** larger than 1.4.0. Preconfigured desktop assets speed up fresh initialization, while the original offline packages remain available to repair existing environments. Allow additional storage for the extracted environment, QQ data and backups.
 - If free space is below the runtime preparation estimate, a warning offers **Continue anyway**. Running out of writable storage can still cause the operation to fail.
 - Resource usage varies with plugins, model calls and QQ activity. Home displays actual app memory usage; the app does not preallocate memory for a virtual machine.
 - Continuous operation requires appropriate background permissions on the device. Accessibility assistance and service recovery after reboot are optional and disabled by default; see the [background operation guide (Chinese)](使用指南.md#后台运行).
