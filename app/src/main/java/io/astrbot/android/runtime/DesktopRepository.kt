@@ -48,6 +48,7 @@ class DesktopRepository(private val context: Context) {
     }
 
     fun desired() = preferences.getBoolean("desired_desktop", false)
+    fun startupProfileDigest(): String? = File(directory, "compat-profile.json").takeIf { it.isFile }?.let { CpolarRepository.digest(it) }
     fun qqDesired() = preferences.getBoolean("desired_desktop_qq", false)
     fun setDesired(value: Boolean) { check(preferences.edit().putBoolean("desired_desktop", value).commit()) }
     fun setQqDesired(value: Boolean) { check(preferences.edit().putBoolean("desired_desktop_qq", value).commit()) }

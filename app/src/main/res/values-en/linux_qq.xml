@@ -14,7 +14,7 @@
     <string name="qq_open">Open QQ</string>
     <string name="qq_stop">Stop QQ</string>
     <string name="qq_download_hint">About 198 MiB from Tencent. Pause and resume supported.</string>
-    <string name="qq_open_hint">Opening QQ prepares the desktop automatically. Complete sign-in inside QQ; leaving this page keeps it running.</string>
+    <string name="qq_open_hint">Opening QQ prepares the desktop and restarts QQ if its startup profile changed; otherwise it reuses the session. Sign in inside QQ if needed. Leaving this page keeps it running.</string>
     <string name="qq_operation_error">Operation incomplete</string>
     <string name="qq_connections">Connections and management</string>
     <string name="qq_lan">LAN access</string>

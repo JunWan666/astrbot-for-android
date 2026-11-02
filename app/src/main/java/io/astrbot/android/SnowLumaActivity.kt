@@ -10,6 +10,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -21,8 +22,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -32,6 +39,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import io.astrbot.android.core.ServiceId
 import io.astrbot.android.runtime.*
@@ -57,6 +67,9 @@ class SnowLumaActivity : LocalizedActivity() {
     private fun desktop() {
         startActivity(Intent(this, DesktopActivity::class.java).putExtra(DesktopActivity.EXTRA_OPEN_QQ, true))
     }
+    private fun installQq() {
+        startActivity(Intent(this, DesktopActivity::class.java).putExtra(DesktopActivity.EXTRA_INSTALL_QQ, true))
+    }
     private fun terminal() { startActivity(Intent(this, TerminalActivity::class.java)) }
     private fun copy(command: String) {
         getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("SnowLuma", command))
@@ -72,10 +85,10 @@ class SnowLumaActivity : LocalizedActivity() {
     @Composable private fun SnowLumaScreen() {
         val state by SnowLumaStore.state.collectAsStateWithLifecycle()
         val manager by RuntimeStore.state.collectAsStateWithLifecycle()
+        val qq by DesktopStore.state.collectAsStateWithLifecycle()
         val output by SnowLumaStore.output.collectAsStateWithLifecycle()
         val initialCredentials by SnowLumaStore.initialCredentials.collectAsStateWithLifecycle()
         var page by rememberSaveable { mutableStateOf(SnowPage.HOME) }
-        var revealPassword by remember(page, initialCredentials) { mutableStateOf(false) }
         val credentials = initialCredentials.takeIf { state.active }
         var guideCompleted by rememberSaveable { mutableStateOf(repository.guideCompleted()) }
         var savedStep by rememberSaveable { mutableIntStateOf(0) }
@@ -162,7 +175,16 @@ class SnowLumaActivity : LocalizedActivity() {
                         LinearProgressIndicator(progress = { (step + 1f) / steps.size }, modifier = Modifier.fillMaxWidth())
                         Text(AppText.get(R.string.snow_step, step + 1, steps.size, AppText.get(steps[step])), style = MaterialTheme.typography.titleSmall)
                         key(step) {
-                            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            if (step == 1) Surface(Modifier.weight(1f).fillMaxWidth(), shape = MaterialTheme.shapes.large,
+                                color = MaterialTheme.colorScheme.surfaceContainerLow) {
+                                Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    GuideText(AppText.get(R.string.snow_package_detail))
+                                    CommandBlock(preparationCommand(state.directory), Modifier.weight(1f))
+                                    TextButton(onClick = { external(SnowLumaRepository.OFFICIAL_RELEASE) }, Modifier.align(Alignment.End)) {
+                                        Text(AppText.get(R.string.snow_official))
+                                    }
+                                }
+                            } else Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 if (step == steps.lastIndex) {
                                     ManagerSection(AppText.get(R.string.snow_astrbot_dashboard)) {
                                         GuideText(AppText.get(R.string.snow_astrbot_detail))
@@ -177,32 +199,39 @@ class SnowLumaActivity : LocalizedActivity() {
                                         GuideText(AppText.get(R.string.snow_connection_token))
                                     }
                                     GuideText(AppText.get(R.string.snow_verify_reply))
+                                    GuideText(AppText.get(R.string.snow_keep_running))
                                 } else ManagerSection(AppText.get(steps[step])) {
                                     when (step) {
                                         0 -> {
                                             GuideText(AppText.get(R.string.snow_environment_detail))
-                                            ManagerActionButton(AppText.get(R.string.snow_qq_install_page), {
-                                                startActivity(Intent(this@SnowLumaActivity, DesktopActivity::class.java))
-                                            }, Modifier.fillMaxWidth())
-                                        }
-                                        1 -> {
-                                            GuideText(AppText.get(R.string.snow_package_detail))
-                                            CommandBlock(listOf(
-                                                "# ${AppText.get(R.string.snow_package_directory)}",
-                                                "mkdir -p ${SnowLumaRepository.quote(state.directory)} && cd ${SnowLumaRepository.quote(state.directory)} &&",
-                                                "# ${AppText.get(R.string.snow_package_download)}",
-                                                "curl -fL --retry 2 -o SnowLuma.tar.gz ${SnowLumaRepository.ARCHIVE_URL} &&",
-                                                "# ${AppText.get(R.string.snow_package_verify)}",
-                                                "printf '%s  %s\\n' '${SnowLumaRepository.ARCHIVE_SHA256}' 'SnowLuma.tar.gz' | sha256sum -c - &&",
-                                                "# ${AppText.get(R.string.snow_package_extract)}",
-                                                "tar -xzf SnowLuma.tar.gz"
-                                            ).joinToString("\n"), terminalButton = true)
-                                            TextButton(onClick = { external(SnowLumaRepository.OFFICIAL_RELEASE) }) { Text(AppText.get(R.string.snow_official)) }
+                                            ManagerActionButton(AppText.get(R.string.snow_qq_install_page), { installQq() }, Modifier.fillMaxWidth())
                                         }
                                         2 -> {
                                             GuideText(AppText.get(R.string.snow_profile_detail))
-                                            CommandBlock(SnowLumaRepository.profileCommand(state.directory), terminalButton = true)
                                             ManagerActionButton(AppText.get(R.string.snow_desktop), { desktop() }, Modifier.fillMaxWidth(), ActionTone.NEUTRAL)
+                                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                ManagerActionButton(AppText.get(R.string.snow_guide_start), { command("start") }, Modifier.weight(1f), ActionTone.START,
+                                                    !manager.busy && manager.environmentInstalled && state.installed && state.profileReady &&
+                                                        !state.active && !napcat && qq.qqRunning)
+                                                ManagerActionButton(AppText.get(R.string.snow_open), {
+                                                    startActivity(Intent(this@SnowLumaActivity, WebsiteBrowserActivity::class.java).putExtra("snowluma", true))
+                                                }, Modifier.weight(1f), enabled = state.ready)
+                                            }
+                                            if (state.active && !state.ready) {
+                                                LinearProgressIndicator(Modifier.fillMaxWidth())
+                                                Text(AppText.get(R.string.snow_starting), style = MaterialTheme.typography.bodySmall)
+                                            }
+                                            if (state.ready) Text(AppText.get(R.string.ui_running), style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.primary)
+                                            state.error?.let { error -> Text(error, Modifier.clickable { errorDetail = error }, maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
+                                            if (napcat) Text(AppText.get(R.string.snow_napcat_conflict), style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.error)
+                                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                                            Text(AppText.get(R.string.snow_credentials), style = MaterialTheme.typography.labelMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            InitialCredentialFields(credentials, compact = true, emptyText = AppText.get(
+                                                if (state.active) R.string.snow_guide_credentials_missing else R.string.snow_guide_credentials_pending))
                                         }
                                     }
                                 }
@@ -221,29 +250,7 @@ class SnowLumaActivity : LocalizedActivity() {
                         ManagerSection(AppText.get(R.string.snow_credentials)) {
                             Text(AppText.get(R.string.snow_credentials_hint), style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            if (credentials == null) {
-                                Text(AppText.get(R.string.snow_credentials_missing), style = MaterialTheme.typography.bodyMedium)
-                            } else {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                        Text(AppText.get(R.string.snow_username), style = MaterialTheme.typography.labelMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                        SelectionContainer { Text(credentials.username, fontFamily = FontFamily.Monospace) }
-                                    }
-                                    TextButton(onClick = { copyCredential(credentials.username) }) { Text(AppText.get(R.string.snow_copy_username)) }
-                                }
-                                Text(AppText.get(R.string.snow_initial_password), style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                SelectionContainer { Text(if (revealPassword) credentials.password else "••••••••••••",
-                                    Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small).padding(12.dp),
-                                    fontFamily = FontFamily.Monospace) }
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    ManagerActionButton(AppText.get(if (revealPassword) R.string.snow_hide_password else R.string.snow_show_password),
-                                        { revealPassword = !revealPassword }, Modifier.weight(1f), ActionTone.NEUTRAL)
-                                    ManagerActionButton(AppText.get(R.string.snow_copy_password), { copyCredential(credentials.password) }, Modifier.weight(1f))
-                                }
-                                TextButton(onClick = { SnowLumaStore.forgetInitialCredentials() }) { Text(AppText.get(R.string.snow_forget_credentials)) }
-                            }
+                            InitialCredentialFields(credentials)
                             ManagerActionButton(AppText.get(R.string.snow_open), {
                                 startActivity(Intent(this@SnowLumaActivity, WebsiteBrowserActivity::class.java).putExtra("snowluma", true))
                             }, Modifier.fillMaxWidth(), enabled = state.ready)
@@ -285,6 +292,54 @@ class SnowLumaActivity : LocalizedActivity() {
             dismissButton = { TextButton(onClick = { errorDetail = null }) { Text(AppText.get(R.string.ui_close)) } }) }
     }
 
+    @Composable private fun InitialCredentialFields(credentials: SnowLumaInitialCredentials?, compact: Boolean = false,
+        emptyText: String = AppText.get(R.string.snow_credentials_missing)) {
+        var revealed by remember(credentials) { mutableStateOf(false) }
+        val owner = LocalLifecycleOwner.current
+        DisposableEffect(owner, credentials) {
+            val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) revealed = false }
+            owner.lifecycle.addObserver(observer)
+            onDispose { owner.lifecycle.removeObserver(observer) }
+        }
+        if (credentials == null) {
+            Text(emptyText, style = if (compact) MaterialTheme.typography.bodySmall else MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            return
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(AppText.get(R.string.snow_username), style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SelectionContainer(Modifier.weight(1f)) { Text(credentials.username, style = MaterialTheme.typography.bodyMedium,
+                    fontFamily = FontFamily.Monospace) }
+                if (!compact) IconButton(onClick = { copyCredential(credentials.username) }) {
+                    Icon(painterResource(R.drawable.ic_copy), AppText.get(R.string.snow_copy_username), Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+            Row(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.small)
+                .padding(start = 12.dp, end = 4.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(AppText.get(R.string.snow_initial_password), style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    SelectionContainer { Text(if (revealed) credentials.password else "••••••••••••",
+                        style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily.Monospace) }
+                }
+                IconButton(onClick = { revealed = !revealed }) {
+                    Icon(painterResource(if (revealed) R.drawable.ic_visibility_off else R.drawable.ic_visibility),
+                        AppText.get(if (revealed) R.string.snow_hide_password else R.string.snow_show_password), Modifier.size(20.dp))
+                }
+                IconButton(onClick = { copyCredential(credentials.password) }) {
+                    Icon(painterResource(R.drawable.ic_copy), AppText.get(R.string.snow_copy_password), Modifier.size(20.dp),
+                        tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+            if (compact) Text(AppText.get(R.string.snow_guide_credentials_hint), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            else TextButton(onClick = { SnowLumaStore.forgetInitialCredentials() }) { Text(AppText.get(R.string.snow_forget_credentials)) }
+        }
+    }
+
     @Composable private fun SetupCheck(ready: Boolean, label: String) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(if (ready) "✓" else "○", color = if (ready) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
@@ -324,7 +379,19 @@ class SnowLumaActivity : LocalizedActivity() {
         }
     }
 
-    @Composable private fun CommandBlock(command: String, terminalButton: Boolean = false) {
+    private fun preparationCommand(directory: String): String = listOf(
+        "# 1. ${AppText.get(R.string.snow_package_directory)}\n" +
+            "mkdir -p ${SnowLumaRepository.quote(directory)} && cd ${SnowLumaRepository.quote(directory)} &&",
+        "# 2. ${AppText.get(R.string.snow_package_download)}\n" +
+            "curl -fL --retry 2 -o SnowLuma.tar.gz ${SnowLumaRepository.ARCHIVE_URL} &&",
+        "# 3. ${AppText.get(R.string.snow_package_verify)}\n" +
+            "printf '%s  %s\\n' '${SnowLumaRepository.ARCHIVE_SHA256}' 'SnowLuma.tar.gz' | sha256sum -c - &&",
+        "# 4. ${AppText.get(R.string.snow_package_extract)}\n" +
+            "tar -xzf SnowLuma.tar.gz &&",
+        "# 5. ${AppText.get(R.string.snow_package_configure)}\n" + SnowLumaRepository.profileCommand(directory)
+    ).joinToString("\n\n")
+
+    @Composable private fun CommandBlock(command: String, modifier: Modifier = Modifier) {
         val dark = isSystemInDarkTheme()
         val commandColor = if (dark) Color(0xFFB9D1FF) else Color(0xFF244B78)
         val commentColor = if (dark) Color(0xFF8BC69D) else Color(0xFF2F7048)
@@ -338,14 +405,34 @@ class SnowLumaActivity : LocalizedActivity() {
                 }
             }
         }
-        SelectionContainer { Text(highlighted, Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer,
-            MaterialTheme.shapes.small).padding(10.dp), softWrap = true,
-            style = MaterialTheme.typography.bodySmall.copy(lineHeight = 17.sp), fontFamily = FontFamily.Monospace) }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ManagerActionButton(AppText.get(R.string.snow_copy), { copy(command) }, Modifier.weight(1f))
-            if (terminalButton) ManagerActionButton(AppText.get(R.string.snow_terminal), { terminal() }, Modifier.weight(1f))
+        val scroll = rememberScrollState()
+        val scrollColor = MaterialTheme.colorScheme.primary
+        Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(AppText.get(R.string.snow_command_scroll_hint), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Box(Modifier.weight(1f).fillMaxWidth().clip(MaterialTheme.shapes.small).background(MaterialTheme.colorScheme.surfaceContainer)) {
+                SelectionContainer(Modifier.fillMaxSize().verticalScroll(scroll).semantics {
+                    contentDescription = AppText.get(R.string.snow_command_scroll_hint)
+                }) {
+                    Text(highlighted, Modifier.fillMaxWidth().padding(start = 10.dp, end = 16.dp, top = 10.dp, bottom = 10.dp), softWrap = true,
+                        style = MaterialTheme.typography.bodySmall.copy(lineHeight = 17.sp), fontFamily = FontFamily.Monospace)
+                }
+                Canvas(Modifier.align(Alignment.CenterEnd).padding(vertical = 8.dp, horizontal = 3.dp).fillMaxHeight().width(3.dp)) {
+                    if (scroll.maxValue > 0) {
+                        val height = (size.height * scroll.viewportSize / (scroll.viewportSize + scroll.maxValue).toFloat())
+                            .coerceAtLeast(18.dp.toPx()).coerceAtMost(size.height)
+                        val top = (size.height - height) * scroll.value / scroll.maxValue.toFloat()
+                        drawRoundRect(scrollColor.copy(alpha = 0.12f), cornerRadius = CornerRadius(size.width / 2))
+                        drawRoundRect(scrollColor.copy(alpha = 0.65f), Offset(0f, top), Size(size.width, height), CornerRadius(size.width / 2))
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ManagerActionButton(AppText.get(R.string.snow_copy), { copy(command) }, Modifier.weight(1f))
+                ManagerActionButton(AppText.get(R.string.snow_terminal), { terminal() }, Modifier.weight(1f))
+            }
+            Text(AppText.get(R.string.snow_copy_terminal_hint), style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary)
         }
-        if (terminalButton) Text(AppText.get(R.string.snow_copy_terminal_hint), style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.primary)
     }
 }

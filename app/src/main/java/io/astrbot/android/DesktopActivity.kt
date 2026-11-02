@@ -67,7 +67,8 @@ class DesktopActivity : LocalizedActivity() {
         val scope = rememberCoroutineScope()
         var page by rememberSaveable { mutableStateOf(QqPage.HOME) }
         var confirmation by rememberSaveable { mutableStateOf<String?>(null) }
-        var entryPending by rememberSaveable { mutableStateOf(intent.getBooleanExtra(EXTRA_OPEN_QQ, false)) }
+        val installOnly = intent.getBooleanExtra(EXTRA_INSTALL_QQ, false)
+        var entryPending by rememberSaveable { mutableStateOf(intent.getBooleanExtra(EXTRA_OPEN_QQ, false) || installOnly) }
         var pendingInstallOpen by rememberSaveable { mutableStateOf<String?>(null) }
         var pendingOpen by rememberSaveable { mutableStateOf<String?>(null) }
         var pendingSave by rememberSaveable { mutableStateOf<String?>(null) }
@@ -96,8 +97,8 @@ class DesktopActivity : LocalizedActivity() {
             Toast.makeText(this, AppText.get(R.string.ui_copied, label), Toast.LENGTH_SHORT).show()
         }
         fun openQq() {
-            if (state.qqRunning && state.webUiReady) viewer()
-            else if (manager.services.getValue(ServiceId.NAPCAT).desiredRunning) confirmation = "qq-open"
+            // The service checks the startup profile even when QQ already has a window.
+            if (manager.services.getValue(ServiceId.NAPCAT).desiredRunning) confirmation = "qq-open"
             else pendingOpen = command("qq-open")
         }
         val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
@@ -112,8 +113,8 @@ class DesktopActivity : LocalizedActivity() {
             if (entryPending && installationChecked && enabled && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) {
                 entryPending = false
                 if (!manager.environmentInstalled) confirmation = "qq-initialize"
-                else if (!state.configuration.qqInstalled) confirmation = "qq-install-open"
-                else openQq()
+                else if (!state.configuration.qqInstalled) confirmation = if (installOnly) "qq-install" else "qq-install-open"
+                else if (!installOnly) openQq()
             }
         }
         DisposableEffect(owner, page) {
@@ -122,15 +123,19 @@ class DesktopActivity : LocalizedActivity() {
             owner.lifecycle.addObserver(observer)
             onDispose { password = null; owner.lifecycle.removeObserver(observer) }
         }
-        LaunchedEffect(manager.completedOperation, manager.busy, lifecycleState, pendingOpen, pendingSave, pendingInstallOpen) {
+        LaunchedEffect(manager.completedOperation, manager.busy, manager.error, state.error, state.qqRunning, state.webUiReady,
+            lifecycleState, pendingOpen, pendingSave, pendingInstallOpen) {
             if (!lifecycleState.isAtLeast(Lifecycle.State.RESUMED)) return@LaunchedEffect
             if (pendingInstallOpen != null && manager.completedOperation == pendingInstallOpen && !manager.busy) {
                 pendingInstallOpen = null
                 if (state.configuration.qqInstalled && state.error == null && manager.error == null) openQq()
             }
             if (pendingOpen != null && manager.completedOperation == pendingOpen) {
-                pendingOpen = null
-                if (state.qqRunning && state.webUiReady) viewer()
+                if (state.error != null || manager.error != null) pendingOpen = null
+                else if (state.qqRunning && state.webUiReady) {
+                    pendingOpen = null
+                    viewer()
+                }
             }
             if (pendingSave != null && manager.completedOperation == pendingSave) {
                 pendingSave = null
@@ -310,5 +315,8 @@ class DesktopActivity : LocalizedActivity() {
             text = { Text(message, Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) }, confirmButton = { TextButton(onClick = { errorDetail = null }) { Text(AppText.get(R.string.ui_ok)) } }) }
     }
 
-    companion object { const val EXTRA_OPEN_QQ = "openQq" }
+    companion object {
+        const val EXTRA_OPEN_QQ = "openQq"
+        const val EXTRA_INSTALL_QQ = "installQq"
+    }
 }
