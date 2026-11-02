@@ -47,6 +47,21 @@
     <string name="qq_repair">Repair built-in desktop</string>
     <string name="qq_repair_notice">Repair the desktop offline using bundled components. Robot services, extensions and terminals stop temporarily. Services resume afterward; reopen terminals manually. Continue?</string>
     <string name="qq_preparing_bundled">Preparing the built-in desktop offline…</string>
+    <string name="qq_desktop_elapsed">Elapsed %2$d:%3$02d · %1$s</string>
+    <string name="qq_desktop_copy">Copy and verify %1$d/%2$d · %3$s</string>
+    <string name="qq_desktop_verify">Check package %1$d/%2$d · %3$s</string>
+    <string name="qq_desktop_install">Starting desktop dependency installation…</string>
+    <string name="qq_desktop_unpack_package">Unpack %1$d/%2$d · %3$s</string>
+    <string name="qq_desktop_configure_package">Configure %1$d/%2$d · %3$s</string>
+    <string name="qq_desktop_configure_name">Configure component · %1$s</string>
+    <string name="qq_desktop_configure">Finishing component configuration…</string>
+    <string name="qq_desktop_cache">Build caches · %1$s</string>
+    <string name="qq_desktop_recover">Recovering incomplete component configuration…</string>
+    <string name="qq_desktop_check">Checking the desktop environment…</string>
+    <string name="qq_desktop_compat">Preparing general compatibility components…</string>
+    <string name="qq_desktop_access">Preparing desktop access credentials…</string>
     <string name="qq_bundle_missing">Bundled desktop resources are incomplete or failed verification. Reinstall the complete APK and retry.</string>
+    <string name="qq_snapshot_verify">Verifying preinstalled desktop resources…</string>
+    <string name="qq_snapshot_extract">Extracting preinstalled desktop: %1$d entries</string>
     <string name="qq_window_timeout">The QQ window did not become ready. Check runtime logs and retry.</string>
 </resources>

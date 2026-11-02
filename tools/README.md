@@ -10,6 +10,7 @@ Windows 双击根目录 `build.bat`，或执行 `python3 -B tools/build_release.
 | `build_support/build_native.py` | 从当前源码编译管理器原生运行器，保留准备好的 PRoot 依赖 |
 | `build_support/prepare_optional_assets.py` | 准备官方 Shizuku 安装包、许可及桌面离线依赖 |
 | `build_support/prepare_desktop_assets.py` | 按版本锁下载并校验 Ubuntu ARM64 桌面离线依赖 |
+| `build_support/prepare_desktop_snapshot.py` | 在干净 Linux 构建根中预配置桌面依赖，生成仅用于全新初始化的资源 |
 | `build_support/collect_distribution.py` | 按实际发行依赖生成随包许可和源码清单 |
 | `build_support/collect_desktop_materials.py` | 从锁定桌面包收集原始版权文本，绑定准确版本的 Ubuntu 源码伴随包 |
 | `build_support/collect_python_sources.py` | 校验发行材料中的 Python 源码伴随包 |

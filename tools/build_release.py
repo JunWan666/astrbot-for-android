@@ -178,6 +178,10 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
         optional_output = work / 'optional-assets'
         run_logged([sys.executable, '-B', '-X', 'utf8', 'tools/build_support/prepare_optional_assets.py',
                     '--output-dir', str(optional_output)], env, log)
+        run_logged([sys.executable, '-B', '-X', 'utf8', 'tools/build_support/prepare_desktop_snapshot.py',
+                    '--runtime-dir', str(input_path('runtimeAssetsDir', 'runtime/apk-assets') / 'bootstrap/arm64-v8a'),
+                    '--bundle-dir', str(optional_output / 'desktop-packages/arm64-v8a'),
+                    '--output-dir', str(optional_output / 'desktop-snapshot/arm64-v8a')], env, log)
         wrapper = ROOT / ("gradlew.bat" if os.name == "nt" else "gradlew")
         command = ([os.environ.get("COMSPEC", "cmd.exe"), "/d", "/c", str(wrapper)] if os.name == "nt"
                    else ["bash", str(wrapper)])
@@ -241,6 +245,15 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
         raise ValueError("APK 包名、版本或架构与发行元数据不一致")
     bundled_runtime = verify_bundled_runtime(apk)
     with zipfile.ZipFile(apk) as archive:
+        snapshot_base = 'assets/desktop-snapshot/arm64-v8a/'
+        snapshot = json.loads(archive.read(snapshot_base + 'manifest.json'))
+        bundle = archive.read('assets/desktop-packages/arm64-v8a/manifest.json')
+        with archive.open(snapshot_base + 'desktop.tar.bin') as stream:
+            snapshot_sha = hashlib.file_digest(stream, 'sha256').hexdigest()
+        if (snapshot.get('schemaVersion') != 1 or snapshot['baseRuntimeSHA256'] != bundled_runtime['sha256'] or
+                snapshot['bundleSHA256'] != hashlib.sha256(bundle).hexdigest() or snapshot['sha256'] != snapshot_sha or
+                snapshot['bytes'] != archive.getinfo(snapshot_base + 'desktop.tar.bin').file_size):
+            raise ValueError('Bundled desktop snapshot does not match its base image and locked package assets')
         optional = json.loads((ROOT / 'runtime/shizuku-manager.lock.json').read_text('utf-8'))
         if hashlib.sha256(archive.read('assets/optional/shizuku.apk')).hexdigest() != optional['sha256']:
             raise ValueError('Bundled Shizuku installer differs from pinned original')
@@ -263,6 +276,7 @@ def build(properties: Path, java_home: Path, sdk: Path, env: dict[str, str], wor
     record = {"file": name, "packageName": PACKAGE, "versionName": version, "versionCode": item["versionCode"],
               "bytes": target.stat().st_size, "sha256": sha, "certificateSha256": fingerprint,
               "signingVerified": True, "signatureSchemes": schemes, "bundledRuntime": bundled_runtime,
+              "bundledDesktopSnapshot": snapshot,
               "nativeBuild": native_record}
     (output / "release.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf8")
     (output / "SHA256SUMS").write_text(f"{sha}  {name}\n", encoding="utf8")

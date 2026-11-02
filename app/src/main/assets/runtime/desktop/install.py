@@ -10,6 +10,7 @@ import sys
 ROOT = Path('/manager/extensions/desktop')
 MARKER = Path('/var/lib/astrbot-manager/desktop.json')
 PENDING = MARKER.with_suffix('.pending')
+PACKAGES_MARKER = MARKER.with_name('desktop-packages.json')
 SOURCES = json.loads((ROOT / 'sources.json').read_text())
 TOOLS = ['Xvfb', 'xauth', 'fluxbox', 'feh', 'x11vnc', 'websockify', 'tmux', 'xdpyinfo', 'dbus-run-session', 'gcc', 'g++', 'make', 'python3', 'curl']
 COMPATIBILITY_FILES = ['guest_compat.c', 'proc_locks.py', 'guest-compat']
@@ -22,6 +23,59 @@ def transfer_state(stage, downloaded=None, total=None, speed=0):
     if total is not None:
         value['total'] = total
     print('ASTRBOT_TRANSFER ' + json.dumps(value), flush=True)
+
+
+def desktop_state(phase, current=0, total=0, package=''):
+    print('ASTRBOT_DESKTOP ' + json.dumps(dict(phase=phase, current=current, total=total, package=package)), flush=True)
+
+
+def installed_packages():
+    # One database read replaces a dpkg-query process for every bundled package.
+    output = subprocess.check_output(['dpkg-query', '-W',
+        '-f=${Package}\t${Architecture}\t${db:Status-Status}\t${Version}\n'], text=True)
+    result = {}
+    for line in output.splitlines():
+        fields = line.split('\t')
+        if len(fields) == 4 and fields[2] == 'installed':
+            result[fields[0], fields[1]] = fields[3]
+    return result
+
+
+def preinstalled_packages_ready():
+    if PENDING.exists() or not PACKAGES_MARKER.is_file():
+        return False
+    bundle_path = ROOT / 'bundled-packages/manifest.json'
+    bundle = json.loads(bundle_path.read_text())
+    marker = json.loads(PACKAGES_MARKER.read_text())
+    if (marker.get('schemaVersion') != 1 or
+            marker.get('bundleSHA256') != hashlib.sha256(bundle_path.read_bytes()).hexdigest() or
+            marker.get('baseRuntimeSHA256') != bundle['baseRuntimeSha256']):
+        return False
+    installed = installed_packages()
+    return all(installed.get((p['name'], p['architecture'])) == p['version'] for p in bundle['packages'])
+
+
+def dependency_archives(bundle, bundle_directory):
+    installed = installed_packages()
+    archives = []
+    for index, item in enumerate(bundle['packages'], 1):
+        desktop_state('VERIFYING', index, len(bundle['packages']), item['name'])
+        assert Path(item['file']).name == item['file'] and item['file'].endswith('.deb')
+        archive = bundle_directory / item['file']
+        assert archive.stat().st_size == item['bytes']
+        with archive.open('rb') as stream:
+            assert hashlib.file_digest(stream, 'sha256').hexdigest() == item['sha256']
+        # Request both fields together; retain archive identity checks without
+        # starting two Linux processes per package under PRoot.
+        output = subprocess.check_output(['dpkg-deb', '-f', str(archive), 'Package', 'Version'], text=True)
+        control = dict(line.split(': ', 1) for line in output.splitlines() if ': ' in line)
+        assert control.get('Package') == item['name'] and control.get('Version') == item['version']
+        current = installed.get((item['name'], item['architecture']))
+        if current is not None and (current == item['version'] or subprocess.run(
+                ['dpkg', '--compare-versions', current, 'ge', item['version']]).returncode == 0):
+            continue  # Preserve equal or newer user-installed packages.
+        archives.append(str(archive))
+    return archives
 
 
 def run(*args, **kwargs):
@@ -125,13 +179,26 @@ def install_qq():
 
 def main():
     mode = sys.argv[1]
-    if mode == 'dependencies':
+    if mode == 'activate':
+        # Only a build-generated snapshot with the exact locked package state can
+        # bypass installation. Modified/older guests use the offline repair path.
+        if not preinstalled_packages_ready():
+            return 75
+        desktop_state('CHECKING')
+        assert all(shutil.which(tool) for tool in TOOLS)
+        assert Path('/usr/share/novnc/vnc.html').is_file()
+        desktop_state('COMPATIBILITY')
+        install_compatibility()
+        packages = subprocess.check_output(['dpkg-query', '-W', '-f=${binary:Package}\t${Version}\n', *SOURCES['packages']], text=True)
+        atomic_json(MARKER, {'schemaVersion': 1, 'packages': packages.splitlines(), 'compatibilitySHA256': compatibility_digest()})
+    elif mode in ('dependencies', 'preinstall'):
         assert subprocess.check_output(['dpkg', '--print-architecture'], text=True).strip() == SOURCES['architecture']
         release = dict(line.split('=', 1) for line in Path('/etc/os-release').read_text().splitlines() if '=' in line)
         assert release.get('VERSION_ID', '').strip('"') == SOURCES['ubuntuVersion']
         environment = dict(os.environ, DEBIAN_FRONTEND='noninteractive')
         if PENDING.is_file():
             transfer_state('INSTALLING')
+            desktop_state('RECOVERING')
             run('dpkg', '--configure', '-a', env=environment)
         atomic_json(PENDING, {'schemaVersion': 1})
         # No network during initialization or repair. Every package is supplied by
@@ -140,30 +207,26 @@ def main():
         bundle = json.loads((bundle_directory / 'manifest.json').read_text())
         assert bundle['schemaVersion'] == 1 and bundle['architecture'] == SOURCES['architecture']
         assert bundle['requestedPackages'] == SOURCES['packages']
-        archives = []
-        for item in bundle['packages']:
-            assert Path(item['file']).name == item['file'] and item['file'].endswith('.deb')
-            archive = bundle_directory / item['file']
-            assert archive.stat().st_size == item['bytes']
-            with archive.open('rb') as stream:
-                assert hashlib.file_digest(stream, 'sha256').hexdigest() == item['sha256']
-            assert subprocess.check_output(['dpkg-deb', '-f', str(archive), 'Package'], text=True).strip() == item['name']
-            assert subprocess.check_output(['dpkg-deb', '-f', str(archive), 'Version'], text=True).strip() == item['version']
-            current = subprocess.run(['dpkg-query', '-W', '-f=${db:Status-Status}\t${Version}', item['name']], text=True, capture_output=True)
-            fields = current.stdout.strip().split('\t')
-            if current.returncode == 0 and len(fields) == 2 and fields[0] == 'installed' and subprocess.run(
-                    ['dpkg', '--compare-versions', fields[1], 'ge', item['version']]).returncode == 0:
-                continue  # Preserve newer user-installed packages.
-            archives.append(str(archive))
+        archives = dependency_archives(bundle, bundle_directory)
         transfer_state('INSTALLING')
+        desktop_state('UNPACKING', total=len(archives))
         if archives:
-            run('dpkg', '--force-confold', '-i', *archives, env=environment)
+            options = ['--abort-after=1'] if mode == 'preinstall' else []
+            run('dpkg', *options, '--force-confold', '-i', *archives, env=environment)
+        desktop_state('CONFIGURING')
         run('dpkg', '--configure', '-a', env=environment)
+        desktop_state('CHECKING')
         assert all(shutil.which(tool) for tool in TOOLS)
         assert Path('/usr/share/novnc/vnc.html').is_file()
-        install_compatibility()
-        packages = subprocess.check_output(['dpkg-query', '-W', '-f=${binary:Package}\t${Version}\n', *SOURCES['packages']], text=True)
-        atomic_json(MARKER, {'schemaVersion': 1, 'packages': packages.splitlines(), 'compatibilitySHA256': compatibility_digest()})
+        if mode == 'preinstall':
+            atomic_json(PACKAGES_MARKER, {'schemaVersion': 1,
+                'bundleSHA256': hashlib.sha256((bundle_directory / 'manifest.json').read_bytes()).hexdigest(),
+                'baseRuntimeSHA256': bundle['baseRuntimeSha256']})
+        else:
+            desktop_state('COMPATIBILITY')
+            install_compatibility()
+            packages = subprocess.check_output(['dpkg-query', '-W', '-f=${binary:Package}\t${Version}\n', *SOURCES['packages']], text=True)
+            atomic_json(MARKER, {'schemaVersion': 1, 'packages': packages.splitlines(), 'compatibilitySHA256': compatibility_digest()})
         PENDING.unlink()
         run('apt-get', 'clean')
     elif mode == 'qq':
@@ -173,4 +236,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

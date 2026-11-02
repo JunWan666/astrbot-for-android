@@ -98,6 +98,7 @@ class BootstrapRuntime(private val context: Context) {
             try {
                 progress(AppText.get(R.string.ui_extracting_ubuntu_runtime))
                 extract(assetBase, staging, manifest.getLong("unpackedBytes"), progress)
+                prepareDesktopSnapshot(staging, manifest, progress)
                 listOf("root", "tmp", "proc", "sys", "dev", "run", "var/tmp", "var/log", "var/cache", "persistent").forEach { File(staging, it).mkdirs() }
                 Os.chmod(File(staging, "tmp").path, 1023)
                 Os.chmod(File(staging, "var/tmp").path, 1023)
@@ -116,20 +117,71 @@ class BootstrapRuntime(private val context: Context) {
             }
     }
 
-    private suspend fun extract(assetBase: String, staging: File, expectedBytes: Long, progress: (String) -> Unit) {
+    private suspend fun prepareDesktopSnapshot(staging: File, base: JSONObject, progress: (String) -> Unit) {
+        if (base.optString("kind") != "complete" || abi != "arm64-v8a") return
+        val asset = "desktop-snapshot/$abi"
+        val snapshot = try {
+            context.assets.open("$asset/manifest.json").bufferedReader().use { JSONObject(it.readText()) }
+        } catch (_: java.io.FileNotFoundException) { return } // Older/custom complete images retain offline preparation.
+        checkLocalized(snapshot.getInt("schemaVersion") == 1 && snapshot.getString("baseRuntimeSHA256") == base.getString("sha256")) {
+            AppText.get(R.string.qq_bundle_missing)
+        }
+        val bundle = context.assets.open("desktop-packages/$abi/manifest.json").use { it.readBytes() }
+        fun sha(bytes: ByteArray) = MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+        checkLocalized(snapshot.getString("bundleSHA256") == sha(bundle)) { AppText.get(R.string.qq_bundle_missing) }
+        progress(AppText.get(R.string.qq_snapshot_verify))
+        val digest = MessageDigest.getInstance("SHA-256")
+        var size = 0L
+        context.assets.open("$asset/desktop.tar.bin").use { input ->
+            val buffer = ByteArray(128 * 1024)
+            while (true) {
+                currentCoroutineContext().ensureActive()
+                val count = input.read(buffer)
+                if (count < 0) break
+                digest.update(buffer, 0, count); size += count
+            }
+        }
+        checkLocalized(size == snapshot.getLong("bytes") &&
+            digest.digest().joinToString("") { "%02x".format(it) } == snapshot.getString("sha256")) { AppText.get(R.string.qq_bundle_missing) }
+        // This overlay contains dpkg state. Apply it only before committing a new
+        // bootstrap, never to an existing guest with user-installed packages.
+        check(!File(staging, ".astrbot-bootstrap.json").exists())
+        val unpacked = snapshot.getLong("unpackedBytes")
+        checkLocalized(unpacked in 1..(2L * 1024 * 1024 * 1024)) { AppText.get(R.string.qq_bundle_missing) }
+        checkLocalized(staging.usableSpace >= maxOf(1024L * 1024 * 1024, unpacked + 128L * 1024 * 1024)) {
+            AppText.get(R.string.desktop_space)
+        }
+        val root = staging.canonicalFile.toPath()
+        val removed = snapshot.getJSONArray("removed")
+        for (index in 0 until removed.length()) {
+            val path = ArchivePaths.entry(root, removed.getString(index), allowUnixEscapes = true)
+            check(path.parent.toFile().canonicalFile.toPath().startsWith(root))
+            java.nio.file.Files.deleteIfExists(path)
+        }
+        extract(asset, staging, unpacked, progress, image = "desktop.tar.bin", replace = true,
+            entriesText = R.string.qq_snapshot_extract)
+        val marker = JSONObject(File(staging, "var/lib/astrbot-manager/desktop-packages.json").readText())
+        checkLocalized(marker.getString("bundleSHA256") == snapshot.getString("bundleSHA256") &&
+            marker.getString("baseRuntimeSHA256") == base.getString("sha256")) { AppText.get(R.string.qq_bundle_missing) }
+    }
+
+    private suspend fun extract(assetBase: String, staging: File, expectedBytes: Long, progress: (String) -> Unit,
+                                image: String = "ubuntu.tar.bin", replace: Boolean = false,
+                                entriesText: Int = R.string.ui_extracting_ubuntu_entries) {
         data class Link(val name: String, val target: String, val hard: Boolean)
         val links = mutableListOf<Link>()
         val root = staging.canonicalFile.toPath()
         var written = 0L
         var entries = 0
-        context.assets.open("$assetBase/ubuntu.tar.bin").use { input ->
+        context.assets.open("$assetBase/$image").use { input ->
             TarArchiveInputStream(GZIPInputStream(input)).use { archive ->
                 while (true) {
                     currentCoroutineContext().ensureActive()
                     val entry = archive.nextEntry ?: break
                     entries++
-                    if (entries % 500 == 0) progress(AppText.get(R.string.ui_extracting_ubuntu_entries, entries))
+                    if (entries % 500 == 0) progress(AppText.get(entriesText, entries))
                     val path = ArchivePaths.entry(root, entry.name, allowUnixEscapes = true)
+                    requireLocalized(path.parent.toFile().canonicalFile.toPath().startsWith(root)) { AppText.get(R.string.qq_bundle_missing) }
                     when {
                         entry.isSymbolicLink || entry.isLink -> links += Link(entry.name, entry.linkName, entry.isLink)
                         entry.isDirectory -> check(path.toFile().isDirectory || path.toFile().mkdirs())
@@ -138,8 +190,10 @@ class BootstrapRuntime(private val context: Context) {
                             written += entry.size
                             requireLocalized(written <= expectedBytes + 1024 * 1024) { AppText.get(R.string.ui_invalid_extracted_resource_size) }
                             path.parent.toFile().mkdirs()
+                            if (replace && java.nio.file.Files.isSymbolicLink(path)) java.nio.file.Files.delete(path)
                             path.toFile().outputStream().use { archive.copyTo(it) }
                             Os.chmod(path.toString(), entry.mode and 511)
+                            check(path.toFile().setLastModified(entry.lastModifiedDate.time))
                         }
                         else -> Unit // Device nodes are provided through Android /dev bindings.
                     }
@@ -153,7 +207,8 @@ class BootstrapRuntime(private val context: Context) {
             requireLocalized(target.toFile().canonicalFile.toPath().startsWith(root)) { AppText.get(R.string.ui_hard_link_outside_permitted_paths, it.name, it.target) }
             path.parent.toFile().mkdirs()
             // Android app SELinux policy can forbid hard links, even inside the app's data.
-            target.toFile().copyTo(path.toFile(), overwrite = false)
+            if (replace && java.nio.file.Files.isSymbolicLink(path)) java.nio.file.Files.delete(path)
+            target.toFile().copyTo(path.toFile(), overwrite = replace)
             Os.chmod(path.toString(), Os.stat(target.toString()).st_mode and 511)
         }
         links.filterNot { it.hard }.forEach {
@@ -162,7 +217,10 @@ class BootstrapRuntime(private val context: Context) {
             requireLocalized(path.parent.toFile().canonicalFile.toPath().startsWith(root)) { AppText.get(R.string.ui_symbolic_link_parent_outside_permitted_paths, it.name) }
             val target = ArchivePaths.link(root, path, it.target, allowUnixEscapes = true)
             path.parent.toFile().mkdirs()
-            try { Os.symlink(target.toString(), path.toString()) }
+            try {
+                if (replace) java.nio.file.Files.deleteIfExists(path)
+                Os.symlink(target.toString(), path.toString())
+            }
             catch (failure: android.system.ErrnoException) {
                 throw LocalizedStateException(AppText.get(R.string.ui_cannot_prepare_link, it.name, it.target), failure)
             }

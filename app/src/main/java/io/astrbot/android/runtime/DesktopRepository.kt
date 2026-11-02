@@ -13,6 +13,7 @@ import org.json.JSONObject
 import java.io.File
 import java.security.SecureRandom
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicReference
 
 data class DesktopConfiguration(val installed: Boolean = false, val qqInstalled: Boolean = false, val qqUpdateAvailable: Boolean = false)
 
@@ -81,23 +82,47 @@ class DesktopRepository(private val context: Context) {
         checkLocalized(result.exitCode == 0) { AppText.get(R.string.desktop_process_recovery_failed) }
     }
 
-    suspend fun install(progress: (String) -> Unit) = withContext(Dispatchers.IO) {
-        checkLocalized(runtime.abi == "arm64-v8a") { AppText.get(R.string.desktop_arm64) }
-        checkLocalized(File(runtime.rootfs, ".astrbot-bootstrap.json").isFile) { AppText.get(R.string.cpolar_initialize_first) }
-        checkLocalized(StatFs(context.filesDir.path).availableBytes >= 1024L * 1024 * 1024) { AppText.get(R.string.desktop_space) }
-        prepareAssets()
-        progress(AppText.get(R.string.qq_preparing_bundled))
-        if (DesktopInstallStore.state.value.let { it.active && it.kind == "desktop" }) DesktopInstallStore.phase(DesktopInstallStage.INSTALLING)
-        prepareBundledPackages()
-        checkLocalized(runInstaller("dependencies", 1200) == 0 && configuration().installed) { AppText.get(R.string.desktop_install_failed) }
-        DurableFiles.delete(File(directory, "bundled-packages"))
-        prepareAccess()
-        val commands = runtime.execute("/bin/bash", "-lc",
-            "ln -sfn '$GUEST/desktop.sh' /usr/local/bin/desktop-start; ln -sfn '$GUEST/qq.sh' /usr/local/bin/qq-desktop; ln -sfn '$GUEST/guest-compat' /usr/local/bin/guest-compat")
-        checkLocalized(commands.exitCode == 0) { AppText.get(R.string.desktop_install_failed) }
-    }
+    suspend fun install(progress: (String) -> Unit) = withContext(Dispatchers.IO) { coroutineScope {
+        val started = android.os.SystemClock.elapsedRealtime()
+        val phase = AtomicReference(AppText.get(R.string.qq_preparing_bundled))
+        fun publish() {
+            val elapsed = (android.os.SystemClock.elapsedRealtime() - started) / 1000
+            progress(AppText.get(R.string.qq_desktop_elapsed, phase.get(), elapsed / 60, elapsed % 60))
+        }
+        fun report(value: String) { phase.set(value); publish() }
+        val heartbeat = launch { while (isActive) { delay(1000); publish() } }
+        try {
+            checkLocalized(runtime.abi == "arm64-v8a") { AppText.get(R.string.desktop_arm64) }
+            checkLocalized(File(runtime.rootfs, ".astrbot-bootstrap.json").isFile) { AppText.get(R.string.cpolar_initialize_first) }
+            prepareAssets()
+            publish()
+            if (DesktopInstallStore.state.value.let { it.active && it.kind == "desktop" }) DesktopInstallStore.phase(DesktopInstallStage.INSTALLING)
+            // A preconfigured snapshot is only ever applied to bootstrap staging.
+            // Probe its exact package state before deciding whether to copy .debs.
+            val bundleDirectory = File(directory, "bundled-packages").apply { mkdirs() }
+            context.assets.open("desktop-packages/$abiName/manifest.json").use {
+                val atomic = android.util.AtomicFile(File(bundleDirectory, "manifest.json"))
+                val stream = atomic.startWrite()
+                try { it.copyTo(stream); atomic.finishWrite(stream) }
+                catch (failure: Throwable) { atomic.failWrite(stream); throw failure }
+            }
+            val activated = runInstaller("activate", 180, ::report)
+            if (activated == 75) {
+                checkLocalized(StatFs(context.filesDir.path).availableBytes >= 1024L * 1024 * 1024) { AppText.get(R.string.desktop_space) }
+                prepareBundledPackages(::report)
+                checkLocalized(runInstaller("dependencies", 1200, ::report) == 0) { AppText.get(R.string.desktop_install_failed) }
+            } else checkLocalized(activated == 0) { AppText.get(R.string.desktop_install_failed) }
+            checkLocalized(configuration().installed) { AppText.get(R.string.desktop_install_failed) }
+            DurableFiles.delete(File(directory, "bundled-packages"))
+            report(AppText.get(R.string.qq_desktop_access))
+            prepareAccess()
+            val commands = runtime.execute("/bin/bash", "-lc",
+                "ln -sfn '$GUEST/desktop.sh' /usr/local/bin/desktop-start; ln -sfn '$GUEST/qq.sh' /usr/local/bin/qq-desktop; ln -sfn '$GUEST/guest-compat' /usr/local/bin/guest-compat")
+            checkLocalized(commands.exitCode == 0) { AppText.get(R.string.desktop_install_failed) }
+        } finally { heartbeat.cancelAndJoin() }
+    } }
 
-    private suspend fun prepareBundledPackages() {
+    private suspend fun prepareBundledPackages(progress: (String) -> Unit) {
         val base = "desktop-packages/$abiName"
         val bundle = runCatching { context.assets.open("$base/manifest.json").bufferedReader().use { JSONObject(it.readText()) } }
             .getOrElse { throw io.astrbot.android.LocalizedStateException(AppText.get(R.string.qq_bundle_missing), it) }
@@ -107,6 +132,7 @@ class DesktopRepository(private val context: Context) {
         for (index in 0 until packages.length()) {
             currentCoroutineContext().ensureActive()
             val item = packages.getJSONObject(index)
+            progress(AppText.get(R.string.qq_desktop_copy, index + 1, packages.length(), item.getString("name")))
             val name = item.getString("file")
             checkLocalized(name.matches(Regex("[A-Za-z0-9.+_~:%-]+\\.deb"))) { AppText.get(R.string.qq_bundle_missing) }
             val target = File(targetDirectory, name)
@@ -174,13 +200,49 @@ class DesktopRepository(private val context: Context) {
         }
     }
 
-    private suspend fun runInstaller(mode: String, seconds: Long): Int = coroutineScope {
+    private suspend fun runInstaller(mode: String, seconds: Long, progress: ((String) -> Unit)? = null): Int = coroutineScope {
         val process = runtime.processBuilder("/usr/bin/python3", "$GUEST/install.py", mode).start()
+        var packageTotal = 0
+        val unpacked = mutableSetOf<String>()
+        val configured = mutableSetOf<String>()
+        val packageLine = Regex("^(Unpacking|Setting up|Processing triggers for) ([A-Za-z0-9.+:~-]+)(?: |$)")
         val output = launch(Dispatchers.IO) {
             runCatching { process.inputStream.bufferedReader().useLines { lines -> lines.forEach {
                 if (it.startsWith("ASTRBOT_TRANSFER ")) runCatching {
                     DesktopInstallStore.guestProgress(JSONObject(it.removePrefix("ASTRBOT_TRANSFER ")))
-                } else RuntimeStore.log(context, LogCategory.DESKTOP).append(SecretRedactor.redact(it))
+                } else if (it.startsWith("ASTRBOT_DESKTOP ")) runCatching {
+                    val item = JSONObject(it.removePrefix("ASTRBOT_DESKTOP "))
+                    val label = when (item.getString("phase")) {
+                        "VERIFYING" -> AppText.get(R.string.qq_desktop_verify, item.getInt("current"), item.getInt("total"), item.getString("package"))
+                        "UNPACKING" -> {
+                            packageTotal = item.getInt("total")
+                            unpacked.clear(); configured.clear()
+                            AppText.get(R.string.qq_desktop_install)
+                        }
+                        "RECOVERING" -> AppText.get(R.string.qq_desktop_recover)
+                        "CONFIGURING" -> AppText.get(R.string.qq_desktop_configure)
+                        "CHECKING" -> AppText.get(R.string.qq_desktop_check)
+                        "COMPATIBILITY" -> AppText.get(R.string.qq_desktop_compat)
+                        else -> null
+                    }
+                    label?.let { labelText -> progress?.invoke(labelText) }
+                } else {
+                    RuntimeStore.log(context, LogCategory.DESKTOP).append(SecretRedactor.redact(it))
+                    if (mode == "dependencies") packageLine.find(it)?.let { match ->
+                        val name = match.groupValues[2]
+                        val label = when (match.groupValues[1]) {
+                            "Unpacking" -> { unpacked += name; AppText.get(R.string.qq_desktop_unpack_package, unpacked.size, packageTotal, name) }
+                            "Setting up" -> {
+                                configured += name
+                                if (packageTotal > 0 && configured.size <= packageTotal)
+                                    AppText.get(R.string.qq_desktop_configure_package, configured.size, packageTotal, name)
+                                else AppText.get(R.string.qq_desktop_configure_name, name)
+                            }
+                            else -> AppText.get(R.string.qq_desktop_cache, name)
+                        }
+                        progress?.invoke(label)
+                    }
+                }
             } } }
         }
         try {
