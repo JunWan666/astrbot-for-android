@@ -47,7 +47,7 @@ def prepare(output: Path):
 
     with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(fetch, lock['packages']))
-    (directory / 'manifest.json').write_text(json.dumps(lock, indent=2) + '\n', encoding='utf-8')
+    (directory / 'manifest.json').write_text(json.dumps(lock, indent=2) + '\n', encoding='utf-8', newline='\n')
     return {'packages': len(lock['packages']), 'bytes': sum(item['bytes'] for item in lock['packages'])}
 
 

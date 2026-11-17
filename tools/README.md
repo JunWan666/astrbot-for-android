@@ -8,6 +8,7 @@ Windows 双击根目录 `build.bat`，或执行 `python3 -B tools/build_release.
 | --- | --- |
 | `build_release.py` | 构建 ARM64 Release、使用长期签名、执行 lint 并校验 APK |
 | `build_support/build_native.py` | 从当前源码编译管理器原生运行器，保留准备好的 PRoot 依赖 |
+| `build_support/prepare_core_runtime.py` | 校验旧构建输入并生成仅含 AstrBot 的基础镜像，重新计算清单摘要 |
 | `build_support/prepare_optional_assets.py` | 准备官方 Shizuku 安装包、许可及桌面离线依赖 |
 | `build_support/prepare_desktop_assets.py` | 按版本锁下载并校验 Ubuntu ARM64 桌面离线依赖 |
 | `build_support/prepare_desktop_snapshot.py` | 在干净 Linux 构建根中预配置桌面依赖，生成仅用于全新初始化的资源 |

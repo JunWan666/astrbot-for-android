@@ -3,6 +3,7 @@
 PUBLIC_DOCUMENTS = frozenset({
     ".github/CONTRIBUTING.md",
     ".github/GIT_COMMIT_RULES.md",
+    ".github/workflows/download-stats.yml",
     "docs/README.en.md",
     "docs/CHANGELOG.md",
     "docs/examples/local.properties.example",
@@ -10,7 +11,6 @@ PUBLIC_DOCUMENTS = frozenset({
     "docs/legal/NOTICE",
     "docs/legal/THIRD_PARTY_NOTICES.md",
     "docs/使用指南.md",
-    "docs/SnowLuma手动部署.md",
     "docs/构建指南.md",
     "docs/更新与分发.md",
     "docs/发行材料.md",
@@ -19,18 +19,19 @@ PUBLIC_DOCUMENTS = frozenset({
     "docs/images/logo.png",
     "docs/images/architecture.webp",
     "docs/images/architecture.en.webp",
+    "docs/images/architecture.svg",
+    "docs/images/architecture.en.svg",
     "docs/images/qq-community.svg",
     "docs/images/qq-community.en.svg",
     "docs/images/astrbot-logo-with-text.svg",
-    "docs/images/napcat-logo.png",
     "docs/images/home.webp",
-    "docs/images/personas.webp",
+    "docs/images/tasks.webp",
     "docs/images/settings.webp",
     "docs/images/websites.webp",
     "docs/images/extensions.webp",
     "docs/images/permissions.webp",
     "docs/images/astrbot-webui.webp",
-    "docs/images/napcat-webui.webp",
+    "docs/images/qq-official.webp",
 })
 
 

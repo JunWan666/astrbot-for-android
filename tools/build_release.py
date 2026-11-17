@@ -12,6 +12,7 @@ import secrets
 import shutil
 import subprocess
 import sys
+import tarfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -121,12 +122,19 @@ def verify_bundled_runtime(apk: Path) -> dict:
     try:
         with zipfile.ZipFile(apk) as archive:
             names = archive.namelist()
+            if any(name.startswith("assets/optional/data.tar") or
+                   name == "assets/optional/runtime-archive.json" for name in names):
+                raise ValueError("APK 包含已退役组件归档，请清理旧构建资源")
             if any(names.count(name) != 1 for name in (manifest_name, image_name)):
                 raise ValueError("APK 内置 Ubuntu 资源或清单缺失、重复，已拒绝导出")
             manifest = json.loads(archive.read(manifest_name))
             if (not isinstance(manifest, dict) or manifest.get("abi") != "arm64-v8a" or
                     manifest.get("kind") != "complete"):
                 raise ValueError("APK 必须包含 ARM64 完整运行环境，已拒绝导出")
+            components = manifest.get("components", {})
+            if (not isinstance(components, dict) or "astrbot" not in components or
+                    set(components) - {"schemaVersion", "status", "astrbot"}):
+                raise ValueError("基础运行镜像必须仅声明 AstrBot，请重新准备运行资源")
             expected = manifest.get("sha256")
             if not isinstance(expected, str) or not re.fullmatch(r"[a-f0-9]{64}", expected):
                 raise ValueError("APK 内置 Ubuntu 清单的 SHA-256 无效，已拒绝导出")
@@ -136,6 +144,12 @@ def verify_bundled_runtime(apk: Path) -> dict:
             if image.file_size == 0 or actual != expected:
                 raise ValueError(f"APK 内置 Ubuntu 资源完整性校验失败：{image_name}，"
                                  f"读取 {image.file_size} 字节，期望 SHA-256 {expected}，实际 {actual}；已拒绝导出")
+            with archive.open(image) as stream, tarfile.open(fileobj=stream, mode="r|gz") as runtime:
+                for entry in runtime:
+                    path = entry.name.removeprefix("./").strip("/").lower()
+                    if (path == "opt/qq" or path.startswith("opt/qq/") or
+                            path == "persistent/snowluma" or path.startswith("persistent/snowluma/")):
+                        raise ValueError("基础运行镜像仍包含已退役程序，请重新准备运行资源")
             return {"abi": manifest["abi"], "bytes": image.file_size, "sha256": actual}
     except (zipfile.BadZipFile, json.JSONDecodeError, UnicodeDecodeError) as failure:
         raise ValueError("无法读取 APK 内置 Ubuntu 资源或清单，已拒绝导出") from failure

@@ -111,8 +111,6 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
         for package in inventory["pythonPackages"] + inventory["npmPackages"]:
             assert package["metadata"] in names
             assert set(package["notices"]).issubset(names)
-        napcat_license = next(p for p in names if p.startswith("sources/napcat-source/") and p.count("/") == 3 and p.endswith("/LICENSE"))
-        assert b"Limited Redistribution License for NapCat" in notices.read(napcat_license)
         assert b"GNU AFFERO GENERAL PUBLIC LICENSE" in notices.read("runtime/opt/astrbot/LICENSE")
         for dependency in inventory["androidArtifacts"]:
             if "pom" in dependency:
@@ -128,8 +126,10 @@ def verify_collection(directory: Path, root: Path = ROOT, python_source_director
     if "ubuntuSourceCollection" in inventory:
         record = inventory["ubuntuSourceCollection"]
         with zipfile.ZipFile(directory / record["file"]) as sources:
-            plan = json.loads(sources.read("plan.json"))
-            assert hashlib.sha256(sources.read("plan.json")).hexdigest() == record["planSha256"]
+            plan_data = sources.read("plan.json")
+            assert plan_data == (root / "runtime/ubuntu-sources.lock.json").read_bytes()
+            plan = json.loads(plan_data)
+            assert hashlib.sha256(plan_data).hexdigest() == record["planSha256"]
             assert plan["runtimeSha256"] == inventory["runtime"]["sha256"]
             assert not plan["missing"]
             assert {(p["name"], p["version"]) for p in plan["packages"]} == {(p["sourceName"], p["sourceVersion"]) for p in inventory["ubuntuPackages"]}

@@ -22,20 +22,18 @@ import zipfile
 from repository_layout import is_public_document
 
 ROOT = Path(__file__).resolve().parents[2]
-NAPCAT = "opt/qq/resources/app/app_launcher/napcat"
 PYTHON = "opt/astrbot-venv/lib/python3.12/site-packages/"
 MAX_TEXT = 16 * 1024 * 1024
 MAX_TOTAL_TEXT = 128 * 1024 * 1024
 FIXED_RUNTIME = {
     "var/lib/dpkg/status", "var/lib/astrbot-manager/system-packages.lock",
     "var/lib/astrbot-manager/astrbot-python.lock.txt", "opt/astrbot/LICENSE",
-    "opt/astrbot/dashboard/package.json", "opt/qq/LICENSE.electron.txt",
-    "opt/qq/LICENSES.chromium.html", "opt/qq/resources/app/package.original.json",
+    "opt/astrbot/dashboard/package.json",
 }
 SOURCE_ROOT_FILES = {
     ".gitignore", ".gitattributes", ".github/workflows/ci.yml", ".github/CODEOWNERS",
     ".github/workflows/renew-updates.yml", "runtime/update-public-key.der",
-    "app/src/main/res/drawable-nodpi/logo_napcat.webp",
+    "app/src/main/res/drawable-nodpi/platform_qq.png",
     "app/src/main/res/drawable-nodpi/app_logo.webp",
     "app/src/main/assets/terminal/vendor/xterm-LICENSE",
     "app/src/main/assets/terminal/vendor/addon-fit-LICENSE",
@@ -85,9 +83,7 @@ def selected_runtime(name: str) -> bool:
     return (name in FIXED_RUNTIME or name.startswith("usr/share/common-licenses/") or
             (name.startswith("usr/share/doc/") and name.endswith("/copyright")) or
             (name.startswith(PYTHON) and ".dist-info/" in name and
-             (name.endswith("/METADATA") or "/licenses/" in name or notice_name(name))) or
-            (name.startswith(NAPCAT + "/") and
-             (name.endswith("/package.json") or notice_name(name))))
+             (name.endswith("/METADATA") or "/licenses/" in name or notice_name(name))))
 
 
 def link_target(name: str, target: str, hardlink: bool = False) -> str:
@@ -219,24 +215,6 @@ def python_packages(files: dict[str, bytes]) -> list[dict]:
                        "metadata": "runtime/" + path,
                        "notices": ["runtime/" + p for p in sorted(files) if p.startswith(parent) and p != path],
                        "correspondingSource": "not-collected; wheel may contain vendored native code"})
-    return result
-
-
-def npm_packages(files: dict[str, bytes]) -> list[dict]:
-    result = []
-    for path, data in sorted(files.items()):
-        if not path.startswith(NAPCAT + "/") or not path.endswith("/package.json"):
-            continue
-        fields = json.loads(data)
-        parent = path.rsplit("/", 1)[0] + "/"
-        # Nested dependencies own their notices. Do not assign their license to the parent.
-        own_notices = ["runtime/" + p for p in sorted(files) if p.startswith(parent) and
-                       "node_modules" not in PurePosixPath(p[len(parent):]).parts and notice_name(p)]
-        result.append({"name": fields.get("name"), "version": fields.get("version"),
-                       "licenseField": fields.get("license", fields.get("licenses")),
-                       "repository": fields.get("repository"), "metadata": "runtime/" + path,
-                       "notices": own_notices,
-                       "correspondingSource": "not-collected; inventory covers external package.json files only"})
     return result
 
 
@@ -418,6 +396,8 @@ def ubuntu_source_collection(root: Path, runtime_sha: str, packages: list[dict],
         data = archive.read("plan.json")
         if hashlib.sha256(data).hexdigest() != record["planSha256"]:
             raise ValueError("Ubuntu source plan digest differs")
+        if data != (root / "runtime/ubuntu-sources.lock.json").read_bytes():
+            raise ValueError("Ubuntu source plan differs from the repository lock")
         plan = json.loads(data)
         pairs = {(p["sourceName"], p["sourceVersion"]) for p in packages}
         if plan["missing"] or {(p["name"], p["version"]) for p in plan["packages"]} != pairs:
@@ -493,6 +473,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     notices = {"runtime/" + path: data for path, data in files.items()}
     for name, source in (("LICENSE", "LICENSE"), ("NOTICE", "docs/legal/NOTICE")):
         notices["manager/" + name] = (root / source).read_bytes()
+    notices["manager/THIRD_PARTY_NOTICES.md"] = (root / "docs/legal/THIRD_PARTY_NOTICES.md").read_bytes()
     terminal_renderer = json.loads((root / "runtime/terminal-assets.lock.json").read_text("utf-8"))
     for package in terminal_renderer["packages"]:
         for entry in package["files"]:
@@ -524,7 +505,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
     dpkg = system_packages(files, links)
     ubuntu_collection = ubuntu_source_collection(root, image_manifest["sha256"], dpkg, notices, cache_dir)
     python = python_packages(files)
-    npm = npm_packages(files)
+    npm = []  # The core image has no installed npm application packages.
     python_lock = dict(re.findall(r"^([^#\s=]+)==([^\s]+)$", (root / "runtime/astrbot-python.lock.txt").read_text(), re.M))
     canonical = lambda name: re.sub(r"[-_.]+", "-", name).lower()
     if {canonical(p["name"]): p["version"] for p in python} != {canonical(k): v for k, v in python_lock.items()}:
@@ -559,13 +540,9 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
             runner = native_dir / abi / f"lib{name}-runner.so"
             native[abi].append({"file": runner.name, "sha256": digest(runner), "origin": f"native/{name}_runner.c; docs/构建指南.md"})
     gaps = [
-        {"id": "linux-qq-redistribution", "status": "unconfirmed", "detail": "Electron/Chromium notices do not grant redistribution rights to Linux QQ itself."},
-        {"id": "napcat-permission", "status": "requires-review", "detail": "Exact 4.18.41 Limited Redistribution License retained; noncommercial and modified-source restrictions apply. No broader permission inferred."},
         {"id": "ubuntu-corresponding-source", "status": "source-archives-collected; binary-build-provenance-unverified" if ubuntu_collection else "not-collected", "detail": "Exact source packages, Debian build/patch archives and signed archive metadata are in ubuntu-source-packages.zip; no binary rebuild claimed." if ubuntu_collection else "Installed binary/source package versions and copyright aliases recorded. Exact Ubuntu source archives and build recipes are not included."},
         {"id": "desktop-corresponding-source", "status": "source-archives-collected; binary-build-provenance-unverified", "detail": "Offline desktop package notices and exact source versions are recorded separately from the base image. ubuntu-desktop-source-packages.zip is an external release companion; no binary rebuild claimed."},
-        {"id": "snowluma-integration-permission", "status": "requires-written-confirmation", "detail": "No SnowLuma program is bundled. Dedicated preparation commands and lifecycle controls require review against SnowLuma LICENSE 4(b) and EULA 5.4; absence of bundled binaries does not establish authorization."},
         {"id": "python-corresponding-source", "status": "source-archives-collected; wheel-native-build-provenance-unverified" if python_collection else "not-collected-in-this-inventory", "detail": "Exact PyPI sdists and separately identified upstream source archives are in the external python-source-packages.zip; wheel provenance, native/vendored dependencies and binary rebuilds remain unverified." if python_collection else "150 pinned distributions; pass --python-source-directory to bind a verified separate source companion. This inventory contains no Python source archive evidence."},
-        {"id": "bundled-js-and-native", "status": "incomplete", "detail": "npm inventory covers external package.json files only. Bundled/minified JS, static/native binaries, fonts and QQ internals need separate dependency/source mapping."},
         {"id": "android-source-completeness", "status": "unverified", "detail": "Resolved source jars retained where available; source jars alone are not proof of complete corresponding source or build reproducibility."},
         {"id": "native-build-provenance", "status": "unverified", "detail": "Original native sources and Termux recipes retained; exact toolchain/binary rebuild provenance remains unverified."},
         {"id": "other-build-tools", "status": "incomplete", "detail": "Inventory covers release runtime graph, not every Gradle/SDK/NDK build tool or generated/vendored code."},
@@ -597,7 +574,7 @@ def collect(root: Path, image_dir: Path, metadata_dir: Path, destination: Path, 
         "This is not a complete SBOM, corresponding-source delivery, or redistribution authorization.\n"
         "Runtime inventory is bound to the image SHA-256, not an APK or a later updated device.\n").encode()
     source_readme = ("Available original upstream sources and resolved Maven source jars only.\n"
-        "Includes native upstream sources, Termux recipes, AstrBot, NapCat and source jars.\n"
+        "Includes native upstream sources, Termux recipes, AstrBot and source jars.\n"
         "This ZIP does not include Ubuntu/Python sources or complete bundled dependency mapping.\n"
         "When available, Ubuntu source packages are a separate ubuntu-source-packages.zip; see inventory.\n"
         "Python source companions are separate external outputs; their directory must be supplied for verification.\n"
