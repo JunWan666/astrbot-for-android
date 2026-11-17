@@ -30,16 +30,16 @@ data class RollbackInfo(val version: String, val snapshotId: String)
 
 /** Transactions replace one interpreted program and retain a matching data recovery point. */
 class UpdateRepository(private val context: Context, private val component: String = "astrbot") {
-    init { require(component in setOf("astrbot", "napcat")) }
-    private val label = if (component == "napcat") "NapCat" else "AstrBot"
+    init { require(component == "astrbot") }
+    private val label = "AstrBot"
     private val files = context.filesDir
-    private val active = File(files, if (component == "napcat") "runtime-data/ubuntu/opt/qq/resources/app/app_launcher/napcat" else "runtime-data/ubuntu/opt/astrbot")
+    private val active = File(files, "runtime-data/ubuntu/opt/astrbot")
     private val work = File(files, "staging/$component-update")
     private val staged = File(work, "program")
     private val packageFile = File(work, "package.zip")
     private val prepared = File(work, "verified.json")
-    private val journal = File(files, if (component == "astrbot") "operations/update.json" else "operations/napcat-update.json")
-    private val rollback = File(files, if (component == "astrbot") "manifests/rollback.json" else "manifests/napcat-rollback.json")
+    private val journal = File(files, "operations/update.json")
+    private val rollback = File(files, "manifests/rollback.json")
     private val officialProof = File(work, "official-proof.json")
     private val backups = BackupRepository(files)
     val hasPendingUpdate get() = DurableFiles.exists(journal)
@@ -66,12 +66,13 @@ class UpdateRepository(private val context: Context, private val component: Stri
         } catch (failure: Throwable) { DurableFiles.delete(work); throw failure }
     }
 
-    internal suspend fun prepareNapCat(archive: File, envelope: JSONObject, id: String, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
-        checkLocalized(component == "napcat" && !hasPendingUpdate && !backups.hasPendingRestore) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
+    internal suspend fun prepareOfficial(release: JSONObject, archive: File, dashboard: File, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
+        check(!hasPendingUpdate && !backups.hasPendingRestore && release.getString("component") == component)
         DurableFiles.delete(work); check(work.mkdirs())
         try {
-            FileOutputStream(packageFile).use { output -> archive.inputStream().use { boundedCopy(it, output, MAX_PACKAGE) }; output.fd.sync() }
-            DurableFiles.write(officialProof, JSONObject().put("envelope", envelope).put("id", id))
+            archive.copyTo(packageFile)
+            if (component == "astrbot") dashboard.copyTo(File(work, "dashboard.zip"))
+            DurableFiles.write(File(work, "github-release.json"), release)
             verifyAndExtract(progress)
         } catch (failure: Throwable) { DurableFiles.delete(work); throw failure }
     }
@@ -82,12 +83,16 @@ class UpdateRepository(private val context: Context, private val component: Stri
     }
 
     private suspend fun verifyAndExtract(progress: (String) -> Unit, expectedVersion: String? = null): UpdateInfo {
-        progress(AppText.get(R.string.ui_verifying_update_signature_and_compatibility))
+        val github = DurableFiles.read(File(work, "github-release.json"))
+        progress(AppText.get(if (github == null) R.string.ui_verifying_update_signature_and_compatibility else R.string.upstream_verifying))
         DurableFiles.delete(staged)
         if (DurableFiles.exists(prepared)) DurableFiles.removeRecord(prepared)
         requireLocalized(packageFile.isFile && packageFile.length() <= MAX_PACKAGE) { AppText.get(R.string.ui_update_package_is_missing_or_too_large) }
-        if (component == "napcat") {
-            val value = OfficialNapCat.extract(context, packageFile, staged, requireNotNull(DurableFiles.read(officialProof)))
+        if (github != null) {
+            progress(AppText.get(R.string.upstream_preparing, label))
+            val value = OfficialComponentArchive.extract(context, github, packageFile, File(work, "dashboard.zip"), staged)
+            validateProgram(staged, value.getString("version"))
+            if (component == "astrbot") checkPythonDependencies(progress)
             DurableFiles.write(prepared, value)
             return info(value)
         }
@@ -137,6 +142,25 @@ class UpdateRepository(private val context: Context, private val component: Stri
         return info(manifest)
     }
 
+    private suspend fun checkPythonDependencies(progress: (String) -> Unit) {
+        progress(AppText.get(R.string.upstream_dependency_check))
+        val requirements = File(staged, "requirements.txt")
+        require(requirements.isFile && requirements.length() <= 1024 * 1024)
+        val directory = File(files, "manager/update-validation").apply { mkdirs() }
+        val mirror = File(directory, "requirements.txt")
+        try {
+            requirements.copyTo(mirror, overwrite = true)
+            File(staged, "astrbot/core/utils/migra_helper.py").copyTo(File(directory, "migra_helper.py"), overwrite = true)
+            context.assets.open("runtime/astrbot_update_compat.py").use { input -> File(directory, "astrbot_update_compat.py").outputStream().use { input.copyTo(it) } }
+            val script = context.assets.open("runtime/check_update_dependencies.py").bufferedReader().use { it.readText() }
+            val result = BootstrapRuntime(context).execute("/opt/astrbot-venv/bin/python", "-c", script,
+                "/manager/update-validation/requirements.txt", "/manager/update-validation/migra_helper.py", timeoutSeconds = 60)
+            if (result.exitCode != 0) RuntimeStore.log(context, LogCategory.RUNTIME).append(result.output.takeLast(5000))
+            requireLocalized(result.exitCode != 2) { AppText.get(R.string.upstream_migration_error) }
+            requireLocalized(result.exitCode == 0) { AppText.get(R.string.upstream_dependency_error) }
+        } finally { DurableFiles.delete(directory) }
+    }
+
     private suspend fun extract(payload: File, expectedCount: Int, expectedSize: Long) {
         check(staged.mkdirs())
         val names = HashSet<String>()
@@ -172,8 +196,7 @@ class UpdateRepository(private val context: Context, private val component: Stri
         check(!hasPendingUpdate && !backups.hasPendingRestore)
         val record = DurableFiles.read(rollback) ?: error(AppText.get(R.string.ui_no_program_and_data_snapshot_available_for_rollback))
         val current = InstalledVersions.read(context)
-        val counterpart = if (component == "napcat") "AstrBot" else "NapCat"
-        requireLocalized(listOf(counterpart, "Linux QQ", "Python", "运行环境", "架构").all {
+        requireLocalized(listOf("Python", "运行环境", "架构").all {
             record.getJSONObject("oldVersions").optString(it) == current.components[it]
         }) { AppText.get(R.string.ui_other_components_have_changed_so_this_old_combination_cannot) }
         val previous = previous(record)
@@ -188,7 +211,7 @@ class UpdateRepository(private val context: Context, private val component: Stri
     }
 
     internal suspend fun preserveUserPlugins() {
-        if (component == "napcat") OfficialNapCat.preservePlugins(active, staged)
+        // AstrBot plugins live in the persistent data directory.
     }
 
     fun begin(snapshot: BackupInfo, versions: RuntimeVersions, wanted: List<ServiceId>) {
@@ -285,12 +308,6 @@ class UpdateRepository(private val context: Context, private val component: Stri
             listOf(record.getString("url"), record.getString("sha256"))
         }
     private fun validateProgram(program: File, version: String) {
-        if (component == "napcat") {
-            val source = File(program, "napcat.mjs")
-            requireLocalized(source.isFile && source.length() <= 32 * 1024 * 1024 &&
-                NapCatVersion.read(program, source.readText()) == version && File(program, "static/index.html").isFile) { AppText.get(R.string.ui_napcat_rollback_program_version_or_dashboard_mismatch) }
-            return
-        }
         fun text(path: String): String {
             val file = File(program, path)
             requireLocalized(file.isFile && file.length() <= 4 * 1024 * 1024) { AppText.get(R.string.ui_update_lacks_required_program_or_dashboard_files) }

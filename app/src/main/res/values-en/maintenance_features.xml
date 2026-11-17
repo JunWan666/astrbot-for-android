@@ -1,0 +1,47 @@
+<resources>
+    <string name="backup_choose_contents">Choose backup contents</string>
+    <string name="backup_contents_hint">Export a ZIP to restore on another phone. Only included data is replaced; other data is kept.</string>
+    <string name="backup_scope_astrbot">AstrBot data</string>
+    <string name="backup_scope_astrbot_hint">Settings, databases, plugins, personas and other data</string>
+
+
+    <string name="backup_scope_qq">QQ sessions</string>
+    <string name="backup_scope_qq_hint">Contains login credentials. Keep private; another phone may still require QR login.</string>
+    <string name="backup_export_complete">Selected data exported as ZIP. Save it outside the app directory.</string>
+    <string name="backup_import_complete">Backup restored; excluded data was kept. Scan the QR code again if QQ login expired.</string>
+    <string name="backup_cross_version_hint">Restoring across phones and versions is supported. Programs and runtime are kept. Services are checked after restore and failures roll back.</string>
+    <string name="backup_restore_summary">Created: %1$s\nIncludes: %2$s\n\n%3$s\n\nServices will stop and a local recovery snapshot will be created first.</string>
+    <string name="backup_portable_subtitle">Choose data and QQ sessions to transfer between phones</string>
+    <string name="cpolar_lan_title">LAN access</string>
+    <string name="cpolar_lan_hint">Allow devices on the same network to access the cpolar dashboard. Sign in with your official cpolar account.</string>
+    <string name="cpolar_lan_confirm">Devices on this network will be able to access port 9200. Running cpolar will restart, briefly disconnecting tunnels.</string>
+    <string name="cpolar_lan_saved">cpolar access settings saved.</string>
+    <string name="cpolar_lan_no_address">Connect to Wi-Fi or enable a hotspot to see the LAN address</string>
+    <string name="logs_clear">Clear</string>
+    <string name="logs_clear_confirm">Clear this log category and its archives? New logs will continue to be recorded. Services and user data are kept.</string>
+    <string name="logs_clear_all">Clear logs</string>
+    <string name="logs_clear_all_hint">Clear manager logs and service history logs that can be safely removed</string>
+    <string name="logs_clear_all_confirm">Clear manager logs and service history logs? Open, recently used or unverifiable service logs are kept. Settings, databases and backups are kept.</string>
+    <string name="logs_cleared">Logs cleared. Running services will continue producing new logs.</string>
+    <string name="upstream_channel">Official GitHub stable release</string>
+    <string name="upstream_checking">Checking official %1$s GitHub releases…</string>
+    <string name="upstream_available">%1$s %2$s is available. Review the notes to update.</string>
+    <string name="upstream_latest">%1$s is up to date (%2$s).</string>
+    <string name="upstream_newer">Installed %1$s %2$s is newer than the latest official stable release.</string>
+    <string name="upstream_error">Could not fetch the official release. Check your network and retry later. GitHub may have temporarily rate-limited requests.</string>
+    <string name="upstream_invalid">Unsupported official release version, files or format. The installed program was kept.</string>
+    <string name="upstream_no_stable">No supported stable version was found in recent official releases. Try again later. Your installed AstrBot was kept.</string>
+    <string name="upstream_downloading">Downloading %1$s: %2$d / %3$d MB</string>
+    <string name="upstream_preparing">Preparing official %1$s update…</string>
+    <string name="upstream_verifying">Verifying official update files…</string>
+    <string name="upstream_dependency_check">Checking Python dependencies required by the new AstrBot…</string>
+    <string name="upstream_dependency_error">The new AstrBot requires Python dependencies this runtime does not satisfy. The program was kept. Update the runtime first; see runtime logs for details.</string>
+    <string name="upstream_flow_hint">Download from official GitHub, check, back up and update. Installation pauses services and closes terminals, then restores the previous service state. Restart terminal commands manually. Failed service checks restore the old program and data; upstream releases still require local compatibility checks.</string>
+    <string name="upstream_download_install">Download and update</string>
+    <string name="upstream_check_hint">Check the latest stable release directly on official GitHub</string>
+    <string name="upstream_download_failed">Official download interrupted or verification failed. Retry; the installed program was kept.</string>
+    <string name="upstream_downloading_unknown">Downloading %1$s: %2$d MB received (total size unavailable)</string>
+    <string name="upstream_size_unknown">Size available during download</string>
+    <string name="upstream_migration_error">The new AstrBot migration implementation is not supported yet. The installed program was preserved. Update the manager before retrying.</string>
+    <string name="backup_no_selected_data">No selected data was found. Configure the component first or choose other contents.</string>
+</resources>

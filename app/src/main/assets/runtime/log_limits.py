@@ -1,15 +1,14 @@
-"""Apply file-log limits to the two pinned upstream logging APIs, without editing config."""
+"""Apply file-log limits when the upstream logging API supports them, without editing config."""
 import inspect
 import math
 
 
 def install():
-    from astrbot import __version__
     from astrbot.core.log import LogManager
 
-    if __version__ not in ("4.29.1", "4.29.3"):
+    original = getattr(LogManager, "_add_file_sink", None)
+    if not callable(original):
         return "unsupported"
-    original = LogManager._add_file_sink
     if getattr(original, "_android_bounded", False):
         return "bounded"
     if not {"max_mb", "backup_count"}.issubset(inspect.signature(original).parameters):

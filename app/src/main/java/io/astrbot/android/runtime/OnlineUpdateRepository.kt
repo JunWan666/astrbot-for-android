@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 data class OnlineUpdateInfo(val id: String, val version: String, val channel: String, val notes: String, val bytes: Long)
 data class OnlineUpdateCheck(val candidate: OnlineUpdateInfo?, val message: String, val latest: OnlineUpdateInfo? = candidate)
 
-/** Downloads are inert until both the signed catalog and existing package verifier accept them. */
+/** Default components use official releases; custom catalogs retain their signature verification. */
 internal class OnlineUpdateRepository(
     private val context: Context,
     private val source: String = BuildConfig.UPDATE_CATALOG_URL,
@@ -33,14 +33,17 @@ internal class OnlineUpdateRepository(
     private val now: () -> Long = { System.currentTimeMillis() },
     private val component: String = "astrbot",
 ) {
-    init { require(component in setOf("astrbot", "napcat")) }
-    private val label = if (component == "napcat") "NapCat" else "AstrBot"
+    init { require(component == "astrbot") }
+    private val label = "AstrBot"
+    // Custom signed channels remain available to downstream builds and offline maintenance.
+    private val upstream = if (source == "https://api.github.com/repos/${OfficialReleaseRepository.repository(component)}/releases/latest")
+        OfficialReleaseRepository(context, component, providedClient) else null
     private val clientDelegate = lazy { providedClient ?: OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS).callTimeout(20, TimeUnit.MINUTES)
         .followRedirects(false).followSslRedirects(false).build() }
     private val client by clientDelegate
-    private val cache = File(context.filesDir, if (component == "astrbot") "manifests/online-catalog.json" else "manifests/napcat-catalog.json")
-    private val downloadDirectory = File(context.filesDir, if (component == "astrbot") "staging/online-download" else "staging/napcat-download")
+    private val cache = File(context.filesDir, "manifests/online-catalog.json")
+    private val downloadDirectory = File(context.filesDir, "staging/online-download")
     private val partial = File(downloadDirectory, "package.part")
     private val receipt = File(downloadDirectory, "download.json")
     val configured get() = source.isNotEmpty()
@@ -50,8 +53,8 @@ internal class OnlineUpdateRepository(
                              val environment: String, val abi: String, val minAppCode: Int)
     private data class Catalog(val entries: List<Entry>)
 
-    fun cachedCandidate(): OnlineUpdateInfo? = cached(onlyNewer = true)
-    fun cachedLatest(): OnlineUpdateInfo? = cached(onlyNewer = false)
+    fun cachedCandidate(): OnlineUpdateInfo? = if (upstream != null) upstream.cached(true) else cached(onlyNewer = true)
+    fun cachedLatest(): OnlineUpdateInfo? = if (upstream != null) upstream.cached(false) else cached(onlyNewer = false)
     private fun cached(onlyNewer: Boolean): OnlineUpdateInfo? = runCatching {
         if (!configured) return null
         val saved = DurableFiles.read(cache) ?: return null
@@ -61,12 +64,13 @@ internal class OnlineUpdateRepository(
 
     suspend fun check(progress: (String) -> Unit): OnlineUpdateCheck = withContext(Dispatchers.IO) {
         requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_online_update_url_configured_import) }
-        progress(AppText.get(R.string.ui_checking_the_signed_update_catalog))
+        progress(if (upstream != null) AppText.get(R.string.upstream_checking, label) else AppText.get(R.string.ui_checking_the_signed_update_catalog))
         acceptCatalog(fetchCatalog())
     }
 
     /** Network-only phase. Automatic checks must not hold the service/maintenance gate here. */
     internal suspend fun fetchCatalog(): JSONObject = withContext(Dispatchers.IO) {
+        upstream?.let { return@withContext it.fetch() }
         requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_online_update_url_configured) }
         requireHttps(source)
         val bytes = withResponse(source.toHttpUrl()) { response ->
@@ -91,6 +95,7 @@ internal class OnlineUpdateRepository(
 
     /** Caller holds RuntimeStore.operationLock. Re-evaluate compatibility at commit time. */
     internal fun acceptCatalog(envelope: JSONObject): OnlineUpdateCheck {
+        upstream?.let { return it.accept(envelope) }
         val catalog = verify(envelope, commitSequence = true)
         val chosen = candidate(catalog)
         val latest = candidate(catalog, onlyNewer = false)
@@ -109,6 +114,7 @@ internal class OnlineUpdateRepository(
     }
 
     suspend fun download(id: String, updates: UpdateRepository, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
+        upstream?.let { return@withContext it.download(id, updates, progress) }
         requireLocalized(configured) { AppText.get(R.string.ui_this_apk_has_no_online_update_url_configured) }
         val saved = DurableFiles.read(cache) ?: error("请先检查更新")
         requireLocalized(saved.getString("source") == source) { AppText.get(R.string.ui_update_source_has_changed_check_again) }
@@ -126,7 +132,7 @@ internal class OnlineUpdateRepository(
         requireLocalized(context.filesDir.usableSpace >= chosen.info.bytes - offset + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_space_to_download_the_update) }
         if (offset != chosen.info.bytes) {
             progress(AppText.get(R.string.ui_downloading_mb, label, chosen.info.version, offset / 1024 / 1024, chosen.info.bytes / 1024 / 1024))
-            withResponse(chosen.url, offset) { response ->
+            withResponse(chosen.url, offset, phase = "download") { response ->
                 requireLocalized(response.code == 200 || response.code == 206) { AppText.get(R.string.ui_update_download_failed_progress_is_preserved_you_can_retry) }
                 val append = offset > 0 && response.code == 206
                 val start = if (append) offset else 0L
@@ -176,8 +182,7 @@ internal class OnlineUpdateRepository(
         }
         // Revalidate expiration after a potentially long download, then independently verify the ZIP signature.
         verify(saved.getJSONObject("envelope"), commitSequence = false)
-        val prepared = if (component == "napcat") updates.prepareNapCat(partial, saved.getJSONObject("envelope"), chosen.info.id, progress)
-            else updates.prepareExpected(Uri.fromFile(partial), chosen.info.version, progress)
+        val prepared = updates.prepareExpected(Uri.fromFile(partial), chosen.info.version, progress)
         partial.delete(); DurableFiles.removeRecord(receipt)
         prepared
     }
@@ -203,7 +208,6 @@ internal class OnlineUpdateRepository(
         val entries = (0 until items.length()).map { index ->
             val value = items.getJSONObject(index)
             requireLocalized(value.getString("component") == component) { AppText.get(R.string.ui_update_catalog_component_does_not_match_this_page) }
-            if (component == "napcat") OfficialNapCat.validateEntry(value)
             val id = value.getString("id"); require(id.matches(Regex("[a-zA-Z0-9._-]{1,100}")))
             val version = value.getString("version"); versionParts(version)
             val notes = value.getString("notes"); require(notes.length <= 8000)
@@ -233,7 +237,7 @@ internal class OnlineUpdateRepository(
             .maxWithOrNull { a, b -> compare(versionParts(a.info.version), versionParts(b.info.version)) }
     }
 
-    private suspend fun <T> withResponse(url: HttpUrl, offset: Long = 0, block: suspend (Response) -> T): T = coroutineScope {
+    private suspend fun <T> withResponse(url: HttpUrl, offset: Long = 0, phase: String = "metadata", block: suspend (Response) -> T): T = coroutineScope {
         var current = requireHttps(url.toString())
         repeat(6) {
             val request = Request.Builder().url(current).header("Accept-Encoding", "identity").header("Cache-Control", "no-cache")
@@ -244,14 +248,20 @@ internal class OnlineUpdateRepository(
                 call.execute().use { response ->
                     if (response.code in setOf(301, 302, 303, 307, 308)) {
                         current = requireHttps(requireNotNull(current.resolve(requireNotNull(response.header("Location")))).toString())
-                    } else return@coroutineScope block(response)
+                    } else {
+                        if (!response.isSuccessful) throw UpdateRequestFailure(phase, current.host, response.code)
+                        return@coroutineScope block(response)
+                    }
                 }
+            } catch (failure: CancellationException) { throw failure }
+            catch (failure: java.io.IOException) {
+                throw if (failure is UpdateRequestFailure) failure else UpdateRequestFailure(phase, current.host, cause = failure)
             } finally { cancellation.cancel() }
         }
         error(AppText.get(R.string.ui_too_many_update_server_redirects))
     }
 
-    fun close() { if (providedClient == null && clientDelegate.isInitialized()) { client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown() } }
+    fun close() { upstream?.close(); if (providedClient == null && clientDelegate.isInitialized()) { client.connectionPool.evictAll(); client.dispatcher.executorService.shutdown() } }
 
     companion object {
         internal fun scopeFor(context: Context, source: String): String =

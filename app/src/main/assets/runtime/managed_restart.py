@@ -5,8 +5,6 @@ import os
 
 
 def install(version, restart_requested=None):
-    if version not in ("4.29.1", "4.29.3"):
-        return "unsupported"
     from astrbot.core import process_restart
 
     original = getattr(process_restart, "_build_restart_argv", None)

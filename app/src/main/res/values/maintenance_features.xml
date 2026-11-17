@@ -1,0 +1,47 @@
+<resources>
+    <string name="backup_choose_contents">选择备份内容</string>
+    <string name="backup_no_selected_data">未找到所选数据，请先完成对应配置或选择其他备份内容。</string>
+    <string name="backup_contents_hint">导出为 ZIP，可在另一台手机导入。只替换备份中包含的内容，其他数据保留。</string>
+    <string name="backup_scope_astrbot">AstrBot 数据</string>
+    <string name="backup_scope_astrbot_hint">配置、数据库、插件、人设及其他数据</string>
+
+
+    <string name="backup_scope_qq">QQ 会话</string>
+    <string name="backup_scope_qq_hint">包含登录凭据，请妥善保管；换手机后仍可能需要重新扫码</string>
+    <string name="backup_export_complete">所选内容已导出为 ZIP。请妥善保存到 App 目录之外。</string>
+    <string name="backup_import_complete">备份内容已恢复；未包含的内容保留。如 QQ 登录失效，请重新扫码。</string>
+    <string name="backup_cross_version_hint">允许跨手机、跨版本恢复；程序和运行环境不会被替换。版本不同时会在恢复后检查服务，失败时回退。</string>
+    <string name="backup_restore_summary">备份时间：%1$s\n包含：%2$s\n\n%3$s\n\n恢复前会停止服务并创建本地恢复点。</string>
+    <string name="backup_portable_subtitle">可选数据与 QQ 会话，支持跨手机迁移</string>
+    <string name="cpolar_lan_title">局域网访问</string>
+    <string name="cpolar_lan_hint">允许同一网络中的设备访问 cpolar 管理后台；使用 cpolar 官方账号登录。</string>
+    <string name="cpolar_lan_confirm">开启后，同一网络中的设备可访问手机的 9200 端口。运行中的 cpolar 将重启以应用设置，隧道会短暂断开。</string>
+    <string name="cpolar_lan_saved">cpolar 访问范围已保存。</string>
+    <string name="cpolar_lan_no_address">连接 Wi-Fi 或开启热点后显示局域网地址</string>
+    <string name="logs_clear">清理</string>
+    <string name="logs_clear_confirm">清理此分类的日志及历史归档？后续日志会继续记录，服务和业务数据不受影响。</string>
+    <string name="logs_clear_all">清理日志</string>
+    <string name="logs_clear_all_hint">清理管理器日志和可安全删除的服务历史日志</string>
+    <string name="logs_clear_all_confirm">清理管理器各分类日志及服务历史日志？正在写入、近期使用或无法确认状态的服务日志会保留，不删除配置、数据库或备份。</string>
+    <string name="logs_cleared">日志清理完成。运行中的服务会继续产生新日志。</string>
+    <string name="upstream_channel">GitHub 官方稳定版</string>
+    <string name="upstream_checking">正在检查 %1$s 官方 GitHub Release…</string>
+    <string name="upstream_available">发现 %1$s %2$s，可以查看更新说明并更新。</string>
+    <string name="upstream_latest">%1$s 当前已是最新版本（%2$s）。</string>
+    <string name="upstream_newer">当前 %1$s %2$s 高于官方最新稳定版。</string>
+    <string name="upstream_error">无法获取官方 Release，请检查网络或稍后重试。GitHub 也可能暂时限制了请求频率。</string>
+    <string name="upstream_invalid">官方 Release 的版本、文件或格式不受支持，当前程序保持不变。</string>
+    <string name="upstream_no_stable">官方近期发布记录中暂未找到支持的正式版。请稍后重试，当前 AstrBot 保持不变。</string>
+    <string name="upstream_downloading">正在下载 %1$s：%2$d / %3$d MB</string>
+    <string name="upstream_downloading_unknown">正在下载 %1$s：已下载 %2$d MB（服务器未提供总大小）</string>
+    <string name="upstream_size_unknown">大小以下载时为准</string>
+    <string name="upstream_preparing">正在准备 %1$s 官方更新…</string>
+    <string name="upstream_verifying">正在校验官方更新文件…</string>
+    <string name="upstream_dependency_check">正在检查新版 AstrBot 所需的 Python 依赖…</string>
+    <string name="upstream_dependency_error">新版 AstrBot 需要当前环境未满足的 Python 依赖，本次未替换程序。请先更新运行环境；详情见运行日志。</string>
+    <string name="upstream_migration_error">新版 AstrBot 的数据迁移方式尚未适配，本次未替换程序。请等待管理器更新后再试。</string>
+    <string name="upstream_flow_hint">从官方 GitHub 下载，检查后自动备份并更新。安装时暂停服务并关闭终端，之后恢复原服务，终端命令需手动重启。服务验证失败时恢复原程序和数据；上游新版仍需本机检查兼容性。</string>
+    <string name="upstream_download_install">下载并更新</string>
+    <string name="upstream_check_hint">直接检查官方 GitHub 最新稳定版</string>
+    <string name="upstream_download_failed">官方下载中断或文件校验失败，请重试；已安装的程序保持不变。</string>
+</resources>
