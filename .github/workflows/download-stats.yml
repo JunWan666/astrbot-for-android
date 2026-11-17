@@ -1,0 +1,129 @@
+name: APK download statistics
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/download-stats.yml']
+  release:
+    types: [published, edited, deleted]
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-download-statistics
+  cancel-in-progress: false
+
+jobs:
+  statistics:
+    if: github.repository == 'JunWan666/astrbot-for-android'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Count APK assets and publish badge metadata
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOWNLOAD_STATS_PUBLISH: '1'
+        shell: python
+        run: |
+          import base64
+          import json
+          import os
+          import re
+          from urllib.error import HTTPError
+          from urllib.parse import quote
+          from urllib.request import Request, urlopen
+
+          api = os.environ.get('GITHUB_API_URL', 'https://api.github.com').rstrip('/')
+          repository = os.environ['GITHUB_REPOSITORY']
+          prefix = '/repos/' + repository
+          token = os.environ.get('GITHUB_TOKEN')
+          branch = 'badges'
+          filename = 'apk-downloads.json'
+
+          def request(path, body=None, missing_ok=False):
+              headers = {'Accept': 'application/vnd.github+json',
+                         'User-Agent': 'AstrBot-APK-download-statistics',
+                         'X-GitHub-Api-Version': '2022-11-28'}
+              if token:
+                  headers['Authorization'] = 'Bearer ' + token
+              payload = None if body is None else json.dumps(body).encode()
+              if payload is not None:
+                  headers['Content-Type'] = 'application/json'
+              try:
+                  with urlopen(Request(api + prefix + path, data=payload, headers=headers), timeout=30) as response:
+                      return json.load(response)
+              except HTTPError as error:
+                  if missing_ok and error.code == 404:
+                      return None
+                  raise RuntimeError('GitHub request failed with HTTP ' + str(error.code)) from None
+
+          def pages(path):
+              page = 1
+              while True:
+                  entries = request(path + '?per_page=100&page=' + str(page))
+                  if not isinstance(entries, list):
+                      raise RuntimeError('Unexpected GitHub list response')
+                  yield from entries
+                  if len(entries) < 100:
+                      return
+                  page += 1
+
+          total = 0
+          apk_assets = 0
+          for release in pages('/releases'):
+              if release.get('draft'):
+                  continue
+              for asset in pages('/releases/' + str(int(release['id'])) + '/assets'):
+                  if asset['name'].lower().endswith('.apk'):
+                      count = asset['download_count']
+                      if not isinstance(count, int) or isinstance(count, bool) or count < 0:
+                          raise RuntimeError('Invalid download counter; preserve existing badge')
+                      total += count
+                      apk_assets += 1
+
+          badge = {'schemaVersion': 1, 'label': 'APK downloads', 'message': format(total, ','),
+                   'color': '3867FF', 'cacheSeconds': 3600}
+          content = json.dumps(badge, ensure_ascii=False, indent=2) + '\n'
+          print('APK assets:', apk_assets, '| downloads:', total)
+          if os.environ.get('DOWNLOAD_STATS_PUBLISH') != '1':
+              print(content)
+              raise SystemExit(0)
+          if not token:
+              raise RuntimeError('Publishing requires the workflow token')
+
+          ref = request('/git/ref/heads/' + branch, missing_ok=True)
+          if ref is None:
+              # Start an independent metadata history without copying application sources.
+              blob = request('/git/blobs', {'content': content, 'encoding': 'utf-8'})
+              tree = request('/git/trees', {'tree': [{'path': filename, 'mode': '100644',
+                                                    'type': 'blob', 'sha': blob['sha']}]})
+              commit = request('/git/commits', {'message': '001:更新:初始化 APK 下载统计',
+                                               'tree': tree['sha'], 'parents': []})
+              request('/git/refs', {'ref': 'refs/heads/' + branch, 'sha': commit['sha']})
+              print('Initialized badge metadata branch')
+          else:
+              head = ref['object']['sha']
+              commit = request('/git/commits/' + head)
+              existing = request('/contents/' + filename + '?ref=' + quote(branch), missing_ok=True)
+              if existing is not None and base64.b64decode(existing['content']).decode() == content:
+                  print('Counters unchanged; no commit needed')
+                  raise SystemExit(0)
+              number = re.match(r'^(\d+):', commit['message'])
+              if number is None:
+                  raise RuntimeError('Unrecognized metadata commit numbering; preserve branch')
+              body = {'message': format(int(number[1]) + 1, '03d') + ':更新:刷新 APK 下载统计',
+                      'content': base64.b64encode(content.encode()).decode(), 'branch': branch}
+              if existing is not None:
+                  body['sha'] = existing['sha']
+              # Contents updates use PUT; all other write requests above use POST.
+              headers = {'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + token,
+                         'User-Agent': 'AstrBot-APK-download-statistics',
+                         'Content-Type': 'application/json', 'X-GitHub-Api-Version': '2022-11-28'}
+              with urlopen(Request(api + prefix + '/contents/' + filename, method='PUT',
+                                   data=json.dumps(body).encode(), headers=headers), timeout=30) as response:
+                  json.load(response)
+              print('Updated badge metadata')

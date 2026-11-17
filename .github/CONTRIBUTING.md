@@ -24,6 +24,8 @@
 
 APK、运行镜像、原生预编译程序和缓存不进入 Git。账号、API Key、QQ 会话、配置备份、本机 `local.properties` 和 `.local/signing/` 签名材料也不提交。第三方依赖变化时，同步维护来源、版本锁和适用的许可材料。
 
+README 的 Stars 由 Shields.io 查询 GitHub。APK 下载量由 `download-stats.yml` 每 6 小时及发布变更时统计，只累加全部公开 Release 中仍存在的 `.apk` 附件，包含预发布，不包含草稿、源码或校验文件，也不代表安装人数。工作流仅在独立的 `badges` 分支维护 `apk-downloads.json`，不修改主分支和发布附件；首次推送该工作流后自动初始化，也可手动运行。该分支的自动提交从 `001` 独立递增。
+
 ## 许可
 
 原创代码采用 [MIT](../LICENSE)。提交原创贡献表示允许按该协议分发；第三方材料保留原作者、来源和许可。
