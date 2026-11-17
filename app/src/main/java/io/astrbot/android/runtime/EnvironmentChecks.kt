@@ -11,17 +11,18 @@ import java.io.File
 
 enum class EnvironmentCheckStatus { OK, ATTENTION, FAILED }
 data class EnvironmentCheckItem(val title: String, val status: EnvironmentCheckStatus, val detail: String)
+enum class EnvironmentRepairTarget { RUNTIME_FILES, PYTHON_DEPENDENCIES, ASTRBOT_DASHBOARD }
 data class EnvironmentCheckReport(val checkedAtMillis: Long, val items: List<EnvironmentCheckItem>,
-    val canRepair: Boolean, val repairExplanation: String)
+    val canRepair: Boolean, val repairExplanation: String, val repairProblem: OperationProblem? = null,
+    val repairTargets: List<EnvironmentRepairTarget> = emptyList()) {
+    internal fun requireRepairable() {
+        if (!canRepair) throw OperationProblemException(repairProblem ?: RuntimeRepairEligibility.blocked(repairExplanation))
+    }
+}
 
 /** Explicit local checks; never starts either server, rewrites configuration or recovers journals. */
 internal class EnvironmentChecks(private val context: Context,
-    private val pythonCheck: suspend (BootstrapRuntime) -> Boolean = { runtime ->
-        runtime.execute("/opt/astrbot-venv/bin/python", "-I", "-B", "-c",
-            "import quart, fastapi, faiss; print('environment-check-ok')", timeoutSeconds = 45).let {
-            it.exitCode == 0 && it.output.lineSequence().any { line -> line.trim() == "environment-check-ok" }
-        }
-    }) {
+    private val pythonCheck: suspend (BootstrapRuntime) -> Boolean = ::probePython) {
     suspend fun check(): EnvironmentCheckReport = withContext(Dispatchers.IO) {
         val runtime = BootstrapRuntime(context)
         val root = runtime.rootfs
@@ -41,7 +42,7 @@ internal class EnvironmentChecks(private val context: Context,
         val installed = marker?.optString("kind") == "complete" && marker.optString("abi") == runtime.abi
         item(AppText.get(R.string.ui_runtime_installation_record), if (installed) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
             if (installed) AppText.get(R.string.ui_complete_runtime_recognized) else AppText.get(R.string.ui_complete_initialization_is_unfinished_or_its_record_is_unrecognized))
-        val pending = listOf("restore.json", "update.json", "runtime-update.json", "persona.json", "backup-retention.json").any {
+        val pending = listOf("restore.json", "update.json", "runtime-update.json", "environment-repair.json", "persona.json", "backup-retention.json").any {
             DurableFiles.exists(File(context.filesDir, "operations/$it"))
         }
         item(AppText.get(R.string.ui_maintenance_recovery_records), if (pending) EnvironmentCheckStatus.ATTENTION else EnvironmentCheckStatus.OK,
@@ -49,17 +50,30 @@ internal class EnvironmentChecks(private val context: Context,
         val resources = listOf(
             "Ubuntu Shell" to "usr/bin/dash", "Python" to "usr/bin/python3.12",
             AppText.get(R.string.ui_python_virtual_environment) to "opt/astrbot-venv/pyvenv.cfg", AppText.get(R.string.ui_astrbot_entry_point) to "opt/astrbot/main.py",
-            AppText.get(R.string.ui_astrbot_webui) to "opt/astrbot/astrbot/dashboard/dist/index.html", "Linux QQ" to "opt/qq/qq",
-            "NapCat" to "opt/qq/resources/app/app_launcher/napcat/napcat.mjs", "Xvfb" to "usr/bin/Xvfb")
+            "Xvfb" to "usr/bin/Xvfb")
         val missing = resources.filterNot { File(root, it.second).let { file -> file.isFile && file.canRead() } }.map { it.first }
         item(AppText.get(R.string.ui_runtime_resource_files), if (missing.isEmpty()) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
             if (missing.isEmpty()) AppText.get(R.string.ui_key_entry_files_exist_this_does_not_verify_complete) else AppText.get(R.string.ui_missing_or_unreadable, missing.joinToString("、")))
+        val dashboard = AstrBotDashboard.inspect(root)
         val versions = if (installed) runCatching { InstalledVersions.read(root) }.getOrNull() else null
+        val components = versions?.components ?: InstalledVersionInspection.read(root).components
+        val astrbotVersion = components["AstrBot"]
+        val dashboardStatus = when {
+            dashboard?.readable != true -> EnvironmentCheckStatus.FAILED
+            dashboard.version == null || dashboard.version != astrbotVersion -> EnvironmentCheckStatus.ATTENTION
+            else -> EnvironmentCheckStatus.OK
+        }
+        item(AppText.get(R.string.environment_dashboard_assets), dashboardStatus,
+            if (dashboard?.readable != true) AppText.get(R.string.environment_dashboard_missing)
+            else AppText.get(R.string.environment_dashboard_found,
+                AppText.get(if (dashboard.source == "data") R.string.environment_dashboard_data else R.string.environment_dashboard_bundled),
+                dashboard.version ?: AppText.get(R.string.ui_unknown), astrbotVersion ?: AppText.get(R.string.ui_unknown)) +
+                if (dashboardStatus == EnvironmentCheckStatus.ATTENTION) "\n" + AppText.get(R.string.environment_dashboard_version_attention) else "")
         item(AppText.get(R.string.ui_version_and_backup_identity), if (versions != null) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.FAILED,
             if (versions != null) AppText.get(R.string.ui_component_combination_and_backup_compatibility_identity_are_readable) else AppText.get(R.string.ui_version_information_is_incomplete_so_a_repair_transaction_cannot))
         var configurationFailed = false
         for (id in ServiceId.entries) {
-            val file = File(context.filesDir, if (id == ServiceId.ASTRBOT) "persistent/astrbot/data/cmd_config.json" else "persistent/napcat/config/webui.json")
+            val file = File(context.filesDir, "persistent/astrbot/data/cmd_config.json")
             val connection = RuntimeConfiguration(context).read(id, recoverPendingWrite = false)
             val status = when {
                 !file.exists() && !File(file.path + ".bak").exists() -> EnvironmentCheckStatus.ATTENTION
@@ -75,17 +89,10 @@ internal class EnvironmentChecks(private val context: Context,
                 else -> AppText.get(R.string.ui_local_endpoint_configuration_is_recognized_login_models_qq_and)
             })
         }
-        try {
-            val compatibility = NapCatStartupCompatibility(context).inspect()
-            if (compatibility.affectedRuntime) item(AppText.get(R.string.napcat_startup_compat_title),
-                if (compatibility.optionsToDisable.isEmpty()) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.ATTENTION,
-                AppText.get(if (compatibility.optionsToDisable.isEmpty()) R.string.napcat_startup_compat_ok else R.string.napcat_startup_compat_pending))
-        } catch (_: Exception) {
-            item(AppText.get(R.string.napcat_startup_compat_title), EnvironmentCheckStatus.ATTENTION,
-                AppText.get(R.string.napcat_startup_compat_failed))
-        }
         var dependenciesReady = false
-        if (installed && nativeReady && !pending && missing.isEmpty()) {
+        val pythonFilesReady = listOf("usr/bin/env", "usr/bin/dash", "usr/bin/python3.12", "opt/astrbot-venv/pyvenv.cfg")
+            .all { File(root, it).let { file -> file.isFile && file.canRead() } }
+        if (installed && nativeReady && !pending && pythonFilesReady) {
             dependenciesReady = try { pythonCheck(runtime) }
                 catch (failure: CancellationException) { throw failure }
                 catch (_: Exception) { false }
@@ -102,20 +109,39 @@ internal class EnvironmentChecks(private val context: Context,
         item(AppText.get(R.string.ui_repair_staging_space), if (enoughSpace) EnvironmentCheckStatus.OK else EnvironmentCheckStatus.ATTENTION,
             required?.let { AppText.get(R.string.ui_available_mib_runtime_preparation_requires_at_least_mib_snapshot, context.filesDir.usableSpace / 1024 / 1024, it / 1024 / 1024) }
                 ?: AppText.get(R.string.ui_cannot_determine_the_full_resource_size_in_this_apk))
-        val damaged = missing.isNotEmpty() || installed && !dependenciesReady
+        val identityProblem = bundled?.let { RuntimeRepairEligibility.inspect(root, it, versions) }
+        val repairMatches = sameImage && identityProblem == null
+        val damaged = missing.isNotEmpty() || dashboard?.readable != true || installed && !dependenciesReady
         val reason = when {
             pending -> AppText.get(R.string.ui_complete_the_pending_maintenance_operation_then_check_again)
             !nativeReady -> AppText.get(R.string.ui_install_an_apk_with_the_same_signing_certificate_to)
             !installed -> AppText.get(R.string.ui_initialize_the_runtime_first_an_unrecognized_existing_runtime_will)
-            versions == null -> AppText.get(R.string.ui_version_information_is_incomplete_export_diagnostics_first_the_runtime)
-            !sameImage -> AppText.get(R.string.ui_the_installed_runtime_differs_from_the_bundled_resources_use)
+            identityProblem != null -> identityProblem.summary
+            versions == null || !repairMatches -> AppText.get(R.string.problem_repair_unknown_summary)
             configurationFailed -> AppText.get(R.string.ui_resolve_dashboard_configuration_issues_first_redeploying_resources_does)
             !damaged -> AppText.get(R.string.ui_no_resource_damage_was_identified_by_this_check_manage)
             else -> AppText.get(R.string.ui_the_same_version_bundled_resources_can_be_redeployed_the)
         }
-        EnvironmentCheckReport(System.currentTimeMillis(), items,
-            pending.not() && nativeReady && installed && versions != null && sameImage && !configurationFailed && damaged, reason)
+        val canRepair = !pending && nativeReady && installed && versions != null && repairMatches && !configurationFailed && damaged
+        val problem = if (canRepair) null else if (!pending && nativeReady && installed && identityProblem != null)
+            identityProblem else RuntimeRepairEligibility.blocked(reason)
+        val targets = if (!pending && nativeReady && installed) buildList {
+            if (sameImage && EnvironmentRepairRepository.missingRestorableFiles(root, bundled, components).isNotEmpty())
+                add(EnvironmentRepairTarget.RUNTIME_FILES)
+            if (sameImage && !dependenciesReady && EnvironmentRepairRepository.pythonMatchesBaseline(root))
+                add(EnvironmentRepairTarget.PYTHON_DEPENDENCIES)
+            if (astrbotVersion?.matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+")) == true &&
+                (dashboard?.readable != true || dashboard.version != astrbotVersion)) add(EnvironmentRepairTarget.ASTRBOT_DASHBOARD)
+        } else emptyList()
+        EnvironmentCheckReport(System.currentTimeMillis(), items, canRepair, reason, problem, targets)
     }
 
     private fun readJson(read: () -> JSONObject): JSONObject? = runCatching(read).getOrNull()
+
+    companion object {
+        internal suspend fun probePython(runtime: BootstrapRuntime): Boolean = runtime.execute("/opt/astrbot-venv/bin/python", "-I", "-B", "-c",
+            "import quart, fastapi, faiss; print('environment-check-ok')", timeoutSeconds = 45).let {
+            it.exitCode == 0 && it.output.lineSequence().any { line -> line.trim() == "environment-check-ok" }
+        }
+    }
 }

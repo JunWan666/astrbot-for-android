@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="problem_operation_failed">%1$s未完成</string>
+    <string name="problem_start_services">启动服务</string>
+    <string name="problem_export_diagnostics">导出诊断</string>
+    <string name="problem_ssh">SSH 操作</string>
+    <string name="problem_current_operation">本次操作</string>
+    <string name="problem_unknown_failure">本次操作遇到未识别的错误，具体原因已记录到管理日志。</string>
+    <string name="problem_general_next">可查看管理日志中的对应操作；如果仍无法解决，点“分享诊断”将设备信息和错误记录交给开发者排查。</string>
+    <string name="problem_repair_title">暂不能整套修复环境</string>
+    <string name="problem_repair_versions_summary">组件版本或安装记录与内置资源不同，整套修复可能覆盖已有更新，已停止替换。原环境保留。</string>
+    <string name="problem_repair_content_summary">程序文件或依赖记录与内置资源不同，版本号相同也可能出现。已停止替换，原环境保留；展开详情可查看差异文件。</string>
+    <string name="problem_repair_unknown_summary">无法确认当前环境与内置资源是否匹配，暂不能整套替换。请检查环境后分享诊断，供开发者确认原因。</string>
+    <string name="problem_repair_next">服务正常可继续使用；无法启动时，请检查环境，再分享诊断供开发者排查。</string>
+    <string name="problem_identity_unknown">无法识别或缺少版本记录</string>
+    <string name="problem_version_different">与修复目标不同</string>
+    <string name="problem_record_different">文件内容或记录不同（显示摘要前 12 位）</string>
+    <string name="problem_runtime_type">环境记录类型</string>
+    <string name="problem_bundled_type">内置资源类型</string>
+    <string name="problem_architecture">处理器架构</string>
+    <string name="problem_astrbot_record">AstrBot 版本记录与程序</string>
+    <string name="problem_unrecognized">无法识别</string>
+    <string name="problem_readable_record">完整且可读取的版本记录</string>
+    <string name="problem_version_record_unreadable">无法读取版本记录：%1$s。请检查环境并分享诊断，以确认缺失或读取失败的原因。</string>
+    <string name="problem_record_missing">文件缺失</string>
+    <string name="problem_record_too_large">文件大小异常</string>
+    <string name="problem_record_unreadable">文件无法读取</string>
+    <string name="problem_current">当前：%1$s</string>
+    <string name="problem_expected">修复目标：%1$s</string>
+    <string name="problem_show_details">查看检测详情</string>
+    <string name="problem_hide_details">收起检测详情</string>
+    <string name="problem_check_environment">检查环境</string>
+    <string name="problem_share_diagnostics">分享诊断</string>
+    <string name="problem_tap_for_help">点此查看原因与处理方法</string>
+</resources>

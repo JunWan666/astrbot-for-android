@@ -47,7 +47,7 @@ class RuntimeImageRepository(private val context: Context) {
     internal suspend fun prepareRepair(progress: (String) -> Unit) { prepareInternal(false, true, progress) }
 
     private suspend fun prepareInternal(isRollback: Boolean, repair: Boolean, progress: (String) -> Unit): String? = withContext(Dispatchers.IO) {
-        checkLocalized(!hasPendingUpdate && !backups.hasPendingRestore && !UpdateRepository(context).hasPendingUpdate && !UpdateRepository(context, "napcat").hasPendingUpdate) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
+        checkLocalized(!hasPendingUpdate && !backups.hasPendingRestore && !UpdateRepository(context).hasPendingUpdate) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
         if (isRollback) {
             val record = requireNotNullLocalized(DurableFiles.read(rollback)) { AppText.get(R.string.ui_no_runtime_available_for_rollback) }
             requireLocalized(InstalledVersions.read(previous(record)).compatibilityKey == record.getJSONObject("oldVersions").getString("compatibilityKey")) {
@@ -57,11 +57,11 @@ class RuntimeImageRepository(private val context: Context) {
             record.getString("snapshotId")
         } else {
             if (!repair) requireLocalized(available != null) { AppText.get(R.string.ui_this_apk_s_runtime_is_already_installed) }
+            if (repair) RuntimeRepairEligibility.inspect(active, runtime.bundledManifest())?.let { throw OperationProblemException(it) }
             runtime.prepareBundled(staged, progress)
             requireLocalized(InstalledVersions.read(staged).components["架构"] == runtime.abi) { AppText.get(R.string.ui_cannot_identify_the_new_runtime_version) }
-            if (repair) requireLocalized(InstalledVersions.read(active).compatibilityKey == InstalledVersions.read(staged).compatibilityKey) {
-                AppText.get(R.string.ui_installed_components_differ_from_bundled_resources_the_original_runtime)
-            }
+            if (repair) RuntimeRepairEligibility.exactProblem(InstalledVersions.read(active), InstalledVersions.read(staged), "staged-image-check")
+                ?.let { throw OperationProblemException(it) }
             null
         }
     }
@@ -71,8 +71,9 @@ class RuntimeImageRepository(private val context: Context) {
         val retained = DurableFiles.read(rollback)
         val candidate = if (isRollback) previous(requireNotNull(retained)) else staged
         val next = InstalledVersions.read(candidate)
-        requireLocalized(!repair || !isRollback && versions.compatibilityKey == next.compatibilityKey) {
-            AppText.get(R.string.ui_component_versions_changed_during_repair_original_runtime_and_snapshot)
+        if (repair) {
+            check(!isRollback)
+            RuntimeRepairEligibility.exactProblem(versions, next, "before-switch")?.let { throw OperationProblemException(it) }
         }
         val record = JSONObject().put("schema", 1).put("id", UUID.randomUUID().toString()).put("phase", "prepared")
             .put("snapshotId", snapshot.id).put("oldVersions", versions.json()).put("newVersions", next.json())
@@ -141,7 +142,6 @@ class RuntimeImageRepository(private val context: Context) {
         }
         // AstrBot-only rollback belongs to the former whole guest; it must not be offered here.
         UpdateRepository(context).discardForRuntimeReplacement()
-        UpdateRepository(context, "napcat").discardForRuntimeReplacement()
         DurableFiles.delete(staged, writableGuestDirectories = true)
         DurableFiles.removeRecord(journal)
     }

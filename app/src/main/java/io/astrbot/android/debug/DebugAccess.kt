@@ -20,6 +20,8 @@ import rikka.shizuku.Shizuku
 internal object DebugAccess {
     private val requests = Mutex()
     private var compatibilityUntil = 0L
+    @Volatile internal var lastInspection: JSONObject? = null
+        private set
     const val MANAGER = "moe.shizuku.privileged.api"
     const val REQUEST = 7101
     enum class Status { NOT_INSTALLED, STOPPED, NEED_PERMISSION, DENIED, READY, UNSUPPORTED }
@@ -41,7 +43,21 @@ internal object DebugAccess {
     // Never run the Ubuntu runtime as shell or root.
     suspend fun inspect(context: Context, restoreDefault: Boolean? = null): JSONObject = access(context,
         { if (restoreDefault == null) it.inspect() else it.setLimit(restoreDefault) },
-        { ShizukuCompatibility.inspect(restoreDefault) })
+        { ShizukuCompatibility.inspect(restoreDefault) }).also { report ->
+            // Retain only non-identifying counts/settings, never privileged command output.
+            lastInspection = JSONObject().put("checkedAt", System.currentTimeMillis()).also { snapshot ->
+                listOf("configuredReadable", "effective", "effectiveConfirmed", "configurationConfirmed").forEach {
+                    if (report.has(it)) snapshot.put(it, report.opt(it))
+                }
+                snapshot.put("configured", report.optString("configured").trim().toIntOrNull() ?: JSONObject.NULL)
+                snapshot.put("monitorSetting", report.optString("monitorSetting").trim().toIntOrNull() ?: JSONObject.NULL)
+                report.optJSONObject("children")?.let { counts ->
+                    snapshot.put("children", JSONObject().also { result -> listOf("readable", "system", "app").forEach {
+                        if (counts.has(it)) result.put(it, counts.opt(it))
+                    } })
+                }
+            }
+        }
 
     suspend fun setBatteryExemption(context: Context, enabled: Boolean): JSONObject = access(context,
         { it.setBatteryExemption(enabled) }, { ShizukuCompatibility.setBatteryExemption(enabled) })

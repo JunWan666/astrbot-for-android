@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="export_share">Share directly</string>
+    <string name="export_save">Save to file</string>
+    <string name="export_preparing">Preparing file to share…</string>
+    <string name="export_failed">Cannot prepare or share this file. Retry or save it to a file.</string>
+    <string name="export_log_title">Export logs</string>
+    <string name="environment_dashboard_assets">AstrBot WebUI assets</string>
+    <string name="environment_dashboard_missing">No readable WebUI entry found in the bundled or AstrBot data directory.</string>
+    <string name="environment_dashboard_data">AstrBot data directory</string>
+    <string name="environment_dashboard_bundled">Bundled program directory</string>
+    <string name="environment_dashboard_found">Source: %1$s; WebUI %2$s / core %3$s</string>
+    <string name="environment_dashboard_version_attention">The WebUI version is unknown or differs from the core. Check component assets.</string>
+    <string name="environment_repair_component_mismatch">Components were updated independently or their versions cannot be verified. This combination differs from the bundled image, so whole-runtime repair is unavailable. Programs and data are preserved; use the corresponding component update or maintenance package.</string>
+    <string name="update_network_timeout">Update request timed out. Retry later; current programs and download progress are preserved.</string>
+    <string name="update_network_dns">Cannot resolve the update server. Check your network or DNS and retry.</string>
+    <string name="update_network_tls">Cannot establish a secure update connection. Check the system time or network and retry.</string>
+    <string name="update_network_http">The update server returned HTTP %1$d. Retry later.</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repair_auto_title">Repair environment automatically</string>
+    <string name="repair_timeout">Repair verification timed out; rollback of uncommitted files was attempted. Check the environment again and share diagnostics if issues persist.</string>
+    <string name="repair_resource_failed">Could not prepare or apply matching repair resources. Check network access and free space, retry, then share diagnostics if the issue persists.</string>
+    <string name="repair_start">Repair identified issues</string>
+    <string name="repair_available">%1$d issues can be repaired automatically</string>
+    <string name="repair_target_runtime">Restore missing runtime files</string>
+    <string name="repair_target_python">Check and restore matching Python dependencies</string>
+    <string name="repair_target_dashboard">Restore the dashboard matching the AstrBot core</string>
+    <string name="repair_no_safe_target">Some issues cannot be handled automatically. Share diagnostics for investigation.</string>
+    <string name="repair_nothing_to_do">No automatic repair is needed. Different component versions alone do not require repair.</string>
+    <string name="repair_confirmation">Prepare matching repair resources while preserving component updates, extra software and configuration. Use matching local dashboard files first, then the official release for the installed version. Briefly stop services, back up affected files, apply repairs and verify. Failed or interrupted changes are restored. Terminal sessions close and need to be reopened.</string>
+    <string name="repair_prepare_resources">Preparing verified repair resources bundled with this APK…</string>
+    <string name="repair_staging_file">Preparing missing file: %1$s</string>
+    <string name="repair_python_staging">Checking Python package versions and file records; preserving extra or different package versions…</string>
+    <string name="repair_dashboard_staging">Preparing the dashboard for AstrBot %1$s…</string>
+    <string name="repair_switching">Backing up and replacing affected files…</string>
+    <string name="repair_verifying">Verifying repairs; failed changes will be restored…</string>
+    <string name="repair_recovered">Processed interrupted repair; uncommitted file changes were restored</string>
+    <string name="repair_completed">Repaired %1$d file items; no failed checks remain</string>
+    <string name="repair_partially_completed">Repaired %1$d file items; other issues remain in the check results</string>
+    <string name="repair_service_resume_failed">File repair completed, but some previous services could not resume. Check service logs.</string>
+    <string name="repair_unhandled_title">Repair needs further diagnosis</string>
+    <string name="repair_unhandled_next">Repair stopped; uncommitted replacements will be restored. Share diagnostics and preserve the current programs and data for investigation.</string>
+    <string name="repair_no_matching_files">No files could be safely matched and replaced. The installed components may use different dependencies.</string>
+    <string name="repair_python_still_failed">Python still failed after restoring matching dependencies, so these file changes were rolled back. System process termination, base libraries or other dependency versions need further diagnosis.</string>
+</resources>

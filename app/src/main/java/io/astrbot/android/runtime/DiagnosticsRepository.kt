@@ -6,6 +6,8 @@ import io.astrbot.android.requireNotNullLocalized
 
 import io.astrbot.android.AppText
 import io.astrbot.android.R
+import io.astrbot.android.SharedExports
+import io.astrbot.android.debug.DebugAccess
 
 import android.app.ActivityManager
 import android.content.Context
@@ -28,7 +30,32 @@ import java.util.zip.ZipOutputStream
 class DiagnosticsRepository(private val context: Context) {
     private val cache = File(context.cacheDir, "diagnostics-export")
 
-    suspend fun export(destination: Uri, snapshot: ManagerState, progress: (String) -> Unit) = withContext(Dispatchers.IO) {
+    suspend fun export(destination: Uri, snapshot: ManagerState, progress: (String) -> Unit) = archive(snapshot, progress) { archive ->
+        progress(AppText.get(R.string.ui_writing_diagnostics_to_the_selected_file))
+        requireNotNullLocalized(context.contentResolver.openOutputStream(destination, "wt")) { AppText.get(R.string.ui_cannot_write_the_selected_diagnostic_file) }.use { output ->
+            archive.inputStream().use { input -> copy(input, output) }
+        }
+    }
+
+    suspend fun prepareShare(snapshot: ManagerState, progress: (String) -> Unit): File = archive(snapshot, progress) { archive ->
+        val destination = SharedExports.destination(context, "astrbot-diagnostics-${System.currentTimeMillis()}.zip")
+        try {
+            destination.outputStream().use { output -> archive.inputStream().use { input -> copy(input, output) } }
+            destination
+        } catch (failure: Throwable) { destination.parentFile?.deleteRecursively(); throw failure }
+    }
+
+    private suspend fun copy(input: InputStream, output: OutputStream) {
+        val buffer = ByteArray(128 * 1024)
+        while (true) {
+            currentCoroutineContext().ensureActive()
+            val count = input.read(buffer); if (count < 0) break
+            output.write(buffer, 0, count)
+        }
+        output.flush()
+    }
+
+    private suspend fun <T> archive(snapshot: ManagerState, progress: (String) -> Unit, consume: suspend (File) -> T): T = withContext(Dispatchers.IO) {
         // Controller serialization guarantees an older folder cannot belong to another export.
         DurableFiles.delete(cache)
         checkLocalized(cache.mkdirs()) { AppText.get(R.string.ui_cannot_prepare_diagnostic_cache) }
@@ -82,18 +109,7 @@ class DiagnosticsRepository(private val context: Context) {
                 }
             }
             requireLocalized(archive.length() in 1..MAX_ARCHIVE) { AppText.get(R.string.ui_diagnostic_archive_exceeds_the_size_limit) }
-            progress(AppText.get(R.string.ui_writing_diagnostics_to_the_selected_file))
-            requireNotNullLocalized(context.contentResolver.openOutputStream(destination, "wt")) { AppText.get(R.string.ui_cannot_write_the_selected_diagnostic_file) }.use { output ->
-                archive.inputStream().use { input ->
-                    val buffer = ByteArray(128 * 1024)
-                    while (true) {
-                        currentCoroutineContext().ensureActive()
-                        val count = input.read(buffer); if (count < 0) break
-                        output.write(buffer, 0, count)
-                    }
-                }
-                output.flush()
-            }
+            consume(archive)
         } finally { DurableFiles.delete(cache) }
     }
 
@@ -105,7 +121,13 @@ class DiagnosticsRepository(private val context: Context) {
         val versions = inspection?.components
         val storageSpace = StorageSpace.read(context)
         val system = JSONObject().put("manufacturer", safe(Build.MANUFACTURER, 128)).put("model", safe(Build.MODEL, 128))
+            .put("brand", safe(Build.BRAND, 128)).put("device", safe(Build.DEVICE, 128))
             .put("androidVersion", safe(Build.VERSION.RELEASE, 64)).put("api", Build.VERSION.SDK_INT)
+            .put("securityPatch", safe(Build.VERSION.SECURITY_PATCH, 64))
+            .put("kernelVersion", safe(System.getProperty("os.version").orEmpty(), 256))
+            .put("timeZone", java.util.TimeZone.getDefault().id)
+            .put("utcOffsetSeconds", java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()) / 1000)
+            .put("availableProcessors", Runtime.getRuntime().availableProcessors())
             .put("supportedAbis", JSONArray(Build.SUPPORTED_ABIS.toList()))
             .put("availableStorageBytes", storageSpace.availableBytes ?: JSONObject.NULL)
             .put("storagePressure", storageSpace.pressure.name)
@@ -124,11 +146,12 @@ class DiagnosticsRepository(private val context: Context) {
             .put("maintenance", snapshot.maintenance.name).put("phase", safe(snapshot.phase))
             .put("versionNotice", inspection?.notice ?: JSONObject.NULL)
             .put("lastError", snapshot.error?.let { safe(it) } ?: JSONObject.NULL)
+            .put("lastProblem", snapshot.currentProblem()?.json() ?: JSONObject.NULL)
         val network = NetworkConnectivity.snapshot(context).let {
             JSONObject().put("state", it.state.name).put("checkedAt", it.checkedAtMillis ?: JSONObject.NULL)
         }
         val interrupted = JSONObject()
-        mapOf("dataRestore" to "restore.json", "programUpdate" to "update.json", "runtimeUpdate" to "runtime-update.json", "personaChange" to "persona.json").forEach { (key, name) ->
+        mapOf("dataRestore" to "restore.json", "programUpdate" to "update.json", "runtimeUpdate" to "runtime-update.json", "environmentRepair" to "environment-repair.json", "personaChange" to "persona.json").forEach { (key, name) ->
             interrupted.put(key, DurableFiles.exists(File(context.filesDir, "operations/$name")))
         }
         val services = JSONObject()
@@ -145,6 +168,33 @@ class DiagnosticsRepository(private val context: Context) {
                 .put("webUiPort", connection.endpoint?.port ?: JSONObject.NULL)
                 .put("webUiScheme", connection.endpoint?.scheme ?: JSONObject.NULL))
         }
+        val dashboard = AstrBotDashboard.inspect(runtimeRoot)
+        val assets = JSONObject().put("status", if (dashboard?.readable == true) "readable" else "missing-or-unreadable")
+            .put("source", dashboard?.source ?: JSONObject.NULL).put("version", dashboard?.version ?: JSONObject.NULL)
+            .put("candidates", JSONArray().also { candidates -> AstrBotDashboard.candidates(runtimeRoot).forEach { (source, directory) ->
+                val index = File(directory, "index.html")
+                candidates.put(JSONObject().put("source", source).put("directoryExists", directory.isDirectory)
+                    .put("indexReadable", index.isFile && index.canRead()))
+            } })
+        val environmentCheck = snapshot.environmentCheck?.let { check ->
+            JSONObject().put("checkedAt", check.checkedAtMillis).put("canRepair", check.canRepair)
+                .put("automaticRepairTargets", JSONArray(check.repairTargets.map { it.name }))
+                .put("repairExplanation", safe(check.repairExplanation))
+                .put("repairProblem", check.repairProblem?.json() ?: JSONObject.NULL)
+                .put("items", JSONArray().also { items -> check.items.forEach {
+                    items.put(JSONObject().put("title", safe(it.title)).put("status", it.status.name).put("detail", safe(it.detail)))
+                } })
+        }
+        val exits = JSONArray()
+        var exitStatus = if (Build.VERSION.SDK_INT >= 30) "unavailable" else "unsupported"
+        if (Build.VERSION.SDK_INT >= 30) runCatching {
+            context.getSystemService(ActivityManager::class.java).getHistoricalProcessExitReasons(context.packageName, 0, 8)
+                .forEach { exit -> exits.put(JSONObject().put("timestamp", exit.timestamp).put("reason", exit.reason)
+                    .put("status", exit.status).put("importance", exit.importance).put("pssKiB", exit.pss).put("rssKiB", exit.rss)
+                    .put("processName", safe(exit.processName, 256))) }
+            exitStatus = "collected"
+        }
+        val terminal = TerminalStore.state.value
         return JSONObject().put("schema", 1).put("format", "astrbot-android-diagnostics")
             .put("id", UUID.randomUUID().toString()).put("createdAt", System.currentTimeMillis())
             .put("app", JSONObject().put("package", context.packageName).put("version", BuildConfig.VERSION_NAME)
@@ -152,6 +202,14 @@ class DiagnosticsRepository(private val context: Context) {
             .put("system", system).put("versionsStatus", if (versions == null) "unavailable" else "read-from-installed-runtime")
             .put("versions", JSONObject().also { result -> versions?.forEach { (name, value) -> result.put(name, safe(value, 256)) } })
             .put("manager", manager).put("network", network).put("services", services).put("interruptedOperations", interrupted)
+            .put("dashboardAssets", assets).put("environmentCheck", environmentCheck ?: JSONObject.NULL)
+            .put("environmentCheckStatus", if (environmentCheck == null) "not-run" else "last-check")
+            .put("processExits", JSONObject().put("supported", Build.VERSION.SDK_INT >= 30).put("status", exitStatus).put("records", exits))
+            .put("permissionBackend", JSONObject().put("shizuku", DebugAccess.status(context).name)
+                .put("processLimits", DebugAccess.lastInspection ?: JSONObject.NULL))
+            .put("terminals", JSONArray().also { sessions -> terminal.sessions.forEach {
+                sessions.put(JSONObject().put("id", it.id).put("running", it.running).put("exitCode", it.exitCode ?: JSONObject.NULL))
+            } })
             .put("scope", JSONObject().put("businessFilesIncluded", false).put("qqSessionFilesIncluded", false)
                 .put("deviceIdentifiersIncluded", false).put("recognizedSecretsRedacted", true).put("logSourceBytesPerFile", LOG_FILE_LIMIT)
                 .put("logSourceFilesPerCategory", 3).put("notice", NOTICE))

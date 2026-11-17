@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="problem_operation_failed">Could not complete: %1$s</string>
+    <string name="problem_start_services">Start services</string>
+    <string name="problem_export_diagnostics">Export diagnostics</string>
+    <string name="problem_ssh">SSH operation</string>
+    <string name="problem_current_operation">This operation</string>
+    <string name="problem_unknown_failure">An unrecognized error interrupted this operation. Details were recorded in the manager log.</string>
+    <string name="problem_general_next">Review the corresponding operation in the manager log. If the issue persists, share diagnostics so a developer can inspect the device information and error records.</string>
+    <string name="problem_repair_title">Whole runtime repair unavailable</string>
+    <string name="problem_repair_versions_summary">Component versions or records differ from the bundled runtime. Repair could overwrite updates, so replacement stopped. The original runtime is preserved.</string>
+    <string name="problem_repair_content_summary">Program or dependency records differ, even if version numbers match. Replacement stopped; the original runtime is preserved. Expand details to see the affected files.</string>
+    <string name="problem_repair_unknown_summary">The installed runtime could not be matched to the bundled resources. Run an environment check and share diagnostics so a developer can identify the cause.</string>
+    <string name="problem_repair_next">Working services can still be used. If a service cannot start, check the environment, then share diagnostics for investigation.</string>
+    <string name="problem_identity_unknown">Version record missing or unrecognized</string>
+    <string name="problem_version_different">Different from the repair target</string>
+    <string name="problem_record_different">File contents or records differ (first 12 digest characters shown)</string>
+    <string name="problem_runtime_type">Runtime record type</string>
+    <string name="problem_bundled_type">Bundled resource type</string>
+    <string name="problem_architecture">Processor architecture</string>
+    <string name="problem_astrbot_record">AstrBot record vs. program version</string>
+    <string name="problem_unrecognized">Unrecognized</string>
+    <string name="problem_readable_record">Complete, readable version records</string>
+    <string name="problem_version_record_unreadable">Cannot read version record: %1$s. Check the environment and share diagnostics to investigate the missing or unreadable file.</string>
+    <string name="problem_record_missing">File missing</string>
+    <string name="problem_record_too_large">Unexpected file size</string>
+    <string name="problem_record_unreadable">File unreadable</string>
+    <string name="problem_current">Installed: %1$s</string>
+    <string name="problem_expected">Repair target: %1$s</string>
+    <string name="problem_show_details">Show check details</string>
+    <string name="problem_hide_details">Hide check details</string>
+    <string name="problem_check_environment">Check environment</string>
+    <string name="problem_share_diagnostics">Share diagnostics</string>
+    <string name="problem_tap_for_help">Tap for the cause and next steps</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="repair_auto_title">自动修复环境</string>
+    <string name="repair_timeout">修复检查超时，未提交的文件替换已尝试撤回。请重新检查环境；仍异常时分享诊断。</string>
+    <string name="repair_resource_failed">无法准备或应用匹配的修复资源。请检查网络和可用空间后重试；仍失败时分享诊断。</string>
+    <string name="repair_start">自动修复可处理项</string>
+    <string name="repair_available">发现 %1$d 项可自动处理的问题</string>
+    <string name="repair_target_runtime">补回缺失的基础文件</string>
+    <string name="repair_target_python">检查并修复匹配版本的 Python 依赖</string>
+    <string name="repair_target_dashboard">恢复与 AstrBot 核心匹配的网页</string>
+    <string name="repair_no_safe_target">仍有异常暂不能自动处理，可分享诊断供开发者定位。</string>
+    <string name="repair_nothing_to_do">未发现需要自动修复的项目。组件版本不同本身不需要修复。</string>
+    <string name="repair_confirmation">根据检查结果准备匹配的修复资源，保留已更新的组件、额外安装的软件及用户配置。网页优先使用本机匹配资源，否则从官方获取当前版本。准备完成后短暂停止服务并备份被替换文件，修复后重新检查；失败或中断会恢复原文件。终端会关闭，需要手动重开。</string>
+    <string name="repair_prepare_resources">正在准备本 APK 中经过校验的修复资源…</string>
+    <string name="repair_staging_file">正在准备缺失文件：%1$s</string>
+    <string name="repair_python_staging">正在核对 Python 包版本及文件记录，保留额外安装和不同版本的包…</string>
+    <string name="repair_dashboard_staging">正在准备 AstrBot %1$s 的匹配网页资源…</string>
+    <string name="repair_switching">正在备份并替换需要修复的文件…</string>
+    <string name="repair_verifying">正在验证修复结果，失败时恢复原文件…</string>
+    <string name="repair_recovered">已处理上次中断的定向修复，未提交的文件改动已恢复</string>
+    <string name="repair_completed">已修复 %1$d 个文件项目，复查未发现失败项</string>
+    <string name="repair_partially_completed">已修复 %1$d 个文件项目，仍有其他异常，请查看检查结果</string>
+    <string name="repair_service_resume_failed">文件修复已完成，但原服务未全部恢复，请查看服务日志</string>
+    <string name="repair_unhandled_title">修复需要进一步诊断</string>
+    <string name="repair_unhandled_next">已停止本次修复；已开始替换的未提交文件会恢复。请分享诊断，保留现有程序和数据供排查。</string>
+    <string name="repair_no_matching_files">未找到可确认版本并安全替换的文件。现有组件可能使用了不同的依赖，暂不能自动处理。</string>
+    <string name="repair_python_still_failed">匹配版本的依赖修复后 Python 检查仍未通过，本次文件替换已撤回。系统终止进程、基础库异常或其他版本依赖需要进一步诊断。</string>
+</resources>
