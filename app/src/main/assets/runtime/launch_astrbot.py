@@ -1,12 +1,12 @@
-"""Observe the pinned upstream migration boundary without changing its return/exception behavior."""
+"""Observe reviewed migration implementations without changing their return/exception behavior."""
 import functools
-import inspect
 import json
 import os
 from pathlib import Path
 import runpy
 import sys
 import uuid
+from astrbot_update_compat import migration_supported
 
 from astrbot_instance import AstrBotInstance, InstanceBlocked, configured_endpoint
 
@@ -18,6 +18,18 @@ except (InstanceBlocked, OSError):
 
 sys.path.insert(0, "/opt/astrbot")
 nonce = os.environ["ASTRBOT_MANAGER_OBSERVATION_NONCE"]
+
+# Use the same local-session contract as upstream AstrBot Desktop. Password
+# authentication stays available for ordinary browser/LAN clients.
+session = json.loads(Path("/manager/astrbot-local-session.json").read_text(encoding="utf-8"))
+if (session.get("schema") != 1 or session.get("nonce") != nonce
+        or not isinstance(session.get("secret"), str)
+        or len(session["secret"]) != 64
+        or any(char not in "0123456789abcdef" for char in session["secret"])):
+    raise RuntimeError("Invalid local manager session")
+os.environ["ASTRBOT_DESKTOP_MANAGED"] = "1"
+os.environ["ASTRBOT_DESKTOP_SESSION_SECRET"] = session["secret"]
+del session
 target = Path("/manager/astrbot-startup.json")
 log_policy = "pending"
 restart_policy = "pending"
@@ -48,8 +60,7 @@ restart_policy = install_restart(__version__, lambda: record("restart-requested"
 record("pending", __version__)
 
 original = getattr(core_lifecycle, "migra", None)
-if (__version__ in ("4.29.1", "4.29.3") and inspect.iscoroutinefunction(original)
-        and original.__module__ == "astrbot.core.utils.migra_helper"):
+if migration_supported(original):
     migration_active = False
     migration_failed = False
     upstream_logger = original.__globals__["logger"]

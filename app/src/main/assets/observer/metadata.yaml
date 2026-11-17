@@ -2,5 +2,5 @@ name: android_connection_observer
 display_name: Android connection observer
 author: astrbot_android_manager
 desc: Read-only local connection health for the Android manager. Disabling this plugin makes connection status unknown.
-version: 1.0.0
+version: 1.1.0
 astrbot_version: '>=4.29.1,<4.30'

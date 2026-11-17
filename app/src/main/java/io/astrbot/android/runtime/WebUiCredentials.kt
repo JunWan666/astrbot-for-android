@@ -19,7 +19,6 @@ object WebUiCredentials {
     internal fun initialLogin(context: Context, id: ServiceId): Login? = initialLogin(File(context.filesDir, "persistent"), id)
     internal fun initialLogin(persistent: File, id: ServiceId): Login? = runCatching {
         val password = read(persistent, id) ?: return null
-        if (id == ServiceId.NAPCAT) return Login("napcat-webui", password)
         val file = File(persistent, "astrbot/data/cmd_config.json")
         require(file.isFile && file.length() <= 8 * 1024 * 1024)
         val dashboard = JSONObject(file.readText().removePrefix("\uFEFF")).getJSONObject("dashboard")
@@ -48,8 +47,7 @@ object WebUiCredentials {
         isCurrent(File(context.filesDir, "persistent"), id, login)
 
     internal fun isCurrent(persistent: File, id: ServiceId, login: Login): Boolean = runCatching {
-        if (id == ServiceId.NAPCAT) read(persistent, id) == login.password
-        else {
+        run {
             val file = File(persistent, "astrbot/data/cmd_config.json")
             require(file.isFile && file.length() <= 8 * 1024 * 1024)
             login.signature != null && signature(JSONObject(file.readText().removePrefix("\uFEFF")).getJSONObject("dashboard")) == login.signature
@@ -66,18 +64,12 @@ object WebUiCredentials {
 
     /** Call only after stopping this service; business configuration and QQ sessions stay in place. */
     internal fun reset(persistent: File, id: ServiceId) {
-        val file = File(persistent, if (id == ServiceId.NAPCAT) "napcat/config/webui.json" else "astrbot/data/cmd_config.json")
+        val file = File(persistent, "astrbot/data/cmd_config.json")
         require(file.isFile && file.length() <= 8 * 1024 * 1024)
         val config = JSONObject(file.readText().removePrefix("\uFEFF"))
         val random = SecureRandom()
         fun randomHex(bytes: Int) = ByteArray(bytes).also(random::nextBytes).joinToString("") { "%02x".format(it) }
-        val password = if (id == ServiceId.ASTRBOT) "Aa7!${randomHex(16)}" else randomHex(16)
-        if (id == ServiceId.NAPCAT) {
-            config.put("token", password)
-            DurableFiles.write(file, config)
-            Os.chmod(file.path, 384)
-            return
-        }
+        val password = "Aa7!${randomHex(16)}"
         val dashboard = config.getJSONObject("dashboard")
         require(dashboard.optString("username").isNotBlank())
         val salt = ByteArray(16).also(random::nextBytes)
@@ -116,10 +108,10 @@ object WebUiCredentials {
     }
 
     private fun read(persistent: File, id: ServiceId): String? = runCatching {
-        val file = File(persistent, if (id == ServiceId.NAPCAT) "napcat/config/webui.json" else "manager/astrbot-initial-password")
-        require(file.isFile && file.length() <= if (id == ServiceId.NAPCAT) 8 * 1024 * 1024 else 4096)
+        val file = File(persistent, "manager/astrbot-initial-password")
+        require(file.isFile && file.length() <= 4096)
         val text = file.readText(Charsets.UTF_8).removePrefix("\uFEFF")
-        val value = if (id == ServiceId.NAPCAT) JSONObject(text).getString("token") else text.trim()
+        val value = text.trim()
         value.takeIf { it.isNotBlank() && it.length <= 4096 }
     }.getOrNull()
 }

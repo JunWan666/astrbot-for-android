@@ -61,6 +61,7 @@ class WebUiActivity : LocalizedActivity() {
     private var committedSequence = -1L
     private var reloadAfterRecovery = true
     private var modelSettingsEntry = false
+    private var targetRoute = "providers"
     private var pendingModelSettings = false
     private var chooser: ValueCallback<Array<Uri>>? = null
     private var chooseMultiple = false
@@ -88,7 +89,9 @@ class WebUiActivity : LocalizedActivity() {
         val id = ServiceId.entries.firstOrNull { it.name == intent.getStringExtra("serviceId") } ?: run { finish(); return }
         serviceId = id
         browserScale = BrowserScale(this, id.name)
-        modelSettingsEntry = id == ServiceId.ASTRBOT && intent.getBooleanExtra(AiAccess.MODEL_SETTINGS_EXTRA, false)
+        val route = intent.getStringExtra(AstrBotWebRoutes.EXTRA)?.takeIf { it in AstrBotWebRoutes.allowed }
+        targetRoute = route ?: "providers"
+        modelSettingsEntry = id == ServiceId.ASTRBOT && (route != null || intent.getBooleanExtra(AiAccess.MODEL_SETTINGS_EXTRA, false))
         pendingModelSettings = modelSettingsEntry && (savedInstanceState?.getBoolean("pendingModelSettings", true) ?: true)
         // A missing/disabled address gets native recovery controls; never load this
         // placeholder unless a real enabled configuration has the same origin.
@@ -121,16 +124,6 @@ class WebUiActivity : LocalizedActivity() {
         }
         heading.addView(status)
         toolbar.addView(heading, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
-        if (modelSettingsEntry) toolbar.addView(android.widget.Button(this).apply {
-            text = AppText.get(R.string.ui_models); textSize = 12f; setTextColor(foreground)
-            setOnClickListener {
-                pendingModelSettings = true
-                val state = RuntimeStore.state.value
-                if (!webUiNeedsRecovery(id, state, endpoint.origin, pageFailure.value, pendingAction.value)) {
-                    webView.loadUrl(endpoint.origin + AiAccess.MODEL_SETTINGS_PATH)
-                }
-            }
-        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)))
         icon(AppText.get(R.string.ui_refresh), R.drawable.ic_restart) { retryPage() }
         icon(AppText.get(R.string.ui_more_actions), R.drawable.ic_more) { anchor ->
             PopupMenu(this, anchor).apply {
@@ -339,7 +332,7 @@ class WebUiActivity : LocalizedActivity() {
         pageFailure.value = null
         beginNavigation()
         if (webView.url?.let(endpoint::acceptsNavigation) == true) webView.reload()
-        else webView.loadUrl(endpoint.origin + if (modelSettingsEntry) AiAccess.MODEL_SETTINGS_PATH else "")
+        else webView.loadUrl(endpoint.origin + if (modelSettingsEntry) "/#/$targetRoute" else "")
     }
 
     /** Invalidate the old rendered document before reload, even if no new response ever arrives. */
@@ -357,7 +350,7 @@ class WebUiActivity : LocalizedActivity() {
         webView.evaluateJavascript("""
             (() => {
               if (location.hash.startsWith('#/auth/') || !localStorage.getItem('token')) return false;
-              if (location.hash !== '#/providers') location.hash = '/providers';
+              if (location.hash !== '#/$targetRoute') location.hash = '/$targetRoute';
               return true;
             })()
         """.trimIndent()) { result -> if (result == "true") pendingModelSettings = false }

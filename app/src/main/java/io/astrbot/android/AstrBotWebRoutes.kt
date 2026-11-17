@@ -5,3 +5,8 @@ internal object AiAccess {
     const val MODEL_SETTINGS_EXTRA = "openModelSettings"
     const val MODEL_SETTINGS_PATH = "/#/providers"
 }
+
+internal object AstrBotWebRoutes {
+    const val EXTRA = "astrbotRoute"
+    val allowed = setOf("providers", "platforms", "extension", "persona")
+}
