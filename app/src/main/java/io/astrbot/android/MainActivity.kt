@@ -61,17 +61,25 @@ import java.io.File
 
 class MainActivity : LocalizedActivity() {
     private val automaticUpdates by lazy { AutomaticUpdateChecks(applicationContext) }
+    private var requestedPage by mutableStateOf<ManagerPage?>(null)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestedPage = ManagerPage.entries.firstOrNull { it.name == intent.getStringExtra("openPage") }
         enableEdgeToEdge()
         setContent { ManagerTheme { Surface(Modifier.fillMaxSize()) { ManagerScreen() } } }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        requestedPage = ManagerPage.entries.firstOrNull { it.name == intent.getStringExtra("openPage") }
     }
 
     override fun onStart() {
         super.onStart()
         lifecycleScope.launch {
             RuntimeStore.operationLock.withLock { RuntimeStore.refreshInstallation(this@MainActivity) }
-            val interrupted = withContext(Dispatchers.IO) { BackupRepository(filesDir).let { it.hasPendingRestore || it.hasPendingCleanup } || UpdateRepository(this@MainActivity).hasPendingUpdate || UpdateRepository(this@MainActivity, "napcat").hasPendingUpdate || RuntimeImageRepository(this@MainActivity).hasPendingUpdate || PortableBackupRepository(this@MainActivity).hasInterruptedWork || PersonaRepository(this@MainActivity).hasPendingChange }
+            val interrupted = withContext(Dispatchers.IO) { BackupRepository(filesDir).let { it.hasPendingRestore || it.hasPendingCleanup } || UpdateRepository(this@MainActivity).hasPendingUpdate || RuntimeImageRepository(this@MainActivity).hasPendingUpdate || EnvironmentRepairRepository(this@MainActivity).hasPendingRepair || PortableBackupRepository(this@MainActivity).hasInterruptedWork || PersonaRepository(this@MainActivity).hasPendingChange }
             val wanted = BackgroundRecovery.hasDesiredServices(this@MainActivity)
             if ((interrupted || wanted) && RuntimeStore.owner == null) RuntimeService.command(this@MainActivity, "reconcile")
         }
@@ -83,19 +91,31 @@ class MainActivity : LocalizedActivity() {
         val networkFlow = remember { NetworkConnectivity.observe(applicationContext) }
         val network by networkFlow.collectAsStateWithLifecycle(NetworkSnapshot())
         val requestedLog = LogCategory.entries.firstOrNull { it.name == intent.getStringExtra("openLogService") }
-        val requestedService = ServiceId.entries.firstOrNull { it.name == requestedLog?.name }
+        val requestedService = ServiceId.entries.firstOrNull { it.name == (requestedLog?.name ?: intent.getStringExtra("openService")) }
         var page by rememberSaveable { mutableStateOf(if (requestedLog != null && requestedService == null) ManagerPage.SETTINGS else ManagerPage.HOME) }
-        val personaPageState = rememberSaveableStateHolder()
         var selectedService by rememberSaveable { mutableStateOf(requestedService) }
         var serviceRoute by rememberSaveable { mutableStateOf(ServiceRoute.STATUS) }
         var settingsRoute by rememberSaveable { mutableStateOf(if (requestedLog != null && requestedService == null) SettingsRoute.DIAGNOSTICS else SettingsRoute.ROOT) }
         var logViewerVisible by rememberSaveable { mutableStateOf(requestedLog != null) }
         var logService by rememberSaveable { mutableStateOf(requestedLog ?: LogCategory.MANAGER) }
+        LaunchedEffect(requestedPage) {
+            requestedPage?.let {
+                page = it; selectedService = null; logViewerVisible = false; settingsRoute = SettingsRoute.ROOT
+                requestedPage = null
+            }
+        }
         var logText by remember { mutableStateOf("") }
         var logPaused by rememberSaveable { mutableStateOf(false) }
         var exportCategory by rememberSaveable { mutableStateOf<LogCategory?>(null) }
         var showVersions by rememberSaveable { mutableStateOf(false) }
         var message by remember { mutableStateOf<Pair<String, String>?>(null) }
+        var shownProblem by remember { mutableStateOf<OperationProblem?>(null) }
+        fun showNotice(title: String, text: String) {
+            if (state.error != null && text == state.error) {
+                message = null
+                shownProblem = state.currentProblem() ?: OperationProblem.failed("unknown", state.phase, text)
+            } else message = title to text
+        }
         var backgroundGuide by rememberSaveable { mutableStateOf<BackgroundTopic?>(null) }
         var showEnvironmentCheck by rememberSaveable { mutableStateOf(false) }
         var showBackups by remember { mutableStateOf(false) }
@@ -107,10 +127,12 @@ class MainActivity : LocalizedActivity() {
         var confirmRollback by remember { mutableStateOf(false) }
         var confirmRuntime by remember { mutableStateOf<String?>(null) }
         var confirmPortableExport by remember { mutableStateOf(false) }
+        var portableExportMask by rememberSaveable { mutableIntStateOf(1) }
+        var clearAllLogs by remember { mutableStateOf(false) }
         var confirmPortableImport by remember { mutableStateOf(false) }
         var confirmDiagnostics by remember { mutableStateOf(false) }
         var viewOnlineUpdate by remember { mutableStateOf(false) }
-        var napcatUpdateDialog by remember { mutableStateOf(false) }
+        var requestedComponentCheck by remember { mutableLongStateOf(-1) }
         var showAutomaticUpdates by remember { mutableStateOf(false) }
         var showLanguage by remember { mutableStateOf(false) }
         var storagePrompt by remember { mutableStateOf<Pair<RuntimeStorageAdvice, () -> Unit>?>(null) }
@@ -120,6 +142,11 @@ class MainActivity : LocalizedActivity() {
         var lanAddresses by remember { mutableStateOf(emptyList<String>()) }
         var resources by remember { mutableStateOf(ResourceSnapshot()) }
         val resourceMonitor = remember { ResourceMonitor(this@MainActivity) }
+        val platformStatuses = rememberMessagePlatforms(state)
+        fun openAstrBot(route: String = "") {
+            startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", ServiceId.ASTRBOT.name)
+                .apply { if (route in AstrBotWebRoutes.allowed) putExtra(AstrBotWebRoutes.EXTRA, route) })
+        }
         val importUpdate = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) {
                 runCatching { contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
@@ -127,10 +154,18 @@ class MainActivity : LocalizedActivity() {
             }
         }
         val exportPortable = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
-            if (uri != null) RuntimeService.command(this@MainActivity, "export-backup", sourceUri = uri.toString())
+            if (uri != null) RuntimeService.command(this@MainActivity, "export-backup", sourceUri = uri.toString(), backupSelectionMask = portableExportMask)
         }
         val exportDiagnostics = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
             if (uri != null) RuntimeService.command(this@MainActivity, "export-diagnostics", sourceUri = uri.toString())
+        }
+        LaunchedEffect(state.sharedExport) {
+            state.sharedExport?.let { path ->
+                RuntimeStore.state.update { if (it.sharedExport == path) it.copy(sharedExport = null) else it }
+                runCatching { SharedExports.launch(this@MainActivity, File(path), "application/zip") }.onFailure {
+                    Toast.makeText(this@MainActivity, AppText.get(R.string.export_failed), Toast.LENGTH_LONG).show()
+                }
+            }
         }
         val importPortable = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) {
@@ -139,6 +174,8 @@ class MainActivity : LocalizedActivity() {
             }
         }
         val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+        val terminal = remember { TerminalPage(this@MainActivity) { permission.launch(Manifest.permission.POST_NOTIFICATIONS) } }
+        DisposableEffect(terminal) { onDispose { terminal.close() } }
         val exportLog = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
             val category = exportCategory
             exportCategory = null
@@ -165,7 +202,9 @@ class MainActivity : LocalizedActivity() {
                         if (advice?.shouldWarn == true) storagePrompt = advice to send else send()
                     } catch (failure: CancellationException) { throw failure }
                     catch (failure: Exception) {
-                        RuntimeStore.state.update { it.copy(error = failure.localizedMessage ?: AppText.get(R.string.ui_operation_failed)) }
+                        val problem = OperationProblem.failed(operation, state.phase,
+                            failure.userFacingMessage() ?: AppText.get(R.string.problem_unknown_failure))
+                        RuntimeStore.state.update { it.copy(error = problem.summary, problem = problem) }
                     } finally { RuntimeStore.endRequest(preparation) }
                 }
             } else send()
@@ -178,7 +217,10 @@ class MainActivity : LocalizedActivity() {
         }
         fun back() {
             when {
-                selectedService != null -> { selectedService = null; serviceRoute = ServiceRoute.STATUS; logViewerVisible = false; logText = "" }
+                selectedService != null -> {
+                    if (intent.hasExtra("openService")) finish()
+                    else { selectedService = null; serviceRoute = ServiceRoute.STATUS; logViewerVisible = false; logText = "" }
+                }
                 logViewerVisible -> { logViewerVisible = false; logText = "" }
                 page == ManagerPage.SETTINGS && settingsRoute != SettingsRoute.ROOT -> settingsRoute = settingsRoute.parent
                 else -> page = ManagerPage.HOME
@@ -187,27 +229,19 @@ class MainActivity : LocalizedActivity() {
         fun settingsAction(action: SettingAction) {
             when (action) {
                 SettingAction.VERSIONS -> showVersions = true
-                SettingAction.CHECK_UPDATE -> command("check-update")
+                SettingAction.CHECK_UPDATE -> { requestedComponentCheck = state.componentCheckSerial; viewOnlineUpdate = true; command("check-update") }
                 SettingAction.CHECK_APP_UPDATE -> startActivity(Intent(this@MainActivity, ManagerUpdateActivity::class.java))
                 SettingAction.STORAGE_USAGE -> startActivity(Intent(this@MainActivity, StorageUsageActivity::class.java))
                 SettingAction.AUTOMATIC_UPDATES -> showAutomaticUpdates = true
                 SettingAction.LANGUAGE -> showLanguage = true
                 SettingAction.IMPORT_UPDATE -> importUpdate.launch(arrayOf("application/zip", "application/octet-stream"))
                 SettingAction.ONLINE_UPDATE -> {
-                    napcatUpdateDialog = false
+                    requestedComponentCheck = if (state.latestUpdate == null) state.componentCheckSerial else -1
                     if (state.latestUpdate == null) command("check-update")
                     viewOnlineUpdate = true
                 }
-                SettingAction.APPLY_UPDATE -> { napcatUpdateDialog = false; confirmUpdate = true }
-                SettingAction.CHECK_NAPCAT -> command("check-napcat")
-                SettingAction.ONLINE_NAPCAT -> {
-                    napcatUpdateDialog = true
-                    if (state.latestNapCat == null) command("check-napcat")
-                    viewOnlineUpdate = true
-                }
-                SettingAction.APPLY_NAPCAT -> { napcatUpdateDialog = true; confirmUpdate = true }
-                SettingAction.ROLLBACK_NAPCAT -> { napcatUpdateDialog = true; confirmRollback = true }
-                SettingAction.ROLLBACK -> { napcatUpdateDialog = false; confirmRollback = true }
+                SettingAction.APPLY_UPDATE -> { confirmUpdate = true }
+                SettingAction.ROLLBACK -> { confirmRollback = true }
                 SettingAction.APPLY_RUNTIME -> confirmRuntime = "apply-runtime"
                 SettingAction.ROLLBACK_RUNTIME -> confirmRuntime = "rollback-runtime"
                 SettingAction.CREATE_BACKUP -> command("backup")
@@ -220,6 +254,7 @@ class MainActivity : LocalizedActivity() {
                 SettingAction.DISCARD_PORTABLE -> command("discard-backup")
                 SettingAction.LOGS -> openLogs(LogCategory.MANAGER)
                 SettingAction.RUNTIME_LOGS -> openLogs(LogCategory.RUNTIME)
+                SettingAction.CLEAR_LOGS -> clearAllLogs = true
                 SettingAction.DIAGNOSTICS -> confirmDiagnostics = true
                 SettingAction.ENVIRONMENT_CHECK -> { showEnvironmentCheck = true; command("check-environment") }
                 SettingAction.EXTENSIONS -> startActivity(Intent(this@MainActivity, ExtensionsActivity::class.java))
@@ -277,14 +312,15 @@ class MainActivity : LocalizedActivity() {
             }
         }
         Scaffold(
-            topBar = { ManagerHeader(page, state,
+            contentWindowInsets = if (page == ManagerPage.TERMINAL) WindowInsets(0, 0, 0, 0) else ScaffoldDefaults.contentWindowInsets,
+            topBar = { if (page != ManagerPage.TERMINAL) ManagerHeader(page, state,
                 title = if (logViewerVisible) AppText.get(R.string.ui_logs, logService.label) else selectedService?.let { "${it.label} · ${serviceRoute.title}" }
                     ?: settingsRoute.takeIf { page == ManagerPage.SETTINGS && it != SettingsRoute.ROOT }?.title,
                 onBack = if (showBackButton) ({ back() }) else null) },
             bottomBar = { if (selectedService != null) ServiceBottomBar(if (logViewerVisible) ServiceRoute.LOGS else serviceRoute) { route ->
                 if (route == ServiceRoute.LOGS) openLogs(LogCategory.valueOf(requireNotNull(selectedService).name))
                 else { logViewerVisible = false; logText = ""; serviceRoute = route }
-            } else ManagerBottomBar(page) {
+            } else if (page != ManagerPage.TERMINAL || !WindowInsets.isImeVisible) ManagerBottomBar(page) {
                 page = it; logViewerVisible = false; logText = ""; selectedService = null; settingsRoute = SettingsRoute.ROOT
             } },
         ) { insets ->
@@ -292,39 +328,37 @@ class MainActivity : LocalizedActivity() {
                 onPause = { logPaused = !logPaused }, onCopy = { copy(AppText.get(R.string.ui_current_logs), logText) }, onExport = {
                     exportCategory = logService
                     exportLog.launch("astrbot-${logService.name.lowercase()}-${System.currentTimeMillis()}.log")
-                }, modifier = Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
+                }, onClear = { RuntimeService.command(this@MainActivity, "clear-logs", logCategory = logService.name); logText = "" }, shareCategory = logService,
+                modifier = Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
                     .padding(horizontal = 16.dp).padding(bottom = 12.dp))
             else when (page) {
                 ManagerPage.HOME -> Box(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
                     .padding(horizontal = 16.dp).padding(bottom = 12.dp)) {
                     val id = selectedService
-                    if (id == null) FixedManagerHome(state, network, resources,
-                        onCommand = { operation, service -> command(operation, service) },
-                        onDetails = { selectedService = it; serviceRoute = ServiceRoute.STATUS },
-                        onOpen = { startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", it.name)) },
-                        onNotice = { title, text -> message = title to text })
+                    if (id == null) AstrBotHome(state, network, resources, platformStatuses,
+                        onCommand = { operation -> command(operation, ServiceId.ASTRBOT) },
+                        onDetails = { selectedService = ServiceId.ASTRBOT; serviceRoute = ServiceRoute.STATUS },
+                        onOpen = { openAstrBot(it) }, onLogs = { openLogs(LogCategory.ASTRBOT) },
+                        onPlatforms = { platform -> startActivity(Intent(this@MainActivity, MessagePlatformActivity::class.java)
+                            .putExtra("platform", platform.name)) },
+                        onNotice = { title, text -> showNotice(title, text) })
                     else FixedServiceDetails(id, serviceRoute, state, lanAddresses,
                         onNavigate = { serviceRoute = it }, onCommand = { command(it, id) },
                         onOpen = { startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", id.name)) },
                         onLogs = { openLogs(LogCategory.valueOf(id.name)) }, onLan = { confirmLan = id to it },
                         onExternal = { external(it) }, onCopy = { label, value -> copy(label, value) },
-                        onNotice = { title, text -> message = title to text }, credentialContent = { CredentialControls(id) })
+                        onNotice = { title, text -> showNotice(title, text) }, credentialContent = { CredentialControls(id) })
                 }
-                ManagerPage.PERSONAS -> personaPageState.SaveableStateProvider("personas") {
-                    Box(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
-                        .padding(horizontal = 16.dp).padding(bottom = 12.dp)) {
-                        ManagerPersonas(state,
-                            onApply = { preset, mode -> command(mode, ServiceId.ASTRBOT, updateId = preset?.id) },
-                            onCopy = { copy(AppText.get(R.string.ui_persona_prompt), it) }, onExternal = { external(it, localBackend = false) },
-                            onBackend = { startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", ServiceId.ASTRBOT.name)) })
-                    }
-                }
-                ManagerPage.WEBSITES -> WebsiteBookmarksScreen(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
+                ManagerPage.TERMINAL -> terminal.Screen(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets))
+                ManagerPage.TASKS -> UserTasksScreen(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
                     .padding(horizontal = 16.dp).padding(bottom = 12.dp))
+                ManagerPage.WEBSITES -> WebsiteBookmarksScreen(
+                    modifier = Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
+                        .padding(horizontal = 16.dp).padding(bottom = 12.dp))
                 ManagerPage.SETTINGS -> Box(Modifier.fillMaxSize().padding(insets).consumeWindowInsets(insets)
                     .padding(horizontal = 16.dp).padding(bottom = 12.dp)) {
                     FixedManagerSettings(settingsRoute, state, onNavigate = { settingsRoute = it },
-                        onAction = { settingsAction(it) }, onNotice = { title, text -> message = title to text },
+                        onAction = { settingsAction(it) }, onNotice = { title, text -> showNotice(title, text) },
                         automaticUpdateEnabled = automaticEnabled, updateChannelConfigured = automaticUpdates.configured)
                 }
             }
@@ -350,22 +384,28 @@ class MainActivity : LocalizedActivity() {
         })
         backgroundGuide?.let { BackgroundGuideDialog(it) { backgroundGuide = null } }
         if (showEnvironmentCheck) EnvironmentCheckDialog(state,
-            onCheck = { command("check-environment") }, onRepair = { showEnvironmentCheck = false; confirmRuntime = "repair-runtime" },
+            onCheck = { command("check-environment") }, onRepair = { showEnvironmentCheck = false; confirmRuntime = "repair-environment" },
             onMaintenance = { showEnvironmentCheck = false; settingsRoute = SettingsRoute.ENVIRONMENT },
-            onDismiss = { showEnvironmentCheck = false })
+            onDismiss = { showEnvironmentCheck = false },
+            onShare = { showEnvironmentCheck = false; command("share-diagnostics") })
+        shownProblem?.let { problem -> OperationProblemDialog(problem, state.busy,
+            onCheck = { shownProblem = null; showEnvironmentCheck = true; command("check-environment") },
+            onShare = { shownProblem = null; command("share-diagnostics") },
+            onLogs = { shownProblem = null; openLogs(LogCategory.MANAGER) }, onDismiss = { shownProblem = null }) }
         message?.let { (title, text) -> AlertDialog(onDismissRequest = { message = null }, title = { Text(title) },
             text = { Text(text, Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
             confirmButton = { TextButton(onClick = { message = null }) { Text(AppText.get(R.string.ui_close)) } },
             dismissButton = { TextButton(onClick = { message = null; openLogs(LogCategory.MANAGER) }) { Text(AppText.get(R.string.ui_view_manager_logs)) } }) }
         confirmRuntime?.let { operation ->
+            val targeted = operation == "repair-environment"
             val reverting = operation == "rollback-runtime"
             val repairing = operation == "repair-runtime"
-            AlertDialog(onDismissRequest = { confirmRuntime = null }, title = { Text(if (repairing) AppText.get(R.string.ui_redeploy_runtime_resources) else if (reverting) AppText.get(R.string.ui_roll_back_the_entire_runtime_6833c) else AppText.get(R.string.ui_upgrade_the_bundled_runtime)) },
-                text = { Text(if (repairing) AppText.get(R.string.ui_prepare_the_runtime_bundled_with_this_apk_stop_both)
+            AlertDialog(onDismissRequest = { confirmRuntime = null }, title = { Text(if (targeted) AppText.get(R.string.repair_auto_title) else if (repairing) AppText.get(R.string.ui_redeploy_runtime_resources) else if (reverting) AppText.get(R.string.ui_roll_back_the_entire_runtime_6833c) else AppText.get(R.string.ui_upgrade_the_bundled_runtime)) },
+                text = { Text(if (targeted) AppText.get(R.string.repair_confirmation) else if (repairing) AppText.get(R.string.ui_prepare_the_runtime_bundled_with_this_apk_stop_both)
                     else if (reverting) AppText.get(R.string.ui_back_up_current_data_then_restore_the_previous_runtime)
                     else AppText.get(R.string.ui_verify_and_prepare_the_full_bundled_runtime_stop_both),
                     Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
-                confirmButton = { TextButton(enabled = !state.busy, onClick = { confirmRuntime = null; command(operation) }) { Text(if (repairing) AppText.get(R.string.ui_back_up_and_repair) else if (reverting) AppText.get(R.string.ui_back_up_and_roll_back) else AppText.get(R.string.ui_back_up_and_upgrade)) } },
+                confirmButton = { TextButton(enabled = !state.busy, onClick = { confirmRuntime = null; command(operation) }) { Text(if (targeted) AppText.get(R.string.repair_start) else if (repairing) AppText.get(R.string.ui_back_up_and_repair) else if (reverting) AppText.get(R.string.ui_back_up_and_roll_back) else AppText.get(R.string.ui_back_up_and_upgrade)) } },
                 dismissButton = { TextButton(onClick = { confirmRuntime = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         confirmLan?.let { (id, enabled) ->
@@ -377,19 +417,28 @@ class MainActivity : LocalizedActivity() {
         }
         if (confirmDiagnostics) AlertDialog(onDismissRequest = { confirmDiagnostics = false }, title = { Text(AppText.get(R.string.ui_export_diagnostics_2f10a)) },
             text = { Text(AppText.get(R.string.ui_includes_the_device_model_versions_runtime_status_and_redacted)) },
-            confirmButton = { TextButton(onClick = { confirmDiagnostics = false; exportDiagnostics.launch("astrbot-diagnostics-${System.currentTimeMillis()}.zip") }) { Text(AppText.get(R.string.ui_choose_destination)) } },
-            dismissButton = { TextButton(onClick = { confirmDiagnostics = false }) { Text(AppText.get(R.string.ui_cancel)) } })
+            confirmButton = { TextButton(enabled = !state.busy, onClick = { confirmDiagnostics = false; command("share-diagnostics") }) { Text(AppText.get(R.string.export_share)) } },
+            dismissButton = { TextButton(enabled = !state.busy, onClick = { confirmDiagnostics = false; exportDiagnostics.launch("astrbot-diagnostics-${System.currentTimeMillis()}.zip") }) { Text(AppText.get(R.string.export_save)) } })
         if (showDataRetention) DataRetentionDialog(
             onPortableBackup = { showDataRetention = false; settingsRoute = SettingsRoute.PORTABLE },
             onDismiss = { showDataRetention = false })
-        if (confirmPortableExport) AlertDialog(onDismissRequest = { confirmPortableExport = false }, title = { Text(AppText.get(R.string.ui_export_portable_backup_47820)) },
-            text = { Text(AppText.get(R.string.ui_includes_astrbot_configuration_database_plugins_and_data_plus_napcat)) },
-            confirmButton = { TextButton(onClick = { confirmPortableExport = false; exportPortable.launch("astrbot-portable-${System.currentTimeMillis()}.zip") }) { Text(AppText.get(R.string.ui_choose_destination)) } },
-            dismissButton = { TextButton(onClick = { confirmPortableExport = false }) { Text(AppText.get(R.string.ui_cancel)) } })
+        if (confirmPortableExport) PortableBackupExportDialog(onExport = { selection ->
+            portableExportMask = selection.mask
+            confirmPortableExport = false
+            exportPortable.launch("astrbot-portable-${System.currentTimeMillis()}.zip")
+        }, onShare = { selection ->
+            confirmPortableExport = false
+            RuntimeService.command(this@MainActivity, "share-backup", backupSelectionMask = selection.mask)
+        }, onDismiss = { confirmPortableExport = false })
+        if (clearAllLogs) AlertDialog(onDismissRequest = { clearAllLogs = false }, title = { Text(AppText.get(R.string.logs_clear_all)) },
+            text = { Text(AppText.get(R.string.logs_clear_all_confirm)) },
+            confirmButton = { TextButton(onClick = { clearAllLogs = false; command("clear-all-logs") }) { Text(AppText.get(R.string.logs_clear)) } },
+            dismissButton = { TextButton(onClick = { clearAllLogs = false }) { Text(AppText.get(R.string.action_cancel)) } })
         if (confirmPortableImport) state.portableImport?.let { backup ->
             val date = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.DEFAULT, java.text.DateFormat.DEFAULT, AppText.locale).format(java.util.Date(backup.createdAt))
             AlertDialog(onDismissRequest = { confirmPortableImport = false }, title = { Text(AppText.get(R.string.ui_restore_this_portable_backup)) },
-                text = { Text(AppText.get(R.string.ui_backup_date_stop_services_and_create_a_local_recovery, date)) },
+                text = { Text(AppText.get(R.string.backup_restore_summary, date, portableScopeLabel(backup.scopes), AppText.get(R.string.backup_cross_version_hint)),
+                    Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) },
                 confirmButton = { TextButton(onClick = { confirmPortableImport = false; command("apply-backup") }) { Text(AppText.get(R.string.ui_back_up_and_import)) } },
                 dismissButton = { TextButton(onClick = { confirmPortableImport = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
@@ -424,7 +473,7 @@ class MainActivity : LocalizedActivity() {
                     val date = java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.DEFAULT, java.text.DateFormat.DEFAULT, AppText.locale).format(java.util.Date(backup.createdAt))
                     Text(date, style = MaterialTheme.typography.titleSmall)
                     Text(AppText.get(R.string.ui_mb_entries, when (backup.kind) { "manual" -> AppText.get(R.string.ui_manual_backup); "before-restore" -> AppText.get(R.string.ui_pre_restore_snapshot); else -> AppText.get(R.string.ui_pre_update_snapshot) }, backup.bytes / 1024 / 1024, backup.count))
-                    Text("AstrBot ${backup.versions["AstrBot"] ?: AppText.get(R.string.ui_unknown)} / NapCat ${backup.versions["NapCat"] ?: AppText.get(R.string.ui_unknown)}", style = MaterialTheme.typography.bodySmall)
+                    Text("AstrBot ${backup.versions["AstrBot"] ?: AppText.get(R.string.ui_unknown)}", style = MaterialTheme.typography.bodySmall)
                     if (backup.id in state.protectedBackupIds) Text(AppText.get(R.string.ui_required_for_rollback_protected), color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
                     Row {
                         TextButton(onClick = { restoreBackup = backup }, enabled = !state.busy) { Text(AppText.get(R.string.ui_restore)) }
@@ -446,34 +495,46 @@ class MainActivity : LocalizedActivity() {
                 confirmButton = { TextButton(onClick = { deleteBackup = null; command("delete-backup", backupId = backup.id) }) { Text(AppText.get(R.string.ui_delete)) } },
                 dismissButton = { TextButton(onClick = { deleteBackup = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
-        val updateLabel = if (napcatUpdateDialog) "NapCat" else "AstrBot"
-        val stagedUpdate = if (napcatUpdateDialog) state.preparedNapCat else state.preparedUpdate
-        val onlineVersion = if (napcatUpdateDialog) state.latestNapCat else state.latestUpdate
+        val updateLabel = "AstrBot"
+        val stagedUpdate = state.preparedUpdate
+        val onlineVersion = state.latestUpdate
         if (confirmUpdate) stagedUpdate?.let { update ->
             AlertDialog(onDismissRequest = { confirmUpdate = false }, title = { Text(AppText.get(R.string.ui_update_to, updateLabel, update.version)) },
                 text = { Text(AppText.get(R.string.ui_n_n_nboth_services_will_stop_briefly_data_is, update.channel, update.notes) +
-                    if (napcatUpdateDialog) AppText.get(R.string.ui_qq_remains_stopped_if_it_was_stopped_otherwise_it) else AppText.get(R.string.ui_astrbot_starts_to_check_its_local_dashboard)) },
-                confirmButton = { TextButton(onClick = { confirmUpdate = false; command(if (napcatUpdateDialog) "apply-napcat" else "apply-update") }) { Text(AppText.get(R.string.ui_back_up_and_update)) } },
+                    AppText.get(R.string.ui_astrbot_starts_to_check_its_local_dashboard)) },
+                confirmButton = { TextButton(onClick = { confirmUpdate = false; command("apply-update") }) { Text(AppText.get(R.string.ui_back_up_and_update)) } },
                 dismissButton = { TextButton(onClick = { confirmUpdate = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
-        if (viewOnlineUpdate && onlineVersion != null) {
+        LaunchedEffect(viewOnlineUpdate, state.busy, state.error) {
+            if (viewOnlineUpdate && !state.busy && state.error != null) viewOnlineUpdate = false
+        }
+        val checkedComponent = requestedComponentCheck < state.componentCheckSerial
+        if (viewOnlineUpdate && onlineVersion == null && checkedComponent && !state.busy && state.error == null) {
+            AlertDialog(onDismissRequest = { viewOnlineUpdate = false }, title = { Text(AppText.get(R.string.ui_check_for_updates)) },
+                text = { Text(state.notice.orEmpty()) }, confirmButton = { TextButton(onClick = { viewOnlineUpdate = false }) { Text(AppText.get(R.string.ui_close)) } })
+        }
+        if (viewOnlineUpdate && onlineVersion != null && checkedComponent && !state.busy && state.error == null) {
             val update = onlineVersion
+            val canUpgrade = update.version != state.versions[updateLabel]
             AlertDialog(onDismissRequest = { viewOnlineUpdate = false }, title = { Text("$updateLabel ${update.version}") },
-                text = { Text("${update.channel} · ${update.bytes / 1024 / 1024} MB\n${update.notes}\n\n" +
-                    (if (state.versions[updateLabel] == update.version) AppText.get(R.string.ui_this_version_is_already_installed_you_can_download_or) else "") +
-                    AppText.get(R.string.ui_services_keep_running_during_download_and_verification_backup_and)) },
-                confirmButton = { TextButton(onClick = { viewOnlineUpdate = false; command(if (napcatUpdateDialog) "download-napcat" else "download-update", updateId = update.id) }) { Text(AppText.get(R.string.ui_download_and_verify)) } },
+                text = { Column(Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("${update.channel} · ${if (update.bytes > 0) Formatter.formatFileSize(this@MainActivity, update.bytes) else AppText.get(R.string.upstream_size_unknown)}")
+                    Text(update.notes)
+                    Text(if (canUpgrade) AppText.get(R.string.upstream_flow_hint) else
+                        AppText.get(R.string.upstream_latest, updateLabel, update.version), style = MaterialTheme.typography.bodySmall)
+                } },
+                confirmButton = { if (canUpgrade) TextButton(onClick = { viewOnlineUpdate = false; command("update-online", updateId = update.id) }) { Text(AppText.get(R.string.upstream_download_install)) } },
                 dismissButton = { TextButton(onClick = { viewOnlineUpdate = false }) { Text(AppText.get(R.string.ui_close)) } })
         }
         if (confirmRollback) AlertDialog(onDismissRequest = { confirmRollback = false }, title = { Text(AppText.get(R.string.ui_roll_back_and_its_data, updateLabel)) },
             text = { Text(AppText.get(R.string.ui_back_up_current_data_then_restore_the_program_and)) },
-            confirmButton = { TextButton(onClick = { confirmRollback = false; command(if (napcatUpdateDialog) "rollback-napcat" else "rollback") }) { Text(AppText.get(R.string.ui_back_up_and_roll_back_65fe8)) } },
+            confirmButton = { TextButton(onClick = { confirmRollback = false; command("rollback") }) { Text(AppText.get(R.string.ui_back_up_and_roll_back_65fe8)) } },
             dismissButton = { TextButton(onClick = { confirmRollback = false }) { Text(AppText.get(R.string.ui_cancel)) } })
     }
 
     @Composable private fun CredentialControls(id: ServiceId) {
         val manager by RuntimeStore.state.collectAsStateWithLifecycle()
-        val label = if (id == ServiceId.NAPCAT) AppText.get(R.string.ui_napcat_access_token) else AppText.get(R.string.ui_astrbot_initial_password)
+        val label = AppText.get(R.string.ui_astrbot_initial_password)
         val owner = LocalLifecycleOwner.current
         var revealed by remember(id) { mutableStateOf<String?>(null) }
         var loading by remember(id) { mutableStateOf(false) }
@@ -512,12 +573,12 @@ class MainActivity : LocalizedActivity() {
             }
         }
         ManagerActionButton(AppText.get(R.string.ui_copy_f4880, label), { readCredential { copy(label, it, sensitive = true) } }, tone = ActionTone.NEUTRAL, enabled = !loading && !manager.busy)
-        ManagerActionButton(AppText.get(if (id == ServiceId.NAPCAT) R.string.credentials_reset_token else R.string.credentials_reset_password), {
+        ManagerActionButton(AppText.get(R.string.credentials_reset_password), {
             request++; revealed = null; confirmReset = true
         }, tone = ActionTone.NEUTRAL, enabled = manager.componentsReady && !manager.busy && !loading)
         if (confirmReset) AlertDialog(onDismissRequest = { confirmReset = false },
-            title = { Text(AppText.get(if (id == ServiceId.NAPCAT) R.string.credentials_reset_token else R.string.credentials_reset_password)) },
-            text = { Text(AppText.get(if (id == ServiceId.NAPCAT) R.string.credentials_reset_napcat_notice else R.string.credentials_reset_astrbot_notice)) },
+            title = { Text(AppText.get(R.string.credentials_reset_password)) },
+            text = { Text(AppText.get(R.string.credentials_reset_astrbot_notice)) },
             confirmButton = { TextButton(onClick = {
                 confirmReset = false; request++; revealed = null
                 RuntimeService.command(this@MainActivity, "reset-webui-password", id)

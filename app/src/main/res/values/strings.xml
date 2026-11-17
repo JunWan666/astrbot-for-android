@@ -5,17 +5,10 @@
     <string name="language_subtitle" formatted="false">"跟随系统、简体中文或 English"</string>
     <string name="language_system" formatted="false">"跟随系统"</string>
     <string name="action_cancel" formatted="false">"取消"</string>
-    <string name="persona_category_fun" formatted="false">"趣味"</string>
-    <string name="persona_category_company" formatted="false">"陪伴"</string>
-    <string name="persona_category_productivity" formatted="false">"效率"</string>
-    <string name="persona_category_creative" formatted="false">"创作"</string>
-    <string name="persona_category_all" formatted="false">"全部"</string>
     <string name="component_runtime" formatted="false">"运行环境"</string>
     <string name="component_architecture" formatted="false">"架构"</string>
     <string name="ui_add_persona" formatted="false">"新增人设"</string>
     <string name="ui_paste_a_prompt_from_the_persona_marketplace_save_it" formatted="false">"可以粘贴从人设市场找到的提示词，保存后再添加到 AstrBot。"</string>
-    <string name="ui_persona_name" formatted="false">"人设名称"</string>
-    <string name="ui_persona_prompt" formatted="false">"人设提示词"</string>
     <string name="ui_description_optional" formatted="false">"简介（选填）"</string>
     <string name="ui_up_to_120_characters" formatted="false">"最多 120 字"</string>
     <string name="ui_greeting_example_optional" formatted="false">"开场示例（选填）"</string>
@@ -71,12 +64,12 @@
     <string name="ui_data_and_uninstallation" formatted="false">"数据与卸载说明"</string>
     <string name="ui_uninstalling_the_app_or_selecting_clear_data_deletes_the" formatted="false">"卸载应用或在系统中“清除数据”，会删除运行环境、配置、数据库、QQ 登录资料，以及应用内的全部本机备份。"</string>
     <string name="ui_before_uninstalling_clearing_data_or_moving_to_another_phone" formatted="false">"准备卸载、清除数据或换手机前，请先导出便携备份到应用外，并确认文件已保存。"</string>
-    <string name="ui_portable_backups_contain_configuration_and_credentials_but_exclude_qq" formatted="false">"便携备份包含业务配置和密钥，不含 QQ 登录会话，只能导入相同运行组合。换机或卸载重装后需要重新登录 QQ。请妥善保管备份文件。"</string>
+    <string name="ui_portable_backups_contain_configuration_and_credentials_but_exclude_qq" formatted="false">便携 ZIP 可选择 AstrBot 数据和独立 Linux QQ 会话，支持跨手机、跨版本导入。QQ 换机后仍可能需要重新扫码。备份可能包含密钥和登录凭据，请妥善保管。</string>
     <string name="ui_for_normal_updates_install_an_apk_with_the_same" formatted="false">"正常更新请使用同包名、同签名的 APK 覆盖安装，保留应用数据。"</string>
     <string name="ui_open_portable_backups" formatted="false">"前往便携备份"</string>
     <string name="ui_close" formatted="false">"关闭"</string>
     <string name="ui_environment_check_and_repair" formatted="false">"环境检查与修复"</string>
-    <string name="ui_checking_runtime_resources_and_webui_configuration_this_does_not" formatted="false">"正在检查运行资源和后台配置，不会启动 AstrBot / NapCat 或重置配置。"</string>
+    <string name="ui_checking_runtime_resources_and_webui_configuration_this_does_not" formatted="false">正在检查运行资源和后台配置，不会启动 AstrBot 或重置配置。</string>
     <string name="ui_checked_at">"检查于 %1$s"</string>
     <string name="ui_passed" formatted="false">"通过"</string>
     <string name="ui_notice" formatted="false">"提示"</string>
@@ -101,7 +94,7 @@
     <string name="ui_unable_to_read_the_password_set_a_new_password" formatted="false">"密码无法读取，请重新设置密码或重装扩展"</string>
     <string name="ui_ssh_password" formatted="false">"SSH 密码"</string>
     <string name="ui_uninstall_the_ssh_extension" formatted="false">"卸载 SSH 扩展？"</string>
-    <string name="ui_ssh_will_stop_and_terminal_sessions_will_disconnect_the" formatted="false">"将停止 SSH、断开终端，并删除 SSH 密码、主机密钥和连接设置。AstrBot、NapCat 和 Ubuntu 数据会保留。内置资源随 APK 保留，可随时重新安装。"</string>
+    <string name="ui_ssh_will_stop_and_terminal_sessions_will_disconnect_the" formatted="false">将停止 SSH、断开终端，并删除 SSH 密码、主机密钥和连接设置。AstrBot 和 Ubuntu 数据保留，内置资源可随时重新安装。</string>
     <string name="ui_uninstall" formatted="false">"卸载"</string>
     <string name="ui_ssh_host_fingerprint" formatted="false">"SSH 主机指纹"</string>
     <string name="ui_the_host_fingerprint_is_generated_when_ssh_starts_for" formatted="false">"首次启动 SSH 后生成主机指纹"</string>
@@ -109,7 +102,7 @@
     <string name="ui_service_running" formatted="false">"服务运行中"</string>
     <string name="ui_installed_not_started" formatted="false">"已安装 · 未启动"</string>
     <string name="ui_not_installed_yet" formatted="false">"尚未安装"</string>
-    <string name="ui_remote_access_to_ubuntu_controlled_independently_of_astrbot_and" formatted="false">"远程进入 Ubuntu，与 AstrBot、NapCat 分别启停。"</string>
+    <string name="ui_remote_access_to_ubuntu_controlled_independently_of_astrbot_and" formatted="false">远程进入 Ubuntu，与 AstrBot 分别启停。</string>
     <string name="ui_install_ssh" formatted="false">"安装 SSH 扩展"</string>
     <string name="ui_stop_ssh" formatted="false">"停止 SSH"</string>
     <string name="ui_start_ssh" formatted="false">"启动 SSH"</string>
@@ -159,7 +152,7 @@
     <string name="ui_copy_the_displayed_content_or_export_all_retained_redacted" formatted="false">"复制当前显示内容；导出保留范围内的完整脱敏日志。"</string>
     <string name="ui_settings" formatted="false">"设置"</string>
     <string name="ui_astrbot_updates" formatted="false">"AstrBot 程序更新"</string>
-    <string name="ui_napcat_updates" formatted="false">"NapCat 程序更新"</string>
+
     <string name="ui_runtime_upgrades" formatted="false">"运行环境升级"</string>
     <string name="ui_backup_and_restore" formatted="false">"备份与恢复"</string>
     <string name="ui_portable_backups" formatted="false">"便携备份"</string>
@@ -221,16 +214,16 @@
     <string name="ui_no_online_update_channel_configured" formatted="false">"尚未配置在线更新通道"</string>
     <string name="ui_on_check_daily_when_opening_the_app" formatted="false">"已开启 · 打开应用时每天检查"</string>
     <string name="ui_off_tap_to_configure" formatted="false">"已关闭 · 点击设置"</string>
-    <string name="ui_check_napcat_updates" formatted="false">"检查 NapCat 更新"</string>
+
     <string name="ui_update_independently_without_reinstalling_the_app" formatted="false">"独立更新，无需重新安装管理器"</string>
-    <string name="ui_napcat_version_and_download" formatted="false">"NapCat 在线版本与下载"</string>
-    <string name="ui_napcat_official_upstream_package">"NapCat %1$s · 上游正式程序包"</string>
-    <string name="ui_install_napcat_update" formatted="false">"安装 NapCat 更新"</string>
+
+
+
     <string name="ui_verified_back_up_before_installing">"已校验 %1$s · 先备份再安装"</string>
     <string name="ui_download_and_verify_a_package_first" formatted="false">"先下载并校验程序包"</string>
-    <string name="ui_roll_back_napcat" formatted="false">"回退 NapCat 程序"</string>
+
     <string name="ui_restore_and_its_data">"回退到 %1$s 及对应数据"</string>
-    <string name="ui_no_napcat_rollback_available" formatted="false">"暂无 NapCat 回退点"</string>
+
     <string name="ui_distinguish_runtime_issues_from_webui_configuration_issues" formatted="false">"区分运行资源与后台配置问题"</string>
     <string name="ui_upgrade_bundled_runtime" formatted="false">"升级 APK 内置环境"</string>
     <string name="ui_runtime_matches_the_bundled_resources" formatted="false">"当前环境已匹配内置资源"</string>
@@ -274,13 +267,12 @@
     <string name="ui_app_and_component_versions" formatted="false">"应用与组件版本"</string>
     <string name="ui_release_notes_maintenance_packages_and_rollback" formatted="false">"在线说明、维护包与程序回退"</string>
     <string name="ui_independent_updates_retaining_configuration_and_sessions" formatted="false">"独立更新、保留配置与会话"</string>
-    <string name="ui_qq_python_and_underlying_dependencies" formatted="false">"QQ、Python 与底层依赖"</string>
+    <string name="ui_qq_python_and_underlying_dependencies" formatted="false">"Python 与底层依赖"</string>
     <string name="ui_third_party_licenses" formatted="false">"第三方许可"</string>
     <string name="ui_open_source_licenses_and_source_materials" formatted="false">"开源许可与来源材料"</string>
     <string name="ui_settings_content" formatted="false">"设置内容"</string>
     <string name="ui_all" formatted="false">"全部"</string>
     <string name="ui_unable_to_read_the_persona_library" formatted="false">"无法读取人设库"</string>
-    <string name="ui_persona_library_content" formatted="false">"人设库内容"</string>
     <string name="ui_give_your_chats_a_new_personality" formatted="false">"给聊天换个性格"</string>
     <string name="ui_local_personas_add_delete_and_switch">"%1$s 款本地人设 · 可添加、删除和切换"</string>
     <string name="ui_restore_previous" formatted="false">"恢复上次"</string>
@@ -293,7 +285,6 @@
     <string name="ui_no_personas_yet_select_add_persona_to_create_one" formatted="false">"还没有人设，点击“新增人设”添加"</string>
     <string name="ui_no_matching_personas" formatted="false">"没有找到匹配的人设"</string>
     <string name="ui_retry" formatted="false">"重试"</string>
-    <string name="ui_persona_card_list" formatted="false">"人设卡片列表"</string>
     <string name="ui_preview_persona">"预览人设 %1$s"</string>
     <string name="ui_in_use">"正在使用 · %1$s"</string>
     <string name="ui_added">"已添加 · %1$s"</string>
@@ -309,7 +300,7 @@
     <string name="ui_astrbot_webui" formatted="false">"AstrBot 后台"</string>
     <string name="ui_restore_previous_default_persona" formatted="false">"恢复上次默认人设"</string>
     <string name="ui_apply">"应用 %1$s"</string>
-    <string name="ui_this_will_astrbot_briefly_stops_then_resumes_its_previous">"将%1$s。操作期间 AstrBot 会短暂停止，完成后恢复原运行状态，NapCat 继续运行。\n\n已有同名人设及后台修改会保留。会话单独指定的人设不变，建议新建会话体验。"</string>
+    <string name="ui_this_will_astrbot_briefly_stops_then_resumes_its_previous">将%1$s。操作期间 AstrBot 会短暂停止，完成后恢复原运行状态。\n\n已有同名人设及后台修改会保留，会话单独指定的人设不变。</string>
     <string name="ui_add_this_persona_to_astrbot_without_changing_the_default" formatted="false">"添加到 AstrBot 人设列表，保持当前默认人设"</string>
     <string name="ui_restore_the_previous_default_persona" formatted="false">"恢复上一次默认人设"</string>
     <string name="ui_add_this_persona_and_make_it_the_default" formatted="false">"添加并设为默认人设"</string>
@@ -321,7 +312,6 @@
     <string name="ui_deleting" formatted="false">"正在删除…"</string>
     <string name="ui_confirm_deletion" formatted="false">"确认删除"</string>
     <string name="ui_home" formatted="false">"首页"</string>
-    <string name="ui_personas" formatted="false">"人设"</string>
     <string name="ui_go_back" formatted="false">"返回上一级"</string>
     <string name="ui_manager" formatted="false">"运行管理"</string>
     <string name="ui_page">"%1$s页面"</string>
@@ -343,7 +333,7 @@
     <string name="ui_partial_processes">"部分统计 · %1$s/%2$s 个进程"</string>
     <string name="ui_memory_usage_unavailable" formatted="false">"暂时无法读取内存"</string>
     <string name="ui_about_resource_usage" formatted="false">"资源统计说明"</string>
-    <string name="ui_app_memory_is_the_total_pss_of_the_manager" formatted="false">"本应用内存为管理器及同一应用用户下托管进程的 PSS 合计，共享内存按比例计算。包含 AstrBot、NapCat 和运行中的扩展；不含系统隔离的 WebView 渲染进程。\n\n手机总内存是 Android 报告的物理内存，不含存储和内存扩展。应用占比为完整 PSS 合计除以手机总内存；部分统计或读取失败时不显示占比。\n\n首页可见时每 15 秒更新，离开首页或进入后台暂停。存储容量可在设置的存储使用页查看。"</string>
+    <string name="ui_app_memory_is_the_total_pss_of_the_manager" formatted="false">本应用内存为管理器及同一应用用户下托管进程的 PSS 合计，共享内存按比例计算。包含 AstrBot 和运行中的扩展，不含系统隔离的 WebView 渲染进程。\n\n手机总内存是 Android 报告的物理内存，不含存储和内存扩展；统计不完整时不显示占比。首页可见时每 15 秒更新，进入后台暂停。</string>
     <string name="ui_service_page">"服务%1$s页面"</string>
     <string name="ui_service_details_content" formatted="false">"服务详情内容"</string>
     <string name="ui_version">"版本 %1$s"</string>
@@ -421,7 +411,7 @@
     <string name="ui_developed_and_maintained_by">"开发与维护：%1$s"</string>
     <string name="ui_project_license">"项目许可：%1$s"</string>
     <string name="ui_author_s_github_profile" formatted="false">"作者 GitHub 主页"</string>
-    <string name="ui_astrbot_and_napcat_support_independent_online_updates_retaining_configur" formatted="false">"AstrBot 与 NapCat 支持独立在线更新，保留配置并提供回退。Linux QQ、Python 或底层依赖变化时，再升级匹配的运行环境。"</string>
+
     <string name="ui_third_party_projects_retain_their_authorship_licenses_and_trademarks" formatted="false">"第三方项目保留各自作者、许可与商标，完整声明见“第三方许可”。"</string>
     <string name="ui_reading_storage_information" formatted="false">"正在读取存储信息"</string>
     <string name="ui_measurement_complete_files_in_use_may_continue_to_change" formatted="false">"统计已完成；运行中的文件可能继续变化"</string>
@@ -503,10 +493,10 @@
     <string name="ui_internet_access_unverified" formatted="false">"外网连接待确认"</string>
     <string name="ui_network_connected" formatted="false">"网络已连通"</string>
     <string name="ui_system_network_status_is_unavailable_local_webui_health_is" formatted="false">"暂时无法确认系统网络，本机后台状态单独检查。"</string>
-    <string name="ui_no_default_network_qq_models_and_online_updates_may" formatted="false">"当前没有默认网络，QQ、模型和在线更新可能无法连接；本机后台可继续使用。"</string>
-    <string name="ui_complete_network_sign_in_in_system_settings_then_check" formatted="false">"请先在系统中完成网络认证，再检查 QQ 和模型连接。"</string>
+    <string name="ui_no_default_network_qq_models_and_online_updates_may" formatted="false">"当前没有默认网络，消息平台、模型和在线更新可能无法连接；本机后台可继续使用。"</string>
+    <string name="ui_complete_network_sign_in_in_system_settings_then_check" formatted="false">"请先在系统中完成网络认证，再检查消息平台和模型连接。"</string>
     <string name="ui_the_system_has_not_confirmed_internet_access_check_your" formatted="false">"系统尚未确认互联网可用，请检查网络；本机后台可继续使用。"</string>
-    <string name="ui_the_system_confirmed_internet_access_qq_onebot_and_model" formatted="false">"系统已确认互联网连接，QQ、OneBot 和模型需分别检查。"</string>
+    <string name="ui_the_system_confirmed_internet_access_qq_onebot_and_model" formatted="false">"系统已确认互联网连接，消息平台和模型连接需分别检查。"</string>
     <string name="ui_storage_not_checked" formatted="false">"存储待检查"</string>
     <string name="ui_storage_space_normal" formatted="false">"存储空间正常"</string>
     <string name="ui_storage_space_low" formatted="false">"存储空间偏低"</string>
@@ -537,7 +527,7 @@
     <string name="ui_not_created_yet_first_start_prepares_default_configuration" formatted="false">"尚未创建，首次启动会准备默认配置"</string>
     <string name="ui_configuration_format_listen_address_or_port_is_unrecognized_repairing" formatted="false">"配置格式、监听地址或端口无法识别；修复运行资源不会重置此配置"</string>
     <string name="ui_the_webui_is_disabled_in_project_configuration" formatted="false">"用户已在项目配置中关闭后台，属于配置状态"</string>
-    <string name="ui_local_endpoint_configuration_is_recognized_login_models_qq_and" formatted="false">"本机入口配置可识别；本项不验证登录、模型、QQ 或 OneBot 消息"</string>
+    <string name="ui_local_endpoint_configuration_is_recognized_login_models_qq_and" formatted="false">"本机入口配置可识别；本项不验证登录、模型或消息平台连通性"</string>
     <string name="ui_runtime_version_record_is_missing_complete_initialization_first" formatted="false">"运行版本记录缺失，请先完成初始化"</string>
     <string name="ui_runtime" formatted="false">"运行环境"</string>
     <string name="ui_unknown_unsupported_by_this_build" formatted="false">"未知（当前代码未适配）"</string>
@@ -597,7 +587,7 @@
     <string name="ui_no_update_package_selected" formatted="false">"未选择更新包"</string>
     <string name="ui_check_for_updates_first" formatted="false">"请先检查更新"</string>
     <string name="ui_update_package_downloaded_and_verified_review_release_notes_before" formatted="false">"更新包已下载并校验，确认版本说明后再安装"</string>
-    <string name="ui_napcat_update_downloaded_and_verified_review_backup_and_installation" formatted="false">"NapCat 更新包已下载并校验，可确认备份和安装"</string>
+
     <string name="ui_this_snapshot_is_required_for_program_or_runtime_rollback" formatted="false">"此快照用于程序或环境回退，请保留；后续成功更新后会解除保护"</string>
     <string name="ui_no_backup_selected" formatted="false">"未选择备份"</string>
     <string name="ui_backup_deleted" formatted="false">"备份已删除"</string>
@@ -605,13 +595,13 @@
     <string name="ui_services_did_not_become_ready_after_import_recovery_of" formatted="false">"导入后的服务就绪检查超时，已尝试恢复操作前数据和原运行状态；请查看管理日志及服务状态"</string>
     <string name="ui_the_new_version_did_not_become_ready_recovery_of" formatted="false">"新版本就绪检查超时，已尝试恢复旧程序与对应数据；请查看管理日志及服务状态"</string>
     <string name="ui_webui_readiness_timed_out_process_monitoring_continues_view_logs" formatted="false">"等待后台就绪超时，进程状态会继续检查；可查看日志、继续等待或停止服务"</string>
-    <string name="ui_napcat_resource_check_exited_with">"NapCat 资源检查退出 %1$s：%2$s"</string>
-    <string name="ui_napcat_resources_or_qq_runtime_dependencies_are_incompatible_restoring" formatted="false">"NapCat 资源或 QQ 运行依赖不兼容，正在恢复原版本"</string>
-    <string name="ui_napcat_complete_configuration_and_qq_sessions_retained_webui_responding">"NapCat %1$s完成，配置与 QQ 会话已保留，后台接口已恢复"</string>
+
+
+
     <string name="ui_rollback" formatted="false">"回退"</string>
     <string name="ui_update" formatted="false">"更新"</string>
-    <string name="ui_napcat_complete_resource_and_dependency_checks_passed_qq_remains">"NapCat %1$s完成，资源与依赖检查通过；QQ 保持停止，启动后可检查后台"</string>
-    <string name="ui_napcat_recovery_incomplete_program_files_and_data_snapshots_are" formatted="false">"NapCat 恢复未完成，程序与数据快照已保留，请查看管理日志后重试"</string>
+
+
     <string name="ui_this_shortcut_is_unavailable_follow_the_steps_above_to" formatted="false">"系统未开放此入口，请按上方路径手动设置。"</string>
     <string name="ui_opened_an_alternative_settings_page_follow_the_steps_above" formatted="false">"直达入口不可用，已打开备用设置页；请按上方路径继续。"</string>
     <string name="ui_device">"当前手机：%1$s %2$s"</string>
@@ -628,9 +618,9 @@
     <string name="ui_redeploy_runtime_resources" formatted="false">"重新部署运行资源？"</string>
     <string name="ui_roll_back_the_entire_runtime_6833c" formatted="false">"回退整个运行环境？"</string>
     <string name="ui_upgrade_the_bundled_runtime" formatted="false">"升级 APK 内置环境？"</string>
-    <string name="ui_prepare_the_runtime_bundled_with_this_apk_stop_both" formatted="false">"将准备 APK 内置的同版本环境，停止两个服务与 SSH，备份配置、数据库和 QQ 会话，再重新部署运行资源并验证双服务。仅在组件组合完全匹配时执行，配置不重置。\n\n在 Ubuntu 程序目录内手动安装的依赖或修改将被替换；AstrBot 数据目录中的插件保留。成功后保留一次环境回退，完成后恢复原运行状态。失败则恢复原环境与数据快照。"</string>
+    <string name="ui_prepare_the_runtime_bundled_with_this_apk_stop_both" formatted="false">"将准备 APK 内置的同版本环境，暂停相关运行任务，备份配置、数据库及已有会话，再重新部署运行资源并验证 AstrBot。仅在组件组合完全匹配时执行，配置不重置。\n\n在 Ubuntu 程序目录内手动安装的依赖或修改将被替换；AstrBot 数据目录中的插件保留。成功后保留一次环境回退，完成后恢复原运行状态。失败则恢复原环境与数据快照。"</string>
     <string name="ui_back_up_current_data_then_restore_the_previous_runtime" formatted="false">"将先备份当前数据，再恢复旧环境与对应快照。恢复点之后的数据不会合并。完成后恢复原先的运行状态。"</string>
-    <string name="ui_verify_and_prepare_the_full_bundled_runtime_stop_both" formatted="false">"将校验并准备 APK 内的完整环境，停止两个服务并备份配置、数据库和 QQ 会话，再切换环境并检查两个服务。失败时恢复原环境与对应快照；成功后保留一次回退。"</string>
+    <string name="ui_verify_and_prepare_the_full_bundled_runtime_stop_both" formatted="false">"将校验并准备 APK 内的完整环境，暂停相关运行任务并备份配置、数据库及已有会话，再切换环境并检查 AstrBot。失败时恢复原环境与对应快照；成功后保留一次回退。"</string>
     <string name="ui_back_up_and_repair" formatted="false">"备份并修复"</string>
     <string name="ui_back_up_and_roll_back" formatted="false">"备份并回退环境"</string>
     <string name="ui_back_up_and_upgrade" formatted="false">"备份并升级环境"</string>
@@ -644,9 +634,9 @@
     <string name="ui_includes_the_device_model_versions_runtime_status_and_redacted" formatted="false">"包含设备型号、版本、运行状态和脱敏日志，不附带配置、数据库或 QQ 登录文件。导出不会停止服务。日志仍可能包含聊天内容或个人信息，请检查后再分享。"</string>
     <string name="ui_choose_destination" formatted="false">"选择保存位置"</string>
     <string name="ui_export_portable_backup_47820" formatted="false">"导出便携备份？"</string>
-    <string name="ui_includes_astrbot_configuration_database_plugins_and_data_plus_napcat" formatted="false">"包含 AstrBot 配置、数据库、插件和数据，以及 NapCat 配置；不包含 QQ 登录会话、运行环境和本机快照。会暂时停止两个服务制作一致性备份，再恢复原状态并保存到所选位置。文件含密码和业务密钥，不做脱敏；文件上限为 2 GiB。"</string>
+
     <string name="ui_restore_this_portable_backup" formatted="false">"恢复此便携备份？"</string>
-    <string name="ui_backup_date_stop_services_and_create_a_local_recovery">"备份时间：%1$s。将先停机创建本机恢复前快照，再替换 AstrBot 数据与 NapCat 配置，保留当前手机的 QQ 会话。备份点之后的数据不会合并；导入后请使用备份中的后台凭据检查业务配置。"</string>
+    <string name="ui_backup_date_stop_services_and_create_a_local_recovery">备份时间：%1$s。先停止相关服务并创建恢复前快照，再替换归档所含数据。备份点之后的数据不会合并；导入后请使用备份中的后台凭据检查配置。</string>
     <string name="ui_back_up_and_import" formatted="false">"备份当前数据并导入"</string>
     <string name="ui_when_creating_a_snapshot_before_an_update_or_restore" formatted="false">"新建更新前或恢复前快照时，按上限自动清理最旧且未受保护的自动快照。新快照校验成功后才清理旧快照。"</string>
     <string name="ui_maximum_snapshots" formatted="false">"最多保留（份）"</string>
@@ -665,12 +655,12 @@
     <string name="ui_required_for_rollback_protected" formatted="false">"回退所需 · 受保护"</string>
     <string name="ui_restore" formatted="false">"恢复"</string>
     <string name="ui_restore_this_backup" formatted="false">"恢复此备份？"</string>
-    <string name="ui_both_services_will_stop_briefly_current_data_is_backed" formatted="false">"两个服务将暂时停止，当前数据会先备份，然后替换为此恢复点的配置、数据库、插件与 QQ 会话。恢复点之后的数据不会合并；仅允许恢复与当前程序版本匹配的备份。"</string>
+    <string name="ui_both_services_will_stop_briefly_current_data_is_backed" formatted="false">"恢复期间会暂停相关运行任务，先备份当前数据，再替换为此恢复点的配置、数据库、插件及已备份的会话。恢复点之后的数据不会合并；仅允许恢复与当前程序版本匹配的备份。"</string>
     <string name="ui_back_up_and_restore" formatted="false">"备份当前数据并恢复"</string>
     <string name="ui_delete_this_local_backup" formatted="false">"删除此本机备份？"</string>
     <string name="ui_only_the_selected_backup_file_is_deleted_data_currently" formatted="false">"仅删除选中的备份文件，服务当前使用的数据不受影响。此操作无法撤销。"</string>
     <string name="ui_update_to">"更新 %1$s 至 %2$s？"</string>
-    <string name="ui_n_n_nboth_services_will_stop_briefly_data_is">"%1$s\n%2$s\n\n将暂时停止两个服务，先备份数据，再切换程序。配置与 QQ 会话会保留，失败会恢复原程序及对应数据。"</string>
+    <string name="ui_n_n_nboth_services_will_stop_briefly_data_is">"%1$s\n%2$s\n\n将暂时停止 AstrBot，先备份数据，再切换程序。配置与已有会话会保留，失败会恢复原程序及对应数据。"</string>
     <string name="ui_qq_remains_stopped_if_it_was_stopped_otherwise_it" formatted="false">"QQ 原本停止时保持停止；原本运行时会重启检查后台接口。"</string>
     <string name="ui_astrbot_starts_to_check_its_local_dashboard" formatted="false">"AstrBot 会启动检查本机后台。"</string>
     <string name="ui_back_up_and_update" formatted="false">"备份并更新"</string>
@@ -678,9 +668,9 @@
     <string name="ui_services_keep_running_during_download_and_verification_backup_and" formatted="false">"下载和校验期间服务继续运行。下载完成后需另行确认备份和安装。"</string>
     <string name="ui_download_and_verify" formatted="false">"下载并校验"</string>
     <string name="ui_roll_back_and_its_data">"回退 %1$s 及对应数据？"</string>
-    <string name="ui_back_up_current_data_then_restore_the_program_and" formatted="false">"当前数据会先备份，然后恢复上次更新前的程序与数据快照。恢复点之后的数据不会合并，两个服务将暂时停止。"</string>
+    <string name="ui_back_up_current_data_then_restore_the_program_and" formatted="false">"当前数据会先备份，然后恢复上次更新前的程序与数据快照。恢复点之后的数据不会合并，AstrBot 将暂时停止。"</string>
     <string name="ui_back_up_and_roll_back_65fe8" formatted="false">"备份当前数据并回退"</string>
-    <string name="ui_napcat_access_token" formatted="false">"NapCat 访问口令"</string>
+
     <string name="ui_astrbot_initial_password" formatted="false">"AstrBot 初始密码"</string>
     <string name="ui_credentials_are_generated_at_first_startup_use_your_existing" formatted="false">"首次启动后生成凭据；已有配置请使用原密码"</string>
     <string name="ui_show" formatted="false">"显示"</string>
@@ -713,7 +703,7 @@
     <string name="ui_free_storage_has_recovered_above_the_warning_threshold" formatted="false">"存储可用空间已恢复到提醒阈值以上"</string>
     <string name="ui_astrbot_data" formatted="false">"AstrBot 数据"</string>
     <string name="ui_configuration_plugins_databases_trace_data_and_upstream_logs" formatted="false">"配置、插件、数据库、追踪数据及上游日志"</string>
-    <string name="ui_napcat_data" formatted="false">"NapCat 数据"</string>
+
     <string name="ui_dashboard_configuration_and_upstream_logs" formatted="false">"后台配置及上游日志"</string>
     <string name="ui_qq_and_user_directory" formatted="false">"QQ 与用户目录"</string>
     <string name="ui_qq_sessions_cache_attachments_and_the_ubuntu_user_directory" formatted="false">"QQ 会话、缓存、附件及 Ubuntu 用户目录"</string>
@@ -721,7 +711,7 @@
     <string name="ui_update_and_import_staging" formatted="false">"更新与导入暂存"</string>
     <string name="ui_downloaded_apks_programs_and_backups_awaiting_import" formatted="false">"下载的 APK、程序及待导入备份"</string>
     <string name="ui_manager_output_logs" formatted="false">"管理输出日志"</string>
-    <string name="ui_rotated_output_from_the_manager_runtime_and_both_services" formatted="false">"管理器、环境和两个项目的轮转输出"</string>
+    <string name="ui_rotated_output_from_the_manager_runtime_and_both_services" formatted="false">管理器、运行环境和服务的轮转日志</string>
     <string name="ui_app_cache" formatted="false">"应用缓存"</string>
     <string name="ui_private_app_cache_including_exports_and_browser_data" formatted="false">"导出及浏览器等应用私有缓存"</string>
     <string name="ui_runtime_resources_and_rollback" formatted="false">"运行资源与回退"</string>
@@ -757,22 +747,22 @@
     <string name="ui_finished_072d2">"结束 %1$s"</string>
     <string name="ui_no_backup_destination_selected" formatted="false">"未选择备份保存位置"</string>
     <string name="ui_stopping_services_to_prepare_a_consistent">"正在停止服务，准备一致性%1$s"</string>
-    <string name="ui_preserving_this_phone_s_qq_session_and_preparing_imported" formatted="false">"正在保留当前手机 QQ 会话并准备导入数据"</string>
+    <string name="ui_preserving_this_phone_s_qq_session_and_preparing_imported" formatted="false">"正在准备备份中包含的数据，其他内容保留"</string>
     <string name="ui_portable_backup_exported_without_the_qq_login_session_it" formatted="false">"便携备份已导出，不包含 QQ 登录会话；包含业务配置及密钥，请妥善保管"</string>
     <string name="ui_portable_backup_restored_this_phone_s_qq_session_and" formatted="false">"便携备份已恢复，已保留本机 QQ 会话及恢复前快照；请使用备份中的后台凭据核对业务配置"</string>
-    <string name="ui_stopping_both_services_and_creating_a_snapshot_before_switching" formatted="false">"正在停止两个服务并创建环境切换前快照"</string>
+    <string name="ui_stopping_both_services_and_creating_a_snapshot_before_switching" formatted="false">"正在暂停相关运行任务并创建环境切换前快照"</string>
     <string name="ui_switching_runtime_and_components" formatted="false">"正在切换运行环境及组件"</string>
-    <string name="ui_checking_the_actual_astrbot_and_napcat_services" formatted="false">"正在验证实际 AstrBot 与 NapCat 服务"</string>
-    <string name="ui_napcat_startup_check_failed" formatted="false">"NapCat 启动检查失败"</string>
-    <string name="ui_runtime_completed_previous_running_states_restored_check_qq_login">"运行环境%1$s完成，已恢复原运行状态；QQ 登录与业务连接请在后台确认"</string>
+
+
+    <string name="ui_runtime_completed_previous_running_states_restored_check_qq_login">"运行环境%1$s完成，已恢复原运行状态；请确认消息平台与模型连接"</string>
     <string name="ui_repair" formatted="false">"修复"</string>
     <string name="ui_upgrade" formatted="false">"升级"</string>
     <string name="ui_runtime_maintenance_error">"环境维护异常：%1$s"</string>
     <string name="ui_the_new_runtime_passed_checks_and_was_committed_old" formatted="false">"新环境已通过检查并提交，旧文件清理未完成。记录已保留，重新打开管理器可重试清理"</string>
     <string name="ui_runtime_switch_did_not_complete_restoring_the_original_runtime" formatted="false">"环境切换未完成，正在恢复原环境与数据"</string>
     <string name="ui_original_runtime_recovery_is_incomplete_files_and_snapshots_are" formatted="false">"原环境恢复尚未完成，已保留文件与快照，请查看管理日志后重试"</string>
-    <string name="ui_stopping_services_and_creating_a_pre_update_napcat_snapshot" formatted="false">"正在停止服务并创建 NapCat 更新前快照"</string>
-    <string name="ui_checking_napcat_resources_qq_dependencies_and_existing_data" formatted="false">"正在检查 NapCat 资源、QQ 运行依赖与现有数据"</string>
+
+
     <string name="ui_stopping_services_and_creating_a_pre_update_snapshot" formatted="false">"正在停止服务并创建更新前快照"</string>
     <string name="ui_switching_program">"正在切换程序%1$s"</string>
     <string name="ui_and_its_data" formatted="false">"及对应数据"</string>
@@ -782,7 +772,7 @@
     <string name="ui_the_new_program_did_not_stay_running" formatted="false">"新程序未保持运行"</string>
     <string name="ui_committing_records">"正在提交%1$s记录"</string>
     <string name="ui_restored_the_program_data_snapshot_and_previous_running_state" formatted="false">"已恢复对应程序和数据快照，并恢复原运行状态"</string>
-    <string name="ui_update_completed_the_previous_program_and_its_data_snapshot" formatted="false">"更新完成，已保留旧程序与对应数据快照；QQ 与业务连接请在后台确认"</string>
+    <string name="ui_update_completed_the_previous_program_and_its_data_snapshot" formatted="false">"更新完成，已保留旧程序与对应数据快照；请确认消息平台与模型连接"</string>
     <string name="ui_update_did_not_complete_restoring_the_previous_program_and" formatted="false">"更新未完成，正在恢复旧程序及对应数据"</string>
     <string name="ui_update_rollback_is_incomplete_files_and_records_are_preserved" formatted="false">"更新回退未完成，文件与记录已保留，请查看管理日志后重试"</string>
     <string name="ui_stopping_services_to_prepare_a_consistent_snapshot" formatted="false">"正在停止服务，准备一致性快照"</string>
@@ -793,9 +783,7 @@
     <string name="ui_local_backup_completed_previous_running_states_restored" formatted="false">"本机备份已完成，已恢复原先的运行状态"</string>
     <string name="ui_data_restored_and_verified_previous_running_states_restored" formatted="false">"数据已恢复并校验，已恢复原先的运行状态"</string>
     <string name="ui_initialize_the_runtime_first" formatted="false">"请先完成运行环境初始化"</string>
-    <string name="ui_persona_preset_not_found" formatted="false">"未找到此人设预设"</string>
     <string name="ui_saving_astrbot_persona_settings" formatted="false">"正在保存 AstrBot 人设设置"</string>
-    <string name="ui_persona_added_to_astrbot_existing_personas_with_the_same" formatted="false">"人设已添加到 AstrBot，原有同名人设和后台修改已保留"</string>
     <string name="ui_previous_default_persona_restored_added_presets_are_preserved" formatted="false">"已恢复上一次默认人设，已添加的预设保留"</string>
     <string name="ui_default_persona_changed_for_new_conversations_conversations_with_an" formatted="false">"默认人设已切换，新会话会使用此人设；单独指定人设的会话不受影响"</string>
     <string name="ui_resuming">"正在恢复 %1$s 运行"</string>
@@ -808,7 +796,7 @@
     <string name="ui_this_migration_state_cannot_be_verified_yet_use_a" formatted="false">"新程序迁移状态暂不支持验证，请使用已验证的版本组合"</string>
     <string name="ui_local_port_is_in_use_stop_the_service_using">"本机端口 %1$s 已被占用，请先停止占用端口的服务"</string>
     <string name="component_astrbot" translatable="false">AstrBot</string>
-    <string name="component_napcat_qq" translatable="false">NapCat / QQ</string>
+
     <string name="ui_could_not_save_update_preferences_check_free_storage" formatted="false">"无法保存更新偏好，请检查可用存储"</string>
     <string name="ui_could_not_save_snapshot_limits_check_free_storage" formatted="false">"无法保存快照上限，请检查存储空间"</string>
     <string name="ui_invalid_backup_id" formatted="false">"备份编号无效"</string>
@@ -929,18 +917,18 @@
     <string name="ui_apk_does_not_contain_the_complete_runtime" formatted="false">"APK 不包含完整运行资源"</string>
     <string name="ui_too_many_update_server_redirects" formatted="false">"更新服务器重定向次数过多"</string>
     <string name="ui_updates_require_https_urls_without_embedded_credentials" formatted="false">"更新仅支持无凭据的 HTTPS 地址"</string>
-    <string name="ui_napcat_updates_must_use_an_official_upstream_shell_release" formatted="false">"NapCat 更新必须来自上游正式发布的 Shell 包"</string>
-    <string name="ui_this_napcat_version_requires_different_qq_or_runtime_dependencies" formatted="false">"此 NapCat 版本需要不同的 QQ 或运行依赖，已保留现有程序；请先升级匹配的运行环境"</string>
-    <string name="ui_napcat_update_package_size_mismatch" formatted="false">"NapCat 更新包大小不符"</string>
-    <string name="ui_napcat_update_package_digest_mismatch_current_program_is_preserved" formatted="false">"NapCat 更新包摘要不符，当前程序已保留"</string>
-    <string name="ui_invalid_extracted_napcat_update_size" formatted="false">"NapCat 更新包解压大小异常"</string>
-    <string name="ui_insufficient_napcat_update_staging_space" formatted="false">"NapCat 更新暂存空间不足"</string>
-    <string name="ui_napcat_update_contains_duplicate_or_invalid_paths" formatted="false">"NapCat 更新包含重复或异常路径"</string>
-    <string name="ui_napcat_update_package_exceeds_its_declared_size" formatted="false">"NapCat 更新包超出声明大小"</string>
-    <string name="ui_napcat_main_program_differs_from_the_signed_version" formatted="false">"NapCat 主程序与签名版本不符"</string>
-    <string name="ui_napcat_update_package_lacks_dashboard_or_runtime_resources" formatted="false">"NapCat 更新包缺少后台或运行资源"</string>
+
+
+
+
+
+
+
+
+
+
     <string name="ui_stable_update" formatted="false">"稳定更新"</string>
-    <string name="ui_the_new_version_contains_a_plugin_directory_with_the" formatted="false">"新版包含同名插件目录，请先将自定义插件移到 NapCat 工作目录后更新"</string>
+
     <string name="ui_the_connection_observer_plugin_is_missing_or_modified_connection" formatted="false">"连接观察插件未安装或已被修改，连接状态可能显示未知；现有插件及启用设置已保留"</string>
     <string name="ui_this_apk_has_no_online_update_url_configured_import" formatted="false">"此安装包尚未配置在线更新地址，可导入可信更新包或安装新版 APK"</string>
     <string name="ui_checking_the_signed_update_catalog" formatted="false">"正在检查签名更新目录"</string>
@@ -1001,16 +989,16 @@
     <string name="ui_unsupported_portable_backup_data_scope" formatted="false">"便携备份的数据范围不支持"</string>
     <string name="ui_portable_backup_does_not_match_installed_program_versions_install" formatted="false">"便携备份与当前运行版本组合不同，请先安装匹配的运行环境"</string>
     <string name="ui_too_many_portable_backup_files" formatted="false">"便携备份文件数量超出范围"</string>
-    <string name="ui_portable_backup_file_paths_are_duplicated_or_out_of" formatted="false">"便携备份文件路径重复或顺序异常"</string>
+    <string name="ui_portable_backup_file_paths_are_duplicated_or_out_of" formatted="false">"便携备份包含重复文件路径"</string>
     <string name="ui_portable_backup_data_directory_is_missing" formatted="false">"便携备份数据目录缺失"</string>
     <string name="ui_portable_backup_contains_paths_outside_its_scope_or_unsupported" formatted="false">"便携备份包含越界或不支持的路径"</string>
-    <string name="ui_unexpected_napcat_configuration_parent_directory" formatted="false">"NapCat 配置父目录异常"</string>
+
     <string name="ui_portable_backup_contains_linked_parent_directories_or_missing_directorie" formatted="false">"便携备份包含链接父目录或缺失目录"</string>
     <string name="ui_invalid_portable_backup_file_size_or_digest" formatted="false">"便携备份文件大小或摘要异常"</string>
     <string name="ui_invalid_portable_backup_directory_record" formatted="false">"便携备份目录记录异常"</string>
     <string name="ui_invalid_portable_backup_link_record" formatted="false">"便携备份链接记录异常"</string>
     <string name="ui_portable_backup_contains_absolute_or_invalid_links" formatted="false">"便携备份不支持绝对或异常链接"</string>
-    <string name="ui_portable_backup_link_targets_a_qq_session_or_a" formatted="false">"便携备份链接指向 QQ 会话或备份范围之外"</string>
+    <string name="ui_portable_backup_link_targets_a_qq_session_or_a" formatted="false">"便携备份链接指向所选数据范围之外"</string>
     <string name="ui_unsupported_portable_backup_file_type" formatted="false">"便携备份文件类型不支持"</string>
     <string name="ui_extracted_portable_backup_exceeds_the_8_gib_limit" formatted="false">"便携备份解包数据超过 8 GiB 上限"</string>
     <string name="ui_portable_backup_root_cannot_be_a_link" formatted="false">"便携备份根目录不能为链接"</string>
@@ -1029,11 +1017,11 @@
     <string name="ui_cannot_create_portable_backup_staging_directory" formatted="false">"无法创建便携备份暂存目录"</string>
     <string name="ui_reading_selected_portable_backup" formatted="false">"正在读取所选便携备份"</string>
     <string name="ui_cannot_read_selected_portable_backup" formatted="false">"无法读取所选便携备份"</string>
-    <string name="ui_verifying_portable_backup_scope_versions_and_file_digests" formatted="false">"正在校验便携备份范围、版本与文件摘要"</string>
+    <string name="ui_verifying_portable_backup_scope_versions_and_file_digests" formatted="false">"正在检查备份格式、所选内容与文件完整性"</string>
     <string name="ui_import_a_portable_backup_first" formatted="false">"请先导入便携备份"</string>
     <string name="ui_portable_backup_manifest_is_missing" formatted="false">"便携备份清单缺失"</string>
     <string name="ui_cannot_create_portable_backup_export_directory" formatted="false">"无法创建便携备份导出目录"</string>
-    <string name="ui_creating_a_portable_backup_without_qq_login_sessions" formatted="false">"正在制作不含 QQ 登录会话的便携备份"</string>
+    <string name="ui_creating_a_portable_backup_without_qq_login_sessions" formatted="false">"正在制作所选内容的 ZIP 备份"</string>
     <string name="ui_portable_backup_export_file_is_missing" formatted="false">"便携备份导出文件缺失"</string>
     <string name="ui_services_resumed_writing_to_the_selected_backup_file" formatted="false">"服务已恢复原状态，正在写入所选备份文件"</string>
     <string name="ui_cannot_write_the_selected_backup_file" formatted="false">"无法写入所选备份文件"</string>
@@ -1099,7 +1087,7 @@
     <string name="ui_previous_program_version_check_failed_update_snapshot_is_preserved" formatted="false">"旧程序版本校验失败，已保留更新快照"</string>
     <string name="ui_update_was_incomplete_previous_program_and_original_data_snapshot" formatted="false">"更新未完成，已恢复旧程序及操作前的数据快照"</string>
     <string name="ui_sqlite_verification_failed_for_the_data_snapshot_recovery_records" formatted="false">"数据快照的 SQLite 检查失败，已保留恢复记录"</string>
-    <string name="ui_napcat_rollback_program_version_or_dashboard_mismatch" formatted="false">"NapCat 回退程序版本或界面不匹配"</string>
+
     <string name="ui_update_lacks_required_program_or_dashboard_files" formatted="false">"更新缺少必要程序或界面文件"</string>
     <string name="ui_program_version_mismatch" formatted="false">"程序版本不匹配"</string>
     <string name="ui_dashboard_and_program_version_mismatch" formatted="false">"Dashboard 与程序版本不匹配"</string>
@@ -1126,21 +1114,10 @@
     <string name="status_onebot_offline" formatted="false">"OneBot 已断开"</string>
     <string name="status_onebot_connecting" formatted="false">"OneBot 连接中"</string>
     <string name="status_onebot_unknown" formatted="false">"OneBot 状态待确认"</string>
-    <string name="persona_local_source" formatted="false">"本地添加的人设"</string>
-    <string name="persona_segmented_reply_hint" formatted="false">"分段发送需在 AstrBot 后台开启；超过字数阈值的长回复会整条发送。"</string>
-    <string name="persona_limit" formatted="false">"最多保存 200 个自建人设，请先删除不需要的人设"</string>
-    <string name="persona_duplicate" formatted="false">"已有同名人设，请换一个名称"</string>
-    <string name="persona_read_error" formatted="false">"本地人设库读取失败，原文件已保留，请重试"</string>
-    <string name="persona_invalid_id" formatted="false">"人设标识无效"</string>
-    <string name="persona_invalid_name" formatted="false">"名称需为 1–30 个字符，不能包含换行"</string>
-    <string name="persona_invalid_category" formatted="false">"请选择人设分类"</string>
-    <string name="persona_invalid_prompt" formatted="false">"提示词需为 1–12000 个字符"</string>
-    <string name="persona_invalid_intro" formatted="false">"简介最多 120 字，开场白最多 1000 字"</string>
-    <string name="persona_initialize" formatted="false">"先启动一次 AstrBot，即可导入和切换人设"</string>
     <string name="runtime_storage_warning_title">存储空间提醒</string>
     <string name="runtime_storage_warning_message">当前应用可用 %1$d MiB，准备运行环境建议预留 %2$d MiB。\n\n这是保守预估，你可以选择仍然继续。空间耗尽可能导致本次操作失败，并影响手机或其他应用正常使用；建议先清理存储。</string>
     <string name="runtime_storage_continue">仍然继续</string>
-    <string name="terminal_name">Ubuntu 终端</string>
+    <string name="terminal_name">终端</string>
     <string name="terminal_subtitle">直接操作本机 Ubuntu，支持后台会话与常用按键</string>
     <string name="terminal_built_in">已内置</string>
     <string name="terminal_session_running">会话运行中 · 返回后继续运行</string>
@@ -1198,11 +1175,11 @@
     <string name="background_autostart_oppo">"设置 → 应用 → 应用管理 → 本应用，开启“允许自启动”和“允许关联启动”；也可在手机管家的启动管理中查找。\n\n完成后返回，勾选确认。"</string>
     <string name="background_autostart_samsung">"三星通常没有独立的自启动开关。请在“设备维护 → 电池 → 后台使用限制”中，将本应用加入“从不休眠的应用程序”。\n\n按本机可用选项检查后返回，勾选确认。"</string>
     <string name="background_autostart_generic">"设置 → 应用 → 本应用，或手机管家 → 启动管理，允许“自启动”和“关联启动”。系统未提供相关开关时，按本机可用选项检查。\n\n检查后返回，勾选确认。"</string>
-    <string name="napcat_startup_compat_title">"NapCat 反检测选项兼容性"</string>
-    <string name="napcat_startup_compat_corrected">"当前 NapCat / Linux QQ 组合在 Android PRoot 中开启反检测可能导致启动或登录后 Worker 崩溃。按上游建议关闭了 %1$s；O3 模式及其他设置保持原值。修改前配置已保留在 persistent/manager/napcat-startup-compat/napcat.before-compat.json。"</string>
-    <string name="napcat_startup_compat_failed">"无法检查或保存 NapCat 反检测兼容配置。为避免启动或登录后反复崩溃，修正前不会继续启动 NapCat；QQ 登录和业务配置不会重置。请检查 napcat.json 格式、文件权限及可用空间；当前组合应关闭 Hook、Window、Module、Process、Container、JS，O3 单独设置。"</string>
-    <string name="napcat_startup_compat_ok">"当前 NapCat 4.18.41 / Linux QQ 3.2.34-53644 未显式开启六项反检测；若以后启用，下次启动前会备份配置并自动关闭，避免启动或登录后崩溃。O3 模式及其他设置保持原值。"</string>
-    <string name="napcat_startup_compat_pending">"反检测已开启，当前环境已复现启动或登录后 Worker 崩溃。按上游建议，下次启动前会备份配置并关闭 Hook、Window、Module、Process、Container、JS；O3 模式、QQ 登录和网络配置保留，无需重装环境。"</string>
+
+
+
+
+
     <string name="onebot_ipv4_compat_corrected">"已将原始默认 OneBot 连接切换为 ws://127.0.0.1:6199/ws，避免 localhost 解析到 IPv6 后无法连接。原配置保留在 persistent/manager/onebot-ipv4-backup/。"</string>
-    <string name="onebot_ipv4_compat_failed">"无法保存 OneBot 本机连接兼容配置。请检查可用空间和 NapCat 配置文件权限，再重新启动。原配置备份位于 persistent/manager/onebot-ipv4-backup/。"</string>
+
 </resources>

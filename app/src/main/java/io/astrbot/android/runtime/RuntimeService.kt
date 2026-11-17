@@ -25,7 +25,16 @@ import java.util.concurrent.ConcurrentHashMap
 class RuntimeService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private lateinit var controller: RuntimeController
-    private val operations = ConcurrentHashMap.newKeySet<Job>()
+    private data class Operation(val action: String, val service: ServiceId?) {
+        fun affectsStoppedService(target: ServiceId): Boolean = when (action) {
+            "start", "restart", "stop" -> (service ?: ServiceId.ASTRBOT) == target
+            "initialize", "reconcile", "backup", "backup-apk", "restore", "export-backup", "share-backup", "apply-backup",
+            "apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "repair-environment",
+            "update-online", "desktop-install" -> true
+            else -> false
+        }
+    }
+    private val operations = ConcurrentHashMap<Job, Operation>()
     private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onCreate() {
@@ -49,18 +58,20 @@ class RuntimeService : Service() {
                 .combine(SshStore.state) { (state, network), ssh -> Triple(state, network, ssh) }
                 .combine(CpolarStore.state) { current, _ -> current }
                 .combine(TerminalStore.state) { current, _ -> current }
+                .combine(UserTaskStore.state) { current, _ -> current }
                 .combine(DesktopStore.state) { current, _ -> current }
                 .combine(HarnessStore.state) { current, _ -> current }
-                .combine(SnowLumaStore.state) { current, _ -> current }
                 .combine(AppText.languageChanged) { current, _ -> current }
                 .collectLatest { (state, network, ssh) ->
-                val detail = if (state.busy) state.phase else state.services.values.joinToString(" · ") { "${it.id.label} ${it.localizedSummary()}" }
+                val detail = if (state.busy) state.phase else state.services.values
+                    .filter { it.id == ServiceId.ASTRBOT || it.desiredRunning }
+                    .joinToString(" · ") { "${it.id.label} ${it.localizedSummary()}" }
                 getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification("${network.title} · $detail" +
                     (if (ssh.running) AppText.get(R.string.ui_ssh_running) else "") +
                     (if (CpolarStore.state.value.running) " · cpolar" else "") +
                     (if (HarnessStore.state.value.active) " · DeepSeek Harness" else "") +
-                    (if (SnowLumaStore.state.value.active) " · SnowLuma" else "") +
                     (if (TerminalStore.state.value.running) " · ${AppText.get(R.string.terminal_running_count, TerminalStore.state.value.runningCount)}" else "") +
+                    (if (UserTaskStore.state.value.active) " · ${AppText.get(R.string.tasks_notification, UserTaskStore.state.value.runningCount)}" else "") +
                     (if (DesktopStore.state.value.running) " · ${AppText.get(R.string.desktop_name)}" else "") +
                     (state.storageSpace.warning?.let { " · ${state.storageSpace.pressure.title}" } ?: "")))
             }
@@ -70,16 +81,26 @@ class RuntimeService : Service() {
                 if (!running && operations.isEmpty() && !RuntimeStore.state.value.busy && idle()) stopSelf()
             }
         }
+        scope.launch {
+            UserTaskStore.state.map { it.active }.distinctUntilChanged().drop(1).collect { active ->
+                if (!active && operations.isEmpty() && !RuntimeStore.state.value.busy && idle()) stopSelf()
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.getStringExtra("operation") ?: "reconcile"
         val id = intent?.getStringExtra("serviceId")?.let { raw -> ServiceId.entries.firstOrNull { it.name == raw } }
+        // A notification or shortcut saved by an older APK must never control another service.
+        if (intent?.getStringExtra("serviceId") != null && id == null) {
+            if (operations.isEmpty() && idle()) stopSelf(startId)
+            return START_NOT_STICKY
+        }
         val requestId = RuntimeStore.beginRequest(intent?.getStringExtra("requestId") ?: UUID.randomUUID().toString())
         if (action == "stop") {
             // Persist a user's stop before cancelling queued work or recovering maintenance.
             val edit = getSharedPreferences("manager", Context.MODE_PRIVATE).edit()
-            (id?.let { listOf(it) } ?: ServiceId.entries).forEach { edit.putBoolean("desired_${it.name}", false) }
+            listOf(id ?: ServiceId.ASTRBOT).forEach { edit.putBoolean("desired_${it.name}", false) }
             if (!edit.commit()) {
                 RuntimeStore.state.update { it.copy(error = AppText.get(R.string.ui_unable_to_save_stop_preferences)) }
                 RuntimeStore.endRequest(requestId)
@@ -87,25 +108,31 @@ class RuntimeService : Service() {
                 return START_STICKY
             }
         }
-        val previous = if (action == "stop") operations.toList() else emptyList()
+        val previous = if (action == "stop") operations.entries.filter {
+            it.value.affectsStoppedService(id ?: ServiceId.ASTRBOT)
+        }.map { it.key } else emptyList()
         previous.forEach { it.cancel() }
         val operation = scope.launch(start = CoroutineStart.LAZY) {
-            // Lifecycle and maintenance commands share one controller mutex. Stop also cancels
-            // queued work, and waits for an interrupted restore to recover before stopping.
+            // Stop cancels lifecycle/maintenance work affecting this service, then waits for
+            // its recovery. Independent component downloads and installations stay queued.
             previous.joinAll()
             controller.execute(action, id, intent?.getStringExtra("backupId"), intent?.getStringExtra("sourceUri"), intent?.getStringExtra("updateId"),
                 intent?.getIntExtra("backupLimitCount", 0) ?: 0, intent?.getIntExtra("backupLimitMiB", 0) ?: 0,
                 intent?.getIntExtra("sshPort", 8022) ?: 8022, intent?.getBooleanExtra("sshLan", false) ?: false, intent?.getStringExtra("sshPassword"),
                 intent?.takeIf { it.hasExtra("terminalSessionId") }?.getLongExtra("terminalSessionId", -1),
-                intent?.getBooleanExtra("desktopLan", false) ?: false, intent?.getIntExtra("desktopLanPort", 6082) ?: 6082)
+                intent?.getBooleanExtra("desktopLan", false) ?: false, intent?.getIntExtra("desktopLanPort", 6082) ?: 6082,
+                intent?.getIntExtra("backupSelectionMask", 1) ?: 1, intent?.getStringExtra("logCategory"),
+                intent?.getStringExtra("taskId"), intent?.getStringExtra("taskName"), intent?.getStringExtra("taskDirectory"), intent?.getStringExtra("taskCommand"))
             intent?.removeExtra("sshPassword")
+            intent?.removeExtra("taskCommand")
             RuntimeStore.state.update { it.copy(completedOperation = requestId) }
             if (idle() && RuntimeStore.state.value.pendingRequests.size <= 1) stopSelf(startId)
         }
-        operations.add(operation)
+        operations[operation] = Operation(action, id)
         operation.invokeOnCompletion {
             operations.remove(operation)
             intent?.removeExtra("sshPassword")
+            intent?.removeExtra("taskCommand")
             RuntimeStore.endRequest(requestId)
         }
         operation.start()
@@ -115,11 +142,12 @@ class RuntimeService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun idle() = RuntimeStore.state.value.services.values.none { it.desiredRunning } &&
-        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running && !DesktopStore.state.value.running && !HarnessStore.state.value.active && !SnowLumaStore.state.value.active
+        !SshStore.state.value.running && !CpolarStore.state.value.running && !TerminalStore.state.value.running &&
+        !DesktopStore.state.value.running && !HarnessStore.state.value.active && !UserTaskStore.state.value.active
 
     override fun onDestroy() {
         lifecycleEvent("destroyed")
-        val closingOperations = operations.toList()
+        val closingOperations = operations.keys.toList()
         closingOperations.forEach { it.cancel() }
         scope.launch {
             try { closingOperations.joinAll(); controller.close() }
@@ -138,7 +166,7 @@ class RuntimeService : Service() {
 
     private fun notification(detail: String): Notification {
         val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val stop = PendingIntent.getService(this, 1, Intent(this, RuntimeService::class.java).putExtra("operation", "stop"),
+        val stop = PendingIntent.getService(this, 1, Intent(this, RuntimeService::class.java).putExtra("operation", "stop").putExtra("serviceId", ServiceId.ASTRBOT.name),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopSsh = PendingIntent.getService(this, 2, Intent(this, RuntimeService::class.java).putExtra("operation", "ssh-stop"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -148,17 +176,19 @@ class RuntimeService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val stopDesktop = PendingIntent.getService(this, 5, Intent(this, RuntimeService::class.java).putExtra("operation", "desktop-stop"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val stopSnowLuma = PendingIntent.getService(this, 6, Intent(this, RuntimeService::class.java).putExtra("operation", "snowluma-stop"),
+        val stopTasks = PendingIntent.getService(this, 6, Intent(this, RuntimeService::class.java).putExtra("operation", "task-stop-all"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         return Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_notification)
             .setColor(Color.rgb(56, 103, 255))
             .setContentTitle(AppText.get(R.string.ui_astrbot_manager)).setContentText(detail).setContentIntent(open)
             .setStyle(Notification.BigTextStyle().bigText(detail))
-            .setOngoing(true).addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_bots), stop).build())
+            .setOngoing(true)
             .apply {
-                if (SnowLumaStore.state.value.active) addAction(Notification.Action.Builder(null, AppText.get(R.string.snow_stop_notification), stopSnowLuma).build())
+                if (RuntimeStore.state.value.services.getValue(ServiceId.ASTRBOT).desiredRunning)
+                    addAction(Notification.Action.Builder(null, AppText.get(R.string.platform_stop_astrbot), stop).build())
                 if (DesktopStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.desktop_stop), stopDesktop).build())
                 if (TerminalStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.terminal_end_all), stopTerminal).build())
+                if (UserTaskStore.state.value.active) addAction(Notification.Action.Builder(null, AppText.get(R.string.tasks_stop_all), stopTasks).build())
                 if (SshStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.ui_stop_ssh), stopSsh).build())
                 if (CpolarStore.state.value.running) addAction(Notification.Action.Builder(null, AppText.get(R.string.cpolar_stop), stopCpolar).build())
             }.build()
@@ -169,13 +199,16 @@ class RuntimeService : Service() {
         private const val NOTIFICATION_ID = 2001
         fun command(context: Context, operation: String, id: ServiceId? = null, backupId: String? = null, sourceUri: String? = null, updateId: String? = null,
                     backupLimitCount: Int = 0, backupLimitMiB: Int = 0, sshPort: Int = 8022, sshLan: Boolean = false, sshPassword: String? = null,
-                    terminalSessionId: Long? = null, desktopLan: Boolean = false, desktopLanPort: Int = 6082): String {
+                    terminalSessionId: Long? = null, desktopLan: Boolean = false, desktopLanPort: Int = 6082, backupSelectionMask: Int = 1, logCategory: String? = null,
+                    taskId: String? = null, taskName: String? = null, taskDirectory: String? = null, taskCommand: String? = null): String {
             val requestId = RuntimeStore.beginRequest()
             try { context.startForegroundService(Intent(context, RuntimeService::class.java)
                 .putExtra("operation", operation).putExtra("serviceId", id?.name).putExtra("backupId", backupId).putExtra("sourceUri", sourceUri).putExtra("updateId", updateId).putExtra("requestId", requestId)
                 .putExtra("backupLimitCount", backupLimitCount).putExtra("backupLimitMiB", backupLimitMiB)
                 .putExtra("sshPort", sshPort).putExtra("sshLan", sshLan).putExtra("sshPassword", sshPassword)
+                .putExtra("backupSelectionMask", backupSelectionMask).putExtra("logCategory", logCategory)
                 .putExtra("desktopLan", desktopLan).putExtra("desktopLanPort", desktopLanPort)
+                .putExtra("taskId", taskId).putExtra("taskName", taskName).putExtra("taskDirectory", taskDirectory).putExtra("taskCommand", taskCommand)
                 .apply { if (terminalSessionId != null) putExtra("terminalSessionId", terminalSessionId) }) }
             catch (failure: Exception) { RuntimeStore.endRequest(requestId); throw failure }
             return requestId

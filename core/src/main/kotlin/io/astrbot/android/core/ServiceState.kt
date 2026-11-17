@@ -1,7 +1,7 @@
 package io.astrbot.android.core
 
 enum class ServiceId(val label: String, val defaultPort: Int) {
-    ASTRBOT("AstrBot", 6185), NAPCAT("NapCat", 6099)
+    ASTRBOT("AstrBot", 6185)
 }
 enum class ProcessState { STOPPED, STARTING, RUNNING, STOPPING, CRASHED }
 enum class HealthState { UNKNOWN, WAITING, AVAILABLE, RECHECKING, UNRESPONSIVE, DISABLED }

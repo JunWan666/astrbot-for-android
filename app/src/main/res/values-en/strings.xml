@@ -5,17 +5,10 @@
     <string name="language_subtitle" formatted="false">"System default, 简体中文 or English"</string>
     <string name="language_system" formatted="false">"System default"</string>
     <string name="action_cancel" formatted="false">"Cancel"</string>
-    <string name="persona_category_fun" formatted="false">"Fun"</string>
-    <string name="persona_category_company" formatted="false">"Companion"</string>
-    <string name="persona_category_productivity" formatted="false">"Productivity"</string>
-    <string name="persona_category_creative" formatted="false">"Creative"</string>
-    <string name="persona_category_all" formatted="false">"All"</string>
     <string name="component_runtime" formatted="false">"Runtime"</string>
     <string name="component_architecture" formatted="false">"Architecture"</string>
     <string name="ui_add_persona" formatted="false">"Add persona"</string>
     <string name="ui_paste_a_prompt_from_the_persona_marketplace_save_it" formatted="false">"Paste a prompt from the persona marketplace, save it, then add it to AstrBot."</string>
-    <string name="ui_persona_name" formatted="false">"Persona name"</string>
-    <string name="ui_persona_prompt" formatted="false">"Persona prompt"</string>
     <string name="ui_description_optional" formatted="false">"Description (optional)"</string>
     <string name="ui_up_to_120_characters" formatted="false">"Up to 120 characters"</string>
     <string name="ui_greeting_example_optional" formatted="false">"Greeting example (optional)"</string>
@@ -71,12 +64,12 @@
     <string name="ui_data_and_uninstallation" formatted="false">"Data and uninstallation"</string>
     <string name="ui_uninstalling_the_app_or_selecting_clear_data_deletes_the" formatted="false">"Uninstalling the app or selecting Clear data deletes the runtime, configuration, databases, QQ login data and every local backup stored inside the app."</string>
     <string name="ui_before_uninstalling_clearing_data_or_moving_to_another_phone" formatted="false">"Before uninstalling, clearing data or moving to another phone, export a portable backup outside the app and confirm that the file was saved."</string>
-    <string name="ui_portable_backups_contain_configuration_and_credentials_but_exclude_qq" formatted="false">"Portable backups contain configuration and credentials, but exclude QQ login sessions. Import requires the same runtime combination. Sign in to QQ again after moving devices or reinstalling. Keep backup files private."</string>
+    <string name="ui_portable_backups_contain_configuration_and_credentials_but_exclude_qq" formatted="false">Choose AstrBot data and optional standalone Linux QQ sessions for ZIP export. Import supports other phones and versions. QQ may require signing in again. Backups may contain credentials; keep them private.</string>
     <string name="ui_for_normal_updates_install_an_apk_with_the_same" formatted="false">"For normal updates, install an APK with the same package name and signing certificate over the existing app to retain data."</string>
     <string name="ui_open_portable_backups" formatted="false">"Open portable backups"</string>
     <string name="ui_close" formatted="false">"Close"</string>
     <string name="ui_environment_check_and_repair" formatted="false">"Environment check and repair"</string>
-    <string name="ui_checking_runtime_resources_and_webui_configuration_this_does_not" formatted="false">"Checking runtime resources and WebUI configuration. This does not start AstrBot / NapCat or reset configuration."</string>
+    <string name="ui_checking_runtime_resources_and_webui_configuration_this_does_not" formatted="false">Checking runtime resources and dashboard configuration without starting AstrBot or resetting settings.</string>
     <string name="ui_checked_at">"Checked at %1$s"</string>
     <string name="ui_passed" formatted="false">"Passed"</string>
     <string name="ui_notice" formatted="false">"Notice"</string>
@@ -101,7 +94,7 @@
     <string name="ui_unable_to_read_the_password_set_a_new_password" formatted="false">"Unable to read the password. Set a new password or reinstall the extension."</string>
     <string name="ui_ssh_password" formatted="false">"SSH password"</string>
     <string name="ui_uninstall_the_ssh_extension" formatted="false">"Uninstall the SSH extension?"</string>
-    <string name="ui_ssh_will_stop_and_terminal_sessions_will_disconnect_the" formatted="false">"SSH will stop and terminal sessions will disconnect. The password, host key and connection settings will be deleted. AstrBot, NapCat and Ubuntu data will be retained. Bundled resources remain in the APK, so you can reinstall the extension."</string>
+    <string name="ui_ssh_will_stop_and_terminal_sessions_will_disconnect_the" formatted="false">Stop SSH and disconnect terminals, then remove its password, host key and connection settings. AstrBot and Ubuntu data remain. Bundled resources can be reinstalled.</string>
     <string name="ui_uninstall" formatted="false">"Uninstall"</string>
     <string name="ui_ssh_host_fingerprint" formatted="false">"SSH host fingerprint"</string>
     <string name="ui_the_host_fingerprint_is_generated_when_ssh_starts_for" formatted="false">"The host fingerprint is generated when SSH starts for the first time"</string>
@@ -109,7 +102,7 @@
     <string name="ui_service_running" formatted="false">"Service running"</string>
     <string name="ui_installed_not_started" formatted="false">"Installed · Not started"</string>
     <string name="ui_not_installed_yet" formatted="false">"Not installed yet"</string>
-    <string name="ui_remote_access_to_ubuntu_controlled_independently_of_astrbot_and" formatted="false">"Remote access to Ubuntu, controlled independently of AstrBot and NapCat."</string>
+    <string name="ui_remote_access_to_ubuntu_controlled_independently_of_astrbot_and" formatted="false">Remote access to Ubuntu, controlled independently of AstrBot.</string>
     <string name="ui_install_ssh" formatted="false">"Install SSH"</string>
     <string name="ui_stop_ssh" formatted="false">"Stop SSH"</string>
     <string name="ui_start_ssh" formatted="false">"Start SSH"</string>
@@ -159,7 +152,7 @@
     <string name="ui_copy_the_displayed_content_or_export_all_retained_redacted" formatted="false">"Copy the displayed content, or export all retained redacted logs."</string>
     <string name="ui_settings" formatted="false">"Settings"</string>
     <string name="ui_astrbot_updates" formatted="false">"AstrBot updates"</string>
-    <string name="ui_napcat_updates" formatted="false">"NapCat updates"</string>
+
     <string name="ui_runtime_upgrades" formatted="false">"Runtime upgrades"</string>
     <string name="ui_backup_and_restore" formatted="false">"Backup and restore"</string>
     <string name="ui_portable_backups" formatted="false">"Portable backups"</string>
@@ -221,16 +214,16 @@
     <string name="ui_no_online_update_channel_configured" formatted="false">"No online update channel configured"</string>
     <string name="ui_on_check_daily_when_opening_the_app" formatted="false">"On · Check daily when opening the app"</string>
     <string name="ui_off_tap_to_configure" formatted="false">"Off · Tap to configure"</string>
-    <string name="ui_check_napcat_updates" formatted="false">"Check NapCat updates"</string>
+
     <string name="ui_update_independently_without_reinstalling_the_app" formatted="false">"Update independently without reinstalling the app"</string>
-    <string name="ui_napcat_version_and_download" formatted="false">"NapCat version and download"</string>
-    <string name="ui_napcat_official_upstream_package">"NapCat %1$s · Official upstream package"</string>
-    <string name="ui_install_napcat_update" formatted="false">"Install NapCat update"</string>
+
+
+
     <string name="ui_verified_back_up_before_installing">"Verified %1$s · Back up before installing"</string>
     <string name="ui_download_and_verify_a_package_first" formatted="false">"Download and verify a package first"</string>
-    <string name="ui_roll_back_napcat" formatted="false">"Roll back NapCat"</string>
+
     <string name="ui_restore_and_its_data">"Restore %1$s and its data"</string>
-    <string name="ui_no_napcat_rollback_available" formatted="false">"No NapCat rollback available"</string>
+
     <string name="ui_distinguish_runtime_issues_from_webui_configuration_issues" formatted="false">"Distinguish runtime issues from WebUI configuration issues"</string>
     <string name="ui_upgrade_bundled_runtime" formatted="false">"Upgrade bundled runtime"</string>
     <string name="ui_runtime_matches_the_bundled_resources" formatted="false">"Runtime matches the bundled resources"</string>
@@ -274,13 +267,12 @@
     <string name="ui_app_and_component_versions" formatted="false">"App and component versions"</string>
     <string name="ui_release_notes_maintenance_packages_and_rollback" formatted="false">"Release notes, maintenance packages and rollback"</string>
     <string name="ui_independent_updates_retaining_configuration_and_sessions" formatted="false">"Independent updates retaining configuration and sessions"</string>
-    <string name="ui_qq_python_and_underlying_dependencies" formatted="false">"QQ, Python and underlying dependencies"</string>
+    <string name="ui_qq_python_and_underlying_dependencies" formatted="false">"Python and runtime dependencies"</string>
     <string name="ui_third_party_licenses" formatted="false">"Third-party licenses"</string>
     <string name="ui_open_source_licenses_and_source_materials" formatted="false">"Open-source licenses and source materials"</string>
     <string name="ui_settings_content" formatted="false">"Settings content"</string>
     <string name="ui_all" formatted="false">"All"</string>
     <string name="ui_unable_to_read_the_persona_library" formatted="false">"Unable to read the persona library"</string>
-    <string name="ui_persona_library_content" formatted="false">"Persona library content"</string>
     <string name="ui_give_your_chats_a_new_personality" formatted="false">"Give your chats a new personality"</string>
     <string name="ui_local_personas_add_delete_and_switch">"%1$s local personas · Add, delete and switch"</string>
     <string name="ui_restore_previous" formatted="false">"Restore previous"</string>
@@ -293,7 +285,6 @@
     <string name="ui_no_personas_yet_select_add_persona_to_create_one" formatted="false">"No personas yet. Select Add persona to create one."</string>
     <string name="ui_no_matching_personas" formatted="false">"No matching personas"</string>
     <string name="ui_retry" formatted="false">"Retry"</string>
-    <string name="ui_persona_card_list" formatted="false">"Persona card list"</string>
     <string name="ui_preview_persona">"Preview persona %1$s"</string>
     <string name="ui_in_use">"In use · %1$s"</string>
     <string name="ui_added">"Added · %1$s"</string>
@@ -309,7 +300,7 @@
     <string name="ui_astrbot_webui" formatted="false">"AstrBot WebUI"</string>
     <string name="ui_restore_previous_default_persona" formatted="false">"Restore previous default persona"</string>
     <string name="ui_apply">"Apply %1$s"</string>
-    <string name="ui_this_will_astrbot_briefly_stops_then_resumes_its_previous">"This will %1$s. AstrBot briefly stops, then resumes its previous state. NapCat keeps running.\n\nExisting personas with the same name and WebUI changes are retained. Conversations with an explicit persona are unaffected. Start a new conversation to try it."</string>
+    <string name="ui_this_will_astrbot_briefly_stops_then_resumes_its_previous">This will %1$s. AstrBot briefly stops, then resumes its previous state.\n\nExisting personas and dashboard changes are retained. Explicit conversation personas are unaffected.</string>
     <string name="ui_add_this_persona_to_astrbot_without_changing_the_default" formatted="false">"add this persona to AstrBot without changing the default"</string>
     <string name="ui_restore_the_previous_default_persona" formatted="false">"restore the previous default persona"</string>
     <string name="ui_add_this_persona_and_make_it_the_default" formatted="false">"add this persona and make it the default"</string>
@@ -321,7 +312,6 @@
     <string name="ui_deleting" formatted="false">"Deleting…"</string>
     <string name="ui_confirm_deletion" formatted="false">"Confirm deletion"</string>
     <string name="ui_home" formatted="false">"Home"</string>
-    <string name="ui_personas" formatted="false">"Personas"</string>
     <string name="ui_go_back" formatted="false">"Go back"</string>
     <string name="ui_manager" formatted="false">"Manager"</string>
     <string name="ui_page">"%1$s page"</string>
@@ -343,7 +333,7 @@
     <string name="ui_partial_processes">"Partial · %1$s/%2$s processes"</string>
     <string name="ui_memory_usage_unavailable" formatted="false">"Memory usage unavailable"</string>
     <string name="ui_about_resource_usage" formatted="false">"About resource usage"</string>
-    <string name="ui_app_memory_is_the_total_pss_of_the_manager" formatted="false">"App memory is the total PSS of the manager and managed processes under the same app user. Shared memory is counted proportionally. It includes AstrBot, NapCat and running extensions, but excludes isolated system WebView renderer processes.\n\nDevice RAM is the physical memory reported by Android, excluding storage and memory expansion. App share is the complete PSS total divided by device RAM. No percentage is shown for partial or failed measurements.\n\nValues refresh every 15 seconds while Home is visible, and pause when you leave Home or background the app. View storage capacity in Settings → Storage usage."</string>
+    <string name="ui_app_memory_is_the_total_pss_of_the_manager" formatted="false">App memory is the total PSS of the manager, AstrBot and running extensions under the same app user, excluding isolated WebView renderers. Shared memory is counted proportionally.\n\nDevice RAM is physical memory reported by Android, excluding storage and memory expansion. Partial readings do not show a percentage. Values refresh every 15 seconds while Home is visible.</string>
     <string name="ui_service_page">"Service %1$s page"</string>
     <string name="ui_service_details_content" formatted="false">"Service details content"</string>
     <string name="ui_version">"Version %1$s"</string>
@@ -421,7 +411,7 @@
     <string name="ui_developed_and_maintained_by">"Developed and maintained by %1$s"</string>
     <string name="ui_project_license">"Project license: %1$s"</string>
     <string name="ui_author_s_github_profile" formatted="false">"Author\'s GitHub profile"</string>
-    <string name="ui_astrbot_and_napcat_support_independent_online_updates_retaining_configur" formatted="false">"AstrBot and NapCat support independent online updates, retaining configuration and providing rollback. Upgrade the matching runtime when Linux QQ, Python or underlying dependencies change."</string>
+
     <string name="ui_third_party_projects_retain_their_authorship_licenses_and_trademarks" formatted="false">"Third-party projects retain their authorship, licenses and trademarks. See Third-party licenses for complete notices."</string>
     <string name="ui_reading_storage_information" formatted="false">"Reading storage information"</string>
     <string name="ui_measurement_complete_files_in_use_may_continue_to_change" formatted="false">"Measurement complete; files in use may continue to change"</string>
@@ -503,10 +493,10 @@
     <string name="ui_internet_access_unverified" formatted="false">"Internet access unverified"</string>
     <string name="ui_network_connected" formatted="false">"Network connected"</string>
     <string name="ui_system_network_status_is_unavailable_local_webui_health_is" formatted="false">"System network status is unavailable. Local WebUI health is checked separately."</string>
-    <string name="ui_no_default_network_qq_models_and_online_updates_may" formatted="false">"No default network. QQ, models and online updates may be unavailable. Local WebUIs can still be used."</string>
-    <string name="ui_complete_network_sign_in_in_system_settings_then_check" formatted="false">"Complete network sign-in in system settings, then check QQ and model connectivity."</string>
+    <string name="ui_no_default_network_qq_models_and_online_updates_may" formatted="false">"No default network. Messaging platforms, models and online updates may be unavailable. Local WebUIs can still be used."</string>
+    <string name="ui_complete_network_sign_in_in_system_settings_then_check" formatted="false">"Complete network sign-in in system settings, then check messaging platform and model connectivity."</string>
     <string name="ui_the_system_has_not_confirmed_internet_access_check_your" formatted="false">"The system has not confirmed internet access. Check your network. Local WebUIs can still be used."</string>
-    <string name="ui_the_system_confirmed_internet_access_qq_onebot_and_model" formatted="false">"The system confirmed internet access. QQ, OneBot and model connections are checked separately."</string>
+    <string name="ui_the_system_confirmed_internet_access_qq_onebot_and_model" formatted="false">"The system confirmed internet access. Messaging platform and model connections are checked separately."</string>
     <string name="ui_storage_not_checked" formatted="false">"Storage not checked"</string>
     <string name="ui_storage_space_normal" formatted="false">"Storage space normal"</string>
     <string name="ui_storage_space_low" formatted="false">"Storage space low"</string>
@@ -537,7 +527,7 @@
     <string name="ui_not_created_yet_first_start_prepares_default_configuration" formatted="false">"Not created yet. First start prepares default configuration."</string>
     <string name="ui_configuration_format_listen_address_or_port_is_unrecognized_repairing" formatted="false">"Configuration format, listen address or port is unrecognized. Repairing runtime resources does not reset this configuration."</string>
     <string name="ui_the_webui_is_disabled_in_project_configuration" formatted="false">"The WebUI is disabled in project configuration"</string>
-    <string name="ui_local_endpoint_configuration_is_recognized_login_models_qq_and" formatted="false">"Local endpoint configuration is recognized. Login, models, QQ and OneBot messages are not tested here."</string>
+    <string name="ui_local_endpoint_configuration_is_recognized_login_models_qq_and" formatted="false">"Local endpoint configuration is recognized. Login, model and messaging platform connectivity are not tested here."</string>
     <string name="ui_runtime_version_record_is_missing_complete_initialization_first" formatted="false">"Runtime version record is missing. Complete initialization first."</string>
     <string name="ui_runtime" formatted="false">"Runtime"</string>
     <string name="ui_unknown_unsupported_by_this_build" formatted="false">"Unknown (unsupported by this build)"</string>
@@ -597,7 +587,7 @@
     <string name="ui_no_update_package_selected" formatted="false">"No update package selected"</string>
     <string name="ui_check_for_updates_first" formatted="false">"Check for updates first"</string>
     <string name="ui_update_package_downloaded_and_verified_review_release_notes_before" formatted="false">"Update package downloaded and verified. Review release notes before installing."</string>
-    <string name="ui_napcat_update_downloaded_and_verified_review_backup_and_installation" formatted="false">"NapCat update downloaded and verified. Review backup and installation confirmation."</string>
+
     <string name="ui_this_snapshot_is_required_for_program_or_runtime_rollback" formatted="false">"This snapshot is required for program or runtime rollback. It becomes unprotected after a later successful update."</string>
     <string name="ui_no_backup_selected" formatted="false">"No backup selected"</string>
     <string name="ui_backup_deleted" formatted="false">"Backup deleted"</string>
@@ -605,13 +595,13 @@
     <string name="ui_services_did_not_become_ready_after_import_recovery_of" formatted="false">"Services did not become ready after import. Recovery of previous data and service state was attempted. Check manager logs and service status."</string>
     <string name="ui_the_new_version_did_not_become_ready_recovery_of" formatted="false">"The new version did not become ready. Recovery of the previous program and its data was attempted. Check manager logs and service status."</string>
     <string name="ui_webui_readiness_timed_out_process_monitoring_continues_view_logs" formatted="false">"WebUI readiness timed out. Process monitoring continues. View logs, wait longer or stop the service."</string>
-    <string name="ui_napcat_resource_check_exited_with">"NapCat resource check exited with %1$s: %2$s"</string>
-    <string name="ui_napcat_resources_or_qq_runtime_dependencies_are_incompatible_restoring" formatted="false">"NapCat resources or QQ runtime dependencies are incompatible. Restoring the previous version."</string>
-    <string name="ui_napcat_complete_configuration_and_qq_sessions_retained_webui_responding">"NapCat %1$s complete. Configuration and QQ sessions retained; WebUI responding again."</string>
+
+
+
     <string name="ui_rollback" formatted="false">"rollback"</string>
     <string name="ui_update" formatted="false">"update"</string>
-    <string name="ui_napcat_complete_resource_and_dependency_checks_passed_qq_remains">"NapCat %1$s complete. Resource and dependency checks passed. QQ remains stopped; check the WebUI after starting it."</string>
-    <string name="ui_napcat_recovery_incomplete_program_files_and_data_snapshots_are" formatted="false">"NapCat recovery incomplete. Program files and data snapshots are retained. Check manager logs and retry."</string>
+
+
     <string name="ui_this_shortcut_is_unavailable_follow_the_steps_above_to" formatted="false">"This shortcut is unavailable. Follow the steps above to change the setting manually."</string>
     <string name="ui_opened_an_alternative_settings_page_follow_the_steps_above" formatted="false">"Opened an alternative settings page. Follow the steps above to continue."</string>
     <string name="ui_device">"Device: %1$s %2$s"</string>
@@ -628,9 +618,9 @@
     <string name="ui_redeploy_runtime_resources" formatted="false">"Redeploy runtime resources?"</string>
     <string name="ui_roll_back_the_entire_runtime_6833c" formatted="false">"Roll back the entire runtime?"</string>
     <string name="ui_upgrade_the_bundled_runtime" formatted="false">"Upgrade the bundled runtime?"</string>
-    <string name="ui_prepare_the_runtime_bundled_with_this_apk_stop_both" formatted="false">"Prepare the runtime bundled with this APK, stop both services and SSH, back up configuration, databases and the QQ session, then redeploy resources and check both services. The component versions must match exactly. Configuration is preserved.\n\nDependencies and changes installed manually in Ubuntu program directories will be replaced. Plugins in AstrBot\'s data directory are preserved. On success, one runtime rollback is retained and the previous running state is restored. On failure, the original runtime and data snapshot are restored."</string>
+    <string name="ui_prepare_the_runtime_bundled_with_this_apk_stop_both" formatted="false">"Prepare the runtime bundled with this APK, pause related runtime tasks, back up configuration, databases and existing sessions, then redeploy resources and check AstrBot. The component versions must match exactly. Configuration is preserved.\n\nDependencies and changes installed manually in Ubuntu program directories will be replaced. Plugins in AstrBot\'s data directory are preserved. On success, one runtime rollback is retained and the previous running state is restored. On failure, the original runtime and data snapshot are restored."</string>
     <string name="ui_back_up_current_data_then_restore_the_previous_runtime" formatted="false">"Back up current data, then restore the previous runtime and its snapshot. Later data will not be merged. The previous running state will be restored."</string>
-    <string name="ui_verify_and_prepare_the_full_bundled_runtime_stop_both" formatted="false">"Verify and prepare the full bundled runtime, stop both services, back up configuration, databases and the QQ session, then switch runtimes and check both services. On failure, restore the original runtime and snapshot. On success, retain one rollback."</string>
+    <string name="ui_verify_and_prepare_the_full_bundled_runtime_stop_both" formatted="false">"Verify and prepare the full bundled runtime, pause related runtime tasks, back up configuration, databases and existing sessions, then switch runtimes and check AstrBot. On failure, restore the original runtime and snapshot. On success, retain one rollback."</string>
     <string name="ui_back_up_and_repair" formatted="false">"Back up and repair"</string>
     <string name="ui_back_up_and_roll_back" formatted="false">"Back up and roll back"</string>
     <string name="ui_back_up_and_upgrade" formatted="false">"Back up and upgrade"</string>
@@ -644,9 +634,9 @@
     <string name="ui_includes_the_device_model_versions_runtime_status_and_redacted" formatted="false">"Includes the device model, versions, runtime status and redacted logs. Configuration, databases and QQ login files are excluded. Services keep running. Logs may still contain chat messages or personal information; review before sharing."</string>
     <string name="ui_choose_destination" formatted="false">"Choose destination"</string>
     <string name="ui_export_portable_backup_47820" formatted="false">"Export portable backup?"</string>
-    <string name="ui_includes_astrbot_configuration_database_plugins_and_data_plus_napcat" formatted="false">"Includes AstrBot configuration, database, plugins and data, plus NapCat configuration. Excludes QQ login sessions, runtime resources and local snapshots. Both services stop briefly for a consistent backup, then resume. The file contains passwords and API keys without redaction. Maximum size: 2 GiB."</string>
+
     <string name="ui_restore_this_portable_backup" formatted="false">"Restore this portable backup?"</string>
-    <string name="ui_backup_date_stop_services_and_create_a_local_recovery">"Backup date: %1$s. Stop services and create a local recovery snapshot, then replace AstrBot data and NapCat configuration. The current phone\'s QQ session is preserved. Later data will not be merged. After importing, check settings with the dashboard credentials from this backup."</string>
+    <string name="ui_backup_date_stop_services_and_create_a_local_recovery">Backup date: %1$s. Stop relevant services and create a recovery snapshot before replacing the included data. Later changes are not merged; use the archived credentials after import.</string>
     <string name="ui_back_up_and_import" formatted="false">"Back up and import"</string>
     <string name="ui_when_creating_a_snapshot_before_an_update_or_restore" formatted="false">"When creating a snapshot before an update or restore, automatically remove the oldest unprotected automatic snapshots to meet these limits. Older snapshots are removed only after the new one passes verification."</string>
     <string name="ui_maximum_snapshots" formatted="false">"Maximum snapshots"</string>
@@ -665,12 +655,12 @@
     <string name="ui_required_for_rollback_protected" formatted="false">"Required for rollback · Protected"</string>
     <string name="ui_restore" formatted="false">"Restore"</string>
     <string name="ui_restore_this_backup" formatted="false">"Restore this backup?"</string>
-    <string name="ui_both_services_will_stop_briefly_current_data_is_backed" formatted="false">"Both services will stop briefly. Current data is backed up first, then configuration, databases, plugins and the QQ session are replaced with this recovery point. Later data will not be merged. The backup must match the installed program versions."</string>
+    <string name="ui_both_services_will_stop_briefly_current_data_is_backed" formatted="false">"Related runtime tasks will pause during restore. Current data is backed up first, then configuration, databases, plugins and backed-up sessions are replaced with this recovery point. Later data will not be merged. The backup must match the installed program versions."</string>
     <string name="ui_back_up_and_restore" formatted="false">"Back up and restore"</string>
     <string name="ui_delete_this_local_backup" formatted="false">"Delete this local backup?"</string>
     <string name="ui_only_the_selected_backup_file_is_deleted_data_currently" formatted="false">"Only the selected backup file is deleted. Data currently used by the services is unaffected. This cannot be undone."</string>
     <string name="ui_update_to">"Update %1$s to %2$s?"</string>
-    <string name="ui_n_n_nboth_services_will_stop_briefly_data_is">"%1$s\n%2$s\n\nBoth services will stop briefly. Data is backed up before switching programs. Configuration and the QQ session are preserved. On failure, the original program and its data are restored."</string>
+    <string name="ui_n_n_nboth_services_will_stop_briefly_data_is">"%1$s\n%2$s\n\nAstrBot will stop briefly. Data is backed up before switching programs. Configuration and existing sessions are preserved. On failure, the original program and its data are restored."</string>
     <string name="ui_qq_remains_stopped_if_it_was_stopped_otherwise_it" formatted="false">"QQ remains stopped if it was stopped; otherwise, it restarts to check the dashboard API."</string>
     <string name="ui_astrbot_starts_to_check_its_local_dashboard" formatted="false">"AstrBot starts to check its local dashboard."</string>
     <string name="ui_back_up_and_update" formatted="false">"Back up and update"</string>
@@ -678,9 +668,9 @@
     <string name="ui_services_keep_running_during_download_and_verification_backup_and" formatted="false">"Services keep running during download and verification. Backup and installation require separate confirmation afterward."</string>
     <string name="ui_download_and_verify" formatted="false">"Download and verify"</string>
     <string name="ui_roll_back_and_its_data">"Roll back %1$s and its data?"</string>
-    <string name="ui_back_up_current_data_then_restore_the_program_and" formatted="false">"Back up current data, then restore the program and data snapshot from before the last update. Later data will not be merged. Both services will stop briefly."</string>
+    <string name="ui_back_up_current_data_then_restore_the_program_and" formatted="false">"Back up current data, then restore the program and data snapshot from before the last update. Later data will not be merged. AstrBot will stop briefly."</string>
     <string name="ui_back_up_and_roll_back_65fe8" formatted="false">"Back up and roll back"</string>
-    <string name="ui_napcat_access_token" formatted="false">"NapCat access token"</string>
+
     <string name="ui_astrbot_initial_password" formatted="false">"AstrBot initial password"</string>
     <string name="ui_credentials_are_generated_at_first_startup_use_your_existing" formatted="false">"Credentials are generated at first startup. Use your existing password if already configured."</string>
     <string name="ui_show" formatted="false">"Show"</string>
@@ -713,7 +703,7 @@
     <string name="ui_free_storage_has_recovered_above_the_warning_threshold" formatted="false">"Free storage has recovered above the warning threshold"</string>
     <string name="ui_astrbot_data" formatted="false">"AstrBot data"</string>
     <string name="ui_configuration_plugins_databases_trace_data_and_upstream_logs" formatted="false">"Configuration, plugins, databases, trace data and upstream logs"</string>
-    <string name="ui_napcat_data" formatted="false">"NapCat data"</string>
+
     <string name="ui_dashboard_configuration_and_upstream_logs" formatted="false">"Dashboard configuration and upstream logs"</string>
     <string name="ui_qq_and_user_directory" formatted="false">"QQ and user directory"</string>
     <string name="ui_qq_sessions_cache_attachments_and_the_ubuntu_user_directory" formatted="false">"QQ sessions, cache, attachments and the Ubuntu user directory"</string>
@@ -721,7 +711,7 @@
     <string name="ui_update_and_import_staging" formatted="false">"Update and import staging"</string>
     <string name="ui_downloaded_apks_programs_and_backups_awaiting_import" formatted="false">"Downloaded APKs, programs and backups awaiting import"</string>
     <string name="ui_manager_output_logs" formatted="false">"Manager output logs"</string>
-    <string name="ui_rotated_output_from_the_manager_runtime_and_both_services" formatted="false">"Rotated output from the manager, runtime and both services"</string>
+    <string name="ui_rotated_output_from_the_manager_runtime_and_both_services" formatted="false">Rotated logs from the manager, runtime and services</string>
     <string name="ui_app_cache" formatted="false">"App cache"</string>
     <string name="ui_private_app_cache_including_exports_and_browser_data" formatted="false">"Private app cache, including exports and browser data"</string>
     <string name="ui_runtime_resources_and_rollback" formatted="false">"Runtime resources and rollback"</string>
@@ -757,22 +747,22 @@
     <string name="ui_finished_072d2">"Finished %1$s"</string>
     <string name="ui_no_backup_destination_selected" formatted="false">"No backup destination selected"</string>
     <string name="ui_stopping_services_to_prepare_a_consistent">"Stopping services to prepare a consistent %1$s"</string>
-    <string name="ui_preserving_this_phone_s_qq_session_and_preparing_imported" formatted="false">"Preserving this phone\'s QQ session and preparing imported data"</string>
+    <string name="ui_preserving_this_phone_s_qq_session_and_preparing_imported" formatted="false">"Preparing included data; other contents will be preserved"</string>
     <string name="ui_portable_backup_exported_without_the_qq_login_session_it" formatted="false">"Portable backup exported without the QQ login session. It contains configuration and keys; store it securely."</string>
     <string name="ui_portable_backup_restored_this_phone_s_qq_session_and" formatted="false">"Portable backup restored. This phone\'s QQ session and a recovery snapshot are preserved. Check settings using the dashboard credentials from the backup."</string>
-    <string name="ui_stopping_both_services_and_creating_a_snapshot_before_switching" formatted="false">"Stopping both services and creating a snapshot before switching runtimes"</string>
+    <string name="ui_stopping_both_services_and_creating_a_snapshot_before_switching" formatted="false">"Pausing related runtime tasks and creating a snapshot before switching runtimes"</string>
     <string name="ui_switching_runtime_and_components" formatted="false">"Switching runtime and components"</string>
-    <string name="ui_checking_the_actual_astrbot_and_napcat_services" formatted="false">"Checking the actual AstrBot and NapCat services"</string>
-    <string name="ui_napcat_startup_check_failed" formatted="false">"NapCat startup check failed"</string>
-    <string name="ui_runtime_completed_previous_running_states_restored_check_qq_login">"Runtime %1$s completed. Previous running states restored. Check QQ login and bot connections in the dashboards."</string>
+
+
+    <string name="ui_runtime_completed_previous_running_states_restored_check_qq_login">"Runtime %1$s completed. Previous running states restored. Check messaging platform and model connections."</string>
     <string name="ui_repair" formatted="false">"repair"</string>
     <string name="ui_upgrade" formatted="false">"upgrade"</string>
     <string name="ui_runtime_maintenance_error">"Runtime maintenance error: %1$s"</string>
     <string name="ui_the_new_runtime_passed_checks_and_was_committed_old" formatted="false">"The new runtime passed checks and was committed. Old files could not be fully removed. Records are preserved; reopen the manager to retry cleanup."</string>
     <string name="ui_runtime_switch_did_not_complete_restoring_the_original_runtime" formatted="false">"Runtime switch did not complete. Restoring the original runtime and data"</string>
     <string name="ui_original_runtime_recovery_is_incomplete_files_and_snapshots_are" formatted="false">"Original runtime recovery is incomplete. Files and snapshots are preserved. Check manager logs and try again."</string>
-    <string name="ui_stopping_services_and_creating_a_pre_update_napcat_snapshot" formatted="false">"Stopping services and creating a pre-update NapCat snapshot"</string>
-    <string name="ui_checking_napcat_resources_qq_dependencies_and_existing_data" formatted="false">"Checking NapCat resources, QQ dependencies and existing data"</string>
+
+
     <string name="ui_stopping_services_and_creating_a_pre_update_snapshot" formatted="false">"Stopping services and creating a pre-update snapshot"</string>
     <string name="ui_switching_program">"Switching program%1$s"</string>
     <string name="ui_and_its_data" formatted="false">" and its data"</string>
@@ -782,7 +772,7 @@
     <string name="ui_the_new_program_did_not_stay_running" formatted="false">"The new program did not stay running"</string>
     <string name="ui_committing_records">"Committing %1$s records"</string>
     <string name="ui_restored_the_program_data_snapshot_and_previous_running_state" formatted="false">"Restored the program, data snapshot and previous running state"</string>
-    <string name="ui_update_completed_the_previous_program_and_its_data_snapshot" formatted="false">"Update completed. The previous program and its data snapshot are preserved. Check QQ and bot connections in the dashboards."</string>
+    <string name="ui_update_completed_the_previous_program_and_its_data_snapshot" formatted="false">"Update completed. The previous program and its data snapshot are preserved. Check messaging platform and model connections."</string>
     <string name="ui_update_did_not_complete_restoring_the_previous_program_and" formatted="false">"Update did not complete. Restoring the previous program and its data"</string>
     <string name="ui_update_rollback_is_incomplete_files_and_records_are_preserved" formatted="false">"Update rollback is incomplete. Files and records are preserved. Check manager logs and try again."</string>
     <string name="ui_stopping_services_to_prepare_a_consistent_snapshot" formatted="false">"Stopping services to prepare a consistent snapshot"</string>
@@ -793,9 +783,7 @@
     <string name="ui_local_backup_completed_previous_running_states_restored" formatted="false">"Local backup completed. Previous running states restored."</string>
     <string name="ui_data_restored_and_verified_previous_running_states_restored" formatted="false">"Data restored and verified. Previous running states restored."</string>
     <string name="ui_initialize_the_runtime_first" formatted="false">"Initialize the runtime first"</string>
-    <string name="ui_persona_preset_not_found" formatted="false">"Persona preset not found"</string>
     <string name="ui_saving_astrbot_persona_settings" formatted="false">"Saving AstrBot persona settings"</string>
-    <string name="ui_persona_added_to_astrbot_existing_personas_with_the_same" formatted="false">"Persona added to AstrBot. Existing personas with the same name and dashboard edits are preserved."</string>
     <string name="ui_previous_default_persona_restored_added_presets_are_preserved" formatted="false">"Previous default persona restored. Added presets are preserved."</string>
     <string name="ui_default_persona_changed_for_new_conversations_conversations_with_an" formatted="false">"Default persona changed for new conversations. Conversations with an explicitly selected persona are unaffected."</string>
     <string name="ui_resuming">"Resuming %1$s"</string>
@@ -927,18 +915,18 @@
     <string name="ui_apk_does_not_contain_the_complete_runtime" formatted="false">"APK does not contain the complete runtime"</string>
     <string name="ui_too_many_update_server_redirects" formatted="false">"Too many update server redirects"</string>
     <string name="ui_updates_require_https_urls_without_embedded_credentials" formatted="false">"Updates require HTTPS URLs without embedded credentials"</string>
-    <string name="ui_napcat_updates_must_use_an_official_upstream_shell_release" formatted="false">"NapCat updates must use an official upstream Shell release"</string>
-    <string name="ui_this_napcat_version_requires_different_qq_or_runtime_dependencies" formatted="false">"This NapCat version requires different QQ or runtime dependencies. The current program is preserved. Upgrade to a matching runtime first."</string>
-    <string name="ui_napcat_update_package_size_mismatch" formatted="false">"NapCat update package size mismatch"</string>
-    <string name="ui_napcat_update_package_digest_mismatch_current_program_is_preserved" formatted="false">"NapCat update package digest mismatch. Current program is preserved."</string>
-    <string name="ui_invalid_extracted_napcat_update_size" formatted="false">"Invalid extracted NapCat update size"</string>
-    <string name="ui_insufficient_napcat_update_staging_space" formatted="false">"Insufficient NapCat update staging space"</string>
-    <string name="ui_napcat_update_contains_duplicate_or_invalid_paths" formatted="false">"NapCat update contains duplicate or invalid paths"</string>
-    <string name="ui_napcat_update_package_exceeds_its_declared_size" formatted="false">"NapCat update package exceeds its declared size"</string>
-    <string name="ui_napcat_main_program_differs_from_the_signed_version" formatted="false">"NapCat main program differs from the signed version"</string>
-    <string name="ui_napcat_update_package_lacks_dashboard_or_runtime_resources" formatted="false">"NapCat update package lacks dashboard or runtime resources"</string>
+
+
+
+
+
+
+
+
+
+
     <string name="ui_stable_update" formatted="false">"stable update"</string>
-    <string name="ui_the_new_version_contains_a_plugin_directory_with_the" formatted="false">"The new version contains a plugin directory with the same name. Move custom plugins to the NapCat working directory before updating."</string>
+
     <string name="ui_the_connection_observer_plugin_is_missing_or_modified_connection" formatted="false">"The connection observer plugin is missing or modified. Connection status may be unknown. Existing plugins and enable settings are preserved."</string>
     <string name="ui_this_apk_has_no_online_update_url_configured_import" formatted="false">"This APK has no online update URL configured. Import a trusted update package or install a newer APK."</string>
     <string name="ui_checking_the_signed_update_catalog" formatted="false">"Checking the signed update catalog"</string>
@@ -999,16 +987,16 @@
     <string name="ui_unsupported_portable_backup_data_scope" formatted="false">"Unsupported portable backup data scope"</string>
     <string name="ui_portable_backup_does_not_match_installed_program_versions_install" formatted="false">"Portable backup does not match installed program versions. Install the matching runtime first."</string>
     <string name="ui_too_many_portable_backup_files" formatted="false">"Too many portable backup files"</string>
-    <string name="ui_portable_backup_file_paths_are_duplicated_or_out_of" formatted="false">"Portable backup file paths are duplicated or out of order"</string>
+    <string name="ui_portable_backup_file_paths_are_duplicated_or_out_of" formatted="false">"Portable backup contains duplicate file paths"</string>
     <string name="ui_portable_backup_data_directory_is_missing" formatted="false">"Portable backup data directory is missing"</string>
     <string name="ui_portable_backup_contains_paths_outside_its_scope_or_unsupported" formatted="false">"Portable backup contains paths outside its scope or unsupported paths"</string>
-    <string name="ui_unexpected_napcat_configuration_parent_directory" formatted="false">"Unexpected NapCat configuration parent directory"</string>
+
     <string name="ui_portable_backup_contains_linked_parent_directories_or_missing_directorie" formatted="false">"Portable backup contains linked parent directories or missing directories"</string>
     <string name="ui_invalid_portable_backup_file_size_or_digest" formatted="false">"Invalid portable backup file size or digest"</string>
     <string name="ui_invalid_portable_backup_directory_record" formatted="false">"Invalid portable backup directory record"</string>
     <string name="ui_invalid_portable_backup_link_record" formatted="false">"Invalid portable backup link record"</string>
     <string name="ui_portable_backup_contains_absolute_or_invalid_links" formatted="false">"Portable backup contains absolute or invalid links"</string>
-    <string name="ui_portable_backup_link_targets_a_qq_session_or_a" formatted="false">"Portable backup link targets a QQ session or a path outside the backup scope"</string>
+    <string name="ui_portable_backup_link_targets_a_qq_session_or_a" formatted="false">"Portable backup link targets a path outside the selected data scope"</string>
     <string name="ui_unsupported_portable_backup_file_type" formatted="false">"Unsupported portable backup file type"</string>
     <string name="ui_extracted_portable_backup_exceeds_the_8_gib_limit" formatted="false">"Extracted portable backup exceeds the 8 GiB limit"</string>
     <string name="ui_portable_backup_root_cannot_be_a_link" formatted="false">"Portable backup root cannot be a link"</string>
@@ -1027,11 +1015,11 @@
     <string name="ui_cannot_create_portable_backup_staging_directory" formatted="false">"Cannot create portable backup staging directory"</string>
     <string name="ui_reading_selected_portable_backup" formatted="false">"Reading selected portable backup"</string>
     <string name="ui_cannot_read_selected_portable_backup" formatted="false">"Cannot read selected portable backup"</string>
-    <string name="ui_verifying_portable_backup_scope_versions_and_file_digests" formatted="false">"Verifying portable backup scope, versions and file digests"</string>
+    <string name="ui_verifying_portable_backup_scope_versions_and_file_digests" formatted="false">"Checking backup format, selected contents and file integrity"</string>
     <string name="ui_import_a_portable_backup_first" formatted="false">"Import a portable backup first"</string>
     <string name="ui_portable_backup_manifest_is_missing" formatted="false">"Portable backup manifest is missing"</string>
     <string name="ui_cannot_create_portable_backup_export_directory" formatted="false">"Cannot create portable backup export directory"</string>
-    <string name="ui_creating_a_portable_backup_without_qq_login_sessions" formatted="false">"Creating a portable backup without QQ login sessions"</string>
+    <string name="ui_creating_a_portable_backup_without_qq_login_sessions" formatted="false">"Creating a ZIP backup of selected contents"</string>
     <string name="ui_portable_backup_export_file_is_missing" formatted="false">"Portable backup export file is missing"</string>
     <string name="ui_services_resumed_writing_to_the_selected_backup_file" formatted="false">"Services resumed. Writing to the selected backup file"</string>
     <string name="ui_cannot_write_the_selected_backup_file" formatted="false">"Cannot write the selected backup file"</string>
@@ -1097,7 +1085,7 @@
     <string name="ui_previous_program_version_check_failed_update_snapshot_is_preserved" formatted="false">"Previous program version check failed. Update snapshot is preserved."</string>
     <string name="ui_update_was_incomplete_previous_program_and_original_data_snapshot" formatted="false">"Update was incomplete. Previous program and original data snapshot restored."</string>
     <string name="ui_sqlite_verification_failed_for_the_data_snapshot_recovery_records" formatted="false">"SQLite verification failed for the data snapshot. Recovery records are preserved."</string>
-    <string name="ui_napcat_rollback_program_version_or_dashboard_mismatch" formatted="false">"NapCat rollback program version or dashboard mismatch"</string>
+
     <string name="ui_update_lacks_required_program_or_dashboard_files" formatted="false">"Update lacks required program or dashboard files"</string>
     <string name="ui_program_version_mismatch" formatted="false">"Program version mismatch"</string>
     <string name="ui_dashboard_and_program_version_mismatch" formatted="false">"Dashboard and program version mismatch"</string>
@@ -1124,21 +1112,10 @@
     <string name="status_onebot_offline" formatted="false">"OneBot disconnected"</string>
     <string name="status_onebot_connecting" formatted="false">"OneBot connecting"</string>
     <string name="status_onebot_unknown" formatted="false">"OneBot status unknown"</string>
-    <string name="persona_local_source" formatted="false">"Locally added persona"</string>
-    <string name="persona_segmented_reply_hint" formatted="false">"Enable segmented replies in the AstrBot dashboard. Replies longer than its length threshold are sent as a single message."</string>
-    <string name="persona_limit" formatted="false">"Up to 200 custom personas. Remove unused personas first."</string>
-    <string name="persona_duplicate" formatted="false">"A persona with this name already exists. Choose another name."</string>
-    <string name="persona_read_error" formatted="false">"Cannot read the local persona library. Original files are preserved. Try again."</string>
-    <string name="persona_invalid_id" formatted="false">"Invalid persona ID"</string>
-    <string name="persona_invalid_name" formatted="false">"Name must contain 1–30 characters without newlines"</string>
-    <string name="persona_invalid_category" formatted="false">"Choose a persona category"</string>
-    <string name="persona_invalid_prompt" formatted="false">"Prompt must contain 1–12,000 characters"</string>
-    <string name="persona_invalid_intro" formatted="false">"Description: up to 120 characters. Greeting: up to 1,000 characters."</string>
-    <string name="persona_initialize" formatted="false">"Start AstrBot once to import and switch personas"</string>
     <string name="runtime_storage_warning_title">Storage space warning</string>
     <string name="runtime_storage_warning_message">The app has %1$d MiB available. Preparing the runtime is recommended to have %2$d MiB free.\n\nThis is a conservative estimate. You can still continue. Running out of space may cause this operation to fail and affect your phone or other apps. Freeing up storage first is recommended.</string>
     <string name="runtime_storage_continue">Continue anyway</string>
-    <string name="terminal_name">Ubuntu terminal</string>
+    <string name="terminal_name">Terminal</string>
     <string name="terminal_subtitle">Local Ubuntu shell with background session and shortcut keys</string>
     <string name="terminal_built_in">Built in</string>
     <string name="terminal_session_running">Session running · continues after leaving</string>
@@ -1196,11 +1173,11 @@
     <string name="background_autostart_oppo">"Settings → Apps → App management → this app: allow auto-start and secondary launch. These options may also appear in Phone Manager.\n\nReturn here and confirm after setup."</string>
     <string name="background_autostart_samsung">"Samsung usually has no separate auto-start switch. Add this app to Never sleeping apps under Device care → Battery → Background usage limits.\n\nReview the options available on your phone, then return and confirm."</string>
     <string name="background_autostart_generic">"Settings → Apps → this app, or Phone Manager → Startup management: allow auto-start and secondary launch where available.\n\nReview the options on your phone, then return and confirm."</string>
-    <string name="napcat_startup_compat_title">"NapCat bypass compatibility"</string>
-    <string name="napcat_startup_compat_corrected">"Bypasses may crash the Worker at startup or after login with this NapCat / Linux QQ combination on Android PRoot. Disabled %1$s following upstream guidance. O3 mode and other settings are preserved. The original configuration is saved at persistent/manager/napcat-startup-compat/napcat.before-compat.json."</string>
-    <string name="napcat_startup_compat_failed">"Could not check or save NapCat bypass compatibility settings. Resolve this before launching NapCat to avoid repeated crashes at startup or after login. QQ login and service settings are preserved. Check napcat.json syntax, permissions and free space. Keep Hook, Window, Module, Process, Container and JS off for this combination; O3 is configured separately."</string>
-    <string name="napcat_startup_compat_ok">"No bypasses are explicitly enabled for NapCat 4.18.41 / Linux QQ 3.2.34-53644. If enabled later, the configuration will be backed up and all six bypasses disabled before launch to avoid startup or post-login crashes. O3 mode and other settings are preserved."</string>
-    <string name="napcat_startup_compat_pending">"Bypasses are enabled. Worker crashes at startup or after login have been reproduced in this environment. Following upstream guidance, Hook, Window, Module, Process, Container and JS will be disabled after a configuration backup before launch. O3 mode, QQ login and network settings are preserved; no environment reinstall is needed."</string>
+
+
+
+
+
     <string name="onebot_ipv4_compat_corrected">"Switched the original default OneBot connection to ws://127.0.0.1:6199/ws to avoid IPv6 localhost resolution failures. Original files are kept in persistent/manager/onebot-ipv4-backup/."</string>
-    <string name="onebot_ipv4_compat_failed">"Unable to save the OneBot local connection compatibility settings. Check free space and NapCat configuration permissions, then start again. Configuration backups are stored in persistent/manager/onebot-ipv4-backup/."</string>
+
 </resources>
