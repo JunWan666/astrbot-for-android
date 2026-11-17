@@ -14,14 +14,8 @@ import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import io.astrbot.android.runtime.SnowLumaStore
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 
-/** User pages have no credential access; the explicit local SnowLuma entry can prefill its initial login. */
+/** User pages have no access to runtime credentials. */
 class WebsiteBrowserActivity : LocalizedActivity() {
     private lateinit var browser: WebView
     private lateinit var scale: BrowserScale
@@ -33,17 +27,14 @@ class WebsiteBrowserActivity : LocalizedActivity() {
     private val gestures = WebsiteGestureWindow()
     private var allowAppLinks = false
     private var hideQuery = false
-    private var navigation = 0L
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val harness = intent.getBooleanExtra("harness",false)
-        val snowluma = intent.getBooleanExtra("snowluma", false)
-        allowAppLinks = !harness && !snowluma
+        allowAppLinks = !harness
         hideQuery = harness
-        val bookmark = (if (snowluma) WebsiteBookmark("extension-snowluma", "SnowLuma", io.astrbot.android.runtime.SnowLumaRepository.WEB_UI_URL)
-            else if (harness) io.astrbot.android.runtime.HarnessStore.entryUrl?.let { WebsiteBookmark("extension-harness","DeepSeek Harness",it) }
+        val bookmark = (if (harness) io.astrbot.android.runtime.HarnessStore.entryUrl?.let { WebsiteBookmark("extension-harness","DeepSeek Harness",it) }
             else WebsiteBookmarks(this).read().firstOrNull { it.id == intent.getStringExtra("bookmarkId") })
             ?: run { finish(); return }
         scale = BrowserScale(this, "website-${bookmark.id}")
@@ -88,7 +79,6 @@ class WebsiteBrowserActivity : LocalizedActivity() {
         content.addView(browser, FrameLayout.LayoutParams(-1, -1))
         layout.addView(content,LinearLayout.LayoutParams(-1,0,1f)); setContentView(layout)
         if (savedInstanceState == null || browser.restoreState(savedInstanceState) == null) browser.loadUrl(bookmark.url)
-        if (snowluma) observeInitialLogin()
         onBackPressedDispatcher.addCallback(this,object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (browser.canGoBack()) browser.goBack() else if (pages.size > 1) closeWindow(browser) else finish()
@@ -126,7 +116,6 @@ class WebsiteBrowserActivity : LocalizedActivity() {
                 }
                 override fun onPageStarted(view: WebView,url: String?,favicon: Bitmap?) {
                     if (view !== browser) return
-                    navigation++
                     error.visibility = View.GONE
                     if (url != null) address.text = displayUrl(url)
                 }
@@ -193,32 +182,6 @@ class WebsiteBrowserActivity : LocalizedActivity() {
             ?: return
         runCatching { startActivity(Intent(Intent.ACTION_VIEW, url.toUri()).addCategory(Intent.CATEGORY_BROWSABLE)) }
             .onFailure { notice(AppText.get(R.string.websites_browser_missing)) }
-    }
-    private fun observeInitialLogin() {
-        val template = assets.open("webui/snowluma-login-prefill.js").bufferedReader().use { it.readText() }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                combine(SnowLumaStore.initialCredentials, SnowLumaStore.state) { credentials, state ->
-                    credentials.takeIf { state.active }
-                }.collectLatest { credentials ->
-                    if (credentials == null) return@collectLatest
-                    val script = SnowLumaLogin.script(template, credentials)
-                    var completedNavigation = -1L
-                    while (isActive) {
-                        val currentNavigation = navigation
-                        if (completedNavigation != currentNavigation && SnowLumaLogin.accepts(browser.url) &&
-                            SnowLumaStore.initialCredentials.value === credentials && SnowLumaStore.state.value.active) {
-                            val result = CompletableDeferred<String>()
-                            browser.evaluateJavascript(script, result::complete)
-                            if (withTimeoutOrNull(1500) { result.await() } in setOf("\"filled\"", "\"occupied\"")) {
-                                completedNavigation = currentNavigation
-                            }
-                        }
-                        delay(1000)
-                    }
-                }
-            }
-        }
     }
     override fun onSaveInstanceState(outState: Bundle) { browser.saveState(outState); super.onSaveInstanceState(outState) }
     override fun onStart() { super.onStart(); pages.forEach { it.onResume() } }

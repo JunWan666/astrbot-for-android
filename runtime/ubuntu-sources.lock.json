@@ -156,7 +156,7 @@
       "url": "https://snapshot.ubuntu.com/ubuntu/20250807T000000Z/dists/noble-security/main/source/by-hash/SHA256/792b4d2b8837f8db9185cf60496e96c3d5fe64fa33544aa3bf4ab6044e5cc7b8"
     }
   ],
-  "inventorySha256": "c56751f4fb09c08cd29f7714920ed14133af1e0722388dd1f6c14d6bebd9bf69",
+  "inventorySha256": "5d610186acf1352480950cc5e708f50aa27937dcf47bc3cb179ec10ac9b4840d",
   "missing": [],
   "packages": [
     {
@@ -8771,7 +8771,7 @@
       "validUntil": null
     }
   ],
-  "runtimeSha256": "9990abeb9febcefe4e68d75c13efa00ab764caea9e3a96d29a35eb42c62588b7",
+  "runtimeSha256": "0aee42ad5697b5c6aba036deb9debe99b210545c13ccb3cf3a5fe088b3fe521c",
   "schemaVersion": 1,
   "scope": "exact Ubuntu source packages from signed archive indices; no binary rebuild claim",
   "summary": {
@@ -8783,7 +8783,7 @@
   "trustAnchor": {
     "path": "ubuntu-archive-keyring.gpg",
     "runtimeMember": "usr/share/keyrings/ubuntu-archive-keyring.gpg",
-    "runtimeSha256": "9990abeb9febcefe4e68d75c13efa00ab764caea9e3a96d29a35eb42c62588b7",
+    "runtimeSha256": "0aee42ad5697b5c6aba036deb9debe99b210545c13ccb3cf3a5fe088b3fe521c",
     "sha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31"
   }
 }

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 # Build artifact only: never include home directories, verification profiles, user data or caches.
-test -f /opt/qq/.astrbot-components.json
+test ! -e /opt/qq
 test -f /opt/astrbot/.astrbot-source.json
 test -f /var/lib/astrbot-manager/astrbot-python.lock.txt
 cd /

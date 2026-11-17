@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "description": "Pinned bootstrap assets; full AstrBot/NapCat runtime is assembled in a later build stage.",
+  "description": "Pinned bootstrap assets; full AstrBot runtime is assembled in a later build stage.",
   "ubuntuVersion": "24.04.3",
   "architectures": {
     "arm64-v8a": {

@@ -25,14 +25,14 @@
     <string name="desktop_open">打开桌面</string>
     <string name="desktop_qq_name">独立原版 Linux QQ</string>
     <string name="desktop_qq_update">更新原版 QQ</string>
-    <string name="desktop_qq_stop_first">请先停止独立原版 QQ，再启动 NapCat。</string>
-    <string name="desktop_qq_isolation">独立 QQ 与 NapCat 分别保存数据。启动独立 QQ 会停止 NapCat；启动 NapCat 会停止独立 QQ。桌面本身可以与机器人服务同时运行。</string>
+
+    <string name="desktop_qq_isolation">Linux QQ 作为独立桌面应用运行，程序与登录数据单独保存；可与 AstrBot 同时使用。</string>
     <string name="desktop_password">桌面访问密码</string>
     <string name="desktop_reveal">显示密码</string>
     <string name="desktop_hide">隐藏密码</string>
     <string name="desktop_copy_password">复制密码</string>
     <string name="desktop_copy_environment">复制终端图形环境配置</string>
-    <string name="desktop_qq_install_notice">从腾讯官方下载约 198 MiB 安装包，校验后解压；安装后约占用 640 MiB。不会修改 NapCat 的 QQ 文件。继续安装？</string>
+    <string name="desktop_qq_install_notice">从腾讯官网下载约 198 MiB 的原版安装包，校验并解压，安装后约占 640 MiB。是否继续？</string>
     <string name="desktop_qq_update_notice">从腾讯官方下载约 198 MiB 安装包，校验并检查依赖后替换旧版 QQ 程序。更新前停止独立 QQ，保留登录数据；安装失败时恢复旧程序。继续更新？</string>
-    <string name="desktop_qq_start_notice">将停止 NapCat 并启动独立原版 QQ，两边的登录数据都会保留。切回 NapCat 时可在首页重新启动。继续？</string>
+    <string name="desktop_qq_start_notice">启动 Linux QQ 并打开桌面，登录数据会保留。</string>
 </resources>

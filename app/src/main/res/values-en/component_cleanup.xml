@@ -1,0 +1,5 @@
+<resources>
+    <string name="backup_scope_legacy">Legacy component data</string>
+    <string name="backup_invalid_parent">Invalid backup parent directory</string>
+    <string name="ui_astrbot_updates_preserve_configuration">AstrBot supports independent online updates with preserved configuration and rollback. Upgrade the matching runtime when Python or native dependencies change.</string>
+</resources>

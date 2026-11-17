@@ -36,6 +36,7 @@ class HarnessActivity : LocalizedActivity() {
             val manager by RuntimeStore.state.collectAsStateWithLifecycle()
             var uninstall by remember { mutableStateOf(false) }
             var logs by remember { mutableStateOf<String?>(null) }
+            var clearLogs by remember { mutableStateOf(false) }
             var lanConfirm by remember { mutableStateOf(false) }
             var addresses by remember { mutableStateOf(emptyList<String>()) }
             LaunchedEffect(Unit) { while (isActive) {
@@ -111,7 +112,14 @@ class HarnessActivity : LocalizedActivity() {
                 dismissButton = { TextButton(onClick = { lanConfirm = false }) { Text(AppText.get(R.string.ui_cancel)) } })
             logs?.let { text -> AlertDialog(onDismissRequest = { logs = null },title = { Text(AppText.get(R.string.ui_logs_894b8)) },
                 text = { Text(text,Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()),style = MaterialTheme.typography.bodySmall) },
-                confirmButton = { TextButton(onClick = { logs = null }) { Text(AppText.get(R.string.ui_ok)) } }) }
+                confirmButton = { TextButton(onClick = { logs = null }) { Text(AppText.get(R.string.ui_ok)) } },
+                dismissButton = { TextButton(onClick = { clearLogs = true }) { Text(AppText.get(R.string.logs_clear)) } }) }
+            if (clearLogs) AlertDialog(onDismissRequest = { clearLogs = false }, title = { Text(AppText.get(R.string.logs_clear)) },
+                text = { Text(AppText.get(R.string.logs_clear_confirm)) }, confirmButton = { TextButton(onClick = {
+                    clearLogs = false
+                    RuntimeService.command(this@HarnessActivity, "clear-logs", logCategory = LogCategory.HARNESS.name)
+                    logs = ""
+                }) { Text(AppText.get(R.string.logs_clear)) } }, dismissButton = { TextButton(onClick = { clearLogs = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         } }
     }
 }

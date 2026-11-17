@@ -1,0 +1,5 @@
+<resources>
+    <string name="backup_scope_legacy">旧版组件数据</string>
+    <string name="backup_invalid_parent">备份的数据父目录异常</string>
+    <string name="ui_astrbot_updates_preserve_configuration">AstrBot 支持独立在线更新，保留配置并提供回退。Python 或底层依赖变化时，请升级匹配的运行环境。</string>
+</resources>

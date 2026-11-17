@@ -118,7 +118,7 @@ internal class StorageUsageRepository(private val context: Context,
             Category(id, title, scope, paths.map { File(context.filesDir, it) })
         val categories = listOf(
             category("astrbot", AppText.get(R.string.ui_astrbot_data), AppText.get(R.string.ui_configuration_plugins_databases_trace_data_and_upstream_logs), "persistent/astrbot"),
-            category("napcat", AppText.get(R.string.ui_napcat_data), AppText.get(R.string.ui_dashboard_configuration_and_upstream_logs), "persistent/napcat"),
+            category("legacy-data", AppText.get(R.string.backup_scope_legacy), AppText.get(R.string.ui_dashboard_configuration_and_upstream_logs), "persistent/napcat"),
             category("qq-home", AppText.get(R.string.ui_qq_and_user_directory), AppText.get(R.string.ui_qq_sessions_cache_attachments_and_the_ubuntu_user_directory), "persistent/home", "persistent/qq"),
             category("backups", AppText.get(R.string.ui_local_backups), AppText.get(R.string.ui_manual_backups_and_automatic_snapshots_including_protected_snapshots), "backups"),
             category("staging", AppText.get(R.string.ui_update_and_import_staging), AppText.get(R.string.ui_downloaded_apks_programs_and_backups_awaiting_import), "staging"),

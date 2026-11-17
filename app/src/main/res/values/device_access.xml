@@ -3,7 +3,7 @@
     <string name="group_runtime">运行与权限</string>
     <string name="group_data">数据与维护</string>
     <string name="group_general">通用</string>
-    <string name="group_terminal_desktop">终端与桌面</string>
+    <string name="group_terminal_desktop">桌面应用</string>
     <string name="group_remote">远程连接</string>
     <string name="group_ai">AI 工作台</string>
     <string name="group_privilege">特权后端</string>

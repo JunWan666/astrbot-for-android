@@ -25,14 +25,14 @@
     <string name="desktop_open">Open desktop</string>
     <string name="desktop_qq_name">Independent original Linux QQ</string>
     <string name="desktop_qq_update">Update original QQ</string>
-    <string name="desktop_qq_stop_first">Stop independent original QQ before starting NapCat.</string>
-    <string name="desktop_qq_isolation">Original QQ and NapCat keep separate data. Starting original QQ stops NapCat; starting NapCat stops original QQ. The desktop itself can coexist with bot services.</string>
+
+    <string name="desktop_qq_isolation">Linux QQ runs as a standalone desktop app with separate program and login data. It can run alongside AstrBot.</string>
     <string name="desktop_password">Desktop password</string>
     <string name="desktop_reveal">Show password</string>
     <string name="desktop_hide">Hide password</string>
     <string name="desktop_copy_password">Copy password</string>
     <string name="desktop_copy_environment">Copy graphical terminal environment</string>
-    <string name="desktop_qq_install_notice">Download about 198 MiB from Tencent, verify and extract it. Installed size is about 640 MiB. NapCat files are preserved. Continue?</string>
+    <string name="desktop_qq_install_notice">Download about 198 MiB from Tencent, then verify and extract the original package. Installed size is about 640 MiB. Continue?</string>
     <string name="desktop_qq_update_notice">Download about 198 MiB from Tencent, verify it and check dependencies before replacing QQ. Independent QQ stops before the update; login data is preserved. Installation failure restores the previous program. Update?</string>
-    <string name="desktop_qq_start_notice">Stop NapCat and start independent original QQ? Both data directories are preserved. Restart NapCat from Home to switch back.</string>
+    <string name="desktop_qq_start_notice">Start Linux QQ and open its desktop. Existing login data is retained.</string>
 </resources>

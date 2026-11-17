@@ -36,7 +36,6 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
     private val lifecycle = Mutex()
     private var process: Owned? = null
     private var qq: Owned? = null
-    private var qqProfileDigest: String? = null
     private var output: Job? = null
     private var qqOutput: Job? = null
     private var monitor: Job? = null
@@ -105,22 +104,16 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
     }
 
     suspend fun startQq() = withContext(Dispatchers.IO) { lifecycle.withLock {
-        val profileDigest = repository.startupProfileDigest()
-        val profileChanged = qqProfileDigest != profileDigest
-        if (qq?.process?.isAlive == true && DesktopStore.state.value.qqRunning && !profileChanged) return@withLock
+        if (qq?.process?.isAlive == true && DesktopStore.state.value.qqRunning) return@withLock
         DesktopStore.state.update { it.copy(qqStarting = true, error = null) }
         try {
-            if (qq?.process?.isAlive == true && profileChanged) {
-                RuntimeStore.log(context, LogCategory.DESKTOP).append("[QQ] startup profile changed; reopening owned session")
-                stopQqLocked()
-            }
-            startQqLocked(profileDigest)
+            startQqLocked()
         }
         catch (failure: Exception) { withContext(NonCancellable) { stopQqLocked() }; throw failure }
         finally { DesktopStore.state.update { it.copy(qqStarting = false) } }
     } }
 
-    private suspend fun startQqLocked(profileDigest: String?) {
+    private suspend fun startQqLocked() {
         if (qq?.process?.isAlive == true) return
         stopQqLocked()
         checkLocalized(repository.configuration().qqInstalled) { AppText.get(R.string.desktop_qq_install_first) }
@@ -130,7 +123,6 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
         } }
         val owned = launch("qq", "${DesktopRepository.GUEST}/qq.sh")
         qq = owned
-        qqProfileDigest = profileDigest
         qqOutput = drain(owned.process, "QQ")
         // A live launcher alone does not mean the application has opened a window.
         withTimeoutOrNull(60_000) {
@@ -181,7 +173,6 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
 
     private suspend fun stopQqLocked() {
         val owned = qq; qq = null
-        qqProfileDigest = null
         qqMonitor?.cancelAndJoin(); qqMonitor = null
         val previousOutput = qqOutput; qqOutput = null
         try { finish("qq", owned, previousOutput) }

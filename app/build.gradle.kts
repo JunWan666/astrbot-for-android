@@ -29,12 +29,8 @@ val distributionAssets = (providers.gradleProperty("distributionAssetsDir").orNu
 val bootstrapAssets = (providers.gradleProperty("bootstrapAssetsDir").orNull ?: localInputs.getProperty("bootstrapAssetsDir"))?.let { file(it) }
 val nativeLibs = (providers.gradleProperty("nativeLibsDir").orNull ?: localInputs.getProperty("nativeLibsDir"))?.let { file(it) }
 val channelBase = "https://raw.githubusercontent.com/JunWan666/astrbot-for-android/updates/stable"
-val updateCatalogUrl = providers.gradleProperty("updateCatalogUrl").getOrElse("$channelBase/astrbot.json")
-val napcatCatalogUrl = providers.gradleProperty("napcatCatalogUrl").getOrElse("$channelBase/napcat.json")
+val updateCatalogUrl = providers.gradleProperty("updateCatalogUrl").getOrElse("https://api.github.com/repos/AstrBotDevs/AstrBot/releases/latest")
 val managerCatalogUrl = providers.gradleProperty("managerCatalogUrl").getOrElse("$channelBase/manager.json")
-require(napcatCatalogUrl.isEmpty() || URI(napcatCatalogUrl).let {
-    it.scheme == "https" && !it.host.isNullOrBlank() && it.userInfo == null && it.fragment == null
-}) { "napcatCatalogUrl must be an HTTPS URL without credentials or a fragment" }
 require(managerCatalogUrl.isEmpty() || URI(managerCatalogUrl).let {
     it.scheme == "https" && !it.host.isNullOrBlank() && it.userInfo == null && it.fragment == null
 }) { "managerCatalogUrl must be an HTTPS URL without credentials or a fragment" }
@@ -61,7 +57,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "UPDATE_CATALOG_URL", "\"${updateCatalogUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("String", "UPDATE_PUBLIC_KEY", "\"$updatePublicKey\"")
-        buildConfigField("String", "NAPCAT_CATALOG_URL", "\"${napcatCatalogUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         buildConfigField("String", "MANAGER_CATALOG_URL", "\"${managerCatalogUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
         ndk { abiFilters += if (bundledRuntime) listOf("arm64-v8a") else listOf("arm64-v8a", "x86_64") }
     }
@@ -265,5 +260,5 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.6.2")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     androidTestImplementation("com.squareup.okhttp3:okhttp-tls:4.12.0")
-    androidTestImplementation("com.google.zxing:core:3.5.3")
+    implementation("com.google.zxing:core:3.5.3")
 }

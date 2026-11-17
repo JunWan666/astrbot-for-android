@@ -3,7 +3,7 @@
     <string name="group_runtime">Runtime and permissions</string>
     <string name="group_data">Data and maintenance</string>
     <string name="group_general">General</string>
-    <string name="group_terminal_desktop">Terminal and desktop</string>
+    <string name="group_terminal_desktop">Desktop apps</string>
     <string name="group_remote">Remote connections</string>
     <string name="group_ai">AI workspace</string>
     <string name="group_privilege">Privileged backend</string>

@@ -14,7 +14,7 @@
     <string name="background_assist_settings">打开系统无障碍设置</string>
     <string name="background_restore_title">开机恢复服务</string>
     <string name="background_restore_detail">默认关闭。首次解锁、应用更新或辅助重新连接后，尝试恢复上次开启的服务。</string>
-    <string name="background_restore_scope">恢复 AstrBot、NapCat、SSH、cpolar、Harness、桌面及原版 QQ 的已保存启停设置。终端命令、手动部署程序和设备控制授权需重新开启。</string>
+    <string name="background_restore_scope">恢复 AstrBot、SSH、cpolar、Harness、桌面和独立 QQ 已保存的运行偏好。终端命令、手动安装的程序及设备控制权限需要手动恢复。</string>
     <string name="background_restore_limit">无障碍辅助不能解除后台子进程限制；强行停止 App 后需手动打开。</string>
     <string name="background_restore_requested">最近恢复请求：%1$s · 已交给运行服务，结果见首页</string>
     <string name="background_restore_blocked">最近恢复请求：%1$s · 系统未允许，请打开 App 后检查</string>

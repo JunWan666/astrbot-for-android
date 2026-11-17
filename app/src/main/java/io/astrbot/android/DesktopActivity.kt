@@ -97,9 +97,7 @@ class DesktopActivity : LocalizedActivity() {
             Toast.makeText(this, AppText.get(R.string.ui_copied, label), Toast.LENGTH_SHORT).show()
         }
         fun openQq() {
-            // The service checks the startup profile even when QQ already has a window.
-            if (manager.services.getValue(ServiceId.NAPCAT).desiredRunning) confirmation = "qq-open"
-            else pendingOpen = command("qq-open")
+            pendingOpen = command("qq-open")
         }
         val export = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
             if (uri != null) scope.launch(Dispatchers.IO) {
@@ -267,7 +265,8 @@ class DesktopActivity : LocalizedActivity() {
                         if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
                         state.error?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
                     }
-                    QqPage.LOGS -> ManagerLogViewer(logs, paused, { paused = !paused }, { copy(AppText.get(R.string.qq_logs), logs) }, { export.launch("linux-qq.log") }, Modifier.weight(1f))
+                    QqPage.LOGS -> ManagerLogViewer(logs, paused, { paused = !paused }, { copy(AppText.get(R.string.qq_logs), logs) }, { export.launch("linux-qq.log") }, Modifier.weight(1f),
+                        onClear = { RuntimeService.command(this@DesktopActivity, "clear-logs", logCategory = LogCategory.DESKTOP.name); logs = "" }, shareCategory = LogCategory.DESKTOP)
                     QqPage.MORE -> {
                         ManagerSection(AppText.get(R.string.qq_management), padded = false) {
                             ManagerSettingsRow(AppText.get(R.string.desktop_qq_update), R.drawable.ic_restart, enabled = enabled && state.configuration.qqUpdateAvailable) { confirmation = "qq-install" }

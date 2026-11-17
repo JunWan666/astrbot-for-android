@@ -10,12 +10,13 @@
       "transformation": "First symbol group, converted to Android VectorDrawable; original paths and colors retained."
     },
     {
-      "project": "NapCat",
-      "sourceUrl": "https://cdn.apifox.com/app/project-icon/custom/20241226/3c5b999f-935a-4116-9d68-e4ddbaa7ef3f.png",
-      "original": "docs/images/napcat-logo.png",
-      "sha256": "0805da7da7a81e84390b7c9ad6e0fdfe7e8a897928ee4cfae3b077054d20e0fe",
-      "appResource": "app/src/main/res/drawable-nodpi/logo_napcat.webp",
-      "transformation": "Resized to 256px WebP with original aspect ratio, colors and alpha retained."
+      "project": "QQ",
+      "sourceUrl": "https://raw.githubusercontent.com/AstrBotDevs/AstrBot/v4.29.3/dashboard/src/assets/images/platform_logos/qq.png",
+      "original": "app/src/main/res/drawable-nodpi/platform_qq.png",
+      "sha256": "7a369eafa37355ce7e2163a34a1a12833a6deb46d1a2ffe3322df3fd85c73bf3",
+      "appResource": "app/src/main/res/drawable-nodpi/platform_qq.png",
+      "transformation": "Unchanged upstream color PNG; displayed at 28dp with original aspect ratio.",
+      "rights": "Tencent trademark and artwork; platform identification only."
     }
   ]
 }

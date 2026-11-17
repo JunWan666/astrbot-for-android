@@ -30,15 +30,6 @@
       "digestProvenance": "pinned-termux-build-recipe"
     },
     {
-      "name": "napcat-source",
-      "version": "4.18.41",
-      "url": "https://codeload.github.com/NapNeko/NapCatQQ/tar.gz/refs/tags/v4.18.41",
-      "sha256": "47d58d647f8b229610f6d682e820e862fe6b64d01899f7949c174e5cafe79777",
-      "filename": "NapCatQQ-4.18.41.tar.gz",
-      "bytes": 58841420,
-      "digestProvenance": "downloaded-tag-or-commit; bytes pinned for subsequent builds"
-    },
-    {
       "name": "termux-packages",
       "version": "8f1f8bbb32c5b867405200f64dbd579d0c90e8ab",
       "url": "https://codeload.github.com/termux/termux-packages/tar.gz/8f1f8bbb32c5b867405200f64dbd579d0c90e8ab",

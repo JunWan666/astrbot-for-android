@@ -14,7 +14,7 @@
     <string name="background_assist_settings">Open system accessibility settings</string>
     <string name="background_restore_title">Restore services after reboot</string>
     <string name="background_restore_detail">Off by default. After first unlock, an App update or helper reconnection, attempt to restore previously enabled services.</string>
-    <string name="background_restore_scope">Restores saved running preferences for AstrBot, NapCat, SSH, cpolar, Harness, the desktop and standalone QQ. Terminal commands, manually deployed programs and device-control permissions require a manual restart.</string>
+    <string name="background_restore_scope">Restores saved running preferences for AstrBot, SSH, cpolar, Harness, the desktop and standalone QQ. Terminal commands, manually installed programs and device-control permissions require manual recovery.</string>
     <string name="background_restore_limit">Accessibility assistance does not remove background child-process limits. Open the App manually after a force stop.</string>
     <string name="background_restore_requested">Last recovery request: %1$s · passed to the runtime service; check Home for results</string>
     <string name="background_restore_blocked">Last recovery request: %1$s · blocked by the system; open the App to check</string>

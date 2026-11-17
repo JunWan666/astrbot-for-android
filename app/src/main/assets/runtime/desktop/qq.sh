@@ -16,4 +16,6 @@ xdpyinfo -display "$DISPLAY" >/dev/null
 cd "$desktop_root/qq/opt/QQ"
 # Keep Electron's GPU work in the main process. A separate GPU process can fail
 # under Android/PRoot even when hardware acceleration is disabled.
-exec env HOME="$desktop_root/qq-home" XDG_CONFIG_HOME="$desktop_root/qq-home/.config" XDG_DATA_HOME="$desktop_root/qq-home/.local/share" XDG_CACHE_HOME="$desktop_root/qq-home/.cache" XDG_RUNTIME_DIR="$desktop_root/qq-runtime" dbus-run-session -- "$desktop_root/guest-compat" --profile "$qq_binary" --no-sandbox --disable-gpu --disable-dev-shm-usage --in-process-gpu --disable-gpu-compositing --disable-features=Vulkan
+# The App opens the original client. External library profiles are only used
+# when a user explicitly invokes guest-compat --profile in their own terminal.
+exec env HOME="$desktop_root/qq-home" XDG_CONFIG_HOME="$desktop_root/qq-home/.config" XDG_DATA_HOME="$desktop_root/qq-home/.local/share" XDG_CACHE_HOME="$desktop_root/qq-home/.cache" XDG_RUNTIME_DIR="$desktop_root/qq-runtime" dbus-run-session -- "$desktop_root/guest-compat" "$qq_binary" --no-sandbox --disable-gpu --disable-dev-shm-usage --in-process-gpu --disable-gpu-compositing --disable-features=Vulkan

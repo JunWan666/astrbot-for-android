@@ -34,7 +34,7 @@ import io.astrbot.android.runtime.InstalledVersionInspection
                 Text(it, color = if (it == InstalledVersionInspection.MATCHED_NOTICE)
                     MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error)
             }
-            Text(AppText.get(R.string.ui_astrbot_and_napcat_support_independent_online_updates_retaining_configur),
+            Text(AppText.get(R.string.ui_astrbot_updates_preserve_configuration),
                 style = MaterialTheme.typography.bodySmall)
             Text(AppText.get(R.string.ui_third_party_projects_retain_their_authorship_licenses_and_trademarks), style = MaterialTheme.typography.bodySmall)
         }
