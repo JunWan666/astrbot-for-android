@@ -5,12 +5,14 @@ import java.io.Writer
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
 import java.nio.file.LinkOption
+import java.util.concurrent.ConcurrentHashMap
 
 /** Capacity is enforced at write time; exports can be redacted again by the caller. */
 class RotatingLog(private val directory: File, private val name: String,
                   private val maxBytes: Long = 1024 * 1024, private val archives: Int = 2) {
+    private val lock = locks.computeIfAbsent(File(directory, name).absolutePath) { Any() }
     init { require(maxBytes >= 256 && archives in 1..10) }
-    @Synchronized fun append(line: String) {
+    fun append(line: String): Unit = synchronized(lock) {
         directory.mkdirs()
         val file = File(directory, "$name.log")
         val bytes = (SecretRedactor.redact(line).take(16_000) + "\n").toByteArray(Charsets.UTF_8)
@@ -25,21 +27,31 @@ class RotatingLog(private val directory: File, private val name: String,
         }
         file.appendBytes(bounded)
     }
-    @Synchronized fun tail(lines: Int = 160): String {
+    fun tail(lines: Int = 160): String = synchronized(lock) {
         require(lines in 1..1000)
         val file = File(directory, "$name.log")
-        if (!file.exists()) return "暂无日志"
+        if (!file.exists()) return@synchronized "暂无日志"
         val tail = ArrayDeque<String>()
         file.useLines { source -> source.forEach { line -> tail.addLast(line); if (tail.size > lines) tail.removeFirst() } }
         // Existing files may predate normalization or the current redaction rules.
-        return SecretRedactor.redact(tail.joinToString("\n"))
+        SecretRedactor.redact(tail.joinToString("\n"))
+    }
+
+    /** Writers open on every append. A shared lock also covers different instances of this log. */
+    fun clear(): Unit = synchronized(lock) {
+        check(!Files.isSymbolicLink(directory.toPath()))
+        (0..10).forEach { index ->
+            val file = File(directory, if (index == 0) "$name.log" else "$name.$index.log")
+            check(!Files.isSymbolicLink(file.toPath()))
+            if (file.exists()) check(file.delete())
+        }
     }
 
     /** Oldest archive first; reapply redaction to files produced by an older application. */
-    @Synchronized fun exportTo(output: Writer, maxFileBytes: Int? = null) {
+    fun exportTo(output: Writer, maxFileBytes: Int? = null): Unit = synchronized(lock) {
         require(maxFileBytes == null || maxFileBytes in 256..8 * 1024 * 1024)
         if (Files.isSymbolicLink(directory.toPath())) {
-            output.write("[日志目录为链接，已省略]\n"); return
+            output.write("[日志目录为链接，已省略]\n"); return@synchronized
         }
         ((archives downTo 1).map { "$name.$it.log" } + "$name.log").forEach { filename ->
             val file = File(directory, filename)
@@ -80,4 +92,5 @@ class RotatingLog(private val directory: File, private val name: String,
             }
         }
     }
+    companion object { private val locks = ConcurrentHashMap<String, Any>() }
 }

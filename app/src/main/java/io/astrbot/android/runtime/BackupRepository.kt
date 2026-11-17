@@ -34,6 +34,9 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     private val retention = AtomicFile(File(filesDir, "operations/backup-retention.json"))
     private val staged = File(filesDir, ".restore-staging")
     private val previous = File(filesDir, ".restore-previous")
+    private val qqHome = DesktopQqData.home(filesDir)
+    private val qqStaged = File(filesDir, ".restore-qq-staging")
+    private val qqPrevious = File(filesDir, ".restore-qq-previous")
     val hasPendingRestore: Boolean get() = journal.baseFile.exists() || File(journal.baseFile.path + ".bak").exists()
     val hasPendingCleanup: Boolean get() = retention.baseFile.exists() || File(retention.baseFile.path + ".bak").exists() ||
         backups.listFiles().orEmpty().any { it.name.startsWith(".creating-") || it.name.startsWith(".deleting-") }
@@ -52,11 +55,16 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         requireLocalized(preserveIds.all(::validId)) { AppText.get(R.string.ui_invalid_backup_id) }
         checkLocalized(!hasPendingRestore && !hasPendingCleanup) { AppText.get(R.string.ui_a_restore_or_backup_cleanup_is_pending_resolve_its) }
         val entries = scan(persistent)
-        val size = entries.sumOf { it.bytes }
+        DesktopQqData.checkParents(filesDir, qqHome)
+        DesktopQqData.roots(qqHome).values.forEach { DesktopQqData.checkParents(filesDir, it) }
+        val includeDesktopQq = DesktopQqData.roots(qqHome).values.any { it.isDirectory }
+        val qqEntries = if (includeDesktopQq) scanQqData(qqHome) else emptyList()
+        val size = (entries + qqEntries).sumOf { it.bytes }
         val id = UUID.randomUUID().toString()
         val manifest = JSONObject().put("schema", 1).put("id", id).put("createdAt", System.currentTimeMillis())
             .put("kind", kind).put("versions", versions.json()).put("bytes", size)
             .put("entries", JSONArray(entries.map { it.json() }))
+        if (includeDesktopQq) manifest.put("desktopQqEntries", JSONArray(qqEntries.map { it.json() }))
         val metadataBytes = manifest.toString().toByteArray(Charsets.UTF_8).size.toLong()
         val remove = if (kind != "manual") capacityPlan(Math.addExact(size, metadataBytes), preserveIds) else emptyList()
         requireLocalized(filesDir.usableSpace >= size + metadataBytes + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_space_backup_requires_at_least_mb, (size + metadataBytes) / 1024 / 1024 + 64) }
@@ -67,6 +75,12 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
             val tree = File(temporary, "data")
             copyTree(persistent, tree)
             checkLocalized(scan(tree) == entries) { AppText.get(R.string.ui_data_changed_during_backup_or_verification_failed_the_backup) }
+            if (includeDesktopQq) {
+                copyQqScopes(qqHome, File(temporary, "desktop-qq-data"), DesktopQqData.relativeScopes)
+                checkLocalized(scan(File(temporary, "desktop-qq-data")) == qqEntries && scanQqData(qqHome) == qqEntries) {
+                    AppText.get(R.string.ui_data_changed_during_backup_or_verification_failed_the_backup)
+                }
+            }
             writeAtomic(File(temporary, "metadata.json"), manifest)
             syncDirectory(temporary)
             if (remove.isNotEmpty()) writeAtomic(retention.baseFile, JSONObject().put("schema", 1).put("newId", id)
@@ -114,23 +128,30 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         }
         val expected = metadata.getJSONArray("entries").let { array ->
             require(array.length() <= 200_000)
-            (0 until array.length()).map { Entry.parse(array.getJSONObject(it)) }
+            (0 until array.length()).map { Entry.parse(array.getJSONObject(it)) }.filterNot { transientQqPath(it.name) }
         }
         val tree = File(backup, "data")
         requireLocalized(scan(tree) == expected) { AppText.get(R.string.ui_the_backup_is_damaged_or_was_modified_current_data) }
         val size = expected.sumOf { it.bytes }
-        requireLocalized(filesDir.usableSpace >= size + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_restore_staging_space) }
+        val qqExpected = metadata.optJSONArray("desktopQqEntries")?.let { array ->
+            require(array.length() <= 200_000)
+            (0 until array.length()).map { Entry.parse(array.getJSONObject(it)) }
+        }
+        if (qqExpected != null) require(scan(File(backup, "desktop-qq-data")) == qqExpected)
+        requireLocalized(filesDir.usableSpace >= size + (qqExpected?.sumOf { it.bytes } ?: 0L) + 64L * 1024 * 1024) { AppText.get(R.string.ui_insufficient_restore_staging_space) }
         deleteTree(staged)
         try {
             copyTree(tree, staged)
             checkLocalized(scan(staged) == expected) { AppText.get(R.string.ui_restore_staging_verification_failed) }
+            val qq = if (qqExpected == null) null else prepareQqRestore(File(backup, "desktop-qq-data"), DesktopQqData.relativeScopes)
             // This record precedes every rename. An interrupted uncommitted restore is rolled back.
-            writeJournal(id, "prepared")
+            writeJournal(id, "prepared", qq)
             move(persistent, previous)
             move(staged, persistent)
-            writeJournal(id, "switched")
+            switchQq(qq)
+            writeJournal(readJournal()!!.put("phase", "switched"))
         } catch (failure: Throwable) {
-            if (!journal.baseFile.exists()) deleteTree(staged)
+            if (!hasPendingRestore) { deleteTree(staged); deleteTree(qqStaged) }
             throw failure
         }
     }
@@ -138,19 +159,20 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     fun commitRestore() {
         val record = readJournal() ?: error(AppText.get(R.string.ui_restore_record_missing))
         check(record.getString("phase") == "switched" && persistent.isDirectory && previous.isDirectory)
-        writeJournal(record.getString("id"), "committed")
+        writeJournal(record.put("phase", "committed"))
         finishCommitted()
     }
 
-    /** Merge selected portable scopes into a private copy; QQ HOME and other scopes stay local. */
-    internal suspend fun beginPortableRestore(beforeId: String, versions: RuntimeVersions, source: File,
-                                             validate: suspend (File) -> Unit) = withContext(Dispatchers.IO) {
+    /** Merge only selected scopes; independent QQ directories participate in the same recovery journal. */
+    internal suspend fun beginPortableRestore(beforeId: String, versions: RuntimeVersions, source: File, scopes: List<String> = PortableBackupArchive.SCOPES,
+                                             validate: suspend (File, Map<String, File>) -> Unit) = withContext(Dispatchers.IO) {
         requireLocalized(validId(beforeId)) { AppText.get(R.string.ui_invalid_pre_restore_snapshot_id) }
         checkLocalized(!hasPendingRestore && !previous.exists()) { AppText.get(R.string.ui_an_unresolved_restore_record_exists_current_data_is_preserved) }
         requireLocalized(readMetadata(File(backups, beforeId)).getJSONObject("versions").getString("compatibilityKey") == versions.compatibilityKey) {
             AppText.get(R.string.ui_the_pre_restore_snapshot_does_not_match_the_current)
         }
-        validate(source)
+        require(scopes.isNotEmpty() && scopes.all { it in BackupSelection.ALL_SCOPES })
+        validate(source, emptyMap())
         val required = scan(persistent).sumOf { it.bytes } + scan(source).sumOf { it.bytes } + 64L * 1024 * 1024
         requireLocalized(filesDir.usableSpace >= required) { AppText.get(R.string.ui_insufficient_staging_space_for_portable_backup_restore) }
         deleteTree(staged)
@@ -158,9 +180,14 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
             copyTree(persistent, staged)
             val rootMode = Os.lstat(staged.path).st_mode and 511
             Os.chmod(staged.path, rootMode or 448)
-            for (scope in PortableBackupArchive.SCOPES) {
+            for (scope in scopes.filterNot { it.startsWith(DesktopQqData.PREFIX) }) {
                 val target = File(staged, scope)
                 val parent = target.parentFile!!
+                var ancestor = parent
+                while (ancestor != staged) {
+                    requireLocalized(!Files.isSymbolicLink(ancestor.toPath())) { AppText.get(R.string.ui_the_configuration_parent_directory_is_a_link_current_data) }
+                    ancestor = ancestor.parentFile!!
+                }
                 requireLocalized(!Files.isSymbolicLink(parent.toPath())) { AppText.get(R.string.ui_the_configuration_parent_directory_is_a_link_current_data) }
                 checkLocalized(parent.isDirectory || parent.mkdirs()) { AppText.get(R.string.ui_cannot_prepare_configuration_directory) }
                 val mode = Os.lstat(parent.path).st_mode and 511
@@ -170,13 +197,19 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
                 Os.chmod(parent.path, mode)
             }
             Os.chmod(staged.path, rootMode)
-            validate(staged)
-            writeJournal(beforeId, "prepared")
+            val qqScopes = scopes.filter { it.startsWith(DesktopQqData.PREFIX) }.map { it.removePrefix(DesktopQqData.PREFIX) }
+            val qq = if (qqScopes.isEmpty()) null else prepareQqRestore(File(source, "desktop/qq-home"), qqScopes)
+            validate(staged, if (qq == null) emptyMap() else DesktopQqData.roots(qqStaged))
+            writeJournal(beforeId, "prepared", qq)
             move(persistent, previous)
             move(staged, persistent)
-            writeJournal(beforeId, "switched")
+            switchQq(qq)
+            writeJournal(readJournal()!!.put("phase", "switched"))
         } catch (failure: Throwable) {
-            if (!hasPendingRestore) DurableFiles.delete(staged, writableGuestDirectories = true)
+            if (!hasPendingRestore) {
+                DurableFiles.delete(staged, writableGuestDirectories = true)
+                DurableFiles.delete(qqStaged, writableGuestDirectories = true)
+            }
             throw failure
         }
     }
@@ -186,27 +219,35 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         val record = readJournal()
         if (record == null) {
             checkLocalized(!previous.exists()) { AppText.get(R.string.ui_an_unrecognized_old_data_directory_exists_operation_stopped_files) }
+            checkLocalized(!qqPrevious.exists()) { AppText.get(R.string.ui_an_unrecognized_old_data_directory_exists_operation_stopped_files) }
             deleteTree(staged)
+            deleteTree(qqStaged)
             val cleaned = finishRetention()
             backups.listFiles().orEmpty().filter { it.name.startsWith(".creating-") }.forEach { deleteTree(it) }
             cleanupRetired(protectedIds())
             return if (cleaned) AppText.get(R.string.ui_previous_automatic_snapshot_cleanup_completed_protected_backups_are_pres) else null
         }
-        requireLocalized(validId(record.getString("id")) && record.getString("phase") in setOf("prepared", "switched", "committed")) {
+        requireLocalized(validId(record.getString("id")) && record.getString("phase") in setOf("prepared", "switched", "committed", "recovering")) {
             AppText.get(R.string.ui_unrecognized_restore_record_all_data_is_preserved)
         }
+        qqRecords(record.optJSONArray("desktopQq"))
         if (record.getString("phase") == "committed") {
             finishCommitted()
             return AppText.get(R.string.ui_cleanup_from_the_previous_restore_completed)
         }
+        if (record.getString("phase") == "switched") checkLocalized(previous.isDirectory) { AppText.get(R.string.ui_old_data_required_for_recovery_is_missing_operation_stopped) }
+        writeJournal(record.put("phase", "recovering"))
         if (previous.exists()) {
             checkLocalized(previous.isDirectory && !Files.isSymbolicLink(previous.toPath())) { AppText.get(R.string.ui_unexpected_old_data_directory_files_are_preserved) }
             deleteTree(persistent)
             move(previous, persistent)
         } else {
-            checkLocalized(record.getString("phase") == "prepared" && persistent.isDirectory) { AppText.get(R.string.ui_old_data_required_for_recovery_is_missing_operation_stopped) }
+            checkLocalized(persistent.isDirectory && !Files.isSymbolicLink(persistent.toPath())) { AppText.get(R.string.ui_old_data_required_for_recovery_is_missing_operation_stopped) }
         }
+        recoverQq(record.optJSONArray("desktopQq"))
         deleteTree(staged)
+        deleteTree(qqStaged)
+        deleteTree(qqPrevious)
         journal.delete()
         syncDirectory(File(filesDir, "operations"))
         return AppText.get(R.string.ui_the_previous_restore_was_incomplete_original_data_has_been)
@@ -214,8 +255,11 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
 
     private fun finishCommitted() {
         checkLocalized(persistent.isDirectory && !Files.isSymbolicLink(persistent.toPath())) { AppText.get(R.string.ui_restored_data_directory_is_missing_old_data_is_preserved) }
+        qqRecords(readJournal()?.optJSONArray("desktopQq")).forEach { (scope, _) -> check(File(qqHome, scope).isDirectory) }
         deleteTree(previous)
         deleteTree(staged)
+        deleteTree(qqStaged)
+        deleteTree(qqPrevious)
         journal.delete()
         syncDirectory(File(filesDir, "operations"))
     }
@@ -270,8 +314,10 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         return journal.openRead().bufferedReader().use { JSONObject(it.readText()) }
     }
 
-    private fun writeJournal(id: String, phase: String) = writeAtomic(journal.baseFile,
-        JSONObject().put("schema", 1).put("id", id).put("phase", phase))
+    private fun writeJournal(id: String, phase: String, qq: JSONArray? = null) = writeJournal(
+        JSONObject().put("schema", 1).put("id", id).put("phase", phase).also { if (qq != null) it.put("desktopQq", qq) })
+
+    private fun writeJournal(record: JSONObject) = writeAtomic(journal.baseFile, record)
 
     private fun readMetadata(directory: File, expectedId: String = directory.name): JSONObject {
         val file = File(directory, "metadata.json")
@@ -286,12 +332,103 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         val bytes = metadata.getLong("bytes")
         requireLocalized(bytes >= 0 && metadataBytes >= 0) { AppText.get(R.string.ui_invalid_backup_size_record) }
         return BackupInfo(metadata.getString("id"), metadata.getLong("createdAt"), metadata.getString("kind"),
-            bytes, metadata.getJSONArray("entries").length(),
+            bytes, metadata.getJSONArray("entries").length() + (metadata.optJSONArray("desktopQqEntries")?.length() ?: 0),
             versions.keys().asSequence().filter { it != "compatibilityKey" }.associateWith { versions.getString(it) },
             Math.addExact(bytes, metadataBytes))
     }
 
-    private suspend fun scan(directory: File): List<Entry> {
+    private suspend fun scanQqData(home: File): List<Entry> {
+        val parents = listOf(".config", ".local", ".local/share").map { Entry(it, "directory", 0, "", 448, "") }
+        val result = parents.toMutableList()
+        for (scope in DesktopQqData.relativeScopes) {
+            val dir = File(home, scope)
+            DesktopQqData.checkParents(home, dir)
+            require(!dir.exists() || dir.isDirectory)
+            result += Entry(scope, "directory", 0, "", if (dir.exists()) Os.lstat(dir.path).st_mode and 511 else 448, "")
+            if (dir.exists()) result += scan(dir, transientQq = true).map { it.copy(name = "$scope/${it.name}") }
+        }
+        return result.sortedBy { it.name }
+    }
+
+    private suspend fun copyQqScopes(source: File, destination: File, scopes: List<String>) {
+        require(scopes.isNotEmpty() && scopes.all { it in DesktopQqData.relativeScopes })
+        check(!Files.exists(destination.toPath(), LinkOption.NOFOLLOW_LINKS) && destination.mkdirs())
+        Os.chmod(destination.path, 448)
+        for (scope in scopes) {
+            val from = File(source, scope)
+            DesktopQqData.checkParents(source, from)
+            val to = File(destination, scope)
+            to.parentFile!!.mkdirs()
+            var parent = to.parentFile!!
+            while (parent != destination) { Os.chmod(parent.path, 448); parent = parent.parentFile!! }
+            if (Files.exists(from.toPath(), LinkOption.NOFOLLOW_LINKS)) copyTree(from, to, transientQq = true)
+            else { check(to.mkdir()); Os.chmod(to.path, 448) }
+            var synced = to
+            while (synced != destination) { syncDirectory(synced); synced = synced.parentFile!! }
+        }
+        syncDirectory(destination)
+    }
+
+    private suspend fun prepareQqRestore(source: File, scopes: List<String>): JSONArray {
+        checkLocalized(!qqPrevious.exists()) { AppText.get(R.string.ui_an_unresolved_restore_record_exists_current_data_is_preserved) }
+        scopes.forEach { DesktopQqData.checkParents(filesDir, File(qqHome, it)) }
+        deleteTree(qqStaged)
+        copyQqScopes(source, qqStaged, scopes)
+        return JSONArray(scopes.map { scope ->
+            val current = File(qqHome, scope)
+            require(!current.exists() || current.isDirectory)
+            JSONObject().put("scope", scope).put("existed", current.exists())
+        })
+    }
+
+    private fun qqRecords(array: JSONArray?): List<Pair<String, Boolean>> {
+        if (array == null) { check(!qqPrevious.exists()); return emptyList() }
+        require(array.length() in 1..DesktopQqData.relativeScopes.size)
+        val records = (0 until array.length()).map { index ->
+            val item = array.getJSONObject(index)
+            item.getString("scope") to item.getBoolean("existed")
+        }
+        require(records.map { it.first }.distinct().size == records.size && records.all { it.first in DesktopQqData.relativeScopes })
+        records.forEach { (scope, _) -> DesktopQqData.checkParents(filesDir, File(qqHome, scope)) }
+        DesktopQqData.checkParents(filesDir, qqStaged)
+        DesktopQqData.checkParents(filesDir, qqPrevious)
+        return records
+    }
+
+    private fun switchQq(array: JSONArray?) {
+        for ((scope, existed) in qqRecords(array)) {
+            val current = File(qqHome, scope)
+            val old = File(qqPrevious, scope)
+            ensureDirectory(current.parentFile!!)
+            if (existed) { ensureDirectory(old.parentFile!!); move(current, old) }
+            move(File(qqStaged, scope), current)
+        }
+    }
+
+    private fun recoverQq(array: JSONArray?) {
+        for ((scope, existed) in qqRecords(array)) {
+            val current = File(qqHome, scope)
+            val old = File(qqPrevious, scope)
+            if (old.exists()) {
+                require(old.isDirectory && !Files.isSymbolicLink(old.toPath()))
+                deleteTree(current)
+                move(old, current)
+            } else if (!existed) deleteTree(current)
+            else checkLocalized(current.isDirectory) { AppText.get(R.string.ui_old_data_required_for_recovery_is_missing_operation_stopped) }
+        }
+    }
+
+    private fun ensureDirectory(directory: File) {
+        require(directory.isDirectory || directory.mkdirs())
+        var current = directory
+        while (current != filesDir) { syncDirectory(current); current = current.parentFile!! }
+        syncDirectory(filesDir)
+    }
+
+    private fun transientQqPath(name: String) = DesktopQqData.transient(name.substringAfterLast('/')) &&
+        BackupSelection.QQ_SCOPES.any { name.startsWith("$it/") }
+
+    private suspend fun scan(directory: File, transientQq: Boolean = false): List<Entry> {
         requireLocalized(directory.isDirectory && !Files.isSymbolicLink(directory.toPath())) { AppText.get(R.string.ui_data_directory_is_missing_or_invalid) }
         val entries = ArrayList<Entry>()
         val coroutine = currentCoroutineContext()
@@ -304,6 +441,9 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
             }
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                 coroutine.ensureActive()
+                if ((transientQq || BackupSelection.QQ_SCOPES.any { base.relativize(file).toString().replace('\\', '/').startsWith("$it/") }) &&
+                    (DesktopQqData.transient(file.fileName.toString()) || !attrs.isRegularFile && !attrs.isSymbolicLink))
+                    return FileVisitResult.CONTINUE
                 when {
                     attrs.isSymbolicLink -> add(file, "symlink", 0, "", Files.readSymbolicLink(file).toString())
                     attrs.isRegularFile -> {
@@ -332,7 +472,7 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
         return entries.sortedBy { it.name }
     }
 
-    private suspend fun copyTree(source: File, destination: File) {
+    private suspend fun copyTree(source: File, destination: File, transientQq: Boolean = false) {
         check(!destination.exists())
         val coroutine = currentCoroutineContext()
         val base = source.toPath()
@@ -346,6 +486,9 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
             }
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                 coroutine.ensureActive()
+                if ((transientQq || BackupSelection.QQ_SCOPES.any { base.relativize(file).toString().replace('\\', '/').startsWith("$it/") }) &&
+                    (DesktopQqData.transient(file.fileName.toString()) || !attrs.isRegularFile && !attrs.isSymbolicLink))
+                    return FileVisitResult.CONTINUE
                 val target = target(file)
                 if (attrs.isSymbolicLink) Files.createSymbolicLink(target, Files.readSymbolicLink(file))
                 else {
@@ -378,6 +521,7 @@ class BackupRepository(private val filesDir: File, private val protectedIds: () 
     private fun move(source: File, destination: File) {
         checkLocalized(!Files.exists(destination.toPath(), LinkOption.NOFOLLOW_LINKS) && source.renameTo(destination)) { AppText.get(R.string.ui_cannot_switch_data_directories_recovery_records_are_preserved) }
         syncDirectory(destination.parentFile!!)
+        if (source.parentFile != destination.parentFile) syncDirectory(source.parentFile!!)
     }
 
     private fun writeAtomic(file: File, value: JSONObject) {

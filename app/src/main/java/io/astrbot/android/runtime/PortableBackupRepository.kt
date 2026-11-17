@@ -1,5 +1,7 @@
 package io.astrbot.android.runtime
 
+import io.astrbot.android.SharedExports
+
 import io.astrbot.android.checkLocalized
 import io.astrbot.android.requireLocalized
 import io.astrbot.android.requireNotNullLocalized
@@ -49,16 +51,20 @@ class PortableBackupRepository(private val context: Context) {
 
     suspend fun beginRestore(beforeSnapshot: BackupInfo, versions: RuntimeVersions) {
         val metadata = withContext(Dispatchers.IO) { requireNotNullLocalized(DurableFiles.read(manifest)) { AppText.get(R.string.ui_portable_backup_manifest_is_missing) } }
-        BackupRepository(files).beginPortableRestore(beforeSnapshot.id, versions, data) { candidate ->
-            archive.verify(candidate, metadata, versions, exclusive = candidate == data)
+        BackupRepository(files).beginPortableRestore(beforeSnapshot.id, versions, data, archive.scopes(metadata)) { candidate, external ->
+            archive.verify(candidate, metadata, versions, exclusive = candidate == data, externalRoots = external)
         }
     }
 
-    suspend fun prepareExport(versions: RuntimeVersions, progress: (String) -> Unit): PortableBackupInfo = withContext(Dispatchers.IO) {
+    suspend fun prepareExport(versions: RuntimeVersions, selection: BackupSelection = BackupSelection(), progress: (String) -> Unit): PortableBackupInfo = withContext(Dispatchers.IO) {
         discardExport()
         checkLocalized(export.mkdirs()) { AppText.get(R.string.ui_cannot_create_portable_backup_export_directory) }
         progress(AppText.get(R.string.ui_creating_a_portable_backup_without_qq_login_sessions))
-        try { archive.write(File(files, "persistent"), File(export, "backup.zip"), versions) }
+        try {
+            if (selection.qq) DesktopQqData.roots(DesktopQqData.home(files)).values.forEach { DesktopQqData.checkParents(files, it) }
+            archive.write(File(files, "persistent"), File(export, "backup.zip"), versions, selection,
+                DesktopQqData.roots(DesktopQqData.home(files)))
+        }
         catch (failure: Throwable) { discardExport(); throw failure }
     }
 
@@ -72,6 +78,15 @@ class PortableBackupRepository(private val context: Context) {
             }
             output.flush()
         }
+    }
+
+    suspend fun shareExport(progress: (String) -> Unit): File = withContext(Dispatchers.IO) {
+        val file = File(export, "backup.zip")
+        requireLocalized(file.isFile && file.length() in 1..PortableBackupArchive.MAX_ARCHIVE) { AppText.get(R.string.ui_portable_backup_export_file_is_missing) }
+        progress(AppText.get(R.string.export_preparing))
+        val destination = SharedExports.destination(context, "astrbot-portable-${System.currentTimeMillis()}.zip")
+        try { DurableFiles.move(file, destination); destination }
+        catch (failure: Throwable) { destination.parentFile?.deleteRecursively(); throw failure }
     }
 
     fun discardImport() = DurableFiles.delete(imports)

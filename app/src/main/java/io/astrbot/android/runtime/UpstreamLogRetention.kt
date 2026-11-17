@@ -20,10 +20,10 @@ internal class UpstreamLogRetention(
     private val textName = Regex(".+\\.log(?:\\.[0-9]+)?")
     private data class Candidate(val path: Path, val bytes: Long, val modified: Long, val dev: Long, val ino: Long)
 
-    @Synchronized fun enforce(active: Set<io.astrbot.android.core.ServiceId>, now: Long = System.currentTimeMillis()): LogRetentionResult {
-        val openFiles = openFiles() ?: return LogRetentionResult(0, 0, 3)
+    @Synchronized fun enforce(active: Set<io.astrbot.android.core.ServiceId>, now: Long = System.currentTimeMillis(), clearHistory: Boolean = false): LogRetentionResult {
+        val openFiles = openFiles() ?: return LogRetentionResult(0, 0, 2)
         val groups = linkedMapOf(
-            "astrbot" to mutableListOf<Candidate>(), "napcat" to mutableListOf(), "qq" to mutableListOf(),
+            "astrbot" to mutableListOf<Candidate>(), "qq" to mutableListOf(),
         )
         var incomplete = 0
         fun collect(group: String, relative: String, accepts: (String) -> Boolean) {
@@ -70,7 +70,6 @@ internal class UpstreamLogRetention(
                     }
             }
         }
-        collect("napcat", "napcat/logs") { textName.matches(it) }
         val qq = File(persistent, "home/.config/QQ")
         if (safe(qq.toPath())) qq.listFiles().orEmpty().filter { it.name == "global" || it.name.matches(Regex("[0-9]{5,20}")) }
             .forEach { account -> collect("qq", "home/.config/QQ/${account.name}/nt_data/Log/log") { it.endsWith(".qqxlog") } }
@@ -83,9 +82,9 @@ internal class UpstreamLogRetention(
             var total = files.sumOf { it.bytes }
             var count = files.size
             val running = if (group == "astrbot") io.astrbot.android.core.ServiceId.ASTRBOT in active
-                else io.astrbot.android.core.ServiceId.NAPCAT in active
+                else DesktopStore.state.value.qqRunning
             for (file in files) {
-                if (total <= maxBytes && count <= maxFiles) break
+                if (!clearHistory && total <= maxBytes && count <= maxFiles) break
                 // QQ writes encrypted hourly archives separately from mmap caches. A two-hour grace
                 // period also protects files whose descriptors are opened only for short writes.
                 if (running && now - file.modified < if (group == "qq") 2 * 60 * 60_000L else 10 * 60_000L) continue
