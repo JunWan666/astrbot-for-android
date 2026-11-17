@@ -2,12 +2,17 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <linux/audit.h>
+#include <linux/filter.h>
+#include <linux/seccomp.h>
+#include <stddef.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/prctl.h>
 #include <sys/types.h>
+#include <sys/syscall.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
@@ -15,6 +20,28 @@
 /* One launcher owns one session and adopts orphaned grandchildren. */
 static volatile sig_atomic_t stop_signal = 0;
 static void request_stop(int signal_number) { stop_signal = signal_number; }
+
+/* Some Android containers reject clone3 with EPERM. glibc falls back to clone
+ * only on ENOSYS. Disable this one syscall in the guest child; all other
+ * syscalls retain the platform's existing restrictions. Never filter the owner. */
+static void prepare_guest_syscalls(void) {
+#if defined(__aarch64__) && defined(__NR_clone3)
+    struct sock_filter instructions[] = {
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, arch)),
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_AARCH64, 0, 3),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_clone3, 0, 1),
+        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | ENOSYS),
+        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
+    };
+    struct sock_fprog program = { .len = sizeof(instructions) / sizeof(instructions[0]), .filter = instructions };
+    if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0 ||
+            prctl(PR_SET_SECCOMP, SECCOMP_MODE_FILTER, &program) < 0) {
+        /* A denied optional fallback must not stop devices that already work. */
+        fprintf(stderr, "process-runner: clone3 fallback unavailable (errno=%d)\n", errno);
+    }
+#endif
+}
 
 static long long monotonic_ms(void) {
     struct timespec now;
@@ -104,6 +131,7 @@ int main(int argc, char **argv) {
         signal(SIGHUP, SIG_DFL);
         if (setpgid(0, 0) < 0 || prctl(PR_SET_PDEATHSIG, SIGKILL) < 0) _exit(72);
         if (getppid() != runner_pid) _exit(72);
+        prepare_guest_syscalls();
         execvp(argv[1], &argv[1]);
         perror("process-runner: exec");
         _exit(127);

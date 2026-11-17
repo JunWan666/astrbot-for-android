@@ -104,8 +104,17 @@ class BootstrapRuntime(private val context: Context) {
                 Os.chmod(File(staging, "var/tmp").path, 1023)
                 File(staging, "etc/resolv.conf").writeText("nameserver 1.1.1.1\nnameserver 8.8.8.8\n")
                 progress(AppText.get(R.string.ui_verifying_extracted_runtime))
+                if (manifest.optString("kind") == "complete") {
+                    val preflight = runCommand(processBuilderAt(staging, "/opt/astrbot-venv/bin/python", "-c",
+                        "import threading,subprocess; e=threading.Event(); t=threading.Thread(target=e.set); " +
+                            "t.start(); t.join(5); assert e.is_set(), 'thread did not start'; " +
+                            "subprocess.run(['/bin/true'], check=True, timeout=5); print('thread-process-ok')"), 20)
+                    requireLocalized(preflight.exitCode == 0) {
+                        AppText.get(R.string.runtime_process_preflight_failed, preflight.output.takeLast(1500))
+                    }
+                }
                 val verification = if (manifest.optString("kind") == "complete") {
-                    "test -x /opt/qq/qq && test -f /opt/astrbot/main.py && " +
+                    "test -f /opt/astrbot/main.py && " +
                         "/opt/astrbot-venv/bin/python -c 'import quart, fastapi, faiss; print(\"runtime-ok\")'"
                 } else "test -f /etc/os-release && /bin/echo bootstrap-ok"
                 val check = runCommand(processBuilderAt(staging, "/bin/sh", "-lc", verification), 180)
@@ -236,6 +245,7 @@ class BootstrapRuntime(private val context: Context) {
     }
 
     private fun processBuilderAt(guestRoot: File, vararg command: String): ProcessBuilder {
+        GuestDns.refresh(context, guestRoot)
         val tmp = File(context.cacheDir, "proot-tmp").apply { mkdirs() }
         // Android has no /dev/shm; Electron needs a private writable shared-memory directory.
         val sharedMemory = File(context.cacheDir, "guest-shm").apply { mkdirs() }
@@ -260,7 +270,7 @@ class BootstrapRuntime(private val context: Context) {
             "-w", "/root",
             "/usr/bin/env", "-i", "HOME=/root", "USER=root", "TMPDIR=/tmp",
             "PATH=/manager/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "ANDROID_SHARED_DIR=/android-share",
-            "LANG=C.UTF-8", "TERM=xterm-256color", "SHELL=/bin/bash",
+            "LANG=C.UTF-8", "TERM=xterm-256color", "SHELL=/bin/bash", "TZ=${java.util.TimeZone.getDefault().id}",
         ) + command).apply {
             directory(context.filesDir)
             redirectErrorStream(true)
@@ -284,25 +294,31 @@ class BootstrapRuntime(private val context: Context) {
 
     private suspend fun runCommand(builder: ProcessBuilder, timeoutSeconds: Long): CommandResult = withContext(Dispatchers.IO) {
         val process = builder.start()
-        coroutineScope {
+        supervisorScope {
                 val output = async(Dispatchers.IO) {
-                    process.inputStream.bufferedReader().use { reader ->
-                        buildString {
+                    val text = StringBuilder()
+                    val failure = runCatching {
+                        process.inputStream.bufferedReader().use { reader ->
                             val buffer = CharArray(4096)
                             while (true) {
                                 val n = reader.read(buffer)
                                 if (n < 0) break
-                                if (length < 1_048_576) append(buffer, 0, n.coerceAtMost(1_048_576 - length))
+                                if (text.length < 1_048_576) text.append(buffer, 0, n.coerceAtMost(1_048_576 - text.length))
                             }
                         }
-                    }
+                    }.exceptionOrNull()
+                    text.toString() to failure
                 }
                 try {
                     if (!process.waitFor(timeoutSeconds, TimeUnit.SECONDS)) {
                         stopOwnedProcess(process)
                         throw LocalizedStateException(AppText.get(R.string.ui_command_timed_out))
                     }
-                    CommandResult(process.exitValue(), output.await())
+                    val (text, readFailure) = output.await()
+                    if (readFailure is CancellationException) throw readFailure
+                    if (readFailure != null && process.exitValue() == 0)
+                        throw LocalizedStateException(AppText.get(R.string.runtime_output_interrupted))
+                    CommandResult(process.exitValue(), text)
                 } finally {
                     if (process.isAlive) stopOwnedProcess(process)
                 }
@@ -315,7 +331,7 @@ class BootstrapRuntime(private val context: Context) {
             process.destroyForcibly()
             process.waitFor(3, TimeUnit.SECONDS)
         }
-        process.inputStream.close()
+        runCatching { process.inputStream.close() }
     }
 
     companion object { private val installationLock = Mutex() }

@@ -29,6 +29,7 @@ class AstrBotInstance:
         self.startup_grace = startup_grace
         self.lock_path = self.directory / "astrbot-instance.lock"
         self.owner_path = self.directory / "astrbot-instance.json"
+        self.stage = "configuration"
 
     @staticmethod
     def identity(pid):
@@ -42,9 +43,9 @@ class AstrBotInstance:
         except (OSError, ValueError, IndexError, StopIteration):
             return None
 
-    def recognized(self, pid):
+    def recognized(self, pid, own=None):
         identity = self.identity(pid)
-        own = self.identity(os.getpid())
+        own = own or self.identity(os.getpid())
         if not identity or not own or identity["uid"] != own["uid"]:
             return None
         try:
@@ -65,12 +66,73 @@ class AstrBotInstance:
 
     def candidates(self):
         result = []
+        own = self.identity(os.getpid())
+        if own is None:
+            raise InstanceBlocked("identity-unavailable")
+        deadline = time.monotonic() + 10
         for entry in Path("/proc").iterdir():
+            if time.monotonic() > deadline:
+                raise InstanceBlocked("inspection-timeout")
             if entry.name.isdecimal() and int(entry.name) != os.getpid():
-                identity = self.recognized(int(entry.name))
+                identity = self.recognized(int(entry.name), own)
                 if identity:
                     result.append(identity)
         return result
+
+    def recognized_owner(self, identity):
+        """Prove the recorded launcher still owns this exact flock inode.
+
+        PRoot exposes other tracees' real loader/cwd through procfs. After a
+        tracer dies those paths cannot identify the guest Python interpreter.
+        The recorded PID, kernel start time, UID, exact entrypoint and kernel
+        flock ownership remain verifiable without trusting those virtual paths.
+        This fallback is never used for arbitrary processes found in a scan.
+        """
+        if (not isinstance(identity, dict) or type(identity.get("pid")) is not int
+                or identity["pid"] <= 1):
+            return None
+        pid = identity["pid"]
+        own = self.identity(os.getpid())
+        if not own or identity.get("uid") != own["uid"] or self.identity(pid) != identity:
+            return None
+        if self.recognized(pid, own) == identity:
+            return identity
+        owner = self.read_owner()
+        if not isinstance(owner, dict) or owner.get("identity") != identity:
+            return None
+        try:
+            root = Path(f"/proc/{pid}")
+            args = (root / "cmdline").read_bytes().split(b"\0")
+            if len(args) < 2 or os.fsdecode(args[1]) != str(self.directory / "launch_astrbot.py"):
+                return None
+            lock = self.lock_path.stat()
+            for descriptor in (root / "fd").iterdir():
+                try:
+                    if not os.path.samestat(descriptor.stat(), lock):
+                        continue
+                    for line in (root / "fdinfo" / descriptor.name).read_text().splitlines():
+                        fields = line.split()
+                        if (len(fields) == 9 and fields[0] == "lock:"
+                                and fields[2:6] == ["FLOCK", "ADVISORY", "WRITE", str(pid)]
+                                and fields[7:] == ["0", "EOF"] and self.identity(pid) == identity):
+                            return identity
+                except OSError:
+                    continue
+        except OSError:
+            pass
+        return None
+
+    def orphaned(self, identity):
+        try:
+            status = Path(f"/proc/{identity['pid']}/status").read_text().splitlines()
+            fields = dict(line.split(":", 1) for line in status if ":" in line)
+            # A managed tracee must not outlive both its parent and tracer.
+            # Only a separately verified lock owner may skip the startup grace.
+            return (fields.get("PPid", "").strip() == "1"
+                    and fields.get("TracerPid", "").strip() == "0"
+                    and self.recognized_owner(identity) == identity)
+        except OSError:
+            return False
 
     @staticmethod
     def port_free(endpoint):
@@ -117,10 +179,12 @@ class AstrBotInstance:
         except (OSError, ValueError):
             return True  # An unknown age must not authorize automatic termination.
 
-    def retire(self, identity):
+    def retire(self, identity, recorded_owner=False):
         pid = identity["pid"]
+        def verified():
+            return self.recognized_owner(identity) if recorded_owner else self.recognized(pid)
         for number, seconds in ((signal.SIGTERM, 5), (signal.SIGKILL, 3)):
-            if self.recognized(pid) != identity:
+            if verified() != identity:
                 return
             # pidfd binds the signal to this process identity on supported kernels.
             descriptor = None
@@ -131,7 +195,7 @@ class AstrBotInstance:
                     except OSError as failure:
                         if failure.errno not in (errno.ENOSYS, errno.EINVAL, errno.EPERM):
                             raise
-                if self.recognized(pid) != identity:
+                if verified() != identity:
                     return
                 if descriptor is not None:
                     signal.pidfd_send_signal(descriptor, number)
@@ -157,6 +221,7 @@ class AstrBotInstance:
             return None
 
     def prepare(self, endpoint, hold=False):
+        self.stage = "lock"
         self.directory.mkdir(parents=True, exist_ok=True)
         descriptor = os.open(self.lock_path, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
         recovered = False
@@ -164,9 +229,10 @@ class AstrBotInstance:
             try:
                 fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
+                self.stage = "owner"
                 owner = self.read_owner()
                 identity = owner.get("identity") if isinstance(owner, dict) else None
-                if not identity or self.recognized(identity.get("pid", -1)) != identity:
+                if not identity or self.recognized_owner(identity) != identity:
                     raise InstanceBlocked("busy")
                 previous = owner.get("endpoint")
                 if (not isinstance(previous, list) or len(previous) != 3
@@ -176,19 +242,20 @@ class AstrBotInstance:
                     raise InstanceBlocked("busy")
                 if self.healthy(previous):
                     raise InstanceBlocked("healthy")
-                if self.young(identity) or endpoint is None:
+                if (self.young(identity) and not self.orphaned(identity)) or endpoint is None:
                     raise InstanceBlocked("starting")
                 # Retry the actual interface before retiring a long-running unresponsive owner.
                 time.sleep(.5)
                 if self.healthy(previous):
                     raise InstanceBlocked("healthy")
-                self.retire(identity)
+                self.retire(identity, recorded_owner=True)
                 recovered = True
                 try:
                     fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 except BlockingIOError:
                     raise InstanceBlocked("busy")
 
+            self.stage = "process-scan"
             legacy = self.candidates()
             if legacy:
                 if self.healthy(endpoint):
@@ -206,12 +273,14 @@ class AstrBotInstance:
                     # A process without this listener may be booting or use a different config.
                     raise InstanceBlocked("busy")
 
+            self.stage = "port"
             deadline = time.monotonic() + 5
             while not self.port_free(endpoint):
                 if time.monotonic() >= deadline:
                     raise InstanceBlocked("unknown-port")
                 time.sleep(.2)
             if hold:
+                self.stage = "record-owner"
                 record = {"identity": self.identity(os.getpid()), "endpoint": endpoint}
                 temporary = self.owner_path.with_suffix(".tmp")
                 with temporary.open("w") as stream:
@@ -264,11 +333,14 @@ def configured_endpoint():
 
 
 if __name__ == "__main__":
+    instance = AstrBotInstance()
     try:
-        print(json.dumps({"status": AstrBotInstance().prepare(configured_endpoint())}))
+        print(json.dumps({"status": instance.prepare(configured_endpoint()), "stage": instance.stage}))
     except InstanceBlocked as failure:
-        print(json.dumps({"status": failure.status}))
+        print(json.dumps({"status": failure.status, "stage": instance.stage}))
         sys.exit(73)
-    except (OSError, ValueError, TypeError):
-        print(json.dumps({"status": "inspection-failed"}))
+    except (OSError, ValueError, TypeError) as failure:
+        # No paths, configuration text or argv: only bounded diagnostic codes.
+        print(json.dumps({"status": "inspection-failed", "stage": instance.stage,
+                          "error": type(failure).__name__, "errno": getattr(failure, "errno", None)}))
         sys.exit(73)

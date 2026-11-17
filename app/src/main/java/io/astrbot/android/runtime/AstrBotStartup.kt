@@ -18,7 +18,7 @@ internal class AstrBotStartup(private val context: Context) {
         nonce = null
         consumedRestart = null
         directory.mkdirs()
-        for (name in listOf("log_limits.py", "managed_restart.py", "astrbot_instance.py", "launch_astrbot.py")) {
+        for (name in listOf("log_limits.py", "managed_restart.py", "astrbot_instance.py", "astrbot_update_compat.py", "launch_astrbot.py")) {
             val script = AtomicFile(File(directory, name))
             val output = script.startWrite()
             try {
@@ -26,6 +26,7 @@ internal class AstrBotStartup(private val context: Context) {
                 script.finishWrite(output)
             } catch (failure: Throwable) { script.failWrite(output); throw failure }
         }
+        AstrBotLocalSession.prepare(context, launch)
         nonce = launch
     }
     /** Runs on the supervisor's IO launcher, before the new service process exists. */
@@ -33,7 +34,13 @@ internal class AstrBotStartup(private val context: Context) {
         val result = runBlocking {
             runtime.execute("/opt/astrbot-venv/bin/python", "/manager/astrbot_instance.py", timeoutSeconds = 40)
         }
-        val status = runCatching { JSONObject(result.output.trim()).getString("status") }.getOrDefault("inspection-failed")
+        val record = result.output.lineSequence().mapNotNull { line ->
+            runCatching { JSONObject(line.trim()) }.getOrNull()?.takeIf { it.has("status") }
+        }.lastOrNull()
+        fun code(key: String) = record?.optString(key)?.takeIf { it.matches(Regex("[a-zA-Z0-9_-]{1,48}")) } ?: "unknown"
+        val status = code("status")
+        RuntimeStore.log(context, io.astrbot.android.core.ServiceId.ASTRBOT).append(
+            "instance-check exit=${result.exitCode} status=$status stage=${code("stage")} error=${code("error")} errno=${code("errno")}")
         if (result.exitCode == 0 && status in setOf("free", "recovered")) {
             if (status == "recovered") RuntimeStore.log(context, io.astrbot.android.core.ServiceId.ASTRBOT)
                 .append(AppText.get(R.string.astrbot_instance_recovered))
@@ -45,6 +52,8 @@ internal class AstrBotStartup(private val context: Context) {
             "unknown-port" -> R.string.astrbot_instance_unknown_port
             "cleanup-failed" -> R.string.astrbot_instance_cleanup_failed
             "configuration" -> R.string.ui_webui_address_or_configuration_is_unrecognized_the_original_file
+            "inspection-timeout" -> R.string.astrbot_instance_inspection_timeout
+            "inspection-failed", "identity-unavailable" -> R.string.astrbot_instance_inspection_failed
             else -> R.string.astrbot_instance_busy
         }))
     }

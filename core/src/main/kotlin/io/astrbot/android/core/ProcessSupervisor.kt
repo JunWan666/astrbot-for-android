@@ -146,7 +146,7 @@ class ProcessSupervisor(
                 onLog("${id.label} 连续异常，暂停自动重启")
             }
             is RestartDecision.Retry -> {
-                onLog("${id.label} 意外退出，${decision.delayMillis} 毫秒后尝试恢复")
+                onLog("${id.label} 意外退出，代码 ${event.exitCode}，${decision.delayMillis} 毫秒后尝试恢复")
                 scope.launch { delay(decision.delayMillis); events.trySend(Event.Retry(event.generation)) }
             }
         }
