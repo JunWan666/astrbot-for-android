@@ -43,7 +43,7 @@ class CpolarEngine(private val context: Context, private val scope: CoroutineSco
         repository.verifyInstalled()
         repository.ensureConfiguration()
         checkLocalized(runCatching {
-            ServerSocket(9200, 1, InetAddress.getByName("127.0.0.1")).use { true }
+            ServerSocket(9200, 1, InetAddress.getByName(if (repository.configuration().lanEnabled) "0.0.0.0" else "127.0.0.1")).use { true }
         }.getOrDefault(false)) { AppText.get(R.string.cpolar_port_in_use) }
         // cpolar's service mode hosts the dashboard before login. Single mode requires an existing token.
         // Our process runner owns the master and workers; no systemd service is installed in PRoot.

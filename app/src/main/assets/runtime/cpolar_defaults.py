@@ -8,8 +8,8 @@ import tempfile
 import yaml
 
 
-def seed(path, tunnels):
-    if not isinstance(tunnels, dict) or set(tunnels) != {"ssh", "astrbot", "napcat"}:
+def seed(path, tunnels, lan=None):
+    if not isinstance(tunnels, dict) or set(tunnels) not in (set(), {"ssh", "astrbot"}):
         raise ValueError("Unexpected default tunnel names")
     if os.path.getsize(path) > 1024 * 1024 or not stat.S_ISREG(os.lstat(path).st_mode):
         raise ValueError("Unsupported cpolar configuration file")
@@ -22,9 +22,16 @@ def seed(path, tunnels):
     existing = configuration.get("tunnels")
     if existing is not None and not isinstance(existing, dict):
         raise ValueError("Expected a tunnel mapping")
-    if existing:
-        return "preserved"
-    configuration["tunnels"] = tunnels
+    status = "preserved" if existing else "created"
+    if existing and lan is None:
+        return status
+    if not existing and tunnels:
+        configuration["tunnels"] = tunnels
+    address = "0.0.0.0:9200" if lan else "127.0.0.1:9200"
+    if (existing or not tunnels) and configuration.get("client_dashboard_addr") == address:
+        return status
+    if lan is not None:
+        configuration["client_dashboard_addr"] = address
     directory = os.path.dirname(os.path.abspath(path))
     descriptor, temporary = tempfile.mkstemp(prefix="cpolar-defaults-", dir=directory)
     try:
@@ -36,13 +43,13 @@ def seed(path, tunnels):
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
-    return "created"
+    return status
 
 
 if __name__ == "__main__":
     # Never print parser errors: they can quote a user's Authtoken from the YAML.
     try:
-        print(seed(sys.argv[1], json.loads(sys.argv[2])))
+        print(seed(sys.argv[1], json.loads(sys.argv[2]), (sys.argv[3] == "lan") if len(sys.argv) > 3 else None))
     except Exception:
         print("configuration-error")
         sys.exit(1)

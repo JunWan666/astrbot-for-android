@@ -20,7 +20,7 @@ import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipFile
 
-data class CpolarConfiguration(val installed: Boolean = false)
+data class CpolarConfiguration(val installed: Boolean = false, val lanEnabled: Boolean = false)
 
 /** The official WebUI owns its configuration, login and tunnels. The APK contains no client binary. */
 class CpolarRepository(private val context: Context) {
@@ -30,7 +30,10 @@ class CpolarRepository(private val context: Context) {
     private val preferences = context.getSharedPreferences("manager", Context.MODE_PRIVATE)
     val configurationFile = File(directory, "cpolar.yml")
 
-    fun configuration() = CpolarConfiguration(binary.isFile && DurableFiles.read(marker)?.optString("sha256") == BINARY_SHA256)
+    fun configuration() = CpolarConfiguration(binary.isFile && DurableFiles.read(marker)?.optString("sha256") == BINARY_SHA256, preferences.getBoolean("cpolar_lan", false))
+    fun setLan(enabled: Boolean) {
+        checkLocalized(preferences.edit().putBoolean("cpolar_lan", enabled).commit()) { AppText.get(R.string.cpolar_save_error) }
+    }
     fun desired() = preferences.getBoolean("desired_cpolar", false)
     fun setDesired(value: Boolean) {
         checkLocalized(preferences.edit().putBoolean("desired_cpolar", value).commit()) { AppText.get(R.string.cpolar_save_error) }
@@ -44,11 +47,10 @@ class CpolarRepository(private val context: Context) {
         Os.chmod(configurationFile.path, 384)
         val installed = checkNotNull(DurableFiles.read(marker))
         // A user can edit or delete any preset in the official dashboard. Do not recreate it later.
-        if (installed.optInt("defaultTunnelsSchema") == 1 && !newConfiguration) return
-        val defaults = defaultTunnels()
+        val defaults = if (installed.optInt("defaultTunnelsSchema") == 1 && !newConfiguration) JSONObject() else defaultTunnels()
         val script = context.assets.open("runtime/cpolar_defaults.py").bufferedReader().use { it.readText() }
         val result = BootstrapRuntime(context).execute("/opt/astrbot-venv/bin/python", "-c", script,
-            "/manager/extensions/cpolar/cpolar.yml", defaults.toString(), timeoutSeconds = 30)
+            "/manager/extensions/cpolar/cpolar.yml", defaults.toString(), if (configuration().lanEnabled) "lan" else "local", timeoutSeconds = 30)
         checkLocalized(result.exitCode == 0 && result.output.trim() in setOf("created", "preserved")) {
             AppText.get(R.string.cpolar_config_error)
         }

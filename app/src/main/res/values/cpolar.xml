@@ -16,7 +16,7 @@
     <string name="cpolar_extension_subtitle" formatted="false">"按需下载 · 公网隧道"</string>
     <string name="cpolar_initialize_first" formatted="false">"请先初始化 Ubuntu 运行环境"</string>
     <string name="cpolar_install" formatted="false">"安装扩展"</string>
-    <string name="cpolar_install_notice" formatted="false">"从 cpolar 官网下载 3.3.12 客户端（约 6.6 MiB），校验并安装后启动本机 WebUI。默认预置 SSH、AstrBot、NapCat 三个隧道；登录后按官方后台配置连接，服务能力以 cpolar 账号套餐为准。"</string>
+    <string name="cpolar_install_notice" formatted="false">下载并校验官方 cpolar 3.3.12 客户端（约 6.6 MiB），启动本机 WebUI。预置 SSH 和 AstrBot 隧道，通过官方后台登录并配置；可用功能取决于账号套餐。</string>
     <string name="cpolar_integrity_error" formatted="false">"cpolar 文件完整性检查失败，请重新安装扩展"</string>
     <string name="cpolar_login_hint" formatted="false">"打开后台后使用 cpolar 账号登录，官方页面会自动保存 Authtoken，无需单独复制。隧道和公网地址也在后台管理。"</string>
     <string name="cpolar_logs" formatted="false">"日志"</string>
@@ -26,7 +26,7 @@
     <string name="cpolar_operation_error" formatted="false">"cpolar 操作失败，请检查网络、配置和可用存储后重试"</string>
     <string name="cpolar_overview" formatted="false">"概览"</string>
     <string name="cpolar_paused" formatted="false">"维护暂停"</string>
-    <string name="cpolar_privacy" formatted="false">"默认预置 SSH、AstrBot、NapCat 三个隧道，使用创建时各服务的实际端口。账号与隧道配置由官方后台保存，不包含在 AstrBot 备份中。"</string>
+    <string name="cpolar_privacy" formatted="false">预置 SSH 和 AstrBot 隧道，使用创建时的服务端口。账号和隧道配置由官方后台保存，不包含在 AstrBot 数据备份中。</string>
     <string name="cpolar_runtime_error" formatted="false">"cpolar 未能在当前环境中运行，请查看运行环境日志"</string>
     <string name="cpolar_save_error" formatted="false">"无法保存 cpolar 偏好，请检查可用存储"</string>
     <string name="cpolar_space_error" formatted="false">"安装 cpolar 至少需要 96 MiB 可用空间"</string>
@@ -36,7 +36,7 @@
     <string name="cpolar_stop_notice" formatted="false">"停止 cpolar 后台及其全部隧道，保留配置。"</string>
     <string name="cpolar_stopped" formatted="false">"已停止"</string>
     <string name="cpolar_uninstall" formatted="false">"卸载扩展"</string>
-    <string name="cpolar_uninstall_notice" formatted="false">"停止 cpolar 并删除客户端、隧道配置和已保存的登录信息。AstrBot、NapCat 和 SSH 的数据保留。"</string>
+    <string name="cpolar_uninstall_notice" formatted="false">停止 cpolar 并删除客户端、隧道配置和已保存的登录信息。AstrBot、SSH 和 Ubuntu 数据保留。</string>
     <string name="cpolar_verifying" formatted="false">"正在验证 cpolar 在 Ubuntu 环境中的运行能力"</string>
     <string name="cpolar_webui_unavailable" formatted="false">"cpolar 后台暂不可用，请刷新或查看扩展日志。"</string>
     <string name="cpolar_working" formatted="false">"处理中"</string>

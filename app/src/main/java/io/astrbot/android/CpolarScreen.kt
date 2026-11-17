@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,6 +32,7 @@ import kotlinx.coroutines.withContext
     var confirmation by remember { mutableStateOf<String?>(null) }
     var logs by rememberSaveable { mutableStateOf(false) }
     var paused by rememberSaveable { mutableStateOf(false) }
+    var addresses by remember { mutableStateOf(emptyList<String>()) }
     var text by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val owner = LocalLifecycleOwner.current
@@ -43,6 +46,11 @@ import kotlinx.coroutines.withContext
             if (result.isFailure) Toast.makeText(context, AppText.get(R.string.cpolar_export_error), Toast.LENGTH_LONG).show()
         }
     }
+    LaunchedEffect(owner, state.configuration.lanEnabled) {
+        owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (true) { addresses = withContext(Dispatchers.IO) { LanAccess.addresses(context) }; delay(5000) }
+        }
+    }
     LaunchedEffect(owner, logs, paused) {
         owner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             while (logs && !paused) {
@@ -53,8 +61,10 @@ import kotlinx.coroutines.withContext
     }
     if (logs) ManagerLogViewer(text, paused, { paused = !paused }, {
         context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("cpolar", text))
-    }, { export.launch("cpolar.log") }, Modifier.weight(1f))
-    else {
+    }, { export.launch("cpolar.log") }, Modifier.weight(1f), onClear = {
+        RuntimeService.command(context, "clear-logs", logCategory = LogCategory.CPOLAR.name); text = ""
+    }, shareCategory = LogCategory.CPOLAR)
+    else Column(Modifier.weight(1f).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         ManagerSection(AppText.get(R.string.cpolar_name)) {
             Text(cpolarStatus(state), style = MaterialTheme.typography.titleMedium)
             Text(AppText.get(R.string.cpolar_description), style = MaterialTheme.typography.bodySmall)
@@ -76,11 +86,25 @@ import kotlinx.coroutines.withContext
             ManagerActionButton(AppText.get(R.string.cpolar_uninstall), { confirmation = "uninstall" }, Modifier.weight(1f), ActionTone.STOP,
                 enabled && state.configuration.installed)
         }
+        ManagerSection(AppText.get(R.string.cpolar_lan_title)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Text(AppText.get(R.string.cpolar_lan_hint), Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                Switch(state.configuration.lanEnabled, onCheckedChange = { value ->
+                    if (value) confirmation = "lan-on" else RuntimeService.command(context, "cpolar-lan-off")
+                }, enabled = enabled)
+            }
+            if (state.configuration.lanEnabled) {
+                Text(if (addresses.isEmpty()) AppText.get(R.string.cpolar_lan_no_address) else addresses.joinToString("\n") { "http://$it:9200" },
+                    style = MaterialTheme.typography.bodySmall)
+                if (addresses.isNotEmpty()) TextButton(onClick = {
+                    context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("cpolar", addresses.joinToString("\n") { "http://$it:9200" }))
+                }) { Text(AppText.get(R.string.ui_copy)) }
+            }
+        }
         if (!manager.environmentInstalled) Text(AppText.get(R.string.cpolar_initialize_first), style = MaterialTheme.typography.bodySmall)
         Text(AppText.get(R.string.cpolar_login_hint), style = MaterialTheme.typography.bodyMedium)
         Text(AppText.get(R.string.cpolar_privacy), style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.weight(1f))
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         ManagerActionButton(AppText.get(R.string.cpolar_overview), { logs = false }, Modifier.weight(1f), if (!logs) ActionTone.PRIMARY else ActionTone.NEUTRAL)
@@ -90,6 +114,7 @@ import kotlinx.coroutines.withContext
         val message = when (action) {
             "install" -> R.string.cpolar_install_notice
             "uninstall" -> R.string.cpolar_uninstall_notice
+            "lan-on" -> R.string.cpolar_lan_confirm
             else -> R.string.cpolar_stop_notice
         }
         AlertDialog(onDismissRequest = { confirmation = null }, title = { Text(AppText.get(R.string.cpolar_name)) },
