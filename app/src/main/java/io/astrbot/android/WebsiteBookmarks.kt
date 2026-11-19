@@ -48,9 +48,8 @@ internal class WebsiteBookmarks(context: Context) {
     }
     companion object {
         private const val DEEPSEEK_HOME = "https://www.deepseek.com/"
-
         fun normalize(input: String): String {
-            val value = input.trim().let { if ("://" in it) it else "https://$it" }
+            val value = input.trim().let { if ("://" in it) it else "http://$it" }
             require(value.length in 1..4096 && value.none { it.isISOControl() })
             val uri = URI(value)
             require(uri.scheme?.lowercase() in setOf("http", "https") && !uri.host.isNullOrBlank() && uri.rawUserInfo == null)

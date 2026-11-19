@@ -37,12 +37,17 @@ class WebsiteBrowserActivity : LocalizedActivity() {
         val bookmark = (if (harness) io.astrbot.android.runtime.HarnessStore.entryUrl?.let { WebsiteBookmark("extension-harness","DeepSeek Harness",it) }
             else WebsiteBookmarks(this).read().firstOrNull { it.id == intent.getStringExtra("bookmarkId") })
             ?: run { finish(); return }
-        scale = BrowserScale(this, "website-${bookmark.id}")
+        scale = BrowserScale(this, "website-${bookmark.id}", defaultPercent = if (harness) 75 else 50)
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; fitsSystemWindows = true }
         val toolbar = LinearLayout(this).apply { gravity = android.view.Gravity.CENTER_VERTICAL }
+        val dark = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val foreground = android.graphics.Color.parseColor(if (dark) "#E9EBF1" else "#202536")
         fun button(label: String, icon: Int, action: (View) -> Unit) {
             toolbar.addView(ImageButton(this).apply {
                 contentDescription = label; setImageResource(icon)
+                imageTintList = android.content.res.ColorStateList.valueOf(foreground)
+                setPadding(dp(13), dp(13), dp(13), dp(13))
                 val typed = android.util.TypedValue()
                 theme.resolveAttribute(android.R.attr.selectableItemBackgroundBorderless, typed, true)
                 setBackgroundResource(typed.resourceId)
@@ -56,6 +61,7 @@ class WebsiteBrowserActivity : LocalizedActivity() {
         }
         toolbar.addView(address,LinearLayout.LayoutParams(0,-2,1f))
         button(AppText.get(R.string.ui_refresh),R.drawable.ic_restart) { error.visibility = View.GONE; browser.reload() }
+        button(AppText.get(R.string.ui_close), R.drawable.ic_close) { finish() }
         button(AppText.get(R.string.ui_more_actions),R.drawable.ic_more) { anchor ->
             PopupMenu(this, anchor).apply {
                 menu.add(0, 1, 0, AppText.get(R.string.ui_page_zoom))

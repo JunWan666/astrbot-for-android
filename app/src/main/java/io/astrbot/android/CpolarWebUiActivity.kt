@@ -64,6 +64,7 @@ class CpolarWebUiActivity : LocalizedActivity() {
         heading.addView(TextView(this).apply { text = CpolarEngine.WEB_UI_URL; textSize = 11f; setTextColor(foreground) })
         toolbar.addView(heading, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         icon(AppText.get(R.string.ui_refresh), R.drawable.ic_restart) { reload() }
+        icon(AppText.get(R.string.ui_close), R.drawable.ic_close) { finish() }
         icon(AppText.get(R.string.ui_more_actions), R.drawable.ic_more) { anchor ->
             PopupMenu(this, anchor).apply {
                 menu.add(0, 1, 0, AppText.get(R.string.ui_page_zoom_b29fc, scale.percent))

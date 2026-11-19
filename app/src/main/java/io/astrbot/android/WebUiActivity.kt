@@ -125,6 +125,7 @@ class WebUiActivity : LocalizedActivity() {
         heading.addView(status)
         toolbar.addView(heading, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
         icon(AppText.get(R.string.ui_refresh), R.drawable.ic_restart) { retryPage() }
+        icon(AppText.get(R.string.ui_close), R.drawable.ic_close) { finish() }
         icon(AppText.get(R.string.ui_more_actions), R.drawable.ic_more) { anchor ->
             PopupMenu(this, anchor).apply {
                 val connection = RuntimeStore.state.value.webUis.getValue(id)
@@ -132,7 +133,7 @@ class WebUiActivity : LocalizedActivity() {
                     menu.add(AppText.get(R.string.ui_open_in_browser)); menu.add(AppText.get(R.string.ui_copy_address))
                     if (!webUiNeedsRecovery(id, RuntimeStore.state.value, endpoint.origin, pageFailure.value, pendingAction.value)) menu.add(AppText.get(R.string.ui_save_page_image))
                 }
-                menu.add(AppText.get(R.string.ui_view_logs)); menu.add(AppText.get(R.string.ui_close_webui))
+                menu.add(AppText.get(R.string.ui_view_logs))
                 menu.add(AppText.get(R.string.ui_page_zoom_b29fc, browserScale.percent))
                 setOnMenuItemClickListener { item ->
                     when (item.title.toString()) {
@@ -144,7 +145,6 @@ class WebUiActivity : LocalizedActivity() {
                         }
                         AppText.get(R.string.ui_save_page_image) -> saveVisiblePage()
                         AppText.get(R.string.ui_view_logs) -> openManager(logs = true)
-                        AppText.get(R.string.ui_close_webui) -> finish()
                         else -> if (item.title.toString().startsWith(AppText.get(R.string.ui_page_zoom))) browserScale.choose(webView)
                     }
                     true

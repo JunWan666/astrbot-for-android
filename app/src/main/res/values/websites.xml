@@ -2,7 +2,7 @@
 <resources>
     <string name="websites_title">网页</string>
     <string name="websites_heading">常用网址，快捷访问</string>
-    <string name="websites_intro">添加常用网址，直接在应用内打开。每个地址可独立保存页面缩放比例。</string>
+    <string name="websites_intro">添加常用网址，直接在应用内打开。未填写协议时使用 HTTP，默认缩放 50%，可单独调整。</string>
     <string name="websites_add">添加网址</string>
     <string name="websites_collection">我的收藏</string>
     <string name="websites_count">%1$d 个网址</string>

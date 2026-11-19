@@ -2,7 +2,7 @@
 <resources>
     <string name="websites_title">Websites</string>
     <string name="websites_heading">Your favorite sites, a tap away</string>
-    <string name="websites_intro">Add your favorite URLs and open them in the app. Each bookmark remembers its page zoom.</string>
+    <string name="websites_intro">Open favorite URLs in the app. Addresses without a scheme use HTTP. Pages default to 50% zoom; each bookmark remembers your changes.</string>
     <string name="websites_add">Add website</string>
     <string name="websites_collection">My bookmarks</string>
     <string name="websites_count">Saved: %1$d</string>

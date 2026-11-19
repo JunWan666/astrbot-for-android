@@ -5,9 +5,9 @@ import android.content.Context
 import android.webkit.WebView
 
 /** Fixed viewport levels reflow the page as well as shrinking it; gestures remain disabled. */
-internal class BrowserScale(private val context: Context, private val key: String) {
+internal class BrowserScale(private val context: Context, private val key: String, private val defaultPercent: Int = 75) {
     private val preferences = context.getSharedPreferences("browser-scale", Context.MODE_PRIVATE)
-    val percent get() = preferences.getInt(key, 75).takeIf { it in levels } ?: 75
+    val percent get() = preferences.getInt(key, defaultPercent).takeIf { it in levels } ?: defaultPercent
 
     fun attach(view: WebView) {
         view.settings.setSupportZoom(false)
