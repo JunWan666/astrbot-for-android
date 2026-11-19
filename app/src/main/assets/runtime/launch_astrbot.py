@@ -6,7 +6,7 @@ from pathlib import Path
 import runpy
 import sys
 import uuid
-from astrbot_update_compat import migration_supported
+from astrbot_update_compat import install_dashboard_setup_status, migration_supported
 
 from astrbot_instance import AstrBotInstance, InstanceBlocked, configured_endpoint
 
@@ -50,6 +50,7 @@ def record(phase, version=""):
 record("pending")
 import runtime_bootstrap
 runtime_bootstrap.initialize_runtime_bootstrap()
+install_dashboard_setup_status()
 from astrbot import __version__
 from astrbot.core import core_lifecycle
 from log_limits import install as install_log_limits

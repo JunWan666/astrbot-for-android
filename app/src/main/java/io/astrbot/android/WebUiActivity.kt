@@ -349,7 +349,9 @@ class WebUiActivity : LocalizedActivity() {
         if (!pendingModelSettings || !endpoint.acceptsNavigation(webView.url.orEmpty())) return
         webView.evaluateJavascript("""
             (() => {
-              if (location.hash.startsWith('#/auth/') || !localStorage.getItem('token')) return false;
+              if (location.origin !== ${JSONObject.quote(endpoint.origin)} || location.hash.startsWith('#/auth/') ||
+                  !localStorage.getItem('token') || localStorage.getItem('change_pwd_hint') === 'true' ||
+                  localStorage.getItem('password_upgrade_required') === 'true') return false;
               if (location.hash !== '#/$targetRoute') location.hash = '/$targetRoute';
               return true;
             })()

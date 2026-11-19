@@ -1,8 +1,32 @@
 (() => {
   if (location.origin !== __ORIGIN__) return false;
   const service = __SERVICE__;
+  const hash = location.hash;
+  const page = hash.split('?')[0];
+  if (service === 'ASTRBOT' && page === '#/auth/setup') return true;
+  if (service === 'ASTRBOT' && location.pathname === '/' && !page.startsWith('#/auth/')) {
+    // An earlier login may have left an authenticated browser on the welcome page.
+    // Resume setup only if the server confirms it for the still-current document.
+    const token = localStorage.getItem('token');
+    if (!token || !document.documentElement) return false;
+    const state = document.documentElement.dataset;
+    if (state.androidSetupChecked) return true;
+    state.androidSetupChecked = 'pending';
+    fetch('/api/v1/auth/setup-status', {cache: 'no-store', redirect: 'error'})
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (result?.data?.setup_required === true && result?.data?.skip_default_password_auth === false &&
+            location.hash === hash && localStorage.getItem('token') === token) {
+          state.androidSetupChecked = 'resumed';
+          location.replace('#/auth/setup');
+        } else {
+          delete state.androidSetupChecked;
+        }
+      }).catch(() => { delete state.androidSetupChecked; });
+    return true;
+  }
   const route = service === 'ASTRBOT'
-    ? location.hash.split('?')[0] === '#/auth/login'
+    ? page === '#/auth/login'
     : /\/web_login\/?$/.test(location.pathname);
   if (!route) return false;
   const password = document.querySelector(service === 'ASTRBOT'
