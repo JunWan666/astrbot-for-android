@@ -47,9 +47,11 @@ data class ManagerState(
     val notice: String? = null,
     val completedOperation: String? = null,
     val preparedUpdate: UpdateInfo? = null,
+    val pendingUpdateArchive: PendingUpdateArchive? = null,
     val rollback: RollbackInfo? = null,
     val availableUpdate: OnlineUpdateInfo? = null,
     val latestUpdate: OnlineUpdateInfo? = null,
+    val previewUpdates: Boolean = false,
     val runtimeUpdate: RuntimeImageInfo? = null,
     val runtimeRollback: RuntimeImageInfo? = null,
     val portableImport: PortableBackupInfo? = null,
@@ -118,7 +120,8 @@ object RuntimeStore {
             versions = inspection?.components.orEmpty(), versionNotice = inspection?.notice, versionsCheckedAtMillis = inspection?.checkedAtMillis,
             backups = backups, backupLimits = BackupCapacitySettings(context).read(),
             protectedBackupIds = updates.protectedBackupIds + images.protectedBackupIds,
-            preparedUpdate = updates.preparedInfo, rollback = updates.rollbackInfo, availableUpdate = availableUpdate,
+            preparedUpdate = updates.preparedInfo, pendingUpdateArchive = updates.pendingImportInfo,
+            rollback = updates.rollbackInfo, availableUpdate = availableUpdate, previewUpdates = online.includePreviews,
             runtimeUpdate = images.available, runtimeRollback = images.rollbackInfo,
             portableImport = portableImport, storageSpace = StorageSpace.read(context),
             webUis = it.webUis + ServiceId.entries.filter { id -> !it.services.getValue(id).desiredRunning }
@@ -169,16 +172,17 @@ class RuntimeController(private val context: Context, private val scope: Corouti
     private val histories = ServiceHistoryRepository(context)
     private val supervisors = ServiceId.entries.associateWith { id ->
         ProcessSupervisor(id, scope, launcher = {
-            val connection = configuration.read(id)
+            val connection = configuration.requireValidDashboard()
             activeConnections[id] = connection
             updateState { it.copy(webUis = it.webUis + (id to connection)) }
             val launchNonce = if (id == ServiceId.ASTRBOT) oneBotObservation.prepareLaunch() else null
             if (launchNonce != null) {
                 updateState { it.copy(platformObservationNonce = launchNonce) }
                 astrbotStartup.prepare(launchNonce)
-                astrbotStartup.checkInstance(runtime)
+                astrbotStartup.checkInstance(runtime, connection.endpoint)
             }
-            runtime.processBuilder("/bin/sh", "-lc", launchCommand(id, launchNonce)).start()
+            runtime.processBuilder("/usr/bin/env", AstrBotStartup.endpointArgument(connection.endpoint),
+                "/bin/sh", "-lc", launchCommand(id, launchNonce)).start()
         }, onLog = { RuntimeStore.log(context, id).append(it) }, expectedRestart = { exitCode ->
             id == ServiceId.ASTRBOT && astrbotStartup.consumeRestartRequest(exitCode)
         }, initialHistory = histories.read(id), terminalFailure = { exitCode ->
@@ -583,7 +587,21 @@ class RuntimeController(private val context: Context, private val scope: Corouti
                     withContext(Dispatchers.IO) { portable.discardImport() }
                     updateState { it.copy(notice = AppText.get(R.string.ui_pending_backup_import_cancelled_current_data_is_unchanged)) }
                 }
-                "prepare-update" -> updates.prepare(Uri.parse(requireNotNullLocalized(sourceUri) { AppText.get(R.string.ui_no_update_package_selected) })) { phase -> updateState { it.copy(phase = phase) } }
+                "prepare-update" -> {
+                    val source = requireNotNullLocalized(sourceUri) { AppText.get(R.string.ui_no_update_package_selected) }
+                    val uris = if (source.startsWith("[")) org.json.JSONArray(source).let { list ->
+                        require(list.length() in 1..2)
+                        (0 until list.length()).map { Uri.parse(list.getString(it)) }
+                    } else listOf(Uri.parse(source))
+                    val imported = updates.importPackages(uris) { phase -> updateState { it.copy(phase = phase) } }
+                    if (imported != null) updateState { it.copy(notice = AppText.get(R.string.upstream_import_ready, imported.version)) }
+                }
+                "clear-update-import" -> updates.clearPendingImport()
+                "set-update-channel" -> {
+                    require(updateId in setOf("stable", "preview"))
+                    onlineUpdates.selectPreviews(updateId == "preview")
+                    updateState { it.copy(previewUpdates = onlineUpdates.includePreviews, availableUpdate = null, latestUpdate = null) }
+                }
                 "check-update" -> {
                     val result = onlineUpdates.check { phase -> updateState { it.copy(phase = phase) } }
                     runCatching { AutomaticUpdateSettings(context).succeeded(onlineUpdates.sourceScope, System.currentTimeMillis()) }
@@ -618,6 +636,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             val message = if (action == "apply-backup")
                 AppText.get(R.string.ui_services_did_not_become_ready_after_import_recovery_of)
                 else if (action == "repair-environment") AppText.get(R.string.repair_timeout)
+                else if (action in setOf("prepare-update", "clear-update-import")) AppText.get(R.string.upstream_import_read_timeout)
                 else if (action in setOf("apply-update", "rollback", "apply-runtime", "rollback-runtime", "repair-runtime", "update-online"))
                 AppText.get(R.string.ui_the_new_version_did_not_become_ready_recovery_of)
                 else AppText.get(R.string.ui_webui_readiness_timed_out_process_monitoring_continues_view_logs)
@@ -639,6 +658,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             else if (action == "repair-environment") failure.userFacingMessage() ?: if (failure is java.io.IOException)
                 UpdateNetworkDiagnostics.message(failure) ?: AppText.get(R.string.repair_resource_failed) else AppText.get(R.string.repair_resource_failed)
             else if (action in setOf("export-diagnostics", "share-diagnostics")) AppText.get(R.string.ui_diagnostic_export_failed_check_free_space_or_choose_another)
+            else if (action in setOf("prepare-update", "clear-update-import")) failure.userFacingMessage()
+                ?: AppText.get(R.string.upstream_import_could_not_read)
+            else if (action == "apply-update") failure.userFacingMessage() ?: AppText.get(R.string.upstream_install_failed)
             else if (action in setOf("check-update", "download-update", "update-online")) when (failure) {
                 is java.io.IOException -> UpdateNetworkDiagnostics.message(failure) ?: AppText.get(R.string.ui_the_update_connection_was_interrupted_or_the_server_is)
                 is org.json.JSONException, is java.security.GeneralSecurityException -> AppText.get(R.string.ui_cannot_verify_the_update_catalog_or_package_check_for)
@@ -878,6 +900,7 @@ class RuntimeController(private val context: Context, private val scope: Corouti
         withContext(Dispatchers.IO) { backups.checkAutomaticCapacity() }
         val progress: (String) -> Unit = { phase -> updateState { it.copy(phase = phase) }; event(phase) }
         val restoreData = if (rollback) updates.prepareRollback(progress) else { updates.verifyPrepared(progress); null }
+        if (!rollback) configuration.requireValidDashboard()
         val versions = withContext(Dispatchers.IO) { InstalledVersions.read(context) }
         val wanted = supervisors.filterValues { it.state.value.desiredRunning }.keys.toList()
         updateState { it.copy(maintenance = MaintenanceState.UPDATING) }
@@ -889,11 +912,9 @@ class RuntimeController(private val context: Context, private val scope: Corouti
             progress(AppText.get(R.string.ui_switching_program, if (rollback) AppText.get(R.string.ui_and_its_data) else ""))
             withContext(Dispatchers.IO) { updates.begin(snapshot, versions, wanted) }
             if (restoreData != null) updates.restoreRollbackData(restoreData)
+            withContext(Dispatchers.IO) { configuration.prepareDefaults(); configuration.requireValidDashboard() }
             updates.checkDatabase()
             progress(AppText.get(R.string.ui_checking_the_new_program_and_its_dashboard))
-            val verify = runtime.execute("/bin/sh", "-lc", "cd /opt/astrbot && /opt/astrbot-venv/bin/python main.py --help", timeoutSeconds = 90)
-            if (verify.exitCode != 0) event(AppText.get(R.string.ui_new_program_check_exited_with, verify.exitCode, SecretRedactor.redact(verify.output.takeLast(3000))))
-            checkLocalized(verify.exitCode == 0) { AppText.get(R.string.ui_new_program_startup_verification_failed) }
             supervisors.values.forEach { it.setMaintenance(MaintenanceState.IDLE) }
             // The changed program must really start even if the user previously kept it stopped.
             supervisors.getValue(ServiceId.ASTRBOT).start()

@@ -315,20 +315,17 @@ class AstrBotInstance:
 
 
 def configured_endpoint():
+    # The manager and its startup probe must use the same local address.
     try:
-        config = json.loads(Path("/persistent/astrbot/data/cmd_config.json").read_text(encoding="utf-8-sig")).get("dashboard", {})
-        if config.get("enable") is False:
+        endpoint = json.loads(os.environ["ASTRBOT_MANAGER_DASHBOARD_ENDPOINT"])
+        if endpoint is None:
             return None
-        host = config.get("host", "127.0.0.1")
-        host = {"0.0.0.0": "127.0.0.1", "": "127.0.0.1", "::": "::1", "[::]": "::1", "[::1]": "::1"}.get(host, host)
-        if host not in ("localhost", "127.0.0.1", "::1"):
-            raise ValueError("non-local endpoint")
-        port = int(config.get("port", 6185))
-        if not 1 <= port <= 65535:
-            raise ValueError("invalid port")
-        ssl_config = config.get("ssl")
-        return host, port, "https" if isinstance(ssl_config, dict) and ssl_config.get("enable") else "http"
-    except (OSError, ValueError, TypeError, AttributeError):
+        host, port, scheme = endpoint
+        if (not isinstance(endpoint, list) or host not in ("localhost", "127.0.0.1", "::1")
+                or type(port) is not int or not 1024 <= port <= 65535 or scheme not in ("http", "https")):
+            raise ValueError("invalid endpoint")
+        return host, port, scheme
+    except (KeyError, ValueError, TypeError):
         raise InstanceBlocked("configuration")
 
 

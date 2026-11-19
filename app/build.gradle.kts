@@ -252,6 +252,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.apache.commons:commons-compress:1.27.1")
+    implementation("org.commonmark:commonmark:0.24.0")
     implementation("org.apache.sshd:sshd-core:2.20.0")
     implementation("org.slf4j:slf4j-nop:2.0.17")
     implementation("dev.rikka.shizuku:api:13.1.5")

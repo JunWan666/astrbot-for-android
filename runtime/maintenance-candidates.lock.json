@@ -23,6 +23,30 @@
         "url": "https://github.com/AstrBotDevs/AstrBot/releases/download/v4.29.3/AstrBot-v4.29.3-dashboard.zip",
         "sha256": "a09f560c4140b930180f63a4929c885da80e24fb9bbda56619727bd25e985a11"
       }
+    },
+    "4.30.0-alpha.1": {
+      "status": "candidate; archive, dependency and migration observer checks passed; Android installation and rollback pending",
+      "commit": "739840886c5fbbd439f477ac4b6e8eb7ba3e0649",
+      "source": {
+        "url": "https://codeload.github.com/AstrBotDevs/AstrBot/tar.gz/739840886c5fbbd439f477ac4b6e8eb7ba3e0649",
+        "sha256": "7ad15d472cade077a1a3bf1557aaea845f0d2a2d030fa0332e3f709d57674b94"
+      },
+      "dashboard": {
+        "url": "https://github.com/AstrBotDevs/AstrBot/releases/download/v4.30.0-alpha.1/AstrBot-v4.30.0-alpha.1-dashboard.zip",
+        "sha256": "8cf14531b8260b1e07cdf0b4e2e2c992daff125fd8d6ce6e229568d8430ff45e"
+      }
+    },
+    "4.30.0-beta.1": {
+      "status": "candidate; archive, dependency and migration observer checks passed; Android installation and rollback pending",
+      "commit": "90ba3270f09b857063da68908d80f742042067cd",
+      "source": {
+        "url": "https://codeload.github.com/AstrBotDevs/AstrBot/tar.gz/90ba3270f09b857063da68908d80f742042067cd",
+        "sha256": "3202446213e3e381caca06e352dd27288d230c2f2d74a6057ff5be88d7fcb327"
+      },
+      "dashboard": {
+        "url": "https://github.com/AstrBotDevs/AstrBot/releases/download/v4.30.0-beta.1/AstrBot-v4.30.0-beta.1-dashboard.zip",
+        "sha256": "56ae32bc82506fecece7fbc44ca4c607090b9087b128c4d23b900cb98dcc671d"
+      }
     }
   }
 }

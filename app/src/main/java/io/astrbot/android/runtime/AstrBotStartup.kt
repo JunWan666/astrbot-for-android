@@ -8,9 +8,15 @@ import kotlinx.coroutines.runBlocking
 import io.astrbot.android.AppText
 import io.astrbot.android.R
 import io.astrbot.android.LocalizedStateException
+import io.astrbot.android.core.LocalEndpoint
+import org.json.JSONArray
 
 /** Startup evidence stays outside the user-data tree and is bound to the actual launch. */
 internal class AstrBotStartup(private val context: Context) {
+    companion object {
+        fun endpointArgument(endpoint: LocalEndpoint?): String = "ASTRBOT_MANAGER_DASHBOARD_ENDPOINT=" +
+            (endpoint?.let { JSONArray().put(it.host).put(it.port).put(it.scheme).toString() } ?: "null")
+    }
     @Volatile private var nonce: String? = null
     private var consumedRestart: String? = null
     private val directory = File(context.filesDir, "manager")
@@ -30,9 +36,10 @@ internal class AstrBotStartup(private val context: Context) {
         nonce = launch
     }
     /** Runs on the supervisor's IO launcher, before the new service process exists. */
-    fun checkInstance(runtime: BootstrapRuntime) {
+    fun checkInstance(runtime: BootstrapRuntime, endpoint: LocalEndpoint?) {
         val result = runBlocking {
-            runtime.execute("/opt/astrbot-venv/bin/python", "/manager/astrbot_instance.py", timeoutSeconds = 40)
+            runtime.execute("/usr/bin/env", endpointArgument(endpoint),
+                "/opt/astrbot-venv/bin/python", "/manager/astrbot_instance.py", timeoutSeconds = 40)
         }
         val record = result.output.lineSequence().mapNotNull { line ->
             runCatching { JSONObject(line.trim()) }.getOrNull()?.takeIf { it.has("status") }
@@ -51,7 +58,7 @@ internal class AstrBotStartup(private val context: Context) {
             "starting" -> R.string.astrbot_instance_starting
             "unknown-port" -> R.string.astrbot_instance_unknown_port
             "cleanup-failed" -> R.string.astrbot_instance_cleanup_failed
-            "configuration" -> R.string.ui_webui_address_or_configuration_is_unrecognized_the_original_file
+            "configuration" -> R.string.upstream_dashboard_config_invalid
             "inspection-timeout" -> R.string.astrbot_instance_inspection_timeout
             "inspection-failed", "identity-unavailable" -> R.string.astrbot_instance_inspection_failed
             else -> R.string.astrbot_instance_busy

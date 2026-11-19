@@ -41,13 +41,37 @@ internal object OfficialComponentArchive {
         ZipFile(dashboard).use { unpack(it, dist) }
         val source = JSONObject().put("version", version).put("commit", release.getString("commit"))
             .put("source", files.getJSONObject(0)).put("dashboard", files.getJSONObject(1))
-        DurableFiles.write(File(destination, ".astrbot-source.json"), source)
-        return JSONObject().put("version", version).put("channel", AppText.get(R.string.upstream_channel))
-            .put("notes", release.getString("notes")).put("unpackedBytes", destination.walkTopDown().filter { it.isFile }.sumOf { it.length() })
+        return finish(destination, source, OfficialReleaseRepository.channel(release), release.getString("notes"))
     }
 
-    private suspend fun verify(file: File, entry: JSONObject) {
-        requireLocalized(file.isFile && file.length() == entry.getLong("bytes") && entry.getLong("bytes") in 1..OfficialReleaseRepository.MAX_PACKAGE) { AppText.get(R.string.upstream_download_failed) }
+    suspend fun extractLocal(release: JSONObject, archive: File, dashboard: File?, destination: File): JSONObject {
+        OfficialImportedArchive.validate(release)
+        val files = release.getJSONArray("files")
+        require((dashboard != null) == (files.length() == 2))
+        verify(archive, files.getJSONObject(0), R.string.upstream_import_changed)
+        dashboard?.let { verify(it, files.getJSONObject(1), R.string.upstream_import_changed) }
+        val selected = OfficialImportedArchive.select(listOfNotNull(archive, dashboard))
+        requireLocalized(selected.identity.version == release.getString("version")) { AppText.get(R.string.upstream_import_pair) }
+        check(destination.mkdirs())
+        ZipFile(archive).use { unpack(it, destination, selected.identity.sourcePrefix) }
+        if (dashboard != null) {
+            val dist = File(destination, "astrbot/dashboard")
+            DurableFiles.delete(File(dist, "dist"))
+            ZipFile(dashboard).use { unpack(it, dist) }
+        }
+        val source = JSONObject().put("version", selected.identity.version).put("origin", "local-import")
+            .put("source", files.getJSONObject(0)).put("dashboard", files.optJSONObject(1) ?: JSONObject().put("embedded", true))
+        return finish(destination, source, release.getString("channel"), release.getString("notes"))
+    }
+
+    private fun finish(destination: File, source: JSONObject, channel: String, notes: String): JSONObject {
+        DurableFiles.write(File(destination, ".astrbot-source.json"), source)
+        return JSONObject().put("version", source.getString("version")).put("channel", channel)
+            .put("notes", notes).put("unpackedBytes", destination.walkTopDown().filter { it.isFile }.sumOf { it.length() })
+    }
+
+    internal suspend fun verify(file: File, entry: JSONObject, failureMessage: Int = R.string.upstream_download_failed) {
+        requireLocalized(file.isFile && file.length() == entry.getLong("bytes") && entry.getLong("bytes") in 1..OfficialReleaseRepository.MAX_PACKAGE) { AppText.get(failureMessage) }
         val hash = java.security.MessageDigest.getInstance("SHA-256")
         file.inputStream().use { input ->
             val buffer = ByteArray(128 * 1024)
@@ -57,7 +81,7 @@ internal object OfficialComponentArchive {
                 hash.update(buffer, 0, n)
             }
         }
-        requireLocalized(hash.digest().joinToString("") { "%02x".format(it) } == entry.getString("sha256")) { AppText.get(R.string.upstream_download_failed) }
+        requireLocalized(hash.digest().joinToString("") { "%02x".format(it) } == entry.getString("sha256")) { AppText.get(failureMessage) }
     }
 
     private suspend fun unpack(zip: ZipFile, destination: File, prefix: String = "") {

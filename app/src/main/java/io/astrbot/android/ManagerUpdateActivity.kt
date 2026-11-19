@@ -90,7 +90,7 @@ class ManagerUpdateActivity : LocalizedActivity() {
                 text = {
                     Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("${candidate.bytes / 1024 / 1024} MiB")
-                        Text(candidate.notes.ifBlank { AppText.get(R.string.manager_update_no_notes) })
+                        ReleaseNotes(candidate.notes.ifBlank { AppText.get(R.string.manager_update_no_notes) })
                         Text(AppText.get(R.string.manager_update_flow_notice), style = MaterialTheme.typography.bodySmall)
                         ManagerActionButton(AppText.get(R.string.manager_update_browser), {
                             review = false

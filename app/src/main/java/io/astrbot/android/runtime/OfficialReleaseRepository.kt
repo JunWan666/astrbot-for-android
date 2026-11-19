@@ -24,12 +24,20 @@ internal class OfficialReleaseRepository(private val context: Context, private v
     private val label = "AstrBot"
     private val cache = File(context.filesDir, "manifests/github-$component.json")
     private val work = File(context.filesDir, "staging/github-$component")
+    private val preferences = context.getSharedPreferences("manager", Context.MODE_PRIVATE)
+    val includePreviews get() = preferences.getBoolean("astrbot-preview-updates", false)
+
+    fun selectPreviews(enabled: Boolean) {
+        check(preferences.edit().putBoolean("astrbot-preview-updates", enabled).commit())
+        if (DurableFiles.exists(cache)) DurableFiles.removeRecord(cache)
+    }
     private val client by lazy { providedClient ?: OkHttpClient.Builder().connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS).callTimeout(15, TimeUnit.MINUTES).followRedirects(false).build() }
 
     fun cached(onlyNewer: Boolean): OnlineUpdateInfo? = runCatching {
         val release = DurableFiles.read(cache) ?: return null
         validate(release, component)
+        if (!includePreviews && release.optBoolean("prerelease", ComponentVersion.preview(release.getString("version")))) return null
         val installed = InstalledVersions.read(context).components.getValue(label)
         info(release).takeIf { compareVersions(it.version, installed) >= if (onlyNewer) 1 else 0 }
     }.getOrNull()
@@ -45,13 +53,14 @@ internal class OfficialReleaseRepository(private val context: Context, private v
     }
 
     private suspend fun fetchRelease(requestedVersion: String? = null): JSONObject {
-        require(requestedVersion == null || requestedVersion.matches(VERSION))
+        require(requestedVersion == null || ComponentVersion.supported(requestedVersion))
         val release = requestedVersion?.let { json("https://api.github.com/repos/$repo/releases/tags/v$it") }
-            ?: latestStableRelease()
-        requireLocalized(!release.getBoolean("draft") && !release.getBoolean("prerelease")) { AppText.get(R.string.upstream_invalid) }
+            ?: if (includePreviews) latestPreviewRelease() else latestStableRelease()
+        requireLocalized(!release.getBoolean("draft") &&
+            (requestedVersion != null || includePreviews || !release.getBoolean("prerelease"))) { AppText.get(R.string.upstream_invalid) }
         val tag = release.getString("tag_name")
         val version = tag.removePrefix("v")
-        requireLocalized(version.matches(VERSION)) { AppText.get(R.string.upstream_invalid) }
+        requireLocalized(ComponentVersion.supported(version)) { AppText.get(R.string.upstream_invalid) }
         require(requestedVersion == null || version == requestedVersion)
         val assets = release.getJSONArray("assets")
         fun asset(name: String): JSONObject {
@@ -70,7 +79,21 @@ internal class OfficialReleaseRepository(private val context: Context, private v
         }
         return JSONObject().put("schema", 1).put("origin", "github").put("component", component).put("version", version)
             .put("id", "github-$component-${release.getLong("id")}").put("notes", release.optString("body").take(8000))
+            .put("prerelease", release.getBoolean("prerelease") || ComponentVersion.preview(version))
             .put("commit", commit).put("files", files).also { validate(it, component) }
+    }
+
+    private suspend fun latestPreviewRelease(): JSONObject {
+        val candidates = mutableListOf<JSONObject>()
+        for (page in 1..5) {
+            val releases = JSONArray(jsonText("https://api.github.com/repos/$repo/releases?per_page=20&page=$page"))
+            candidates += (0 until releases.length()).mapNotNull(releases::optJSONObject).filter {
+                !it.optBoolean("draft", true) && ComponentVersion.supported(it.optString("tag_name").removePrefix("v"))
+            }
+            if (releases.length() < 20) break
+        }
+        return candidates.maxWithOrNull { a, b -> compareVersions(a.getString("tag_name").removePrefix("v"), b.getString("tag_name").removePrefix("v")) }
+            ?: throw LocalizedArgumentException(AppText.get(R.string.upstream_no_stable))
     }
 
     private suspend fun latestStableRelease(): JSONObject {
@@ -119,6 +142,7 @@ internal class OfficialReleaseRepository(private val context: Context, private v
         val release = requireNotNull(DurableFiles.read(cache))
         validate(release, component)
         require(release.getString("id") == id)
+        require(includePreviews || !release.optBoolean("prerelease", ComponentVersion.preview(release.getString("version"))))
         DurableFiles.delete(work); check(work.mkdirs())
         try {
             val files = release.getJSONArray("files")
@@ -226,20 +250,20 @@ internal class OfficialReleaseRepository(private val context: Context, private v
                 .maxWithOrNull { a, b -> compareVersions(a.getString("tag_name").removePrefix("v"), b.getString("tag_name").removePrefix("v")) }
         fun repository(component: String) = when (component) { "astrbot" -> "AstrBotDevs/AstrBot"; else -> error("Unknown component") }
         fun compareVersions(a: String, b: String): Int {
-            require(a.matches(VERSION) && b.matches(VERSION))
-            return a.split('.').map(String::toInt).zip(b.split('.').map(String::toInt)).firstOrNull { it.first != it.second }
-                ?.let { it.first.compareTo(it.second) } ?: 0
+            return ComponentVersion.compare(a, b)
         }
+        fun channel(value: JSONObject) = AppText.get(if (value.optBoolean("prerelease", ComponentVersion.preview(value.getString("version"))))
+            R.string.upstream_preview_channel else R.string.upstream_channel)
         fun info(value: JSONObject): OnlineUpdateInfo {
             val files = value.getJSONArray("files")
             val sizes = (0 until files.length()).map { files.getJSONObject(it).getLong("bytes") }
-            return OnlineUpdateInfo(value.getString("id"), value.getString("version"), AppText.get(R.string.upstream_channel),
+            return OnlineUpdateInfo(value.getString("id"), value.getString("version"), channel(value),
                 value.getString("notes"), if (0L in sizes) 0 else sizes.sum())
         }
         fun validate(value: JSONObject, component: String) {
             requireLocalized(value.getInt("schema") == 1 && value.getString("origin") == "github" && value.getString("component") == component) { AppText.get(R.string.upstream_invalid) }
             val repo = repository(component)
-            val version = value.getString("version"); require(version.matches(VERSION))
+            val version = value.getString("version"); require(ComponentVersion.supported(version))
             require(value.getString("id").matches(Regex("github-$component-[0-9]+")))
             require(value.getString("notes").length <= 8000)
             val files = value.getJSONArray("files")

@@ -2,6 +2,7 @@ package io.astrbot.android.runtime
 
 import io.astrbot.android.requireLocalized
 import io.astrbot.android.LocalizedStateException
+import io.astrbot.android.LocalizedFailure
 
 import io.astrbot.android.AppText
 import io.astrbot.android.R
@@ -13,7 +14,6 @@ import io.astrbot.android.core.LocalEndpoint
 import io.astrbot.android.core.ServiceId
 import org.json.JSONObject
 import org.json.JSONArray
-import org.json.JSONTokener
 import java.io.File
 import java.security.SecureRandom
 
@@ -31,7 +31,7 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
     fun prepareDefaults() {
         listOf("home", "astrbot/data", "manager").forEach { File(persistent, it).mkdirs() }
         val astrbot = File(persistent, "astrbot/data/cmd_config.json")
-        if (!astrbot.exists()) {
+        if (!DurableFiles.exists(astrbot)) {
             writeNew(File(persistent, "manager/astrbot-initial-password"), "Aa7" + secret(20))
             writeNew(astrbot, JSONObject().put("dashboard", JSONObject()
                 .put("host", "127.0.0.1").put("port", ServiceId.ASTRBOT.defaultPort)).put("platform", JSONArray()).toString(2))
@@ -48,19 +48,22 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
             requireLocalized(selected.length() <= 8 * 1024 * 1024) { AppText.get(R.string.ui_configuration_file_too_large) }
             JSONObject(selected.inputStream().bufferedReader(Charsets.UTF_8).use { it.readText() }.removePrefix("\uFEFF"))
         } else JSONObject()
-        val config = if (document.has("dashboard")) document.getJSONObject("dashboard") else JSONObject()
-        val enabled = !config.has("enable") || config.getBoolean("enable")
+        val config = if (document.has("dashboard")) document.optJSONObject("dashboard")
+            ?: throw LocalizedStateException(AppText.get(R.string.upstream_dashboard_config_invalid)) else JSONObject()
+        val enabled = !config.has("enable") || (config.opt("enable") as? Boolean
+            ?: throw LocalizedStateException(AppText.get(R.string.upstream_dashboard_enabled_invalid)))
         if (!enabled) WebUiConnection(enabled = false, note = AppText.get(R.string.ui_webui_is_disabled_in_project_configuration_the_service_process))
         else {
-            val host = if (config.has("host")) config.getString("host").trim() else "127.0.0.1"
+            val host = if (config.has("host")) config.opt("host") as? String else "127.0.0.1"
             val loopback = when (host) {
                 "0.0.0.0", "127.0.0.1", "" -> "127.0.0.1"
                 "::", "::1", "[::]", "[::1]" -> "::1"
                 "localhost" -> "localhost"
-                else -> error(AppText.get(R.string.ui_the_listen_address_cannot_be_used_as_a_local))
+                else -> throw LocalizedStateException(AppText.get(R.string.upstream_dashboard_host_invalid))
             }
             val rawPort = if (config.has("port")) config.get("port").toString() else id.defaultPort.toString()
-            val port = rawPort.toIntOrNull() ?: error(AppText.get(R.string.ui_webui_port_must_be_an_integer_existing_configuration_is))
+            val port = rawPort.toIntOrNull()?.takeIf { it in 1024..65535 }
+                ?: throw LocalizedStateException(AppText.get(R.string.upstream_dashboard_port_invalid))
             val https = run {
                 val ssl = config.optJSONObject("ssl")
                 ssl?.optBoolean("enable") == true && listOf("cert_file", "key_file").all {
@@ -71,9 +74,13 @@ class RuntimeConfiguration(private val persistent: File, private val rootfs: Fil
                 if (https) AppText.get(R.string.ui_https_uses_system_certificate_verification_for_untrusted_certificates_ch) else null,
                 lanEnabled = host == "0.0.0.0")
         }
-    } catch (_: Exception) {
+    } catch (failure: Exception) {
         // Never expose raw JSON parse failures: the source line can contain credentials.
-        WebUiConnection(note = AppText.get(R.string.ui_webui_address_or_configuration_is_unrecognized_the_original_file))
+        WebUiConnection(note = if (failure is LocalizedFailure) failure.message else AppText.get(R.string.upstream_dashboard_config_invalid))
+    }
+
+    fun requireValidDashboard(): WebUiConnection = read(ServiceId.ASTRBOT).also {
+        if (it.enabled && it.endpoint == null) throw LocalizedStateException(it.note ?: AppText.get(R.string.upstream_dashboard_config_invalid))
     }
 
     /** One atomic file commit: interrupted changes leave either the old or requested host. */

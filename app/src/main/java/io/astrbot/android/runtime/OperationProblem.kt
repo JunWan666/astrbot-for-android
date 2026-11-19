@@ -33,7 +33,13 @@ data class OperationProblem(
         fun failed(action: String, phase: String, message: String, timeout: Boolean = false) = OperationProblem(
             code = if (timeout) "OPERATION_TIMEOUT" else "OPERATION_FAILED", operation = action, stage = safe(phase).take(256),
             title = AppText.get(R.string.problem_operation_failed, label(action)),
-            summary = SecretRedactor.redact(message).take(2000), nextStep = AppText.get(R.string.problem_general_next))
+            summary = SecretRedactor.redact(message).take(2000),
+            nextStep = AppText.get(when (action) {
+                "prepare-update", "clear-update-import", "apply-update", "update-online", "download-update", "rollback" -> R.string.upstream_failure_next
+                else -> R.string.problem_general_next
+            }),
+            actions = if (action in setOf("prepare-update", "clear-update-import")) emptyList() else
+                listOf(ProblemAction.CHECK_ENVIRONMENT, ProblemAction.SHARE_DIAGNOSTICS))
 
         private fun label(action: String): String = AppText.get(when {
             action == "repair-runtime" -> R.string.ui_repair_runtime_resources
@@ -42,6 +48,10 @@ data class OperationProblem(
             action in setOf("start", "restart") -> R.string.problem_start_services
             action.contains("diagnostics") -> R.string.problem_export_diagnostics
             action.contains("backup") || action == "restore" -> R.string.ui_backup_and_restore
+            action in setOf("prepare-update", "clear-update-import") -> R.string.ui_import_update_package
+            action in setOf("apply-update", "update-online") -> R.string.upstream_install_title
+            action == "download-update" -> R.string.upstream_download_install
+            action == "rollback" -> R.string.ui_roll_back_astrbot
             action.contains("update") || action.contains("runtime") -> R.string.ui_check_for_updates
             action.startsWith("desktop-") -> R.string.desktop_name
             action.startsWith("cpolar-") -> R.string.cpolar_name

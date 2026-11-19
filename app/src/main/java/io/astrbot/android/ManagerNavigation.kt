@@ -35,7 +35,7 @@ internal enum class SettingsRoute(private val titleResource: Int) {
 internal enum class ServiceRoute(private val titleResource: Int) { STATUS(R.string.ui_overview), CONNECTION(R.string.ui_connection_eebb5), CREDENTIALS(R.string.ui_credentials), LOGS(R.string.ui_logs_894b8), LAN(R.string.ui_connection_eebb5) ;
     val title: String get() = AppText.get(titleResource)
 }
-internal enum class SettingAction { VERSIONS, CHECK_UPDATE, CHECK_APP_UPDATE, IMPORT_UPDATE, ONLINE_UPDATE, APPLY_UPDATE, ROLLBACK,
+internal enum class SettingAction { VERSIONS, CHECK_UPDATE, UPDATE_CHANNEL, CHECK_APP_UPDATE, IMPORT_UPDATE, ONLINE_UPDATE, APPLY_UPDATE, ROLLBACK,
     APPLY_RUNTIME, ROLLBACK_RUNTIME, CREATE_BACKUP, BACKUPS, BACKUP_LIMITS, EXPORT_PORTABLE, IMPORT_PORTABLE,
     PORTABLE_SCOPE, DISCARD_PORTABLE, LOGS, RUNTIME_LOGS, CLEAR_LOGS, DIAGNOSTICS, EXTENSIONS, APP_SETTINGS, BATTERY, LICENSES,
     NOTIFICATIONS, UNRESTRICTED, AUTOSTART, TASK_LOCK, BACKGROUND_HELP, AUTOMATIC_UPDATES, ENVIRONMENT_CHECK, STORAGE_USAGE, DATA_RETENTION, LANGUAGE, PERMISSIONS }
@@ -198,14 +198,17 @@ internal data class ManagerMenuItem(val title: String, val icon: Int, val subtit
             destination(AppText.get(R.string.ui_about), R.drawable.ic_info, AppText.get(R.string.ui_updates_app_version_and_licenses), SettingsRoute.ABOUT))
         SettingsRoute.PROGRAMS -> listOf(
             action(AppText.get(R.string.ui_check_astrbot_updates), R.drawable.ic_update, AppText.get(R.string.upstream_check_hint), ready, SettingAction.CHECK_UPDATE),
-            action(AppText.get(R.string.ui_import_update_package), R.drawable.ic_import, AppText.get(R.string.ui_select_a_signed_local_maintenance_package), ready, SettingAction.IMPORT_UPDATE),
+            action(AppText.get(R.string.ui_import_update_package), R.drawable.ic_import, AppText.get(R.string.upstream_import_hint), ready, SettingAction.IMPORT_UPDATE),
             action(AppText.get(R.string.ui_view_prepared_update), R.drawable.ic_update, if (state.preparedUpdate == null) AppText.get(R.string.ui_no_update_package_prepared) else AppText.get(R.string.ui_review_before_installation), state.preparedUpdate != null && !state.busy, SettingAction.APPLY_UPDATE),
             action(AppText.get(R.string.ui_roll_back_astrbot), R.drawable.ic_restart, state.rollback?.let { AppText.get(R.string.ui_restore_version, it.version) } ?: AppText.get(R.string.ui_no_program_rollback_available), state.rollback != null && !state.busy, SettingAction.ROLLBACK),
             action(AppText.get(R.string.ui_automatic_update_checks), R.drawable.ic_settings, when {
                 !updateChannelConfigured -> AppText.get(R.string.ui_no_online_update_channel_configured)
                 automaticUpdateEnabled -> AppText.get(R.string.ui_on_check_daily_when_opening_the_app)
                 else -> AppText.get(R.string.ui_off_tap_to_configure)
-            }, action = SettingAction.AUTOMATIC_UPDATES))
+            }, action = SettingAction.AUTOMATIC_UPDATES),
+            action(AppText.get(R.string.upstream_channel_title), R.drawable.ic_settings,
+                AppText.get(if (state.previewUpdates) R.string.upstream_preview_channel else R.string.upstream_channel),
+                !state.busy && BuildConfig.UPDATE_CATALOG_URL == "https://api.github.com/repos/AstrBotDevs/AstrBot/releases/latest", SettingAction.UPDATE_CHANNEL))
         SettingsRoute.ENVIRONMENT -> listOf(
             action(AppText.get(R.string.ui_environment_check_and_repair), R.drawable.ic_settings, AppText.get(R.string.ui_distinguish_runtime_issues_from_webui_configuration_issues), !state.busy, SettingAction.ENVIRONMENT_CHECK),
             action(AppText.get(R.string.ui_upgrade_bundled_runtime), R.drawable.ic_update, state.runtimeUpdate?.name ?: AppText.get(R.string.ui_runtime_matches_the_bundled_resources), state.runtimeUpdate != null && !state.busy, SettingAction.APPLY_RUNTIME),

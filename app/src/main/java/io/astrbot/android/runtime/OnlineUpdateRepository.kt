@@ -47,7 +47,10 @@ internal class OnlineUpdateRepository(
     private val partial = File(downloadDirectory, "package.part")
     private val receipt = File(downloadDirectory, "download.json")
     val configured get() = source.isNotEmpty()
-    internal val sourceScope by lazy { scopeFor(context, source) }
+    val official get() = upstream != null
+    val includePreviews get() = upstream?.includePreviews ?: false
+    fun selectPreviews(enabled: Boolean) = requireNotNull(upstream).selectPreviews(enabled)
+    internal val sourceScope get() = scopeFor(context, source + if (includePreviews) "#preview" else "")
 
     private data class Entry(val info: OnlineUpdateInfo, val url: HttpUrl, val sha256: String,
                              val environment: String, val abi: String, val minAppCode: Int)

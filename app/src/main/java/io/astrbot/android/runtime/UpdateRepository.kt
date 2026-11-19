@@ -27,6 +27,7 @@ import java.util.zip.ZipFile
 
 data class UpdateInfo(val version: String, val channel: String, val notes: String, val bytes: Long)
 data class RollbackInfo(val version: String, val snapshotId: String)
+data class PendingUpdateArchive(val kind: String, val version: String)
 
 /** Transactions replace one interpreted program and retain a matching data recovery point. */
 class UpdateRepository(private val context: Context, private val component: String = "astrbot") {
@@ -41,9 +42,13 @@ class UpdateRepository(private val context: Context, private val component: Stri
     private val journal = File(files, "operations/update.json")
     private val rollback = File(files, "manifests/rollback.json")
     private val officialProof = File(work, "official-proof.json")
+    private val pendingImport = File(files, "staging/astrbot-import-pending.zip")
     private val backups = BackupRepository(files)
     val hasPendingUpdate get() = DurableFiles.exists(journal)
     val preparedInfo: UpdateInfo? get() = DurableFiles.read(prepared)?.let(::info)
+    val pendingImportInfo: PendingUpdateArchive? get() = pendingImport.takeIf { it.isFile }?.let { file ->
+        runCatching { OfficialImportedArchive.inspect(file).let { PendingUpdateArchive(it.kind, it.version) } }.getOrNull()
+    }
     val rollbackInfo: RollbackInfo? get() = DurableFiles.read(rollback)?.let {
         RollbackInfo(it.getJSONObject("oldVersions").getString(label), it.getString("snapshotId"))
     }
@@ -51,6 +56,68 @@ class UpdateRepository(private val context: Context, private val component: Stri
         .map { it.getString("snapshotId") }.toSet()
 
     suspend fun prepare(uri: Uri, progress: (String) -> Unit): UpdateInfo = prepareExpected(uri, null, progress)
+
+    suspend fun clearPendingImport() = withContext(Dispatchers.IO) { DurableFiles.delete(pendingImport) }
+
+    /** A single matching half remains available after the picker or app closes. */
+    suspend fun importPackages(uris: List<Uri>, progress: (String) -> Unit): UpdateInfo? = withContext(Dispatchers.IO) {
+        requireLocalized(uris.size in 1..2) { AppText.get(R.string.upstream_import_pair) }
+        checkLocalized(!hasPendingUpdate && !backups.hasPendingRestore) { AppText.get(R.string.ui_complete_the_previous_maintenance_operation_first) }
+        val directory = File(files, "staging/astrbot-import")
+        DurableFiles.delete(directory); check(directory.mkdirs())
+        try {
+            progress(AppText.get(R.string.ui_reading_update_package))
+            val imports = uris.mapIndexed { index, uri ->
+                val target = File(directory, "selected-$index.zip")
+                context.contentResolver.openInputStream(uri).use { input ->
+                    requireNotNullLocalized(input) { AppText.get(R.string.ui_cannot_read_the_selected_update_package) }
+                    FileOutputStream(target).use { output -> boundedCopy(input, output, MAX_PACKAGE); output.fd.sync() }
+                }
+                target
+            }
+            val signed = imports.any { file -> ZipFile(file).use { zip ->
+                listOf("manifest.json", "manifest.sig", "program.tar.bin").any { zip.getEntry(it) != null }
+            } }
+            val result = if (signed) {
+                requireLocalized(imports.size == 1) { AppText.get(R.string.upstream_import_pair) }
+                prepareExpected(Uri.fromFile(imports.single()), null, progress)
+            } else {
+                val picked = imports.map { it to OfficialImportedArchive.inspect(it) }
+                val single = picked.singleOrNull()
+                val previous = pendingImportInfo
+                val combined = if (single != null && !single.second.embeddedDashboard &&
+                    previous != null && previous.kind != single.second.kind) {
+                    requireLocalized(previous.version == single.second.version) {
+                        AppText.get(R.string.upstream_import_version_conflict, previous.version, single.second.version)
+                    }
+                    listOf(pendingImport, single.first)
+                } else imports
+                if (combined.size == 1 && single != null && !single.second.embeddedDashboard) {
+                    Os.rename(single.first.path, pendingImport.path)
+                    DurableFiles.sync(pendingImport.parentFile!!)
+                    return@withContext null
+                }
+                prepareLocalArchives(combined, progress)
+            }
+            clearPendingImport()
+            result
+        } catch (_: java.util.zip.ZipException) {
+            throw io.astrbot.android.LocalizedArgumentException(AppText.get(R.string.upstream_import_format))
+        } finally { DurableFiles.delete(directory) }
+    }
+
+    private suspend fun prepareLocalArchives(imports: List<File>, progress: (String) -> Unit): UpdateInfo {
+        val selection = OfficialImportedArchive.select(imports)
+        DurableFiles.delete(work); check(work.mkdirs())
+        try {
+            progress(AppText.get(R.string.upstream_import_checking))
+            selection.source.copyTo(packageFile)
+            val dashboard = selection.dashboard?.copyTo(File(work, "dashboard.zip"))
+            val release = OfficialImportedArchive.describe(OfficialImportedArchive.select(listOfNotNull(packageFile, dashboard)))
+            DurableFiles.write(File(work, "local-release.json"), release)
+            return verifyAndExtract(progress)
+        } catch (failure: Throwable) { DurableFiles.delete(work); throw failure }
+    }
 
     internal suspend fun prepareExpected(uri: Uri, expectedVersion: String?, progress: (String) -> Unit): UpdateInfo = withContext(Dispatchers.IO) {
         check(component == "astrbot")
@@ -84,13 +151,19 @@ class UpdateRepository(private val context: Context, private val component: Stri
 
     private suspend fun verifyAndExtract(progress: (String) -> Unit, expectedVersion: String? = null): UpdateInfo {
         val github = DurableFiles.read(File(work, "github-release.json"))
-        progress(AppText.get(if (github == null) R.string.ui_verifying_update_signature_and_compatibility else R.string.upstream_verifying))
+        val local = DurableFiles.read(File(work, "local-release.json"))
+        check(github == null || local == null)
+        progress(AppText.get(when { local != null -> R.string.upstream_import_checking
+            github != null -> R.string.upstream_verifying
+            else -> R.string.ui_verifying_update_signature_and_compatibility }))
         DurableFiles.delete(staged)
         if (DurableFiles.exists(prepared)) DurableFiles.removeRecord(prepared)
         requireLocalized(packageFile.isFile && packageFile.length() <= MAX_PACKAGE) { AppText.get(R.string.ui_update_package_is_missing_or_too_large) }
-        if (github != null) {
+        if (github != null || local != null) {
             progress(AppText.get(R.string.upstream_preparing, label))
-            val value = OfficialComponentArchive.extract(context, github, packageFile, File(work, "dashboard.zip"), staged)
+            val value = if (local != null) OfficialComponentArchive.extractLocal(local, packageFile,
+                File(work, "dashboard.zip").takeIf { local.getJSONArray("files").length() == 2 }, staged)
+                else OfficialComponentArchive.extract(context, requireNotNull(github), packageFile, File(work, "dashboard.zip"), staged)
             validateProgram(staged, value.getString("version"))
             if (component == "astrbot") checkPythonDependencies(progress)
             DurableFiles.write(prepared, value)
@@ -113,7 +186,13 @@ class UpdateRepository(private val context: Context, private val component: Stri
             requireLocalized(expectedVersion == null || value.getString("version") == expectedVersion) { AppText.get(R.string.ui_update_package_version_differs_from_the_signed_catalog) }
             requireLocalized(value.getInt("minAppCode") <= BuildConfig.VERSION_CODE) { AppText.get(R.string.ui_this_update_requires_a_newer_manager_apk) }
             val installed = InstalledVersions.read(context)
-            requireLocalized(value.getString("abi") == installed.components["架构"] && value.getString("environmentKey") == installed.environmentKey) {
+            val environments = value.optJSONArray("compatibleEnvironmentKeys")?.let { keys ->
+                require(keys.length() in 1..8)
+                (0 until keys.length()).map(keys::getString).also { items ->
+                    require(items.distinct().size == items.size && items.all { it.matches(Regex("[a-f0-9]{64}")) } && value.getString("environmentKey") in items)
+                }
+            } ?: listOf(value.getString("environmentKey"))
+            requireLocalized(value.getString("abi") == installed.components["架构"] && installed.environmentKey in environments) {
                 AppText.get(R.string.ui_this_update_does_not_match_the_current_runtime_or)
             }
             val count = value.getInt("entries")
@@ -138,6 +217,7 @@ class UpdateRepository(private val context: Context, private val component: Stri
             } finally { payload.delete() }
             value
         }
+        checkPythonDependencies(progress)
         DurableFiles.write(prepared, manifest)
         return info(manifest)
     }

@@ -52,7 +52,11 @@ internal class AutomaticUpdateChecks(
     },
 ) {
     val settings = AutomaticUpdateSettings(context)
-    private val sourceScope by lazy { if (source.isEmpty()) null else runCatching { OnlineUpdateRepository.scopeFor(context, source) }.getOrNull() }
+    private val sourceScope get() = if (source.isEmpty()) null else runCatching {
+        val previews = source == "https://api.github.com/repos/AstrBotDevs/AstrBot/releases/latest" &&
+            context.getSharedPreferences("manager", Context.MODE_PRIVATE).getBoolean("astrbot-preview-updates", false)
+        OnlineUpdateRepository.scopeFor(context, source + if (previews) "#preview" else "")
+    }.getOrNull()
     val configured get() = sourceScope != null
 
     suspend fun checkIfDue(eligible: () -> Boolean): Unit = withContext(Dispatchers.IO) {
@@ -70,7 +74,7 @@ internal class AutomaticUpdateChecks(
             gate.withLock {
                 currentCoroutineContext().ensureActive()
                 // User may disable the option, leave the app or begin maintenance during IO.
-                if (settings.enabled && eligible()) {
+                if (settings.enabled && eligible() && scope == sourceScope) {
                     val result = repository.acceptCatalog(envelope)
                     settings.succeeded(scope, now())
                     publish(result)

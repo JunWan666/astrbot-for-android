@@ -124,6 +124,10 @@ class MainActivity : LocalizedActivity() {
         var restoreBackup by remember { mutableStateOf<BackupInfo?>(null) }
         var deleteBackup by remember { mutableStateOf<BackupInfo?>(null) }
         var confirmUpdate by remember { mutableStateOf(false) }
+        var showUpdateImport by rememberSaveable { mutableStateOf(false) }
+        var importRequest by rememberSaveable { mutableStateOf<String?>(null) }
+        var importReady by rememberSaveable { mutableStateOf(false) }
+        var importMessage by rememberSaveable { mutableStateOf<String?>(null) }
         var confirmRollback by remember { mutableStateOf(false) }
         var confirmRuntime by remember { mutableStateOf<String?>(null) }
         var confirmPortableExport by remember { mutableStateOf(false) }
@@ -134,6 +138,7 @@ class MainActivity : LocalizedActivity() {
         var viewOnlineUpdate by remember { mutableStateOf(false) }
         var requestedComponentCheck by remember { mutableLongStateOf(-1) }
         var showAutomaticUpdates by remember { mutableStateOf(false) }
+        var showUpdateChannel by remember { mutableStateOf(false) }
         var showLanguage by remember { mutableStateOf(false) }
         var storagePrompt by remember { mutableStateOf<Pair<RuntimeStorageAdvice, () -> Unit>?>(null) }
         val automaticSettingsFlow = remember { automaticUpdates.settings.observeEnabled() }
@@ -147,10 +152,22 @@ class MainActivity : LocalizedActivity() {
             startActivity(Intent(this@MainActivity, WebUiActivity::class.java).putExtra("serviceId", ServiceId.ASTRBOT.name)
                 .apply { if (route in AstrBotWebRoutes.allowed) putExtra(AstrBotWebRoutes.EXTRA, route) })
         }
-        val importUpdate = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            if (uri != null) {
-                runCatching { contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-                RuntimeService.command(this@MainActivity, "prepare-update", sourceUri = uri.toString())
+        val importUpdate = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            if (uris.isNotEmpty()) {
+                if (uris.size > 2) importMessage = AppText.get(R.string.upstream_import_pair)
+                else {
+                    importMessage = null
+                    importReady = false
+                    importRequest = RuntimeService.command(this@MainActivity, "prepare-update",
+                        sourceUri = org.json.JSONArray(uris.map { it.toString() }).toString())
+                }
+            }
+        }
+        LaunchedEffect(importRequest, state.completedOperation, state.busy) {
+            if (importRequest != null && state.completedOperation == importRequest && !state.busy) {
+                importReady = state.error == null && state.pendingUpdateArchive == null && state.preparedUpdate != null
+                importMessage = state.error
+                importRequest = null
             }
         }
         val exportPortable = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/zip")) { uri ->
@@ -230,11 +247,17 @@ class MainActivity : LocalizedActivity() {
             when (action) {
                 SettingAction.VERSIONS -> showVersions = true
                 SettingAction.CHECK_UPDATE -> { requestedComponentCheck = state.componentCheckSerial; viewOnlineUpdate = true; command("check-update") }
+                SettingAction.UPDATE_CHANNEL -> showUpdateChannel = true
                 SettingAction.CHECK_APP_UPDATE -> startActivity(Intent(this@MainActivity, ManagerUpdateActivity::class.java))
                 SettingAction.STORAGE_USAGE -> startActivity(Intent(this@MainActivity, StorageUsageActivity::class.java))
                 SettingAction.AUTOMATIC_UPDATES -> showAutomaticUpdates = true
                 SettingAction.LANGUAGE -> showLanguage = true
-                SettingAction.IMPORT_UPDATE -> importUpdate.launch(arrayOf("application/zip", "application/octet-stream"))
+                SettingAction.IMPORT_UPDATE -> {
+                    viewOnlineUpdate = false
+                    importReady = false
+                    importMessage = null
+                    showUpdateImport = true
+                }
                 SettingAction.ONLINE_UPDATE -> {
                     requestedComponentCheck = if (state.latestUpdate == null) state.componentCheckSerial else -1
                     if (state.latestUpdate == null) command("check-update")
@@ -496,12 +519,39 @@ class MainActivity : LocalizedActivity() {
                 dismissButton = { TextButton(onClick = { deleteBackup = null }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
         val updateLabel = "AstrBot"
+        if (showUpdateChannel) AlertDialog(onDismissRequest = { showUpdateChannel = false },
+            title = { Text(AppText.get(R.string.upstream_channel_title)) }, text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(AppText.get(R.string.upstream_preview_notice))
+                    for (preview in listOf(false, true)) ManagerActionButton(
+                        AppText.get(if (preview) R.string.upstream_preview_channel else R.string.upstream_channel), {
+                            showUpdateChannel = false
+                            command("set-update-channel", updateId = if (preview) "preview" else "stable")
+                        }, Modifier.fillMaxWidth(), if (preview == state.previewUpdates) ActionTone.PRIMARY else ActionTone.NEUTRAL, !state.busy)
+                }
+            }, confirmButton = { TextButton(onClick = { showUpdateChannel = false }) { Text(AppText.get(R.string.ui_close)) } })
         val stagedUpdate = state.preparedUpdate
         val onlineVersion = state.latestUpdate
+        if (showUpdateImport) LocalUpdateImportDialog(
+            pending = state.pendingUpdateArchive,
+            ready = stagedUpdate.takeIf { importReady },
+            progress = state.phase.takeIf { importRequest != null && state.busy },
+            error = importMessage,
+            busy = state.busy,
+            onChoose = { importUpdate.launch(arrayOf("application/zip", "application/x-zip-compressed", "application/octet-stream")) },
+            onClear = {
+                importMessage = null
+                command("clear-update-import")
+            },
+            onInstall = { showUpdateImport = false; command("apply-update") },
+            onDismiss = { showUpdateImport = false })
         if (confirmUpdate) stagedUpdate?.let { update ->
             AlertDialog(onDismissRequest = { confirmUpdate = false }, title = { Text(AppText.get(R.string.ui_update_to, updateLabel, update.version)) },
-                text = { Text(AppText.get(R.string.ui_n_n_nboth_services_will_stop_briefly_data_is, update.channel, update.notes) +
-                    AppText.get(R.string.ui_astrbot_starts_to_check_its_local_dashboard)) },
+                text = { Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(update.channel)
+                    ReleaseNotes(update.notes, baseUrl = "https://github.com/AstrBotDevs/AstrBot/")
+                    Text(AppText.get(R.string.upstream_flow_hint) + AppText.get(R.string.ui_astrbot_starts_to_check_its_local_dashboard), style = MaterialTheme.typography.bodySmall)
+                } },
                 confirmButton = { TextButton(onClick = { confirmUpdate = false; command("apply-update") }) { Text(AppText.get(R.string.ui_back_up_and_update)) } },
                 dismissButton = { TextButton(onClick = { confirmUpdate = false }) { Text(AppText.get(R.string.ui_cancel)) } })
         }
@@ -519,7 +569,7 @@ class MainActivity : LocalizedActivity() {
             AlertDialog(onDismissRequest = { viewOnlineUpdate = false }, title = { Text("$updateLabel ${update.version}") },
                 text = { Column(Modifier.heightIn(max = 400.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("${update.channel} · ${if (update.bytes > 0) Formatter.formatFileSize(this@MainActivity, update.bytes) else AppText.get(R.string.upstream_size_unknown)}")
-                    Text(update.notes)
+                    ReleaseNotes(update.notes, baseUrl = "https://github.com/AstrBotDevs/AstrBot/")
                     Text(if (canUpgrade) AppText.get(R.string.upstream_flow_hint) else
                         AppText.get(R.string.upstream_latest, updateLabel, update.version), style = MaterialTheme.typography.bodySmall)
                 } },
