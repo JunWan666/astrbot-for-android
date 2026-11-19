@@ -31,6 +31,9 @@
     <string name="tasks_clear_log">Clear logs</string>
     <string name="tasks_clear_log_confirm">Clear all logs for this task? Its process and program files are unaffected.</string>
     <string name="tasks_log_hint">Only recent output within a size limit is retained; common credentials are redacted. Task commands and output are excluded from manager diagnostics.</string>
+    <string name="tasks_initial_password">Initial login password</string>
+    <string name="tasks_show_password">Show</string>
+    <string name="tasks_hide_password">Hide</string>
     <string name="tasks_read_failed">Could not read task configuration. The original file is preserved. Retry and check free storage if this persists.</string>
     <string name="tasks_history_failed">Task status could not be saved. Check free storage. The app still manages its process.</string>
     <string name="tasks_limit">Up to %1$d tasks can be saved. Remove an unused task first.</string>

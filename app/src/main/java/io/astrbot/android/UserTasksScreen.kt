@@ -1,8 +1,12 @@
 package io.astrbot.android
 
 import android.content.ClipData
+import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Build
+import android.os.PersistableBundle
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
@@ -221,8 +226,16 @@ import kotlinx.coroutines.withContext
     val manager by RuntimeStore.state.collectAsStateWithLifecycle()
     val repository = remember { UserTaskRepository(context) }
     val lifecycle = LocalLifecycleOwner.current
+    val passwords by UserTaskStore.initialPasswords.collectAsStateWithLifecycle()
+    val password = passwords[id]
+    var showPassword by remember(id, password) { mutableStateOf(false) }
     var output by remember { mutableStateOf("") }
     var confirmClear by remember { mutableStateOf(false) }
+    DisposableEffect(lifecycle, id, password) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) showPassword = false }
+        lifecycle.lifecycle.addObserver(observer)
+        onDispose { lifecycle.lifecycle.removeObserver(observer) }
+    }
     LaunchedEffect(id, lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             while (isActive) {
@@ -243,6 +256,27 @@ import kotlinx.coroutines.withContext
                     TextButton(onClick = onDismiss) { Text(AppText.get(R.string.ui_close)) }
                 }
                 Text(AppText.get(R.string.tasks_log_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (password != null) Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainerLow) {
+                    Column(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp)) {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(AppText.get(R.string.tasks_initial_password), Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
+                            TextButton(onClick = { showPassword = !showPassword }) {
+                                Text(AppText.get(if (showPassword) R.string.tasks_hide_password else R.string.tasks_show_password))
+                            }
+                            TextButton(onClick = {
+                                val label = AppText.get(R.string.tasks_initial_password)
+                                val clip = ClipData.newPlainText(label, password)
+                                if (Build.VERSION.SDK_INT >= 33) clip.description.extras = PersistableBundle().apply {
+                                    putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true)
+                                }
+                                context.getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
+                                Toast.makeText(context, AppText.get(R.string.ui_copied, label), Toast.LENGTH_SHORT).show()
+                            }) { Text(AppText.get(R.string.ui_copy_password)) }
+                        }
+                        if (showPassword) Text(password, Modifier.padding(bottom = 8.dp),
+                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace))
+                    }
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ManagerActionButton(AppText.get(R.string.ui_copy), {
                         context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText(name, output))

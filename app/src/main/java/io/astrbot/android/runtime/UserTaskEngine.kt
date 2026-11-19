@@ -4,8 +4,10 @@ import android.content.Context
 import io.astrbot.android.AppText
 import io.astrbot.android.R
 import io.astrbot.android.checkLocalized
+import io.astrbot.android.core.SecretRedactor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -19,6 +21,20 @@ data class UserTasksState(val loaded: Boolean = false, val tasks: List<UserTaskS
 
 object UserTaskStore {
     val state = MutableStateFlow(UserTasksState())
+    // Only the explicit initial-login password is kept, for the lifetime of the current run.
+    private val passwords = MutableStateFlow<Map<String, String>>(emptyMap())
+    internal val initialPasswords = passwords.asStateFlow()
+
+    internal fun captureInitialPassword(id: String, line: String) {
+        if (!line.contains("password", ignoreCase = true)) return
+        val password = SecretRedactor.initialLoginPassword(line) ?: return
+        passwords.update { it + (id to password) }
+    }
+
+    internal fun forgetInitialPassword(id: String) {
+        passwords.update { it - id }
+    }
+
     @Synchronized fun load(context: Context) {
         if (state.value.loaded) return
         runCatching { UserTaskRepository(context).read() }
@@ -41,6 +57,7 @@ class UserTaskEngine(context: Context, private val scope: CoroutineScope) {
     }
     private val sessions = ConcurrentHashMap<String, Session>()
     private val historyGate = Any()
+    private val outputGate = Any()
 
     private fun requireLoaded() {
         UserTaskStore.load(app)
@@ -80,7 +97,10 @@ class UserTaskEngine(context: Context, private val scope: CoroutineScope) {
             record(id)
             throw io.astrbot.android.LocalizedStateException(AppText.get(R.string.tasks_start_failed))
         }
-        sessions[id] = current
+        synchronized(outputGate) {
+            UserTaskStore.forgetInitialPassword(id)
+            sessions[id] = current
+        }
         runCatching { current.process.outputStream.close() } // Non-interactive tasks never wait for terminal input.
         UserTaskStore.update(id) { it.copy(phase = UserTaskPhase.RUNNING) }
         record(id)
@@ -88,6 +108,10 @@ class UserTaskEngine(context: Context, private val scope: CoroutineScope) {
             var readFailed = false
             try {
                 val log = repository.log(id)
+                fun append(line: String) = synchronized(outputGate) {
+                    log.append(line)
+                    if (sessions[id] === current && !current.stopping) UserTaskStore.captureInitialPassword(id, line)
+                }
                 current.process.inputStream.bufferedReader().use { reader ->
                     val buffer = CharArray(4096)
                     val line = StringBuilder()
@@ -98,18 +122,18 @@ class UserTaskEngine(context: Context, private val scope: CoroutineScope) {
                         for (index in 0 until count) {
                             val char = buffer[index]
                             if (char == '\n' || char == '\r') {
-                                if (line.isNotEmpty()) log.append(line.toString())
+                                if (line.isNotEmpty()) append(line.toString())
                                 line.setLength(0); omitted = false
                             } else if (!omitted) {
                                 line.append(char)
                                 if (line.length > 16_000) {
-                                    log.append(AppText.get(R.string.tasks_long_line))
+                                    append(AppText.get(R.string.tasks_long_line))
                                     line.setLength(0); omitted = true
                                 }
                             }
                         }
                     }
-                    if (line.isNotEmpty()) log.append(line.toString())
+                    if (line.isNotEmpty()) append(line.toString())
                 }
             } catch (_: Exception) {
                 readFailed = !current.stopping
@@ -118,7 +142,10 @@ class UserTaskEngine(context: Context, private val scope: CoroutineScope) {
                 withContext(NonCancellable + Dispatchers.IO) {
                     if (readFailed || cancelled) terminate(current)
                     val code = current.process.waitFor()
-                    if (sessions.remove(id, current)) {
+                    val ended = synchronized(outputGate) {
+                        sessions.remove(id, current).also { if (it) UserTaskStore.forgetInitialPassword(id) }
+                    }
+                    if (ended) {
                         UserTaskStore.update(id) { it.copy(
                             phase = if (current.stopping) UserTaskPhase.STOPPED else if (code == 0 && !readFailed) UserTaskPhase.EXITED else UserTaskPhase.FAILED,
                             finishedAt = System.currentTimeMillis(), exitCode = code,
@@ -149,7 +176,10 @@ class UserTaskEngine(context: Context, private val scope: CoroutineScope) {
         repository.removeHistory(id)
     }
 
-    fun clearLog(id: String) = repository.log(id).clear()
+    fun clearLog(id: String) = synchronized(outputGate) {
+        repository.log(id).clear()
+        UserTaskStore.forgetInitialPassword(id)
+    }
 
     private fun record(id: String) = synchronized(historyGate) {
         UserTaskStore.state.value.tasks.firstOrNull { it.definition.id == id }?.let { task ->

@@ -31,6 +31,9 @@
     <string name="tasks_clear_log">清空日志</string>
     <string name="tasks_clear_log_confirm">清空此任务的全部日志？任务运行和程序文件不受影响。</string>
     <string name="tasks_log_hint">仅保留有容量限制的最近输出，常见凭据会脱敏；任务命令和输出不加入管理器诊断包。</string>
+    <string name="tasks_initial_password">初始登录密码</string>
+    <string name="tasks_show_password">查看</string>
+    <string name="tasks_hide_password">隐藏</string>
     <string name="tasks_read_failed">任务配置读取失败，原文件已保留。请重试；持续失败时检查存储空间。</string>
     <string name="tasks_history_failed">任务状态暂未保存，请检查存储空间。当前进程仍由 App 管理。</string>
     <string name="tasks_limit">最多保存 %1$d 个任务，请先删除不需要的任务。</string>
