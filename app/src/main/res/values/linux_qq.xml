@@ -14,7 +14,7 @@
     <string name="qq_open">打开 QQ</string>
     <string name="qq_stop">停止 QQ</string>
     <string name="qq_download_hint">从腾讯官方下载约 198 MiB，支持暂停和继续。</string>
-    <string name="qq_open_hint">打开时自动准备桌面并启动原版 QQ，重复打开复用现有会话。未登录时在 QQ 窗口扫码，离开页面后继续运行。</string>
+    <string name="qq_open_hint">自动准备桌面并启动 QQ，应用你保存的兼容配置。重复打开复用会话，配置变化时重启 QQ；未登录时扫码，离开页面后继续运行。</string>
     <string name="qq_operation_error">操作未完成</string>
     <string name="qq_connections">连接与管理</string>
     <string name="qq_lan">局域网访问</string>

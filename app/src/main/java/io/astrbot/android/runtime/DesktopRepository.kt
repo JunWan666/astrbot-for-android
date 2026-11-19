@@ -6,6 +6,7 @@ import android.system.Os
 import io.astrbot.android.AppText
 import io.astrbot.android.R
 import io.astrbot.android.checkLocalized
+import io.astrbot.android.LocalizedStateException
 import io.astrbot.android.core.SecretRedactor
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 data class DesktopConfiguration(val installed: Boolean = false, val qqInstalled: Boolean = false, val qqUpdateAvailable: Boolean = false)
 
-/** Generic, optional Linux tools. No third-party bridge or installer is bundled or invoked. */
+/** Generic Linux tools; optional library profiles refer only to files supplied by the user. */
 class DesktopRepository(private val context: Context) {
     val directory = File(context.filesDir, "manager/extensions/desktop")
     private val runtime = BootstrapRuntime(context)
@@ -68,6 +69,21 @@ class DesktopRepository(private val context: Context) {
                 staged.writeBytes(contents); Os.chmod(staged.path, 448); Os.rename(staged.path, target.path)
             }
         }
+    }
+
+    /** Validate user-provided startup settings before interrupting a running QQ. */
+    internal suspend fun qqProfileFingerprint(): String? {
+        prepareAssets()
+        val result = runtime.execute("/usr/bin/python3", "$GUEST/guest-compat", "profile-status", timeoutSeconds = 15)
+        val status = result.output.lineSequence().mapNotNull { line ->
+            runCatching { JSONObject(line) }.getOrNull()?.takeIf { it.has("status") }
+        }.lastOrNull()
+        if (result.exitCode == 0) when (status?.optString("status")) {
+            "absent" -> return null
+            "ready" -> status.optString("fingerprint").takeIf { it.matches(Regex("[a-f0-9]{64}")) }?.let { return it }
+            "missing-library" -> throw LocalizedStateException(AppText.get(R.string.qq_profile_library_missing))
+        }
+        throw LocalizedStateException(AppText.get(R.string.qq_profile_invalid))
     }
 
     suspend fun recoverProcesses(role: String, session: String? = null) {

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Launch a user-provided guest program with optional glibc compatibility."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -9,6 +10,40 @@ import tempfile
 
 ROOT = Path('/manager/extensions/desktop')
 PROFILE = ROOT / 'compat-profile.json'
+
+
+class ProfileError(Exception):
+    def __init__(self, status):
+        self.status = status
+        super().__init__(status)
+
+
+def read_profile():
+    try:
+        with PROFILE.open('rb') as stream:
+            raw = stream.read(8193)
+    except FileNotFoundError:
+        if PROFILE.is_symlink():
+            raise ProfileError('invalid')
+        return None, None
+    except OSError:
+        raise ProfileError('invalid')
+    try:
+        if not 1 <= len(raw) <= 8192:
+            raise ValueError('size')
+        data = json.loads(raw)
+        library, symbol, module, delay = (data[key] for key in ('library', 'symbol', 'waitModule', 'delayMs'))
+        if (not all(isinstance(value, str) and '\x00' not in value and '\n' not in value and '\r' not in value
+                    for value in (library, symbol, module))
+                or not Path(library).is_absolute()
+                or not symbol or not symbol.isascii() or not symbol.replace('_', 'a').isalnum()
+                or type(delay) is not int or not 0 <= delay <= 300000):
+            raise ValueError('fields')
+    except (ValueError, KeyError, TypeError):
+        raise ProfileError('invalid')
+    if not Path(library).is_file():
+        raise ProfileError('missing-library')
+    return data, hashlib.sha256(raw).hexdigest()
 
 
 def configure(arguments):
@@ -26,7 +61,7 @@ def configure(arguments):
     if not 0 <= args.delay_ms <= 300000:
         parser.error('Delay must be between 0 and 300000 ms')
     data = dict(library=str(library), symbol=args.symbol, waitModule=args.wait_module, delayMs=args.delay_ms)
-    if any('\x00' in str(value) or '\n' in str(value) for value in data.values()):
+    if any('\x00' in str(value) or '\n' in str(value) or '\r' in str(value) for value in data.values()):
         parser.error('Configuration values must be single lines')
     fd, name = tempfile.mkstemp(prefix='.compat-profile-', dir=ROOT)
     try:
@@ -37,7 +72,7 @@ def configure(arguments):
         os.replace(name, PROFILE)
     finally:
         Path(name).unlink(missing_ok=True)
-    print('Optional desktop startup profile saved. Programs and account files were not changed.')
+    print('Startup profile saved. Open QQ to apply it; an App-managed QQ restarts if its profile changed.')
 
 
 def main():
@@ -47,7 +82,14 @@ def main():
         return
     if arguments == ['clear-profile']:
         PROFILE.unlink(missing_ok=True)
-        print('Optional startup profile removed.')
+        print('Startup profile removed. Open QQ to return to its normal launch.')
+        return
+    if arguments == ['profile-status']:
+        try:
+            data, fingerprint = read_profile()
+            print(json.dumps(dict(status='ready' if data is not None else 'absent', fingerprint=fingerprint)))
+        except ProfileError as failure:
+            print(json.dumps(dict(status=failure.status)))
         return
     use_profile = bool(arguments and arguments[0] == '--profile')
     if use_profile:
@@ -68,15 +110,17 @@ def main():
                ASTRBOT_COMPAT_LOCK_HELPER=str(ROOT / 'proc_locks.py'))
     existing = env.get('LD_PRELOAD', '').split()
     env['LD_PRELOAD'] = ' '.join([str(library), *(item for item in existing if item != str(library))])
-    if use_profile and PROFILE.is_file():
-        if PROFILE.stat().st_size > 8192:
-            raise SystemExit('Invalid optional startup profile size.')
-        data = json.loads(PROFILE.read_text())
-        if not Path(data['library']).is_file():
-            raise SystemExit('The configured external library is missing. Restore it or run guest-compat clear-profile.')
-        env.update(ASTRBOT_COMPAT_INIT_LIBRARY=data['library'], ASTRBOT_COMPAT_INIT_SYMBOL=data['symbol'],
-                   ASTRBOT_COMPAT_WAIT_MODULE=data['waitModule'], ASTRBOT_COMPAT_INIT_DELAY_MS=str(data['delayMs']),
-                   ASTRBOT_COMPAT_TARGET_NAME=Path(arguments[0]).name)
+    if use_profile:
+        try:
+            data, _ = read_profile()
+        except ProfileError as failure:
+            raise SystemExit('The configured external library is missing. Restore it or run guest-compat clear-profile.'
+                             if failure.status == 'missing-library'
+                             else 'Cannot read the startup profile. Configure it again or run guest-compat clear-profile.')
+        if data is not None:
+            env.update(ASTRBOT_COMPAT_INIT_LIBRARY=data['library'], ASTRBOT_COMPAT_INIT_SYMBOL=data['symbol'],
+                       ASTRBOT_COMPAT_WAIT_MODULE=data['waitModule'], ASTRBOT_COMPAT_INIT_DELAY_MS=str(data['delayMs']),
+                       ASTRBOT_COMPAT_TARGET_NAME=Path(arguments[0]).name)
     os.execvpe(arguments[0], arguments, env)
 
 

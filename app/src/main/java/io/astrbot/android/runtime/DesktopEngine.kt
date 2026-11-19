@@ -36,6 +36,7 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
     private val lifecycle = Mutex()
     private var process: Owned? = null
     private var qq: Owned? = null
+    private var qqProfileFingerprint: String? = null
     private var output: Job? = null
     private var qqOutput: Job? = null
     private var monitor: Job? = null
@@ -104,17 +105,19 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
     }
 
     suspend fun startQq() = withContext(Dispatchers.IO) { lifecycle.withLock {
-        if (qq?.process?.isAlive == true && DesktopStore.state.value.qqRunning) return@withLock
+        val profile = repository.qqProfileFingerprint()
+        if (qq?.process?.isAlive == true && DesktopStore.state.value.qqRunning && qqProfileFingerprint == profile) return@withLock
         DesktopStore.state.update { it.copy(qqStarting = true, error = null) }
         try {
-            startQqLocked()
+            startQqLocked(profile)
         }
         catch (failure: Exception) { withContext(NonCancellable) { stopQqLocked() }; throw failure }
         finally { DesktopStore.state.update { it.copy(qqStarting = false) } }
     } }
 
-    private suspend fun startQqLocked() {
-        if (qq?.process?.isAlive == true) return
+    private suspend fun startQqLocked(profile: String?) {
+        if (qq?.process?.isAlive == true && qqProfileFingerprint != profile)
+            RuntimeStore.log(context, LogCategory.DESKTOP).append(AppText.get(R.string.qq_profile_restarting))
         stopQqLocked()
         checkLocalized(repository.configuration().qqInstalled) { AppText.get(R.string.desktop_qq_install_first) }
         startLocked()
@@ -123,6 +126,7 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
         } }
         val owned = launch("qq", "${DesktopRepository.GUEST}/qq.sh")
         qq = owned
+        qqProfileFingerprint = profile
         qqOutput = drain(owned.process, "QQ")
         // A live launcher alone does not mean the application has opened a window.
         withTimeoutOrNull(60_000) {
@@ -139,7 +143,7 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
             while (isActive && qq === owned && owned.process.isAlive) delay(1500)
             lifecycle.withLock {
                 if (qq === owned) {
-                    qq = null; qqMonitor = null
+                    qq = null; qqMonitor = null; qqProfileFingerprint = null
                     RuntimeStore.log(context, LogCategory.DESKTOP).append("[QQ] launcher exited: ${owned.process.exitValue()}")
                     val previousOutput = qqOutput; qqOutput = null
                     val error = try {
@@ -173,6 +177,7 @@ class DesktopEngine(private val context: Context, private val scope: CoroutineSc
 
     private suspend fun stopQqLocked() {
         val owned = qq; qq = null
+        qqProfileFingerprint = null
         qqMonitor?.cancelAndJoin(); qqMonitor = null
         val previousOutput = qqOutput; qqOutput = null
         try { finish("qq", owned, previousOutput) }
