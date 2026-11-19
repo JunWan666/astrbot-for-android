@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.5.0-3867FF?style=flat-square" alt="Version 1.5.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.5.1-3867FF?style=flat-square" alt="Version 1.5.1" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="../LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -35,7 +35,7 @@
 
 Built with Kotlin and Jetpack Compose, the app provides native management in Simplified Chinese and English. Connect QQ official bots and official WeChat ClawBot from Home, and use the embedded AstrBot WebUI for models, plugins and personas. Terminal and Tasks run user-deployed Ubuntu programs; optional extensions include LAN access, SSH, Linux QQ and cpolar.
 
-Latest stable release: **1.5.0**, with an AstrBot-focused home, native QQ official bot and official WeChat ClawBot configuration, general task management, standalone Linux QQ, and runtime, update, backup and diagnostics improvements. See the [changelog (Chinese)](CHANGELOG.md) for upgrade notes and the full list of changes.
+Latest stable release: **1.5.1**, with direct offline AstrBot update imports, a fix for first-login password setup, and improvements to Linux QQ startup, task logs and the built-in browser. See the [changelog (Chinese)](CHANGELOG.md) for upgrade notes and the full list of changes.
 
 ### About NapCat and SnowLuma
 
@@ -164,6 +164,8 @@ The keystore and credentials stay in the Git-ignored `.local/signing/` directory
 **Settings → About → Check for updates** manages app APK updates. A dialog shows release notes and offers an in-app download or an external browser. The in-app download verifies the APK and opens the system installer; if installation permission is missing, the app guides you to settings and continues when you return. A message confirms when the latest applicable version is installed. AstrBot retains its component update entry. The in-app flow retains signature verification, resumable downloads, snapshots before installation and component rollback. Android asks you to confirm APK installation.
 
 App APK updates use this project's signed GitHub channel. AstrBot checks its **official GitHub stable releases** directly by default. Review the notes and choose **Download and update** to download, verify, back up and install; custom builds can still use signed catalogs. AstrBot updates include matching source and dashboard files. Missing Python dependencies or unsupported migration implementations stop the update before replacement. New upstream versions may be incompatible with existing adapters, dependencies or plugins; failed service checks restore the previous program and data. See [updates and distribution (Chinese)](更新与分发.md) for details.
+
+Version 1.5.1 can import matching source and Dashboard ZIPs offline, together or separately, or accept a single archive containing both. It also adds an optional Alpha/Beta/RC channel and Markdown release notes. See the [1.5.1 changelog (Chinese)](CHANGELOG.md#v151).
 
 ## Community
 

@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/Ubuntu-PRoot-E95420?style=for-the-badge&amp;logo=ubuntu&amp;logoColor=white" alt="PRoot Ubuntu" />
   </p>
   <p>
-    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.5.0-3867FF?style=flat-square" alt="Version 1.5.0" /></a>
+    <a href="https://github.com/JunWan666/astrbot-for-android/releases/latest"><img src="https://img.shields.io/badge/Version-1.5.1-3867FF?style=flat-square" alt="Version 1.5.1" /></a>
     <img src="https://img.shields.io/badge/Android-8.0%2B-3DDC84?style=flat-square&amp;logo=android&amp;logoColor=white" alt="Android 8.0 and above" />
     <img src="https://img.shields.io/badge/Architecture-ARM64-64748B?style=flat-square" alt="ARM64" />
     <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-18A978?style=flat-square" alt="MIT License" /></a>
@@ -35,7 +35,7 @@
 
 应用采用 Kotlin 与 Jetpack Compose 构建原生管理界面，支持简体中文与英文。从首页接入 QQ 官方机器人和微信官方 ClawBot，通过内置 WebView 配置 AstrBot 的模型、插件与人设；终端和任务页用于运行自行部署的 Ubuntu 程序，另提供局域网访问、SSH、Linux QQ 和 cpolar 等扩展。
 
-当前最新正式版为 **1.5.0**：首页聚焦 AstrBot，新增 QQ 官方机器人与微信官方 ClawBot 配置入口、通用任务管理，Linux QQ 保留为独立桌面扩展，并完善环境兼容、更新、备份与诊断。升级影响及完整变更见[更新记录](docs/CHANGELOG.md)。
+当前最新正式版为 **1.5.1**：支持直接离线导入 AstrBot 上游更新包，修复首次登录设密跳转，并改进 Linux QQ 启动兼容、任务日志和内置网页操作。升级影响及完整变更见[更新记录](docs/CHANGELOG.md)。
 
 ### 关于 NapCat 与 SnowLuma
 
@@ -160,6 +160,8 @@ cpolar 在“设置 → 扩展组件”中单独下载安装，客户端不打�
 “设置 → 关于 → 检查更新”管理 App 安装包：发现新版后弹窗显示说明，可选择“下载并安装”或使用外部浏览器下载。内置下载完成后自动校验，再进入系统安装器；缺少安装权限时引导授权，返回后继续。当前已是适用的最新版本时会明确提示。AstrBot 保留独立程序更新。内置流程保留签名校验、断点续传、安装前快照和组件失败回退，APK 安装由系统确认。
 
 管理器 APK 使用本项目 GitHub 签名通道。AstrBot 默认直接检查其**官方 GitHub 最新稳定 Release**，查看说明后点击“下载并更新”，连续完成下载、检查、备份和安装；定制构建仍支持原有签名目录。AstrBot 同时更新源码与匹配 WebUI，现有 Python 依赖或数据迁移实现不满足时会在替换前停止；上游新版不保证兼容现有依赖或插件，服务检查失败时恢复原程序和数据。配置方式见[更新与分发](docs/更新与分发.md)。
+
+1.5.1 支持分次离线导入同版源码与 Dashboard ZIP，或单选包含两者的完整包。更新前会显示已选与待补文件；可主动选择 Alpha、Beta、RC 预发布通道，更新说明支持 Markdown。详见 [1.5.1 更新记录](docs/CHANGELOG.md#v151)。
 
 ## 交流与反馈
 
